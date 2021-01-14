@@ -51,6 +51,7 @@ export default {
         'faUserAlt',
         'faChevronDown',
         'faSearch',
+        'faInfo',
       ],
       regular: ['faCaretSquareDown'],
     },

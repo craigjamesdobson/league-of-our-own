@@ -1,20 +1,11 @@
 <template>
   <div class="flex flex-col w-3/4">
-    <!-- <div class="filters mb-4 flex-col w-full">
-      <button
-        class="border-2 border-green-600 p-2"
-        @click="initPlayerData(null, null, 1)"
-      >
-        Filter Goalkeepers
-      </button>
-    </div> -->
-    <!-- Goalkeeper List -->
-    <template v-for="(playerTypes, key, index) in playerData">
-      <h2 :key="playerTypes[index]" class="player-heading">
+    <div v-for="(playerTypes, key, index) in playerData" :key="index">
+      <h2 class="player-heading">
         {{ key }}
       </h2>
       <div
-        :key="playerTypes[index]"
+        v-if="playerTypes.length"
         class="flex justify-between mb-4 bg-white rounded-xl"
       >
         <div class="py-2 px-4 border-r border-gray-100 w-full">
@@ -83,7 +74,21 @@
           </ul>
         </div>
       </div>
-    </template>
+      <div v-else>
+        <div
+          class="flex items-center p-2 mb-4 bg-blue-200 rounded-sm text-blue-800 text-sm"
+        >
+          <span
+            class="flex items-center justify-center bg-blue-300 w-5 h-5 mr-4 rounded-full"
+            ><font-awesome-icon
+              class="fa-xs text-blue-800"
+              :icon="['fa', 'info']"
+          /></span>
+          No results for filtered
+          <span class="font-bold ml-1"> {{ key }} </span>, please adjust filters
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>

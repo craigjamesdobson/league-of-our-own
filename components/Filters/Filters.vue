@@ -34,6 +34,7 @@
             class="placeholder-gray-800 placeholder-opacity-50 bg-gray-100 text-sm w-full focus:outline-none"
             @change="filterPlayers"
           >
+            <option selected="selected" value="">All</option>
             <option
               v-for="price in pricesAvailable"
               :key="price"
@@ -55,8 +56,8 @@ export default {
   setup() {
     const { store } = useContext()
     const filterData = reactive({
-      filterName: null,
-      filterPrice: null,
+      filterName: '',
+      filterPrice: '',
       filterTeam: null,
     })
     const pricesAvailable = [

@@ -53,31 +53,7 @@ export const getters = {
       ),
     }
   },
+  getTeams: (state: State) => {
+    return state.teams
+  },
 }
-
-// const getFilteredPlayers = (
-//   playerData: Player[],
-//   filterName?: string,
-//   filterPrice?: string,
-//   filterTeam?: number
-// ) => {
-//   const FilterName = filterName || ''
-//   const FilterPrice = filterPrice || ''
-//   const FilterTeam = filterTeam || null
-
-//   let filteredPlayers = playerData.filter((p) =>
-//     p.name
-//       .normalize('NFD')
-//       .replace(/[\u0300-\u036F]/g, '')
-//       .toLowerCase()
-//       .includes(FilterName)
-//   )
-
-//   filteredPlayers = filteredPlayers.filter((p) => p.price.includes(FilterPrice))
-
-//   if (FilterTeam !== null) {
-//     filteredPlayers = filteredPlayers.filter((p) => p.teamID === FilterTeam)
-//   }
-
-//   return filteredPlayers
-// }

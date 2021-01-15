@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col w-3/4">
     <div v-for="(playerTypes, key, index) in playerData" :key="index">
-      <h2 class="player-heading">
+      <h2 class="player-heading capitalize">
         {{ key }}
       </h2>
       <div
@@ -76,7 +76,7 @@
       </div>
       <div v-else>
         <div
-          class="flex items-center p-2 mb-4 bg-blue-200 rounded-sm text-blue-800 text-sm"
+          class="flex items-center p-3 mb-4 bg-blue-200 rounded-b-sm border-t-2 shadow-sm border-blue-700 text-blue-700 text-sm"
         >
           <span
             class="flex items-center justify-center bg-blue-300 w-5 h-5 mr-4 rounded-full"

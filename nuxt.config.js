@@ -40,6 +40,7 @@ export default {
     '@nuxtjs/tailwindcss',
     '@nuxtjs/composition-api',
     '@nuxtjs/fontawesome',
+    '@nuxtjs/svg-sprite',
   ],
 
   fontawesome: {

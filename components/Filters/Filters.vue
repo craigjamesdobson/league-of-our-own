@@ -1,7 +1,7 @@
 <template>
   <div class="filter-container">
     <h2 class="mb-4 text-2xl px-4">Filters</h2>
-    <div class="h-64 justify-between mb-4 bg-white rounded-xl p-4">
+    <div class="justify-between mb-4 bg-white rounded-xl p-4">
       <div class="mb-4">
         <label class="flex text-xs mb-2" for="filter_name"
           >Filter by name</label
@@ -22,7 +22,7 @@
           />
         </div>
       </div>
-      <div>
+      <div class="mb-4">
         <label class="flex text-xs mb-2" for="filter_name"
           >Filter by price</label
         >
@@ -45,16 +45,31 @@
           </select>
         </div>
       </div>
+      <div>
+        <label class="flex text-xs mb-2 w-full" for="filter_name"
+          >Filter by team</label
+        >
+        <div class="flex flex-wrap -mx-2 -mb-1">
+          <div
+            v-for="team in teamData"
+            :key="team.id"
+            class="icon-container mb-2"
+          >
+            <svg-icon class="px-2 w-full h-full" :name="team.short_name" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { useContext, reactive } from '@nuxtjs/composition-api'
+import { useContext, reactive, computed } from '@nuxtjs/composition-api'
 
 export default {
   setup() {
     const { store } = useContext()
+    const teamData = computed(() => store.getters.getTeams)
     const filterData = reactive({
       filterName: '',
       filterPrice: '',
@@ -82,7 +97,7 @@ export default {
       store.commit('UPDATE_PLAYERS', filterData)
     }
 
-    return { filterPlayers, filterData, pricesAvailable }
+    return { filterPlayers, filterData, teamData, pricesAvailable }
   },
 }
 </script>
@@ -91,5 +106,11 @@ export default {
 .filter-container {
   @apply px-4 w-1/4 h-64 sticky;
   top: 5.5rem;
+}
+
+.icon-container {
+  @apply h-8;
+  width: 10%;
+  filter: grayscale(1);
 }
 </style>

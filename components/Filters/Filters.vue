@@ -2,7 +2,7 @@
   <div class="filter-container">
     <h2 class="mb-4 text-2xl px-4">Filters</h2>
     <div class="justify-between mb-4 bg-white rounded-xl p-4">
-      <div class="mb-4">
+      <div class="pb-3 border-b border-gray-100 mb-3">
         <label class="flex text-xs mb-2" for="filter_name"
           >Filter by name</label
         >
@@ -22,7 +22,7 @@
           />
         </div>
       </div>
-      <div class="mb-4">
+      <div class="pb-3 border-b border-gray-100 mb-3">
         <label class="flex text-xs mb-2" for="filter_name"
           >Filter by price</label
         >
@@ -49,11 +49,13 @@
         <label class="flex text-xs mb-2 w-full" for="filter_name"
           >Filter by team</label
         >
-        <div class="flex flex-wrap -mx-2 -mb-1">
+        <div class="flex flex-wrap -mx-2 -mb-1 cursor-pointer">
           <div
             v-for="team in teamData"
             :key="team.id"
+            :data-teamID="team.id"
             class="icon-container mb-2"
+            @click="selectfilteredTeam"
           >
             <svg-icon class="px-2 w-full h-full" :name="team.short_name" />
           </div>
@@ -93,24 +95,44 @@ export default {
       '12.0',
     ]
 
+    const selectfilteredTeam = (event) => {
+      document
+        .querySelectorAll('.icon-container')
+        .forEach((e) => e.classList.remove('active'))
+      event.currentTarget.classList.add('active')
+      filterData.filterTeam = +event.currentTarget.dataset.teamid
+      filterPlayers()
+    }
+
     const filterPlayers = () => {
       store.commit('UPDATE_PLAYERS', filterData)
     }
 
-    return { filterPlayers, filterData, teamData, pricesAvailable }
+    return {
+      filterPlayers,
+      filterData,
+      teamData,
+      pricesAvailable,
+      selectfilteredTeam,
+    }
   },
 }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
 .filter-container {
   @apply px-4 w-1/4 h-64 sticky;
   top: 5.5rem;
 }
 
 .icon-container {
-  @apply h-8;
+  @apply transition-all duration-200 ease-in-out h-8;
   width: 10%;
   filter: grayscale(1);
+
+  &.active {
+    filter: grayscale(0);
+    transform: scale(1.2);
+  }
 }
 </style>

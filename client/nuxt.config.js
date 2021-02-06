@@ -27,7 +27,7 @@ export default {
   css: ['~assets/scss/animations.scss', '~assets/scss/main.scss'],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [],
+  plugins: ['~/plugins/vee-validate.js'],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
@@ -53,6 +53,7 @@ export default {
         'faChevronDown',
         'faSearch',
         'faInfo',
+        'faSignInAlt',
       ],
       regular: ['faCaretSquareDown'],
     },
@@ -74,5 +75,7 @@ export default {
   axios: {},
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
-  build: {},
+  build: {
+    transpile: ['vee-validate/dist/rules'],
+  },
 }

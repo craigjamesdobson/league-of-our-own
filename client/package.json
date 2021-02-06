@@ -17,8 +17,10 @@
     "@nuxtjs/composition-api": "^0.17.0",
     "@nuxtjs/pwa": "^3.0.2",
     "@nuxtjs/svg-sprite": "^0.5.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "nuxt": "^2.14.6",
+    "vee-validate": "^3.4.5",
     "vuex-composition-helpers": "^1.0.22"
   },
   "devDependencies": {

@@ -26,21 +26,24 @@
       </li>
     </ul>
 
-    <div class="text-white text-center">
+    <nuxt-link
+      v-if="!userData._id"
+      to="/register"
+      class="flex items-center justify-center h-10 w-10 text-center bg-white rounded-full"
+    >
       <!-- User info -->
-      <img
-        class="h-10 w-10 border-2 border-white rounded-full object-cover m-auto"
-        src="https://appzzang.me/data/editor/1608/f9c387cb6bd7a0b004f975cd92cbe2d9_1471626325_6802.png"
-        alt="enoshima profile"
-      />
-    </div>
+      <font-awesome-icon :icon="['fa', 'sign-in-alt']" />
+    </nuxt-link>
   </nav>
 </template>
 
 <script>
-import { reactive } from '@nuxtjs/composition-api'
+import { reactive, useContext, computed } from '@nuxtjs/composition-api'
+
 export default {
   setup() {
+    const { store } = useContext()
+    const userData = computed(() => store.getters.getUser)
     const routes = reactive([
       {
         title: 'Dashboard',
@@ -58,12 +61,12 @@ export default {
         path: '/players',
       },
     ])
-    return { routes }
+    return { routes, userData }
   },
 }
 </script>
 
-<style lang="postcss" scoped>
+<style lang="scss" scoped>
 .nuxt-link-exact-active {
   @apply bg-opacity-100;
 }

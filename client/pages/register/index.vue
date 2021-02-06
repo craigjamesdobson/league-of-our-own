@@ -137,6 +137,10 @@ export default {
   @apply border-red-600 bg-red-100;
 }
 
+.valid {
+  @apply border-green-600 bg-green-100;
+}
+
 .error-message {
   @apply text-xs text-red-600;
 }

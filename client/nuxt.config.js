@@ -54,6 +54,8 @@ export default {
         'faSearch',
         'faInfo',
         'faSignInAlt',
+        'faExclamationCircle',
+        'faCheckCircle',
       ],
       regular: ['faCaretSquareDown'],
     },

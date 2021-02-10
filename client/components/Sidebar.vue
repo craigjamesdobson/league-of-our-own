@@ -27,12 +27,18 @@
     </ul>
 
     <nuxt-link
-      v-if="!userData._id"
+      v-if="!isLoggedIn"
       to="/register"
       class="flex items-center justify-center h-10 w-10 text-center bg-white rounded-full"
     >
-      <!-- User info -->
       <font-awesome-icon :icon="['fa', 'sign-in-alt']" />
+    </nuxt-link>
+    <nuxt-link
+      v-else-if="isLoggedIn"
+      to="/account"
+      class="flex items-center justify-center h-10 w-10 text-center bg-white rounded-full"
+    >
+      <font-awesome-icon class="fa-2x" :icon="['fas', 'user-circle']" />
     </nuxt-link>
   </nav>
 </template>
@@ -43,7 +49,7 @@ import { reactive, useContext, computed } from '@nuxtjs/composition-api'
 export default {
   setup() {
     const { store } = useContext()
-    const userData = computed(() => store.getters.getUser)
+    const isLoggedIn = computed(() => store.getters.isLoggedIn)
     const routes = reactive([
       {
         title: 'Dashboard',
@@ -61,7 +67,7 @@ export default {
         path: '/players',
       },
     ])
-    return { routes, userData }
+    return { routes, isLoggedIn }
   },
 }
 </script>

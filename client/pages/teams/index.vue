@@ -12,6 +12,8 @@ import teamsJson from '@/static/teams.json'
 import { reactive } from '@nuxtjs/composition-api'
 
 export default {
+  middleware: 'auth',
+
   setup() {
     const teams = reactive(teamsJson)
 

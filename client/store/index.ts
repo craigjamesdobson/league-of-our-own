@@ -8,11 +8,17 @@ import { Player } from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import { UPDATE_PLAYERS, GET_TEAMS, REGISTER_USER } from './mutation-types'
 
+interface User {
+  name: string
+  tokens: []
+  role: string
+}
+
 interface State {
   players: any
   teams: any
   loading: boolean
-  user: {}
+  user: User
 }
 
 export const state = () => ({
@@ -21,7 +27,7 @@ export const state = () => ({
   loading: false,
   user: {
     name: '',
-    token: localStorage.getItem('token') || '',
+    tokens: localStorage.getItem('token') || '',
     role: '',
   },
 })
@@ -52,6 +58,7 @@ export const actions = {
       .then((res) => {
         commit('REGISTER_USER', res.data.user)
         localStorage.setItem('token', res.data.token)
+        axios.defaults.headers.common.Authorization = res.data.token
         this.app.router.push('/players')
       })
       .catch((err) => {
@@ -84,4 +91,6 @@ export const getters = {
   getUser: (state: State) => {
     return state.user
   },
+
+  isLoggedIn: (state: State) => !!state.user.tokens,
 }

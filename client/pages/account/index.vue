@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Hello {{ userName }}</h1>
+    <h1>Hello {{ userData.name }}</h1>
   </div>
 </template>
 
@@ -13,9 +13,8 @@ export default {
   setup() {
     const { store } = useContext()
     const userData = computed(() => store.getters.getUser)
-    const userName = userData.value.name || 'Joe Bloggs'
 
-    return { userName }
+    return { userData }
   },
 }
 </script>

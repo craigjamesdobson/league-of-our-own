@@ -28,7 +28,7 @@
 
     <nuxt-link
       v-if="!isLoggedIn"
-      to="/register"
+      to="/account/login"
       class="flex items-center justify-center h-10 w-10 text-center bg-white rounded-full"
     >
       <font-awesome-icon :icon="['fa', 'sign-in-alt']" />

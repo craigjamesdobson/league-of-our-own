@@ -17,11 +17,20 @@
 </template>
 
 <script>
+import { useContext, computed } from '@nuxtjs/composition-api'
 import Sidebar from '@/components/Sidebar'
 
 export default {
   components: {
     Sidebar,
+  },
+  setup() {
+    const { store } = useContext()
+    const isLoggedIn = computed(() => store.getters.isLoggedIn)
+
+    if (isLoggedIn.value) {
+      store.dispatch('fetchUser')
+    }
   },
 }
 </script>

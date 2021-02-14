@@ -1,3 +1,3 @@
 export const GET_TEAMS = 'GET_TEAMS'
 export const UPDATE_PLAYERS = 'UPDATE_PLAYERS'
-export const REGISTER_USER = 'REGISTER_USER'
+export const SET_USER = 'SET_USER'

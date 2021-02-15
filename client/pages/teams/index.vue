@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-col">
     <h1>Teams</h1>
     <ul>
       <li v-for="team in teams" :key="team.id">{{ team.name }}</li>

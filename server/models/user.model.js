@@ -67,7 +67,9 @@ userSchema.methods.isPasswordMatch = async function (password) {
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
 
-  const token = jwt.sign({ _id: user._id.toString() }, config.jwt.secret);
+  const token = jwt.sign({ _id: user._id.toString() }, config.jwt.secret, {
+    expiresIn: `1m`,
+  });
 
   user.tokens = { token };
   console.log(user);

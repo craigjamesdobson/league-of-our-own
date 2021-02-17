@@ -91,6 +91,7 @@ export const actions = {
         axios.defaults.headers.common.Authorization = res.data.tokens[0].token
       })
       .catch((err) => {
+        localStorage.removeItem('token')
         commit('SET_USER', {})
         this.app.router.push('/account/login')
         throw err.response.data

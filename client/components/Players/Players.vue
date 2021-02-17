@@ -18,13 +18,14 @@
             >
               <div class="flex w-full">
                 <span class="w-1/12 p-2">{{ player.id }}</span>
-                <span class="w-1/12 p-2"
-                  ><img
+                <span class="w-1/12 p-2">
+                  <img
                     class="w-6 h-6 rounded-full shadow-md"
                     :src="player.image"
                     :alt="player.name"
-                    onerror="this.src='https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/40x40/Photo-Missing.png'"
-                /></span>
+                    @error="loadFallbackImage"
+                  />
+                </span>
                 <span class="w-2/12 p-2">{{ player.teamShort }}</span>
                 <span class="w-5/12 p-2 text-center">{{ player.name }}</span>
                 <span class="w-2/12 p-2">{{ player.price }}</span>
@@ -80,12 +81,15 @@
         >
           <span
             class="flex items-center justify-center bg-blue-300 w-5 h-5 mr-4 rounded-full"
-            ><font-awesome-icon
+          >
+            <font-awesome-icon
               class="fa-xs text-blue-800"
               :icon="['fa', 'info']"
-          /></span>
+            />
+          </span>
           No results for filtered
-          <span class="font-bold ml-1"> {{ key }} </span>, please adjust filters
+          <span class="font-bold ml-1">{{ key }}</span>
+          , please adjust filters
         </div>
       </div>
     </div>
@@ -99,8 +103,14 @@ export default {
     const { store } = useContext()
     const playerData = computed(() => store.getters.getFilteredPlayerData)
 
+    const loadFallbackImage = (e) => {
+      e.target.src =
+        'https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/40x40/Photo-Missing.png'
+    }
+
     return {
       playerData,
+      loadFallbackImage,
     }
   },
 }

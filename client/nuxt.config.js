@@ -69,6 +69,7 @@ export default {
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
     '@nuxtjs/style-resources',
+    'portal-vue/nuxt',
   ],
   styleResources: {
     scss: ['./assets/scss/*.scss'],

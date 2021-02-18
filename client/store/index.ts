@@ -106,6 +106,10 @@ export const actions = {
 }
 
 export const getters = {
+  getPlayerData: (state: State) => {
+    return state.players
+  },
+
   getFilteredPlayerData: (state: State) => {
     return {
       goalkeepers: state.players.filteredPlayers.filter(
@@ -122,6 +126,7 @@ export const getters = {
       ),
     }
   },
+
   getTeams: (state: State) => {
     return state.teams
   },

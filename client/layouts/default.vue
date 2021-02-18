@@ -13,6 +13,7 @@
         <Nuxt class="flex mx-10 my-2" keep-alive />
       </div>
     </main>
+    <portal-target name="modals"></portal-target>
   </div>
 </template>
 

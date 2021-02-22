@@ -57,6 +57,8 @@ export default {
         'faExclamationCircle',
         'faCheckCircle',
         'faUserCircle',
+        'faTimes',
+        'faRedo',
       ],
       regular: ['faCaretSquareDown'],
     },
@@ -82,4 +84,8 @@ export default {
   build: {
     transpile: ['vee-validate/dist/rules'],
   },
+  server: {
+    port: 3000, // default: 3000
+    host: '0.0.0.0', // default: localhost
+  }, // other configs
 }

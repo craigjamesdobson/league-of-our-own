@@ -3,9 +3,9 @@
     <h2 class="mb-4 text-2xl px-4">Filters</h2>
     <div class="justify-between mb-4 bg-white rounded-xl p-4">
       <div class="pb-3 border-b border-gray-100 mb-3">
-        <label class="flex text-xs mb-2" for="filter_name"
-          >Filter by name</label
-        >
+        <label class="flex text-xs mb-2" for="filter_name">
+          Filter by name
+        </label>
         <div class="flex items-center bg-gray-100 py-1 px-2 rounded">
           <input
             id="filter_name"
@@ -23,9 +23,9 @@
         </div>
       </div>
       <div class="pb-3 border-b border-gray-100 mb-3">
-        <label class="flex text-xs mb-2" for="filter_name"
-          >Filter by price</label
-        >
+        <label class="flex text-xs mb-2" for="filter_name">
+          Filter by price
+        </label>
         <div class="flex items-center bg-gray-100 py-1 px-2 rounded">
           <select
             id="filter_number"
@@ -46,9 +46,18 @@
         </div>
       </div>
       <div>
-        <label class="flex text-xs mb-2 w-full" for="filter_name"
-          >Filter by team</label
+        <label
+          class="flex justify-between text-xs mb-2 w-full"
+          for="filter_name"
         >
+          Filter by team
+          <button @click="selectfilteredTeam" title="clear team selection">
+            <font-awesome-icon
+              :icon="['fa', 'redo']"
+              class="fa-sm text-gray-900"
+            />
+          </button>
+        </label>
         <div class="flex flex-wrap -mx-2 -mb-1 cursor-pointer">
           <div
             v-for="team in teamData"

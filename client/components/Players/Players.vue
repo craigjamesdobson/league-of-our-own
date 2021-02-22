@@ -14,7 +14,7 @@
               v-for="player in playerTypes"
               :key="player.id"
               class="player-row relative w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm cursor-pointer"
-              @click.stop="showPlayerData(player.id)"
+              @click.stop="showPlayerDataModal(player.id)"
             >
               <div class="flex w-full">
                 <span class="w-1/12 p-2">{{ player.id }}</span>
@@ -88,61 +88,89 @@
         :class="{
           active: modalIsActive,
         }"
-        @click.self="modalIsActive = false"
+        @click.self="hidePlayerDataModal"
       >
-        <div class="modal-content px-4">
-          <div class="bg-white rounded-xl p-8 lg:max-w-xl shadow-2xl">
+        <div v-if="selectedPlayer" class="modal--content px-4">
+          <div
+            class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer"
+            @click="hidePlayerDataModal"
+          >
+            <font-awesome-icon
+              class="fa-3x text-white"
+              :icon="['fa', 'times']"
+            />
+          </div>
+          <div
+            class="modal--inner"
+            :class="{
+              'border-4 border-yellow-300':
+                !selectedPlayer.unavailableForSeason &&
+                selectedPlayer.isUnavailable,
+              'border-4 border-red-400': selectedPlayer.unavailableForSeason,
+            }"
+          >
+            <svg-icon
+              class="modal--badge px-2 w-full h-full"
+              :name="selectedPlayer.teamShort"
+            />
             <div class="flex flex-row justify-between items-end">
-              <h4 class="text-2xl md:text-4xl uppercase leading-none">
-                {{ selectedPlayer.name }}
+              <div class="w-24">
+                <img
+                  class="rounded-full"
+                  :src="selectedPlayer.imageLarge"
+                  :alt="selectedPlayer.name"
+                  @error="loadFallbackImage"
+                />
+              </div>
+              <h4
+                class="flex flex-col items-end text-right text-4xl uppercase leading-none"
+              >
+                <span class="text-base mb-2">
+                  {{ selectedPlayer.firstName }}
+                </span>
+                {{ selectedPlayer.secondName }}
               </h4>
-              <div>
-                <img :src="selectedPlayer.image" :alt="selectedPlayer.name" />
-              </div>
             </div>
-            <div class="inner bg-white p-8 my-6 md:my-8 rounded-lg">
-              <p class="text-base md:text-lg mb-4 leading-tight font-bold">
-                To hear more from Kirk on how he can help your business save
-                money please get in touch.
-              </p>
-              <a
-                href="tel:02080661000"
-                class="btn btn-secondary flex justify-center text-lg leading-tighter -mb-2px md:mb-4"
-              >
-                0208 066 1000
-              </a>
-              <a
-                href="mailto:kirk@nicegroup.io"
-                class="btn btn-secondary flex justify-center text-lg leading-tighter -mb-2px md:mb-4"
-              >
-                kirk@nicegroup.io
-              </a>
-              <a
-                href="https://nicegroup.io"
-                rel="noopener"
-                target="_blank"
-                class="btn btn-secondary flex justify-center text-lg leading-tighter -mb-2px md:mb-4"
-              >
-                nicegroup.io
-              </a>
-              <div class="flex flex-row mt-8 justify-center">
-                <a
-                  href="https://www.linkedin.com/company/nice-group-sw-ltd"
-                  rel="noopener"
-                  target="_blank"
+            <div class="inner mt-6 rounded-lg">
+              <div class="flex justify-between items-end">
+                <div
+                  v-if="selectedPlayer.availabilityNews"
+                  class="flex flex-grow items-center mr-4 w-3/4"
                 >
-                  <svg
-                    viewBox="0 0 100 100"
-                    class="w-6 mr-2 focus:outline-none"
+                  <span
+                    class="flex items-center justify-center bg-gray-300 mr-2 w-5 h-5 rounded-full"
                   >
-                    <use xlink:href="svg/sprites.svg#icon-linkedin"></use>
-                  </svg>
-                </a>
+                    <font-awesome-icon
+                      class="fa-xs text-gray-900"
+                      :icon="['fa', 'info']"
+                    />
+                  </span>
+                  <strong class="text-sm">
+                    {{ selectedPlayer.availabilityNews }}
+                  </strong>
+                </div>
+                <ul class="flex flex-col items-end w-1/4 ml-auto">
+                  <li class="flex w-full justify-between">
+                    <span>Goals:</span>
+                    <strong>{{ selectedPlayer.goalsScored }}</strong>
+                  </li>
+                  <li class="flex w-full justify-between">
+                    <span>Assists:</span>
+                    <strong>{{ selectedPlayer.assists }}</strong>
+                  </li>
+                  <li
+                    v-if="
+                      selectedPlayer.playerType === 1 ||
+                      selectedPlayer.playerType === 2
+                    "
+                    class="flex w-full justify-between"
+                  >
+                    <span class="mr-2">Clean Sheets:</span>
+                    <strong>{{ selectedPlayer.cleanSheets }}</strong>
+                  </li>
+                </ul>
               </div>
             </div>
-            <p class="flex justify-center text-lg">
-              © 2020 Nice group (sw) ltd.
-            </p>
           </div>
         </div>
       </div>
@@ -161,10 +189,7 @@ export default {
     const filteredPlayerData = computed(
       () => store.getters.getFilteredPlayerData
     )
-    const selectedPlayer = ref({
-      name: '',
-      image: '',
-    })
+    const selectedPlayer = ref(null)
 
     const modalIsActive = ref(false)
 
@@ -173,17 +198,24 @@ export default {
         'https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/40x40/Photo-Missing.png'
     }
 
-    const showPlayerData = (playerID) => {
+    const showPlayerDataModal = (playerID) => {
       const player = playerData.value.filter((e) => e.id === playerID)
       selectedPlayer.value = { ...player[0] }
       modalIsActive.value = true
+      document.querySelector('body').classList.add('overflow-hidden')
+    }
+
+    const hidePlayerDataModal = () => {
+      modalIsActive.value = false
+      document.querySelector('body').classList.remove('overflow-hidden')
     }
 
     return {
       playerData,
       filteredPlayerData,
       loadFallbackImage,
-      showPlayerData,
+      showPlayerDataModal,
+      hidePlayerDataModal,
       selectedPlayer,
       modalIsActive,
     }
@@ -202,7 +234,7 @@ export default {
   background-color: rgba(30, 30, 30, 0.5);
   opacity: 0;
   visibility: hidden;
-  transform: scale(1.2);
+  transform: scale(1.5);
   transition: visibility 0s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
   z-index: 50;
   overflow-y: auto;
@@ -211,9 +243,27 @@ export default {
     opacity: 1;
     visibility: visible;
     transform: scale(1);
-    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+    transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
+  }
+
+  .modal--inner {
+    @apply bg-white rounded-xl p-8 shadow-2xl relative overflow-hidden z-10;
+    width: 36rem;
+  }
+
+  .modal--badge {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    opacity: 0.1;
+    left: -20%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: -1;
+    pointer-events: none;
   }
 }
+
 .player-row {
   &:hover {
     .player-news {

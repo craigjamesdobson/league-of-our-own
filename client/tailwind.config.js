@@ -12,6 +12,9 @@ module.exports = {
       spacing: {
         sidebar: '18rem',
       },
+      zIndex: {
+        '-1': '-1',
+      },
     },
   },
   variants: {},

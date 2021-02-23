@@ -1,12 +1,20 @@
 /* eslint-disable camelcase */
 
 import axios from 'axios'
-import Players from 'static/players.json'
 import Teams from 'static/teams.json'
-import { initPlayerData } from '@/components/Players/CreatePlayerData'
+import {
+  initPlayerData,
+  getFilteredPlayers,
+} from '@/components/Players/CreatePlayerData'
 import { Player } from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
-import { UPDATE_PLAYERS, GET_TEAMS, SET_USER } from './mutation-types'
+import {
+  FILTER_PLAYERS,
+  FETCH_PLAYERS,
+  GET_TEAMS,
+  SET_USER,
+  SET_LOAD,
+} from './mutation-types'
 
 interface User {
   name: string
@@ -15,16 +23,23 @@ interface User {
 }
 
 interface State {
-  players: any
+  playerData: any
   teams: any
   loading: boolean
   user: User
 }
 
 export const state = () => ({
-  players: initPlayerData(Players),
+  playerData: {
+    players: {
+      players: [],
+    },
+    filteredPlayers: {
+      players: [],
+    },
+  },
   teams: Teams,
-  loading: false,
+  loading: true,
   user: {
     name: '',
     tokens: localStorage.getItem('token') || '',
@@ -37,13 +52,21 @@ export const mutations = {
     state.user = data
   },
 
-  [UPDATE_PLAYERS](state: State, filterData: any) {
-    state.players = initPlayerData(
-      Players,
+  [SET_LOAD](state: State, isLoading: boolean) {
+    state.loading = isLoading
+  },
+
+  [FILTER_PLAYERS](state: State, filterData: any) {
+    state.playerData.filteredPlayers.players = getFilteredPlayers(
+      state.playerData.players.players,
       filterData.filterName,
       filterData.filterPrice,
       filterData.filterTeam
     )
+  },
+
+  [FETCH_PLAYERS](state: State, playerData: any) {
+    state.playerData = initPlayerData(playerData.players)
   },
 
   [GET_TEAMS](state: State, teams: any) {
@@ -98,6 +121,19 @@ export const actions = {
       })
   },
 
+  async fetchPlayers({ commit }: any) {
+    await axios
+      .get('http://localhost:8080/v1/players')
+      .then((res) => {
+        commit('FETCH_PLAYERS', res.data)
+        commit('SET_LOAD', false)
+      })
+      .catch((err) => {
+        commit('SET_LOAD', false)
+        throw err.response.data
+      })
+  },
+
   logoutUser({ commit }: any) {
     commit('SET_USER', {})
     localStorage.removeItem('token')
@@ -107,21 +143,21 @@ export const actions = {
 
 export const getters = {
   getPlayerData: (state: State) => {
-    return state.players
+    return state.playerData
   },
 
   getFilteredPlayerData: (state: State) => {
     return {
-      goalkeepers: state.players.filteredPlayers.filter(
+      goalkeepers: state.playerData.filteredPlayers.players.filter(
         (p: Player) => p.playerType === PlayerPositionShort.GK
       ),
-      defenders: state.players.filteredPlayers.filter(
+      defenders: state.playerData.filteredPlayers.players.filter(
         (p: Player) => p.playerType === PlayerPositionShort.DEF
       ),
-      midfielders: state.players.filteredPlayers.filter(
+      midfielders: state.playerData.filteredPlayers.players.filter(
         (p: Player) => p.playerType === PlayerPositionShort.MID
       ),
-      forwards: state.players.filteredPlayers.filter(
+      forwards: state.playerData.filteredPlayers.players.filter(
         (p: Player) => p.playerType === PlayerPositionShort.FWD
       ),
     }
@@ -136,4 +172,6 @@ export const getters = {
   },
 
   isLoggedIn: (state: State) => !!state.user.tokens,
+
+  isLoading: (state: State) => state.loading,
 }

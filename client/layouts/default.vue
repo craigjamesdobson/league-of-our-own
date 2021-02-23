@@ -32,6 +32,8 @@ export default {
     if (isLoggedIn.value) {
       store.dispatch('fetchUser')
     }
+
+    store.dispatch('fetchPlayers')
   },
 }
 </script>

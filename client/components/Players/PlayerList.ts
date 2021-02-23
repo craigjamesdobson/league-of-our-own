@@ -7,7 +7,6 @@ export class PlayerList {
 
   constructor(players: Player[]) {
     this.players = players
-    this.filteredPlayers = players
   }
 
   public getFilteredPlayers(

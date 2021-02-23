@@ -11,24 +11,42 @@ export function generatePlayerData(playerData: PlayerDataElements[]) {
   return playerList
 }
 
-export function initPlayerData(
-  playerData: any,
-  filterName?: string,
-  filterPrice?: string,
-  filterTeam?: number | null
-) {
+export function initPlayerData(playerData: any) {
   const players = generatePlayerData(playerData)
+  const filteredPlayers = generatePlayerData(playerData)
 
-  const filteredPlayers = players.getFilteredPlayers(
-    filterName,
-    filterPrice,
-    filterTeam!
-  )
-
-  // prettier-ignore
+  players.players.sort((a, b) => a.teamID - b.teamID)
+  filteredPlayers.players.sort((a, b) => a.teamID - b.teamID)
 
   return {
-      filteredPlayers,
-      players,
-    }
+    players,
+    filteredPlayers,
+  }
+}
+
+export function getFilteredPlayers(
+  playerData: Player[],
+  filterName?: string,
+  filterPrice?: string,
+  filterTeam?: number
+) {
+  const FilterName = filterName || ''
+  const FilterPrice = filterPrice || ''
+  const FilterTeam = filterTeam || null
+
+  let filteredPlayers = playerData.filter((p) =>
+    p.name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036F]/g, '')
+      .toLowerCase()
+      .includes(FilterName)
+  )
+
+  filteredPlayers = filteredPlayers.filter((p) => p.price.includes(FilterPrice))
+
+  if (FilterTeam !== null) {
+    filteredPlayers = filteredPlayers.filter((p) => p.teamID === FilterTeam)
+  }
+
+  return filteredPlayers
 }

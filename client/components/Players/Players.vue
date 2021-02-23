@@ -1,6 +1,11 @@
 <template>
   <div class="flex flex-col w-3/4">
-    <div v-for="(playerTypes, key, index) in filteredPlayerData" :key="index">
+    <div v-if="isLoading">Loading...</div>
+    <div
+      v-for="(playerTypes, key, index) in filteredPlayerData"
+      v-else
+      :key="index"
+    >
       <h2 class="player-heading capitalize">
         {{ key }}
       </h2>
@@ -106,7 +111,7 @@
               'border-4 border-yellow-300':
                 !selectedPlayer.unavailableForSeason &&
                 selectedPlayer.isUnavailable,
-              'border-4 border-red-400': selectedPlayer.unavailableForSeason,
+              'border-4 border-red-500': selectedPlayer.unavailableForSeason,
             }"
           >
             <svg-icon
@@ -190,8 +195,8 @@ export default {
       () => store.getters.getFilteredPlayerData
     )
     const selectedPlayer = ref(null)
-
     const modalIsActive = ref(false)
+    const isLoading = computed(() => store.getters.isLoading)
 
     const loadFallbackImage = (e) => {
       e.target.src =
@@ -218,6 +223,7 @@ export default {
       hidePlayerDataModal,
       selectedPlayer,
       modalIsActive,
+      isLoading,
     }
   },
 }
@@ -235,7 +241,7 @@ export default {
   opacity: 0;
   visibility: hidden;
   transform: scale(1.5);
-  transition: visibility 0s linear 0.5s, opacity 0.5s 0s, transform 0.5s;
+  transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
   z-index: 50;
   overflow-y: auto;
 
@@ -243,7 +249,7 @@ export default {
     opacity: 1;
     visibility: visible;
     transform: scale(1);
-    transition: visibility 0s linear 0s, opacity 0.5s 0s, transform 0.5s;
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
   }
 
   .modal--inner {

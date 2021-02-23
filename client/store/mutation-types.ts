@@ -1,3 +1,5 @@
 export const GET_TEAMS = 'GET_TEAMS'
-export const UPDATE_PLAYERS = 'UPDATE_PLAYERS'
+export const FILTER_PLAYERS = 'UPDATE_PLAYERS'
+export const FETCH_PLAYERS = 'FETCH_PLAYERS'
 export const SET_USER = 'SET_USER'
+export const SET_LOAD = 'SET_LOAD'

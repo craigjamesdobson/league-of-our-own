@@ -32,4 +32,7 @@ module.exports = {
       'nuxt.config.ts',
     ],
   },
+  future: {
+    purgeLayersByDefault: true,
+  },
 }

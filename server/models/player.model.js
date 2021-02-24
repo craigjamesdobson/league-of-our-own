@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const playerSchema = new Schema({
+  chance_of_playing_next_round: {
+    type: Number,
+  },
+  chance_of_playing_this_round: {
+    type: Number,
+  },
   code: {
     type: Number,
   },

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col w-3/4">
-    <div v-if="isLoading">Loading...</div>
+    <playerLoadingSkeleton v-if="isLoading"></playerLoadingSkeleton>
     <div
       v-for="(playerTypes, key, index) in filteredPlayerData"
       v-else
@@ -18,7 +18,7 @@
             <li
               v-for="player in playerTypes"
               :key="player.id"
-              class="player-row relative w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm cursor-pointer"
+              class="player-row relative w-full lg:w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm cursor-pointer"
               @click.stop="showPlayerDataModal(player.id)"
             >
               <div class="flex w-full">
@@ -184,8 +184,12 @@
 </template>
 <script>
 import { useContext, computed, ref } from '@nuxtjs/composition-api'
+import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton'
 
 export default {
+  components: {
+    playerLoadingSkeleton,
+  },
   setup() {
     const { store } = useContext()
     const playerData = computed(

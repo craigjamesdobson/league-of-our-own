@@ -7,7 +7,7 @@
           <li
             v-for="index in 60"
             :key="index"
-            class="player-row relative w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm cursor-pointer"
+            class="player-row relative w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm"
           >
             <div class="content-loader-row flex w-full">
               <div class="w-1/12 p-2">
@@ -27,7 +27,7 @@
               </div>
               <div class="w-5/12 p-2">
                 <span
-                  class="content-loader"
+                  class="content-loader m-auto"
                   :style="`width: ${Math.floor(Math.random() * 51) + 50}%;`"
                 ></span>
               </div>
@@ -54,6 +54,16 @@
 export default {}
 </script>
 <style lang="scss">
+@keyframes aniHorizontal {
+  0% {
+    background-position: -100% 0;
+  }
+
+  100% {
+    background-position: 100% 0;
+  }
+}
+
 .content-loader-row {
   position: relative;
 

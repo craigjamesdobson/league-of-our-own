@@ -34,6 +34,7 @@ export default {
     }
 
     store.dispatch('fetchPlayers')
+    // store.dispatch('fetchDraftedTeams')
   },
 }
 </script>

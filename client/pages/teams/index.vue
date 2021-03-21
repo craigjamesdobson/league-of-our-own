@@ -2,23 +2,23 @@
   <div class="flex flex-col">
     <h1>Teams</h1>
     <ul>
-      <li v-for="team in teams" :key="team.id">{{ team.name }}</li>
+      <li v-for="team in draftedTeamData" :key="team.id">
+        {{ team.teamName }}
+      </li>
     </ul>
   </div>
 </template>
 
 <script>
-import teamsJson from '@/static/teams.json'
-import { reactive } from '@nuxtjs/composition-api'
+import { useContext, computed } from '@nuxtjs/composition-api'
 
 export default {
-  middleware: 'auth',
-
   setup() {
-    const teams = reactive(teamsJson)
+    const { store } = useContext()
+    const draftedTeamData = computed(() => store.getters.getDraftedTeams)
 
     return {
-      teams,
+      draftedTeamData,
     }
   },
 }

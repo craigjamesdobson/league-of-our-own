@@ -51,7 +51,7 @@
           for="filter_name"
         >
           Filter by team
-          <button @click="selectfilteredTeam" title="clear team selection">
+          <button title="clear team selection" @click="selectfilteredTeam">
             <font-awesome-icon
               :icon="['fa', 'redo']"
               class="fa-sm text-gray-900"

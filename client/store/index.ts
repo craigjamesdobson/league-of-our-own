@@ -6,11 +6,13 @@ import {
   initPlayerData,
   getFilteredPlayers,
 } from '@/components/Players/CreatePlayerData'
+import { initDraftedTeamData } from '@/components/DraftedTeams/CreateDraftedTeams'
 import { Player } from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,
   FETCH_PLAYERS,
+  FETCH_DRAFTEDTEAMS,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
@@ -24,6 +26,7 @@ interface User {
 
 interface State {
   playerData: any
+  draftedTeamData: any
   teams: any
   loading: boolean
   user: User
@@ -38,6 +41,7 @@ export const state = () => ({
       players: [],
     },
   },
+  draftedTeamData: {},
   teams: Teams,
   loading: true,
   user: {
@@ -67,6 +71,13 @@ export const mutations = {
 
   [FETCH_PLAYERS](state: State, playerData: any) {
     state.playerData = initPlayerData(playerData.players)
+  },
+
+  [FETCH_DRAFTEDTEAMS](state: State, draftedTeamData: any) {
+    state.draftedTeamData = initDraftedTeamData(
+      state.playerData,
+      draftedTeamData
+    )
   },
 
   [GET_TEAMS](state: State, teams: any) {
@@ -121,15 +132,27 @@ export const actions = {
       })
   },
 
-  async fetchPlayers({ commit }: any) {
+  async fetchPlayers({ commit, dispatch }: any) {
     await axios
       .get('http://localhost:8080/v1/players')
       .then((res) => {
         commit('FETCH_PLAYERS', res.data)
         commit('SET_LOAD', false)
+        dispatch('fetchDraftedTeams')
       })
       .catch((err) => {
         commit('SET_LOAD', false)
+        throw err.response.data
+      })
+  },
+
+  async fetchDraftedTeams({ commit }: any) {
+    await axios
+      .get('http://localhost:8080/v1/drafted-teams')
+      .then((res) => {
+        commit('FETCH_DRAFTEDTEAMS', res.data)
+      })
+      .catch((err) => {
         throw err.response.data
       })
   },
@@ -165,6 +188,10 @@ export const getters = {
 
   getTeams: (state: State) => {
     return state.teams
+  },
+
+  getDraftedTeams: (state: State) => {
+    return state.draftedTeamData
   },
 
   getUser: (state: State) => {

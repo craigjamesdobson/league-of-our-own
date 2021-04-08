@@ -20,38 +20,63 @@
           }"
         >
           <div
-            v-for="(transfer, index) in player.transfers"
-            :key="index"
-            :class="[
-              transfer.isCurrentWeekTransfer ? 'bg-yellow-500' : 'bg-green-500',
-              { 'invisible absolute old-transfer': index > 0 },
-            ]"
-            class="flex w-full justify-between"
+            v-if="!player.transfers.length"
+            class="flex w-full border-b border-gray-100"
+            :class="{
+              'opacity-25': player.isUnavailableForSeason,
+            }"
           >
-            <div>{{ transfer.player.id }}</div>
-            <div>{{ transfer.player.name }}</div>
-            <div>{{ transfer.player.teamShort }}</div>
-            <div>{{ transfer.player.price }}</div>
+            <span class="w-1/12 p-2">{{ player.id }}</span>
+            <span class="w-2/12 p-2">
+              <img
+                class="w-6 h-6 rounded-full shadow-md m-auto"
+                :src="player.image"
+                :alt="player.name"
+              />
+            </span>
+            <span class="w-2/12 p-2">{{ player.teamShort }}</span>
+            <span class="w-5/12 p-2 text-center">{{ player.name }}</span>
+            <span class="w-2/12 p-2">{{ player.price }}</span>
           </div>
           <div
-            class="flex flex-wrap w-full justify-between"
+            v-for="transfer in player.transfers"
+            v-else
+            :key="transfer.player.id"
+            class="flex w-full border-b border-gray-100 bg-green-500 text-white cursor-pointer"
+          >
+            <span class="w-1/12 p-2">{{ transfer.player.id }}</span>
+            <span class="w-2/12 p-2">
+              <img
+                class="w-6 h-6 rounded-full shadow-md m-auto"
+                :src="transfer.player.image"
+                :alt="transfer.player.name"
+              />
+            </span>
+            <span class="w-2/12 p-2">{{ transfer.player.teamShort }}</span>
+            <span class="w-5/12 p-2 text-center">
+              {{ transfer.player.name }}
+            </span>
+            <span class="w-2/12 p-2">{{ transfer.player.price }}</span>
+          </div>
+          <div
+            class="flex flex-wrap h-full w-full justify-between"
             :class="{
               'hidden absolute top-0 z-10 bg-red-600 text-white old-transfer hover:flex':
                 player.transfers.length,
             }"
           >
-            <template v-if="!player.transfers.length">
-              <div>{{ player.playerId }}</div>
-              <div>{{ player.playerName }}</div>
-              <div>{{ player.playerTeamShort }}</div>
-              <div>{{ player.playerPrice }}</div>
-            </template>
-            <template v-else>
-              <div v-if="player.transfers.length" class="w-full text-center">
-                {{ player.playerName }} was transferred out on week
-                {{ player.transfers[0].transferWeek }}
-              </div>
-            </template>
+            <div
+              v-if="player.transfers.length"
+              class="flex justify-center items-center w-full text-center cursor-pointer"
+            >
+              <img
+                class="w-6 h-6 rounded-full border border-white mr-4"
+                :src="player.image"
+                :alt="player.name"
+              />
+              {{ player.name }} was transferred out on week
+              {{ player.transfers[0].transferWeek }}
+            </div>
           </div>
         </div>
       </div>

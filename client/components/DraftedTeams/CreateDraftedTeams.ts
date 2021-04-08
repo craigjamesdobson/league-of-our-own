@@ -16,7 +16,15 @@ export function initDraftedTeamData(
       player: playerList.players.players.filter(
         (p) => p.id === player.playerID
       )[0],
-      transfers: player.transfers,
+      transfers: player.transfers.map((t) => {
+        return {
+          player: playerList.players.players.filter(
+            (p) => p.id === t.transferId
+          )[0],
+          isCurrentWeekTransfer: t.isCurrentWeekTransfer,
+          transferWeek: t.transferWeek,
+        }
+      }),
     }))
     return new CompleteDraftedTeam(draftedTeam, players)
   })

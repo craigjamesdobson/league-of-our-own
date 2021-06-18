@@ -11,7 +11,7 @@
       </h2>
       <div
         v-if="playerTypes.length"
-        class="flex justify-between mb-4 bg-white rounded-xl"
+        class="flex justify-between mb-4 bg-white rounded-sm"
       >
         <div class="py-2 px-4 border-r border-gray-100 w-full">
           <ul class="flex flex-wrap">

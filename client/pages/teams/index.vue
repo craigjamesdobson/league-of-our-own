@@ -6,8 +6,8 @@
       :key="team.id"
       class="flex flex-col w-1/4"
     >
-      <div class="bg-white rounded-md m-2 p-4">
-        <div>
+      <div class="bg-white rounded-sm m-2 p-4">
+        <div class="p-2 mb-2 border-b border-gray-800">
           {{ team.teamName }}
           <span v-if="team.allowedTransfers">!</span>
         </div>
@@ -39,24 +39,30 @@
             <span class="w-2/12 p-2">{{ player.price }}</span>
           </div>
           <div
-            v-for="transfer in player.transfers"
             v-else
-            :key="transfer.player.id"
-            class="flex w-full border-b border-gray-100 bg-green-500 text-white cursor-pointer"
+            :key="player.transfers[0].player.id"
+            class="flex w-full border-b border-gray-100 cursor-pointer"
+            :class="
+              player.transfers[0].isCurrentWeekTransfer ? 'bg-yellow-500 text-gray-800' : 'bg-green-500 text-white',
+            "
           >
-            <span class="w-1/12 p-2">{{ transfer.player.id }}</span>
+            <span class="w-1/12 p-2">{{ player.transfers[0].player.id }}</span>
             <span class="w-2/12 p-2">
               <img
                 class="w-6 h-6 rounded-full shadow-md m-auto"
-                :src="transfer.player.image"
-                :alt="transfer.player.name"
+                :src="player.transfers[0].player.image"
+                :alt="player.transfers[0].player.name"
               />
             </span>
-            <span class="w-2/12 p-2">{{ transfer.player.teamShort }}</span>
-            <span class="w-5/12 p-2 text-center">
-              {{ transfer.player.name }}
+            <span class="w-2/12 p-2">
+              {{ player.transfers[0].player.teamShort }}
             </span>
-            <span class="w-2/12 p-2">{{ transfer.player.price }}</span>
+            <span class="w-5/12 p-2 text-center">
+              {{ player.transfers[0].player.name }}
+            </span>
+            <span class="w-2/12 p-2">
+              {{ player.transfers[0].player.price }}
+            </span>
           </div>
           <div
             class="flex flex-wrap h-full w-full justify-between"

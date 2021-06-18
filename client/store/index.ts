@@ -13,6 +13,7 @@ import {
   FILTER_PLAYERS,
   FETCH_PLAYERS,
   FETCH_DRAFTEDTEAMS,
+  FETCH_FIXTURES,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
@@ -28,6 +29,7 @@ interface State {
   playerData: any
   draftedTeamData: any
   teams: any
+  fixtures: any
   loading: boolean
   user: User
 }
@@ -43,6 +45,7 @@ export const state = () => ({
   },
   draftedTeamData: {},
   teams: Teams,
+  fixtures: {},
   loading: true,
   user: {
     name: '',
@@ -82,6 +85,10 @@ export const mutations = {
 
   [GET_TEAMS](state: State, teams: any) {
     state.teams = teams
+  },
+
+  [FETCH_FIXTURES](state: State, fixtures: any) {
+    state.fixtures = fixtures
   },
 }
 
@@ -157,6 +164,17 @@ export const actions = {
       })
   },
 
+  async fetchFixtures({ commit }: any) {
+    await axios
+      .get('http://localhost:8080/v1/fixtures')
+      .then((res) => {
+        commit('FETCH_FIXTURES', res.data.fixtures)
+      })
+      .catch((err) => {
+        throw err.response.data
+      })
+  },
+
   logoutUser({ commit }: any) {
     commit('SET_USER', {})
     localStorage.removeItem('token')
@@ -192,6 +210,10 @@ export const getters = {
 
   getDraftedTeams: (state: State) => {
     return state.draftedTeamData
+  },
+
+  getFixtures: (state: State) => {
+    return state.fixtures
   },
 
   getUser: (state: State) => {

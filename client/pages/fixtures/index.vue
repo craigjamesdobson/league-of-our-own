@@ -15,15 +15,19 @@
       </button>
     </div>
     <div class="grid grid-flow-row grid-cols-5 auto-rows-max gap-4 my-5">
+      <div v-if="!fixtureData.filteredFixtures.length">
+        Please select a gameweek to view fixtures
+      </div>
       <div
         v-for="(fixture, index) in fixtureData.filteredFixtures"
+        v-else
         :key="index"
         class="flex flex-col justify-center"
       >
         <div>Fixture {{ index + 1 }}</div>
         <div class="flex">
-          <div class="home w-1/2">{{ fixture.home }}</div>
-          <div class="away w-1/2">{{ fixture.away }}</div>
+          <div class="home w-1/2">{{ fixture.home.name }}</div>
+          <div class="away w-1/2">{{ fixture.away.name }}</div>
         </div>
       </div>
     </div>
@@ -41,7 +45,7 @@ export default {
 
     const fixtureData = reactive({
       fixturesTotal: 38,
-      activeFixtureRound: 1,
+      activeFixtureRound: null,
       fixtures: computed(() => store.getters.getFixtures[0].matches),
       filteredFixtures: [],
     })

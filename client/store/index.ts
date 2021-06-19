@@ -18,6 +18,7 @@ import {
   SET_USER,
   SET_LOAD,
 } from './mutation-types'
+import { initFixturesData } from '~/components/Fixtures/CompleteFixtures'
 
 interface User {
   name: string
@@ -88,7 +89,7 @@ export const mutations = {
   },
 
   [FETCH_FIXTURES](state: State, fixtures: any) {
-    state.fixtures = fixtures
+    state.fixtures = initFixturesData(fixtures)
   },
 }
 

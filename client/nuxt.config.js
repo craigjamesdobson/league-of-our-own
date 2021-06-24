@@ -59,6 +59,7 @@ export default {
         'faUserCircle',
         'faTimes',
         'faRedo',
+        'faCalendarAlt',
       ],
       regular: ['faCaretSquareDown'],
     },

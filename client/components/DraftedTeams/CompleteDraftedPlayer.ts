@@ -3,27 +3,33 @@ import { PlayerPositionShort } from '../Interfaces/PlayerPosition'
 import { DraftedTransfer } from './DraftedTransfer'
 
 export class CompleteDraftedPlayer {
-  public readonly playerPrice: string
-  public readonly playerPosition: string
-  private readonly playerId: number
-  private readonly playerName: string
-  private readonly playerTeamId: number
-  private readonly playerTeamName: string
-  private readonly playerTeamShort: string
-  private readonly isUnAvailable: boolean
-  private readonly playerStatus: string
+  public readonly price: string
+  public readonly position: string
+  private readonly id: number
+  private readonly name: string
+  private readonly teamId: number
+  private readonly teamName: string
+  private readonly teamShort: string
+  private readonly isUnavailable: boolean
+  private readonly isUnavailableForSeason: boolean
+  private readonly status: string
+  private readonly image: string
+  private readonly imageLarge: string
   private readonly transfers: DraftedTransfer[]
 
   constructor(player: Player, transfers: DraftedTransfer[]) {
-    this.playerId = player.id
-    this.playerName = player.name
-    this.playerPosition = PlayerPositionShort[player.playerType]
-    this.playerTeamId = player.teamID
-    this.playerTeamName = player.teamName
-    this.playerTeamShort = player.teamShort
-    this.isUnAvailable = player.isUnavailable
-    this.playerStatus = player.availabilityType
-    this.playerPrice = player.price
+    this.id = player.id
+    this.name = player.name
+    this.position = PlayerPositionShort[player.playerType]
+    this.teamId = player.teamID
+    this.teamName = player.teamName
+    this.teamShort = player.teamShort
+    this.isUnavailable = player.isUnavailable
+    this.isUnavailableForSeason = player.unavailableForSeason
+    this.status = player.availabilityType
+    this.price = player.price
+    this.image = player.image
+    this.imageLarge = player.imageLarge
     this.transfers = transfers
   }
 }

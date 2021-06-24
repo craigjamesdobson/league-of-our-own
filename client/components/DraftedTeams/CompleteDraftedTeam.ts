@@ -26,8 +26,7 @@ export class CompleteDraftedTeam {
     )
 
     this.totalTeamValue = this.teamPlayers.reduce(
-      (accumulator, current) =>
-        (accumulator += parseFloat(current.playerPrice)),
+      (accumulator, current) => (accumulator += parseFloat(current.price)),
       0
     )
 
@@ -37,7 +36,7 @@ export class CompleteDraftedTeam {
     let forwardCount = 0
 
     for (const teamPlayer of this.teamPlayers) {
-      const playerPosition = teamPlayer.playerPosition
+      const playerPosition = teamPlayer.position
 
       switch (playerPosition) {
         case 'GK':

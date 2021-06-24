@@ -1,7 +1,7 @@
 <template>
   <div class="filter-container">
     <h2 class="mb-4 text-2xl px-4">Filters</h2>
-    <div class="justify-between mb-4 bg-white rounded-xl p-4">
+    <div class="justify-between mb-4 bg-white rounded-sm p-4">
       <div class="pb-3 border-b border-gray-100 mb-3">
         <label class="flex text-xs mb-2" for="filter_name">
           Filter by name

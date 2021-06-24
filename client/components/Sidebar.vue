@@ -66,6 +66,11 @@ export default {
         icon: 'user-alt',
         path: '/players',
       },
+      {
+        title: 'Fixtures',
+        icon: 'calendar-alt',
+        path: '/fixtures',
+      },
     ])
     return { routes, isLoggedIn }
   },

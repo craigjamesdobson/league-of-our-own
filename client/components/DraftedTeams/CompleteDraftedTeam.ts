@@ -1,4 +1,3 @@
-import { CompleteDraftedPlayer as ICompleteDraftedPlayer } from '../Interfaces/CompleteDraftedPlayer'
 import { CompleteDraftedPlayer } from './CompleteDraftedPlayer'
 import { DraftedTeam } from './DraftedTeam'
 
@@ -13,7 +12,7 @@ export class CompleteDraftedTeam {
   private readonly totalTeamValue: number
   private readonly teamPlayers: CompleteDraftedPlayer[]
 
-  constructor(draftedTeam: DraftedTeam, players: ICompleteDraftedPlayer[]) {
+  constructor(draftedTeam: DraftedTeam, players: any[]) {
     this.teamID = draftedTeam.teamID
     this.teamName = draftedTeam.teamName
     this.ownerName = draftedTeam.ownerName

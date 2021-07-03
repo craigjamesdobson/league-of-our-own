@@ -14,21 +14,26 @@
         {{ index }}
       </button>
     </div>
-    <div class="grid grid-flow-row grid-cols-5 auto-rows-max gap-4 my-5">
-      <div v-if="!fixtureData.filteredFixtures.length">
-        Please select a gameweek to view fixtures
-      </div>
-      <div
-        v-for="(fixture, index) in fixtureData.filteredFixtures"
-        v-else
-        :key="index"
-        class="flex flex-col justify-center"
-      >
-        <div>Fixture {{ index + 1 }}</div>
-        <div class="flex">
-          <div class="home w-1/2">{{ fixture.home.name }}</div>
-          <div class="away w-1/2">{{ fixture.away.name }}</div>
+    <div class="flex my-5">
+      <div class="grid grid-flow-row grid-cols-2 auto-rows-max gap-4 w-1/2">
+        <div v-if="!fixtureData.filteredFixtures.length">
+          Please select a gameweek to view fixtures
         </div>
+        <div
+          v-for="(fixture, index) in fixtureData.filteredFixtures"
+          v-else
+          :key="index"
+          class="flex flex-col justify-center"
+        >
+          <div>Fixture {{ index + 1 }}</div>
+          <div class="flex">
+            <div class="home w-1/2">{{ fixture.home.name }}</div>
+            <div class="away w-1/2">{{ fixture.away.name }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="w-1/2">
+        <DraftedTeams column-class="w-1/2"></DraftedTeams>
       </div>
     </div>
   </div>
@@ -36,8 +41,12 @@
 
 <script>
 import { useContext, computed, reactive } from '@nuxtjs/composition-api'
+import DraftedTeams from '@/components/DraftedTeams/DraftedTeams'
 
 export default {
+  components: {
+    DraftedTeams,
+  },
   setup() {
     const { store } = useContext()
 

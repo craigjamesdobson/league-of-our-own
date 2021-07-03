@@ -130,7 +130,7 @@ export default {
 
 <style lang="scss" scoped>
 .filter-container {
-  @apply px-4 w-1/4 h-64 sticky;
+  @apply px-4 w-1/4 self-start sticky;
   top: 5.5rem;
 }
 

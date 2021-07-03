@@ -3,7 +3,7 @@ module.exports = {
     extend: {
       fontFamily: {
         display: 'Bebas Neue, cursive',
-        sans: '"Source Sans Pro", sans-serif',
+        sans: '"Karla", sans-serif',
       },
       colors: {
         primary: '#03044A',

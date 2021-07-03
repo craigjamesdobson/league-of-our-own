@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Players></Players>
+    <Players column-size:4></Players>
     <Filters></Filters>
   </div>
 </template>

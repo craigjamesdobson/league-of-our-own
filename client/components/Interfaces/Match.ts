@@ -1,5 +1,5 @@
 export interface Match {
   round: string
-  home: any
-  away: any
+  home: number
+  away: number
 }

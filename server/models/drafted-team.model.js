@@ -22,4 +22,4 @@ const draftedTeamSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('drafted teams', draftedTeamSchema);
+module.exports = mongoose.model('drafted-teams-2021_2022', draftedTeamSchema);

@@ -14,17 +14,17 @@
         {{ index }}
       </button>
     </div>
-    <div class="flex my-5">
+    <div class="flex flex-col my-5">
       <div
         v-if="!fixtureData.filteredFixtures.length"
-        class="flex flex-col self-start bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mr-4 w-1/2"
+        class="flex flex-col self-start bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mr-4"
         role="alert"
       >
         <p class="text-sm">Please select a gameweek to view fixtures</p>
       </div>
       <div
         v-else
-        class="grid grid-flow-row grid-cols-2 auto-rows-max gap-4 w-1/2 items-start"
+        class="grid grid-flow-row grid-cols-2 auto-rows-max gap-4 items-start"
       >
         <div
           v-for="(fixture, index) in fixtureData.filteredFixtures"
@@ -37,19 +37,25 @@
               <div class="mb-4">
                 {{ fixture.home.name }} - {{ fixture.home.id }}
               </div>
-              <PlayersForm :team-id="fixture.home.id"></PlayersForm>
+              <PlayersForm
+                :key="fixture.home.id"
+                :team-id="fixture.home.id"
+              ></PlayersForm>
             </div>
             <div class="away w-1/2">
               <div class="mb-4">
                 {{ fixture.away.name }} - {{ fixture.away.id }}
               </div>
-              <PlayersForm :team-id="fixture.away.id"></PlayersForm>
+              <PlayersForm
+                :key="fixture.away.id"
+                :team-id="fixture.away.id"
+              ></PlayersForm>
             </div>
           </div>
         </div>
       </div>
-      <div class="w-1/2">
-        <DraftedTeams column-class="w-1/2"></DraftedTeams>
+      <div>
+        <DraftedTeams column-class="w-1/4"></DraftedTeams>
       </div>
     </div>
   </div>

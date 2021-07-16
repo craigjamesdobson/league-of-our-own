@@ -17,7 +17,7 @@
     <div class="flex flex-col my-5">
       <div
         v-if="!fixtureData.filteredFixtures.length"
-        class="flex flex-col self-start bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mr-4"
+        class="flex flex-col w-full self-start bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 mb-4"
         role="alert"
       >
         <p class="text-sm">Please select a gameweek to view fixtures</p>
@@ -31,20 +31,31 @@
           :key="index"
           class="flex flex-col justify-center"
         >
-          <div>Fixture {{ index + 1 }}</div>
-          <div class="flex">
-            <div class="home w-1/2">
-              <div class="mb-4">
-                {{ fixture.home.name }} - {{ fixture.home.id }}
+          <div
+            class="flex justify-between items-center py-2 mb-2 border-b border-t border-primary text-xl"
+          >
+            <span>Fixture</span>
+            <span
+              class="flex items-center justify-center w-5 h-5 bg-primary text-white rounded-full text-sm"
+            >
+              {{ index + 1 }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="home">
+              <div class="flex justify-between mb-4 uppercase">
+                <h3>{{ fixture.home.name }}</h3>
+                <customNumberInput></customNumberInput>
               </div>
               <PlayersForm
                 :key="fixture.home.id"
                 :team-id="fixture.home.id"
               ></PlayersForm>
             </div>
-            <div class="away w-1/2">
-              <div class="mb-4">
-                {{ fixture.away.name }} - {{ fixture.away.id }}
+            <div class="away">
+              <div class="flex justify-between mb-4 uppercase">
+                <h3>{{ fixture.away.name }}</h3>
+                <customNumberInput></customNumberInput>
               </div>
               <PlayersForm
                 :key="fixture.away.id"
@@ -65,11 +76,13 @@
 import { useContext, computed, reactive } from '@nuxtjs/composition-api'
 import DraftedTeams from '@/components/DraftedTeams/DraftedTeams'
 import PlayersForm from '@/components/Fixtures/PlayersForm'
+import customNumberInput from '@/components/Common/customNumberInput'
 
 export default {
   components: {
     DraftedTeams,
     PlayersForm,
+    customNumberInput,
   },
   setup() {
     const { store } = useContext()

@@ -17,7 +17,11 @@ module.exports = {
       },
     },
   },
-  variants: {},
+  variants: {
+    extend: {
+      opacity: ['disabled'],
+    },
+  },
   plugins: [],
   purge: {
     enabled: process.env.NODE_ENV === 'production',

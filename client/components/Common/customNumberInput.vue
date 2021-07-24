@@ -1,20 +1,24 @@
 <template>
-  <div class="flex justify-center h-6">
+  <div class="flex h-5 number-input-container">
     <button
-      class="decrement px-2 rounded-l-sm bg-primary text-white disabled:opacity-50"
+      class="flex items-center justify-center w-5 h-5 text-white rounded-l-sm  decrement bg-primary hover:bg-indigo-900 disabled:opacity-50 focus:outline-none animate"
       disabled
       @click="decrement"
     >
       -
     </button>
     <input
-      class="flex w-8 border-t border-b border-primary p-1 appearance-none text-center"
-      :value="0"
+      class="flex w-5 h-5 p-1 text-xs text-center border-t border-b appearance-none pointer-events-none  border-primary animate"
       min="0"
       pattern="[0-9]*"
       type="number"
+      :value="value"
+      @change="$emit('custom-input-value', parseInt($event.target.value))"
     />
-    <button class="px-2 rounded-r-sm bg-primary text-white" @click="increment">
+    <button
+      class="flex items-center justify-center w-5 h-5 text-white rounded-r-sm  bg-primary hover:bg-indigo-900 focus:outline-none animate"
+      @click="increment"
+    >
       +
     </button>
   </div>
@@ -22,33 +26,60 @@
 
 <script>
 export default {
-  setup() {
+  props: {
+    value: {
+      default: 0,
+      type: Number,
+    },
+  },
+  setup(_, { emit }) {
     const increment = (event) => {
       const numberInput = event.target.parentNode.querySelector(
         'input[type="number"]'
       )
-      const decrementButton = event.target.parentNode.querySelector(
-        '.decrement'
-      )
+      const decrementButton =
+        event.target.parentNode.querySelector('.decrement')
 
       numberInput.value++
       decrementButton.disabled = false
+
+      event.target.parentNode.classList.add('active')
+      emit('custom-input-value', parseInt(numberInput.value))
     }
 
     const decrement = (event) => {
       const numberInput = event.target.parentNode.querySelector(
         'input[type="number"]'
       )
-      const decrementButton = event.target.parentNode.querySelector(
-        '.decrement'
-      )
+      const decrementButton =
+        event.target.parentNode.querySelector('.decrement')
 
       numberInput.value--
-      numberInput.value > 0
-        ? (decrementButton.disabled = false)
-        : (decrementButton.disabled = true)
+      if (numberInput.value > 0) {
+        decrementButton.disabled = false
+      } else {
+        decrementButton.disabled = true
+        event.target.parentNode.classList.remove('active')
+      }
+      emit('custom-input-value', parseInt(numberInput.value))
     }
     return { increment, decrement }
   },
 }
 </script>
+
+<style lang="scss">
+.number-input-container {
+  &.active {
+    button {
+      @apply bg-green-600 text-white animate;
+      &:hover {
+        @apply bg-green-700;
+      }
+    }
+    input {
+      @apply border-green-600 bg-green-100 animate;
+    }
+  }
+}
+</style>

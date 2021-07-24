@@ -2,7 +2,7 @@
   <div class="container">
     <div>
       <Logo />
-      <h1 class="uppercase text-6xl font-display">League of our own</h1>
+      <h1 class="text-6xl uppercase font-display">League of our own</h1>
       <div class="links">
         <a
           href="https://nuxtjs.org/"

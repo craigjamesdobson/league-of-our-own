@@ -2,11 +2,11 @@
   <div class="flex flex-row">
     <Sidebar></Sidebar>
     <main
-      class="flex flex-row w-full bg-offWhite dark:bg-gray-700 transition duration-500 ease-in-out"
+      class="flex flex-row w-full transition duration-500 ease-in-out  bg-offWhite dark:bg-gray-700"
     >
       <div class="flex flex-col w-full">
         <div
-          class="w-full sticky top-0 p-4 bg-white border-b-2 border-gray-300 mb-2 z-50"
+          class="sticky top-0 z-50 w-full p-4 mb-2 bg-white border-b-2 border-gray-300 "
         >
           <h1 class="text-2xl">Players</h1>
         </div>

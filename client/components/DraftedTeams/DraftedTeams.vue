@@ -7,7 +7,7 @@
       class="flex flex-col"
       :class="props.columnClass"
     >
-      <div class="bg-white rounded-sm m-2 p-4">
+      <div class="p-4 m-2 bg-white rounded-sm">
         <div class="p-2 mb-2 border-b border-gray-800">
           {{ team.teamName }}
           <span v-if="team.allowedTransfers">!</span>
@@ -30,7 +30,7 @@
             <span class="w-1/12 p-2">{{ player.id }}</span>
             <span class="w-2/12 p-2">
               <img
-                class="w-6 h-6 rounded-full shadow-md m-auto"
+                class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.image"
                 :alt="player.name"
               />
@@ -50,7 +50,7 @@
             <span class="w-1/12 p-2">{{ player.transfers[0].player.id }}</span>
             <span class="w-2/12 p-2">
               <img
-                class="w-6 h-6 rounded-full shadow-md m-auto"
+                class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.transfers[0].player.image"
                 :alt="player.transfers[0].player.name"
               />
@@ -66,7 +66,7 @@
             </span>
           </div>
           <div
-            class="flex flex-wrap h-full w-full justify-between"
+            class="flex flex-wrap justify-between w-full h-full"
             :class="{
               'hidden absolute top-0 z-10 bg-red-600 text-white old-transfer hover:flex':
                 player.transfers.length,
@@ -74,10 +74,10 @@
           >
             <div
               v-if="player.transfers.length"
-              class="flex justify-center items-center w-full text-center cursor-pointer"
+              class="flex items-center justify-center w-full text-center cursor-pointer "
             >
               <img
-                class="w-6 h-6 rounded-full border border-white mr-4"
+                class="w-6 h-6 mr-4 border border-white rounded-full"
                 :src="player.image"
                 :alt="player.name"
               />
@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { useContext, computed } from '@nuxtjs/composition-api'
 
 export default {

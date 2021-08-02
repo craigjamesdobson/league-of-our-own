@@ -1,0 +1,62 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('league-of-our-own');
+
+// Insert a few documents into the sales collection.
+db['drafted-teams-2021_2022'].insert({
+      "team_id": 1,
+      "team_name": "Sonny side up",
+      "team_owner": "Robert Mottram",
+      "team_email": "Bobby.spurslad.mottram@gmail.com",
+      "allowed_transfers": true,
+      "team_players": [
+        {
+          "player_id": 143,
+          "transfers": []
+        },
+        {
+          "player_id": 135,
+          "transfers": []
+        },
+        {
+          "player_id": 16,
+          "transfers": []
+        },
+        {
+          "player_id": 370,
+          "transfers": []
+        },
+        {
+          "player_id": 326,
+          "transfers": []
+        },
+        {
+          "player_id": 33,
+          "transfers": []
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 359,
+          "transfers": []
+        },
+        {
+          "player_id": 40,
+          "transfers": []
+        },
+        {
+          "player_id": 189,
+          "transfers": []
+        },
+        {
+          "player_id": 357,
+          "transfers": []
+        }
+      ]
+    });

@@ -77,13 +77,6 @@ export const mutations = {
     state.playerData = initPlayerData(playerData.players)
   },
 
-  [FETCH_DRAFTEDTEAMS](state: State, draftedTeamData: any) {
-    state.draftedTeamData = initDraftedTeamData(
-      state.playerData,
-      draftedTeamData
-    )
-  },
-
   [GET_TEAMS](state: State, teams: any) {
     state.teams = teams
   },
@@ -140,27 +133,16 @@ export const actions = {
       })
   },
 
-  async fetchPlayers({ commit, dispatch }: any) {
+  async fetchPlayers({ commit, dispatch, state }: any) {
     await axios
       .get('http://localhost:8080/v1/players')
       .then((res) => {
         commit('FETCH_PLAYERS', res.data)
         commit('SET_LOAD', false)
-        dispatch('fetchDraftedTeams')
+        dispatch('draftedData/fetchDraftedTeams', state.playerData)
       })
       .catch((err) => {
         commit('SET_LOAD', false)
-        throw err.response.data
-      })
-  },
-
-  async fetchDraftedTeams({ commit }: any) {
-    await axios
-      .get('http://localhost:8080/v1/drafted-teams')
-      .then((res) => {
-        commit('FETCH_DRAFTEDTEAMS', res.data)
-      })
-      .catch((err) => {
         throw err.response.data
       })
   },

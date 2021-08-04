@@ -103,7 +103,9 @@ export default {
   },
   setup(props) {
     const { store } = useContext()
-    const draftedTeamData = computed(() => store.getters.getDraftedTeams)
+    const draftedTeamData = computed(
+      () => store.getters['draftedData/getDraftedTeams']
+    )
 
     return {
       draftedTeamData,

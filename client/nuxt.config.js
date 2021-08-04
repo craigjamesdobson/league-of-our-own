@@ -47,7 +47,6 @@ export default {
   ],
 
   tailwindcss: {
-    jit: true,
     cssPath: '~/assets/tailwind.css',
   },
 

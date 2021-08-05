@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import axios from 'axios'
+import axios from '@/plugins/axios'
 import Teams from 'static/teams.json'
 import {
   initPlayerData,
@@ -89,7 +89,7 @@ export const mutations = {
 export const actions = {
   async registerUser({ commit }: any, formData: any) {
     await axios
-      .post('http://localhost:8080/v1/auth/register', formData)
+      .post('/v1/auth/register', formData)
       .then((res) => {
         commit('SET_USER', res.data.user)
         localStorage.setItem('token', res.data.token)
@@ -103,7 +103,7 @@ export const actions = {
 
   async loginUser({ commit }: any, formData: any) {
     await axios
-      .post('http://localhost:8080/v1/auth/login', formData)
+      .post('/v1/auth/login', formData)
       .then((res) => {
         commit('SET_USER', res.data.user)
         localStorage.setItem('token', res.data.token)
@@ -117,7 +117,7 @@ export const actions = {
 
   async fetchUser({ commit, state }: any) {
     await axios
-      .get('http://localhost:8080/v1/users', {
+      .get('/v1/users', {
         headers: { Authorization: `Bearer ${state.user.tokens}` },
       })
       .then((res) => {
@@ -135,11 +135,11 @@ export const actions = {
 
   async fetchPlayers({ commit, dispatch, state }: any) {
     await axios
-      .get('http://localhost:8080/v1/players')
+      .get('/v1/players')
       .then((res) => {
         commit('FETCH_PLAYERS', res.data)
         commit('SET_LOAD', false)
-        dispatch('draftedData/fetchDraftedTeams', state.playerData)
+        dispatch('drafted-data/fetchDraftedTeams', state.playerData)
       })
       .catch((err) => {
         commit('SET_LOAD', false)
@@ -149,7 +149,7 @@ export const actions = {
 
   async fetchFixtures({ commit }: any) {
     await axios
-      .get('http://localhost:8080/v1/fixtures')
+      .get('/v1/fixtures')
       .then((res) => {
         commit('FETCH_FIXTURES', res.data.fixtures)
       })

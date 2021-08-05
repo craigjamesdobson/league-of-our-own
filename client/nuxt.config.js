@@ -23,6 +23,9 @@ export default {
       },
     ],
   },
+  env: {
+    baseUrl: process.env.BASE_URL || 'http://localhost:8080',
+  },
   ssr: false,
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
@@ -94,6 +97,5 @@ export default {
   },
   server: {
     port: 3000, // default: 3000
-    host: '0.0.0.0', // default: localhost
   }, // other configs
 }

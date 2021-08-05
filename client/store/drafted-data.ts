@@ -1,6 +1,6 @@
 import { FETCH_DRAFTEDTEAMS } from './mutation-types'
 import { initDraftedTeamData } from '@/components/DraftedTeams/CreateDraftedTeams'
-import axios from 'axios'
+import axios from '@/plugins/axios'
 
 interface State {
   playerStats: any
@@ -24,7 +24,7 @@ export const mutations = {
 export const actions = {
   async fetchDraftedTeams({ commit }: any, playerData) {
     await axios
-      .get('http://localhost:8080/v1/drafted-teams')
+      .get('/v1/drafted-teams')
       .then((res) => {
         commit('FETCH_DRAFTEDTEAMS', {
           draftedTeamData: res.data,

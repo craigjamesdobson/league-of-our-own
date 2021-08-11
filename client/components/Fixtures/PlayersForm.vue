@@ -131,9 +131,18 @@ export default {
     const toggleAccordionBody = (event) => {
       const accordionBody = event.currentTarget.nextElementSibling
 
-      accordionBody.classList.contains('hidden')
-        ? accordionBody.classList.remove('hidden')
-        : accordionBody.classList.add('hidden')
+      const accordionContainer = accordionBody.closest('.accordion')
+
+      if (!accordionBody.classList.contains('hidden')) {
+        accordionBody.classList.add('hidden')
+        return
+      }
+
+      accordionContainer
+        .querySelectorAll('.accordion__body')
+        .forEach((x) => x.classList.add('hidden'))
+
+      accordionBody.classList.remove('hidden')
     }
 
     return {

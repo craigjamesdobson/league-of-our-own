@@ -42,7 +42,7 @@
             </span>
           </div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="home">
+            <div class="home js-fixture-container">
               <div class="flex justify-between mb-4 uppercase">
                 <h3>{{ fixture.home.name }}</h3>
                 <customNumberInput></customNumberInput>
@@ -53,7 +53,7 @@
                 @player-stats-change="storePlayerStats"
               ></PlayersForm>
             </div>
-            <div class="away">
+            <div class="away js-fixture-container">
               <div class="flex justify-between mb-4 uppercase">
                 <h3>{{ fixture.away.name }}</h3>
                 <customNumberInput></customNumberInput>

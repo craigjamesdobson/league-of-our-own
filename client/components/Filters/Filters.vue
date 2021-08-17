@@ -1,16 +1,16 @@
 <template>
   <div class="filter-container">
-    <h2 class="mb-4 text-2xl px-4">Filters</h2>
-    <div class="justify-between mb-4 bg-white rounded-sm p-4">
-      <div class="pb-3 border-b border-gray-100 mb-3">
-        <label class="flex text-xs mb-2" for="filter_name">
+    <h2 class="px-4 mb-4 text-2xl">Filters</h2>
+    <div class="justify-between p-4 mb-4 bg-white rounded-sm">
+      <div class="pb-3 mb-3 border-b border-gray-100">
+        <label class="flex mb-2 text-xs" for="filter_name">
           Filter by name
         </label>
-        <div class="flex items-center bg-gray-100 py-1 px-2 rounded">
+        <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
           <input
             id="filter_name"
             v-model="filterData.filterName"
-            class="placeholder-gray-800 placeholder-opacity-50 bg-gray-100 text-sm w-full focus:outline-none"
+            class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100  focus:outline-none"
             type="text"
             name="filter_name"
             placeholder="Search Players..."
@@ -18,20 +18,20 @@
           />
           <font-awesome-icon
             :icon="['fa', 'search']"
-            class="fa-xs text-gray-400"
+            class="text-gray-400 fa-xs"
           />
         </div>
       </div>
-      <div class="pb-3 border-b border-gray-100 mb-3">
-        <label class="flex text-xs mb-2" for="filter_name">
+      <div class="pb-3 mb-3 border-b border-gray-100">
+        <label class="flex mb-2 text-xs" for="filter_name">
           Filter by price
         </label>
-        <div class="flex items-center bg-gray-100 py-1 px-2 rounded">
+        <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
           <select
             id="filter_number"
             v-model="filterData.filterPrice"
             name="filter_number"
-            class="placeholder-gray-800 placeholder-opacity-50 bg-gray-100 text-sm w-full focus:outline-none"
+            class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100  focus:outline-none"
             @change="filterPlayers"
           >
             <option selected="selected" value="">All</option>
@@ -47,14 +47,14 @@
       </div>
       <div>
         <label
-          class="flex justify-between text-xs mb-2 w-full"
+          class="flex justify-between w-full mb-2 text-xs"
           for="filter_name"
         >
           Filter by team
           <button title="clear team selection" @click="selectfilteredTeam">
             <font-awesome-icon
               :icon="['fa', 'redo']"
-              class="fa-sm text-gray-900"
+              class="text-gray-900 fa-sm"
             />
           </button>
         </label>
@@ -63,10 +63,13 @@
             v-for="team in teamData"
             :key="team.id"
             :data-teamID="team.id"
-            class="icon-container mb-2"
+            class="mb-2 icon-container"
             @click="selectfilteredTeam"
           >
-            <svg-icon class="px-2 w-full h-full" :name="team.short_name" />
+            <svg-icon
+              class="w-full h-full px-2"
+              :name="'teams/' + team.short_name"
+            />
           </div>
         </div>
       </div>

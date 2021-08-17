@@ -8,7 +8,10 @@
         <h4>
           {{ key }}
         </h4>
-        <svg-icon class="w-5 h-5 text-white fill-current" name="chevron-down" />
+        <svg-icon
+          class="w-5 h-5 text-white fill-current"
+          name="icons/icon-chevron-down"
+        />
       </button>
       <div class="justify-between hidden mb-4 accordion__body">
         <div

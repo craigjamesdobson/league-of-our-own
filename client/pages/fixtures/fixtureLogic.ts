@@ -5,24 +5,14 @@ import {
   reactive,
   onMounted,
 } from '@nuxtjs/composition-api'
-
-interface fixtures {
-  home: fixtureTeamData[]
-  away: fixtureTeamData[]
-  round: number
-}
-
-interface fixtureTeamData {
-  id: number
-  name: string
-  shortName: string
-}
+import { CompleteWeek } from '~/components/Fixtures/CompleteWeek'
+import { Fixture } from '~/components/Interfaces/Fixture'
 
 interface fixtureData {
   fixturesTotal: number
   activeFixtureRound: number
-  fixtures: fixtures[]
-  filteredFixtures: fixtures[]
+  fixtures: CompleteWeek[]
+  filteredFixtures: Fixture[]
 }
 
 interface playerStats {
@@ -50,7 +40,7 @@ const useFixtureLogic = () => {
   const fixtureData: fixtureData = reactive({
     fixturesTotal: 38,
     activeFixtureRound: null,
-    fixtures: computed(() => store.getters.getFixtures[0].matches),
+    fixtures: computed(() => store.getters.getFixtures[0].weeks),
     filteredFixtures: [],
   })
 
@@ -72,8 +62,8 @@ const useFixtureLogic = () => {
   const filterFixtures = (fixtureRound: number) => {
     fixtureData.activeFixtureRound = fixtureRound
     fixtureData.filteredFixtures = fixtureData.fixtures.filter(
-      (x) => +x.round === fixtureData.activeFixtureRound
-    )
+      (x) => +x.week === fixtureData.activeFixtureRound
+    )[0].fixtures
   }
 
   return { fixtureData, filterFixtures, playerStats, storePlayerStats }

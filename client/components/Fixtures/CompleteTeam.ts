@@ -1,13 +1,16 @@
 import Teams from 'static/teams.json'
+import { Stats, Team } from '../Interfaces/Fixture'
 
 export class CompleteTeam {
   public readonly id: number
   public readonly name: string
   public readonly shortName: string
+  public readonly stats: Stats[]
 
-  constructor(matchTeamID: number) {
-    this.id = matchTeamID
-    this.name = Teams.filter((x) => x.id === matchTeamID)[0].name
-    this.shortName = Teams.filter((x) => x.id === matchTeamID)[0].short_name
+  constructor(matchTeam: Team) {
+    this.id = matchTeam.id
+    this.name = Teams.filter((x) => x.id === matchTeam.id)[0].name
+    this.shortName = Teams.filter((x) => x.id === matchTeam.id)[0].short_name
+    this.stats = matchTeam.stats
   }
 }

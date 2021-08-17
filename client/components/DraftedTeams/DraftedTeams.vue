@@ -8,9 +8,17 @@
       :class="props.columnClass"
     >
       <div class="p-4 m-2 bg-white rounded-sm">
-        <div class="p-2 mb-2 border-b border-gray-800">
+        <div
+          class="flex items-center justify-between p-2 mb-2 border-b border-gray-800 "
+        >
           {{ team.teamName }}
-          <span v-if="team.allowedTransfers">!</span>
+          <span v-if="team.allowedTransfers">
+            <svg-icon
+              class="w-5 h-5"
+              name="icons/icon-transfer"
+              title="transfers allowed"
+            />
+          </span>
         </div>
         <div
           v-for="player in team.teamPlayers"
@@ -33,11 +41,12 @@
                 class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.image"
                 :alt="player.name"
+                @error="loadFallbackImage"
               />
             </span>
             <span class="w-2/12 p-2">{{ player.teamShort }}</span>
             <span class="w-5/12 p-2 text-center">{{ player.name }}</span>
-            <span class="w-2/12 p-2">{{ player.price }}</span>
+            <span class="w-2/12 p-2 text-right">{{ player.price }}</span>
           </div>
           <div
             v-else
@@ -53,6 +62,7 @@
                 class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.transfers[0].player.image"
                 :alt="player.transfers[0].player.name"
+                @error="loadFallbackImage"
               />
             </span>
             <span class="w-2/12 p-2">
@@ -80,6 +90,7 @@
                 class="w-6 h-6 mr-4 border border-white rounded-full"
                 :src="player.image"
                 :alt="player.name"
+                @error="loadFallbackImage"
               />
               {{ player.name }} was transferred out on week
               {{ player.transfers[0].transferWeek }}
@@ -93,6 +104,7 @@
 
 <script lang="ts">
 import { useContext, computed } from '@nuxtjs/composition-api'
+import { loadFallbackImage } from '@/helpers/helpers'
 
 export default {
   props: {
@@ -110,6 +122,7 @@ export default {
     return {
       draftedTeamData,
       props,
+      loadFallbackImage,
     }
   },
 }

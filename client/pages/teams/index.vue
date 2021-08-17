@@ -7,9 +7,17 @@
       class="flex flex-col w-1/4"
     >
       <div class="p-4 m-2 bg-white rounded-sm">
-        <div class="p-2 mb-2 border-b border-gray-800">
+        <div
+          class="flex items-center justify-between p-2 mb-2 border-b border-gray-800 "
+        >
           {{ team.teamName }}
-          <span v-if="team.allowedTransfers">!</span>
+          <span v-if="team.allowedTransfers">
+            <svg-icon
+              class="w-5 h-5"
+              name="icons/icon-transfer"
+              title="transfers allowed"
+            />
+          </span>
         </div>
         <div
           v-for="player in team.teamPlayers"
@@ -32,6 +40,7 @@
                 class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.image"
                 :alt="player.name"
+                @error="loadFallbackImage"
               />
             </span>
             <span class="w-2/12 p-2">{{ player.teamShort }}</span>
@@ -52,6 +61,7 @@
                 class="w-6 h-6 m-auto rounded-full shadow-md"
                 :src="player.transfers[0].player.image"
                 :alt="player.transfers[0].player.name"
+                @error="loadFallbackImage"
               />
             </span>
             <span class="w-2/12 p-2">
@@ -79,6 +89,7 @@
                 class="w-6 h-6 mr-4 border border-white rounded-full"
                 :src="player.image"
                 :alt="player.name"
+                @error="loadFallbackImage"
               />
               {{ player.name }} was transferred out on week
               {{ player.transfers[0].transferWeek }}
@@ -92,14 +103,18 @@
 
 <script>
 import { useContext, computed } from '@nuxtjs/composition-api'
+import { loadFallbackImage } from '@/helpers/helpers'
 
 export default {
   setup() {
     const { store } = useContext()
-    const draftedTeamData = computed(() => store.getters.getDraftedTeams)
+    const draftedTeamData = computed(
+      () => store.getters['drafted-data/getDraftedTeams']
+    )
 
     return {
       draftedTeamData,
+      loadFallbackImage,
     }
   },
 }

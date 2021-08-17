@@ -185,6 +185,7 @@
 <script>
 import { useContext, computed, ref } from '@nuxtjs/composition-api'
 import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton'
+import { loadFallbackImage } from '@/helpers/helpers'
 
 export default {
   components: {
@@ -201,11 +202,6 @@ export default {
     const selectedPlayer = ref(null)
     const modalIsActive = ref(false)
     const isLoading = computed(() => store.getters.isLoading)
-
-    const loadFallbackImage = (e) => {
-      e.target.src =
-        'https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/40x40/Photo-Missing.png'
-    }
 
     const showPlayerDataModal = (playerID) => {
       const player = playerData.value.filter((e) => e.id === playerID)

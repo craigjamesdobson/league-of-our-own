@@ -1,13 +1,13 @@
-import { Fixtures } from '../Interfaces/Fixtures'
-import { CompleteFixture } from './CompleteFixture'
+import { Weeks } from '../Interfaces/Weeks'
+import { CompleteWeek } from './CompleteWeek'
 
 export class CompleteFixtures {
   public readonly name: string
-  public readonly matches: Object
+  public readonly weeks: Object
 
-  constructor(fixtures: Fixtures) {
+  constructor(fixtures: Weeks) {
     this.name = fixtures.name
-    this.matches = fixtures.matches.map((x) => new CompleteFixture(x))
+    this.weeks = fixtures.weeks.map((x) => new CompleteWeek(x))
   }
 }
 

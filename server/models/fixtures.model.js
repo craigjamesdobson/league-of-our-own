@@ -1,16 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const fixturesSchema = new Schema({
-  team_id: {
-    type: Number,
-  },
-  name: {
-    type: String,
-  },
-  matches: {
-    type: Array,
-  },
-});
+const fixturesSchema = new Schema(
+  {
+    week: String,
+    fixtures: [
+      {
+        id: Number,
+        home: {
+          id: Number,
+          stats: Array
+        },
+        away: {
+          id: Number,
+          stats: Array
+        },
+        score: [Number, Number]
+      },
+    ]
+  }
+);
 
 module.exports = mongoose.model('fixtures', fixturesSchema);

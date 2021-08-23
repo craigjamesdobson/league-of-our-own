@@ -6,6 +6,7 @@ const fixturesSchema = new Schema(
     week: String,
     fixtures: [
       {
+        _id: false,
         id: Number,
         home: {
           id: Number,
@@ -18,7 +19,10 @@ const fixturesSchema = new Schema(
         score: [Number, Number]
       },
     ]
+  },
+  {
+    timestamps: true
   }
 );
 
-module.exports = mongoose.model('fixtures', fixturesSchema);
+module.exports = mongoose.model('fixtures-2021-2022', fixturesSchema);

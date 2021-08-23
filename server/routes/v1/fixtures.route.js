@@ -4,4 +4,6 @@ const fixturesController = require('../../controllers/fixtures.controller');
 
 router.get('/', fixturesController.getFixtures);
 
+router.post('/update', fixturesController.updateFixtures);
+
 module.exports = router;

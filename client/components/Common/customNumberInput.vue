@@ -2,8 +2,8 @@
   <div class="flex h-5 number-input-container">
     <button
       class="flex items-center justify-center w-5 h-5 text-white rounded-l-sm  decrement bg-primary hover:bg-indigo-900 disabled:opacity-50 focus:outline-none animate"
-      disabled
       @click="decrement"
+      :disabled="value === 0"
     >
       -
     </button>
@@ -13,7 +13,6 @@
       pattern="[0-9]*"
       type="number"
       :value="value"
-      @change="$emit('custom-input-value', parseInt($event.target.value))"
     />
     <button
       class="flex items-center justify-center w-5 h-5 text-white rounded-r-sm  bg-primary hover:bg-indigo-900 focus:outline-none animate"
@@ -27,11 +26,9 @@
 <script>
 export default {
   props: {
-    value: {
-      default: 0,
-      type: Number,
-    },
+    value: Number,
   },
+  emits: ['input-updated'],
   setup(_, { emit }) {
     const increment = (event) => {
       const numberInput = event.target.parentNode.querySelector(
@@ -44,7 +41,7 @@ export default {
       decrementButton.disabled = false
 
       event.target.parentNode.classList.add('active')
-      emit('custom-input-value', parseInt(numberInput.value))
+      emit('input-updated', +numberInput.value)
     }
 
     const decrement = (event) => {
@@ -61,7 +58,7 @@ export default {
         decrementButton.disabled = true
         event.target.parentNode.classList.remove('active')
       }
-      emit('custom-input-value', parseInt(numberInput.value))
+      emit('input-updated', +numberInput.value)
     }
     return { increment, decrement }
   },

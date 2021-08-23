@@ -22,47 +22,29 @@
       >
         <p class="text-sm">Please select a gameweek to view fixtures</p>
       </div>
-      <div
-        v-else
-        class="grid items-start grid-flow-row grid-cols-2 gap-4 auto-rows-max"
-      >
+      <div v-else>
+        <div class="flex">
+          <button
+            class="p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn"
+            @click="updateFixtureCollection"
+            >Save Gameweek {{ fixtureData.activeFixtureRound }}</button
+          >
+        </div>
         <div
-          v-for="(fixture, index) in fixtureData.filteredFixtures"
-          :key="index"
-          class="flex flex-col justify-center"
+          class="grid items-start grid-flow-row grid-cols-2 gap-4 auto-rows-max"
         >
           <div
-            class="flex items-center justify-between py-2 mb-2 text-xl border-t border-b  border-primary"
+            v-for="(fixture, index) in fixtureData.filteredFixtures"
+            :key="index"
+            class="flex flex-col justify-center"
           >
-            <span>Fixture</span>
-            <span
-              class="flex items-center justify-center w-5 h-5 text-sm text-white rounded-full  bg-primary"
-            >
-              {{ index + 1 }}
-            </span>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="home js-fixture-container">
-              <div class="flex justify-between mb-4 uppercase">
-                <h3>{{ fixture.home.name }}</h3>
-                <customNumberInput></customNumberInput>
-              </div>
-              <PlayersForm
-                :key="fixture.home.id"
-                :team-id="fixture.home.id"
-                @player-stats-change="storePlayerStats"
-              ></PlayersForm>
-            </div>
-            <div class="away js-fixture-container">
-              <div class="flex justify-between mb-4 uppercase">
-                <h3>{{ fixture.away.name }}</h3>
-                <customNumberInput></customNumberInput>
-              </div>
-              <PlayersForm
-                :key="fixture.away.id"
-                :team-id="fixture.away.id"
-              ></PlayersForm>
-            </div>
+            <Fixture
+              :fixture-data="{
+                fixture: fixture,
+                fixtureID: index + 1,
+                selectedWeek: fixtureData.activeFixtureRound,
+              }"
+            ></Fixture>
           </div>
         </div>
       </div>
@@ -75,25 +57,31 @@
 
 <script lang="ts">
 import DraftedTeams from '@/components/DraftedTeams/DraftedTeams.vue'
-import PlayersForm from '@/components/Fixtures/PlayersForm.vue'
-import customNumberInput from '@/components/Common/customNumberInput.vue'
+import Fixture from '@/components/Fixtures/Fixture.vue'
 import { useFixtureLogic } from './fixtureLogic'
 
 export default {
   components: {
     DraftedTeams,
-    PlayersForm,
-    customNumberInput,
+    Fixture,
   },
   setup() {
-    const { playerStats, fixtureData, storePlayerStats, filterFixtures } =
-      useFixtureLogic()
+    const {
+      playerStats,
+      fixtureData,
+      storePlayerStats,
+      filterFixtures,
+      updateFixtureScore,
+      updateFixtureCollection,
+    } = useFixtureLogic()
 
     return {
       fixtureData,
       filterFixtures,
       playerStats,
       storePlayerStats,
+      updateFixtureScore,
+      updateFixtureCollection,
     }
   },
 }

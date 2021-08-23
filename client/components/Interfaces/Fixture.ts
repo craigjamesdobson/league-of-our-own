@@ -7,6 +7,8 @@ export interface Stats {
 
 export interface Team {
   id: number
+  name?: string
+  shortName?: string
   stats: Stats[]
 }
 

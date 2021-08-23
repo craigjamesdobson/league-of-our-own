@@ -6,14 +6,13 @@ import {
   initPlayerData,
   getFilteredPlayers,
 } from '@/components/Players/CreatePlayerData'
-import { initDraftedTeamData } from '@/components/DraftedTeams/CreateDraftedTeams'
 import { Player } from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,
   FETCH_PLAYERS,
-  FETCH_DRAFTEDTEAMS,
   FETCH_FIXTURES,
+  UPDATE_FIXTURESCORE,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
@@ -83,6 +82,18 @@ export const mutations = {
 
   [FETCH_FIXTURES](state: State, fixtures: any) {
     state.fixtures = initFixturesData(fixtures)
+  },
+
+  [UPDATE_FIXTURESCORE](state: State, formData: any) {
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === formData.activeWeek.toString()
+    )
+
+    const selectedFixture = selectedWeek[0].fixtures.filter(
+      (x) => x.id === formData.selectedFixtureID
+    )
+
+    selectedFixture[0].score = formData.score
   },
 }
 
@@ -158,6 +169,34 @@ export const actions = {
       })
   },
 
+  async updateFixtureScore({ commit, state }: any, formData: any) {
+    await commit('UPDATE_FIXTURESCORE', formData)
+  },
+
+  async updateFixtureCollection({ state }: any, activeWeek: any) {
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === activeWeek.toString()
+    )
+
+    const button: HTMLButtonElement = document.querySelector(
+      '.js-update-fixture-collection-btn'
+    )
+
+    button.innerHTML = 'Saving Week...'
+
+    await axios
+      .post('/v1/fixtures/update', ...selectedWeek)
+      .then((res) => {
+        setTimeout(() => {
+          button.innerHTML = 'Save Week'
+        }, 1000)
+      })
+      .catch((err) => {
+        button.innerHTML = 'Save Week'
+        throw err.response.data
+      })
+  },
+
   logoutUser({ commit }: any) {
     commit('SET_USER', {})
     localStorage.removeItem('token')
@@ -197,6 +236,10 @@ export const getters = {
 
   getFixtures: (state: State) => {
     return state.fixtures
+  },
+
+  getFilteredFixtures: (state: State) => (fixtureRound) => {
+    return state.fixtures.filter((x) => +x.week === fixtureRound)[0].fixtures
   },
 
   getUser: (state: State) => {

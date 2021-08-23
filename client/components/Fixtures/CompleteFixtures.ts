@@ -1,16 +1,17 @@
 import { Weeks } from '../Interfaces/Weeks'
+import { CompleteFixture } from './CompleteFixture'
 import { CompleteWeek } from './CompleteWeek'
 
 export class CompleteFixtures {
-  public readonly name: string
-  public readonly weeks: Object
+  public readonly week: String
+  public readonly fixtures: Object
 
-  constructor(fixtures: Weeks) {
-    this.name = fixtures.name
-    this.weeks = fixtures.weeks.map((x) => new CompleteWeek(x))
+  constructor(weeks: Weeks) {
+    this.week = weeks.week
+    this.fixtures = weeks.fixtures.map((x) => new CompleteFixture(x))
   }
 }
 
-export function initFixturesData(fixtures) {
-  return fixtures.map((x) => new CompleteFixtures(x))
+export function initFixturesData(weeks) {
+  return weeks.map((x) => new CompleteFixtures(x))
 }

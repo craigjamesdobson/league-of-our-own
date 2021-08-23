@@ -11,7 +11,6 @@ import { Fixture } from '~/components/Interfaces/Fixture'
 interface fixtureData {
   fixturesTotal: number
   activeFixtureRound: number
-  fixtures: CompleteWeek[]
   filteredFixtures: Fixture[]
 }
 
@@ -40,7 +39,6 @@ const useFixtureLogic = () => {
   const fixtureData: fixtureData = reactive({
     fixturesTotal: 38,
     activeFixtureRound: null,
-    fixtures: computed(() => store.getters.getFixtures[0].weeks),
     filteredFixtures: [],
   })
 
@@ -61,12 +59,30 @@ const useFixtureLogic = () => {
 
   const filterFixtures = (fixtureRound: number) => {
     fixtureData.activeFixtureRound = fixtureRound
-    fixtureData.filteredFixtures = fixtureData.fixtures.filter(
-      (x) => +x.week === fixtureData.activeFixtureRound
-    )[0].fixtures
+    fixtureData.filteredFixtures =
+      store.getters.getFilteredFixtures(fixtureRound)
   }
 
-  return { fixtureData, filterFixtures, playerStats, storePlayerStats }
+  const updateFixtureScore = (fixturePayload) => {
+    store.dispatch('updateFixtureScore', {
+      score: fixturePayload.score,
+      selectedFixtureID: fixturePayload.selectedFixtureID,
+      activeWeek: fixturePayload.selectedWeek,
+    })
+  }
+
+  const updateFixtureCollection = () => {
+    store.dispatch('updateFixtureCollection', fixtureData.activeFixtureRound)
+  }
+
+  return {
+    fixtureData,
+    filterFixtures,
+    updateFixtureScore,
+    updateFixtureCollection,
+    playerStats,
+    storePlayerStats,
+  }
 }
 
 export { useFixtureLogic }

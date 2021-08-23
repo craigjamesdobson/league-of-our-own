@@ -1,8 +1,8 @@
 import { Fixture } from './Fixture'
 
 export interface Weeks {
-  name: string
-  weeks: Week[]
+  week: string
+  fixtures: Fixture[]
 }
 
 export interface Week {

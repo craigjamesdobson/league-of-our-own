@@ -16,7 +16,7 @@
           <h3>{{ fixtureData.fixture.home.name }}</h3>
           <customNumberInput
             :class="{ active: fixtureData.fixture.score[0] > 0 }"
-            :value="fixtureData.fixture.score[0]"
+            :value="fixtureData.fixture.score[0].toString()"
             @input-updated="updateScore(0, $event)"
           ></customNumberInput>
         </div>
@@ -31,13 +31,14 @@
           <h3>{{ fixtureData.fixture.away.name }}</h3>
           <customNumberInput
             :class="{ active: fixtureData.fixture.score[1] > 0 }"
-            :value="fixtureData.fixture.score[1]"
+            :value="fixtureData.fixture.score[1].toString()"
             @input-updated="updateScore(1, $event)"
           ></customNumberInput>
         </div>
         <PlayersForm
           :key="fixtureData.fixture.away.id"
           :team-id="fixtureData.fixture.away.id"
+          @player-stat-change="storePlayerStats"
         ></PlayersForm>
       </div>
     </div>
@@ -48,7 +49,6 @@
 import PlayersForm from '@/components/Fixtures/PlayersForm.vue'
 import customNumberInput from '@/components/Common/customNumberInput.vue'
 import { useFixtureLogic } from '@/pages/fixtures/fixtureLogic'
-import { reactive } from '@vue/composition-api'
 
 export default {
   components: {

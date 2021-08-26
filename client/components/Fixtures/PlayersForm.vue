@@ -36,7 +36,8 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                @custom-input-value="
+                value="0"
+                @input-updated="
                   emitPlayerStats('goalsScored', $event, player.id)
                 "
               ></customNumberInput>
@@ -44,7 +45,8 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                @custom-input-value="
+                value="0"
+                @input-updated="
                   emitPlayerStats('assists', $event, player.id)
                 "
               ></customNumberInput>

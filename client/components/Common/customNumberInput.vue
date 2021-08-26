@@ -26,7 +26,7 @@
 <script>
 export default {
   props: {
-    value: Number,
+    value: String,
   },
   emits: ['input-updated'],
   setup(_, { emit }) {

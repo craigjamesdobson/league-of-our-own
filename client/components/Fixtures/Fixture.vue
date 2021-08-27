@@ -23,7 +23,15 @@
         <PlayersForm
           :key="fixtureData.fixture.home.id"
           :team-id="fixtureData.fixture.home.id"
-          @player-stats-change="storePlayerStats"
+          :player-stats="fixtureData.fixture.home.stats"
+          @player-stats-change="
+            storePlayerStats(
+              fixtureData.selectedWeek,
+              fixtureData.fixtureID,
+              'home',
+              $event
+            )
+          "
         ></PlayersForm>
       </div>
       <div class="away js-fixture-container">
@@ -38,7 +46,15 @@
         <PlayersForm
           :key="fixtureData.fixture.away.id"
           :team-id="fixtureData.fixture.away.id"
-          @player-stat-change="storePlayerStats"
+          :player-stats="fixtureData.fixture.home.stats"
+          @player-stats-change="
+            storePlayerStats(
+              fixtureData.selectedWeek,
+              fixtureData.fixtureID,
+              'away',
+              $event
+            )
+          "
         ></PlayersForm>
       </div>
     </div>

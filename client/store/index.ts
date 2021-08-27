@@ -13,6 +13,7 @@ import {
   FETCH_PLAYERS,
   FETCH_FIXTURES,
   UPDATE_FIXTURESCORE,
+  STORE_PLAYERSTATS,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
@@ -95,6 +96,29 @@ export const mutations = {
 
     selectedFixture[0].score = formData.score
   },
+
+  [STORE_PLAYERSTATS](state: State, formData: any) {
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === formData.activeWeek.toString()
+    )
+
+    const selectedFixture = selectedWeek[0].fixtures.filter(
+      (x) => x.id === formData.activeFixture
+    )
+
+    const activePlayerStats = selectedFixture[0][
+      formData.activeVenue
+    ].stats.filter((x) => x.playerID === formData.stats.playerID)
+    if (activePlayerStats.length) {
+      const currentStatType = formData.stats.statType
+      activePlayerStats[0][currentStatType] = formData.stats.playerStat
+    } else {
+      selectedFixture[0][formData.activeVenue].stats.push({
+        playerID: formData.stats.playerID,
+        [formData.stats.statType]: formData.stats.playerStat,
+      })
+    }
+  },
 }
 
 export const actions = {
@@ -169,8 +193,12 @@ export const actions = {
       })
   },
 
-  async updateFixtureScore({ commit, state }: any, formData: any) {
+  async updateFixtureScore({ commit }: any, formData: any) {
     await commit('UPDATE_FIXTURESCORE', formData)
+  },
+
+  async storePlayerStats({ commit }: any, formData: any) {
+    await commit('STORE_PLAYERSTATS', formData)
   },
 
   async updateFixtureCollection({ state }: any, activeWeek: any) {

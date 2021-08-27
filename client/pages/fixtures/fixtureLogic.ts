@@ -42,21 +42,6 @@ const useFixtureLogic = () => {
     filteredFixtures: [],
   })
 
-  const storePlayerStats = (e: PlayerStatData) => {
-    const activePlayerStats = playerStats.value.filter(
-      (x) => x.playerID === e.playerID
-    )
-    if (activePlayerStats.length) {
-      const currentStatType = e.statType
-      activePlayerStats[0][currentStatType] = e.playerStat
-    } else {
-      playerStats.value.push({
-        playerID: e.playerID,
-        [e.statType]: e.playerStat,
-      })
-    }
-  }
-
   const filterFixtures = (fixtureRound: number) => {
     fixtureData.activeFixtureRound = fixtureRound
     fixtureData.filteredFixtures =
@@ -68,6 +53,15 @@ const useFixtureLogic = () => {
       score: fixturePayload.score,
       selectedFixtureID: fixturePayload.selectedFixtureID,
       activeWeek: fixturePayload.selectedWeek,
+    })
+  }
+
+  const storePlayerStats = (week, fixture, venue, playerStats) => {
+    store.dispatch('storePlayerStats', {
+      activeWeek: week,
+      activeFixture: fixture,
+      activeVenue: venue,
+      stats: playerStats,
     })
   }
 

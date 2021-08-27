@@ -36,7 +36,9 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                value="0"
+                :value="setPlayerStat(player.id, 'goalsScored').toString()"
+                :class="{ active: setPlayerStat(player.id, 'goalsScored') > 0 }"
+                :disabled="setPlayerStat(player.id, 'goalsScored') === 0"
                 @input-updated="
                   emitPlayerStats('goalsScored', $event, player.id)
                 "
@@ -45,10 +47,10 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                value="0"
-                @input-updated="
-                  emitPlayerStats('assists', $event, player.id)
-                "
+                :value="setPlayerStat(player.id, 'assists').toString()"
+                :class="{ active: setPlayerStat(player.id, 'assists') > 0 }"
+                :disabled="setPlayerStat(player.id, 'goalsScored') === 0"
+                @input-updated="emitPlayerStats('assists', $event, player.id)"
               ></customNumberInput>
             </span>
             <span class="flex">
@@ -56,7 +58,11 @@
                 :value="player.id"
                 :disabled="player.playerType > 2"
                 class="w-5 h-5 clean-sheet"
+                :class="{
+                  active: setPlayerStat(player.id, 'cleanSheet') === true,
+                }"
                 type="checkbox"
+                :checked="setPlayerStat(player.id, 'cleanSheet')"
                 @change="
                   emitPlayerStats(
                     'cleanSheet',
@@ -71,7 +77,11 @@
               <input
                 :value="player.id"
                 class="w-5 h-5 sent-off"
+                :class="{
+                  active: setPlayerStat(player.id, 'sentOff') === true,
+                }"
                 type="checkbox"
+                :checked="setPlayerStat(player.id, 'sentOff')"
                 @change="
                   emitPlayerStats('sentOff', $event.target.checked, player.id)
                   toggleCheckboxStatus($event)
@@ -87,7 +97,7 @@
 </template>
 
 <script>
-import { useContext, computed, reactive } from '@nuxtjs/composition-api'
+import { useContext, computed } from '@nuxtjs/composition-api'
 import { loadFallbackImage } from '@/helpers/helpers'
 import customNumberInput from '@/components/Common/customNumberInput'
 export default {
@@ -99,11 +109,10 @@ export default {
       type: Number,
       required: true,
     },
+    playerStats: Array,
   },
   setup(props, { emit }) {
     const { store } = useContext()
-
-    const playerStats = reactive([])
 
     const playerData = computed(() => store.getters.getFilteredPlayerData)
 
@@ -116,6 +125,17 @@ export default {
       },
       {}
     )
+
+    const setPlayerStat = (playerID, stat) => {
+      const activePlayer = props.playerStats.filter(
+        (x) => x.playerID === playerID
+      )[0]
+
+      const defaultValue =
+        stat === 'goalsScored' || stat === 'assists' ? 0 : false
+
+      return activePlayer?.[stat] ?? defaultValue
+    }
 
     const emitPlayerStats = (statType, playerStat, playerID) => {
       emit('player-stats-change', {
@@ -155,7 +175,7 @@ export default {
       props,
       loadFallbackImage,
       toggleAccordionBody,
-      playerStats,
+      setPlayerStat,
       emitPlayerStats,
       toggleCheckboxStatus,
     }

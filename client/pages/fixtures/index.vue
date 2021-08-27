@@ -23,11 +23,15 @@
         <p class="text-sm">Please select a gameweek to view fixtures</p>
       </div>
       <div v-else>
-        <div class="flex">
+        <div class="flex items-center justify-between">
           <button
             class="p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn"
             @click="updateFixtureCollection"
             >Save Gameweek {{ fixtureData.activeFixtureRound }}</button
+          >
+          <div class="text-sm"
+            >This fixture was lasted updated on
+            {{ new Date(fixtureData.updatedAt).toLocaleString() }}</div
           >
         </div>
         <div

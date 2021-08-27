@@ -80,45 +80,6 @@ export const mutations = {
   [GET_TEAMS](state: State, teams: any) {
     state.teams = teams
   },
-
-  [FETCH_FIXTURES](state: State, fixtures: any) {
-    state.fixtures = initFixturesData(fixtures)
-  },
-
-  [UPDATE_FIXTURESCORE](state: State, formData: any) {
-    const selectedWeek = state.fixtures.filter(
-      (x) => x.week === formData.activeWeek.toString()
-    )
-
-    const selectedFixture = selectedWeek[0].fixtures.filter(
-      (x) => x.id === formData.selectedFixtureID
-    )
-
-    selectedFixture[0].score = formData.score
-  },
-
-  [STORE_PLAYERSTATS](state: State, formData: any) {
-    const selectedWeek = state.fixtures.filter(
-      (x) => x.week === formData.activeWeek.toString()
-    )
-
-    const selectedFixture = selectedWeek[0].fixtures.filter(
-      (x) => x.id === formData.activeFixture
-    )
-
-    const activePlayerStats = selectedFixture[0][
-      formData.activeVenue
-    ].stats.filter((x) => x.playerID === formData.stats.playerID)
-    if (activePlayerStats.length) {
-      const currentStatType = formData.stats.statType
-      activePlayerStats[0][currentStatType] = formData.stats.playerStat
-    } else {
-      selectedFixture[0][formData.activeVenue].stats.push({
-        playerID: formData.stats.playerID,
-        [formData.stats.statType]: formData.stats.playerStat,
-      })
-    }
-  },
 }
 
 export const actions = {
@@ -182,49 +143,6 @@ export const actions = {
       })
   },
 
-  async fetchFixtures({ commit }: any) {
-    await axios
-      .get('/v1/fixtures')
-      .then((res) => {
-        commit('FETCH_FIXTURES', res.data.fixtures)
-      })
-      .catch((err) => {
-        throw err.response.data
-      })
-  },
-
-  async updateFixtureScore({ commit }: any, formData: any) {
-    await commit('UPDATE_FIXTURESCORE', formData)
-  },
-
-  async storePlayerStats({ commit }: any, formData: any) {
-    await commit('STORE_PLAYERSTATS', formData)
-  },
-
-  async updateFixtureCollection({ state }: any, activeWeek: any) {
-    const selectedWeek = state.fixtures.filter(
-      (x) => x.week === activeWeek.toString()
-    )
-
-    const button: HTMLButtonElement = document.querySelector(
-      '.js-update-fixture-collection-btn'
-    )
-
-    button.innerHTML = 'Saving Week...'
-
-    await axios
-      .post('/v1/fixtures/update', ...selectedWeek)
-      .then((res) => {
-        setTimeout(() => {
-          button.innerHTML = 'Save Week'
-        }, 1000)
-      })
-      .catch((err) => {
-        button.innerHTML = 'Save Week'
-        throw err.response.data
-      })
-  },
-
   logoutUser({ commit }: any) {
     commit('SET_USER', {})
     localStorage.removeItem('token')
@@ -260,14 +178,6 @@ export const getters = {
 
   getDraftedTeams: (state: State) => {
     return state.draftedTeamData
-  },
-
-  getFixtures: (state: State) => {
-    return state.fixtures
-  },
-
-  getFilteredFixtures: (state: State) => (fixtureRound) => {
-    return state.fixtures.filter((x) => +x.week === fixtureRound)[0].fixtures
   },
 
   getUser: (state: State) => {

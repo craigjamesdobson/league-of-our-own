@@ -5,7 +5,6 @@ import {
   reactive,
   onMounted,
 } from '@nuxtjs/composition-api'
-import { CompleteWeek } from '~/components/Fixtures/CompleteWeek'
 import { Fixture } from '~/components/Interfaces/Fixture'
 
 interface fixtureData {
@@ -13,6 +12,7 @@ interface fixtureData {
   activeFixtureRound: number
   filteredFixtures: Fixture[]
   updatedAt: any
+  updatedBy: any
 }
 
 interface playerStats {
@@ -36,15 +36,17 @@ const useFixtureLogic = () => {
     activeFixtureRound: null,
     filteredFixtures: [],
     updatedAt: null,
+    updatedBy: null,
   })
 
   const filterFixtures = (fixtureRound: number) => {
-    const filteredFixtureData = (fixtureData.filteredFixtures =
-      store.getters['fixture-data/getFilteredFixtures'](fixtureRound))
+    const filteredFixtureData =
+      store.getters['fixture-data/getFilteredFixtures'](fixtureRound)
 
     fixtureData.activeFixtureRound = fixtureRound
     fixtureData.filteredFixtures = filteredFixtureData.fixtures
     fixtureData.updatedAt = filteredFixtureData.updatedAt
+    fixtureData.updatedBy = filteredFixtureData.updatedBy
   }
 
   const updateFixtureScore = (fixturePayload) => {
@@ -70,7 +72,7 @@ const useFixtureLogic = () => {
       fixtureData.activeFixtureRound
     )
 
-    fixtureData.updatedAt = new Date().toISOString()
+    filterFixtures(fixtureData.activeFixtureRound)
   }
 
   return {

@@ -15,6 +15,7 @@ const updateFixtures = catchAsync(async (req, res) => {
   try {
     await Fixtures.updateOne(
       { week: req.body.week },
+      { updatedBy: req.body.updatedBy },
       { $set: {fixtures: req.body.fixtures} }
     )
     res.status(httpStatus.OK).send({

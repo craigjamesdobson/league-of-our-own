@@ -5,6 +5,7 @@ import {
   FETCH_FIXTURES,
   UPDATE_FIXTURESCORE,
   STORE_PLAYERSTATS,
+  SET_UPDATEDBYUSER,
 } from './mutation-types'
 import { initFixturesData } from '~/components/Fixtures/CompleteFixtures'
 
@@ -26,6 +27,7 @@ interface Weeks {
   week: string
   fixtures: fixture[]
   updatedAt: string
+  updatedBy?: string
 }
 
 interface State {
@@ -76,6 +78,15 @@ export const mutations = {
       })
     }
   },
+
+  [SET_UPDATEDBYUSER](state: State, payload) {
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === payload.activeWeek.toString()
+    )
+
+    selectedWeek[0].updatedAt = new Date().toISOString()
+    selectedWeek[0].updatedBy = payload.userName
+  },
 }
 
 export const actions = {
@@ -98,11 +109,10 @@ export const actions = {
     await commit('STORE_PLAYERSTATS', formData)
   },
 
-  async updateFixtureCollection({ state }: any, activeWeek: any) {
-    const selectedWeek = state.fixtures.filter(
-      (x) => x.week === activeWeek.toString()
-    )
-
+  async updateFixtureCollection(
+    { state, commit, getters }: any,
+    activeWeek: any
+  ) {
     const button: HTMLButtonElement = document.querySelector(
       '.js-update-fixture-collection-btn'
     )
@@ -110,17 +120,30 @@ export const actions = {
     const buttonPrevState = button.innerText
     button.innerText = 'Saving...'
 
-    await axios
-      .post('/v1/fixtures/update', ...selectedWeek)
-      .then(() => {
-        setTimeout(() => {
-          button.innerHTML = buttonPrevState
-        }, 1000)
+    const userName = getters.getUserName
+
+    try {
+      await commit('SET_UPDATEDBYUSER', { activeWeek, userName })
+    } catch (err) {
+      throw err
+    }
+
+    console.log(2)
+
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === activeWeek.toString()
+    )
+
+    try {
+      await axios.post('/v1/fixtures/update', ...selectedWeek)
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000)
       })
-      .catch((err) => {
-        button.innerHTML = buttonPrevState
-        throw err.response.data
-      })
+      button.innerHTML = buttonPrevState
+    } catch (err) {
+      button.innerHTML = buttonPrevState
+      throw err.response.data
+    }
   },
 }
 
@@ -131,6 +154,14 @@ export const getters = {
 
   getFilteredFixtures: (state: State) => (fixtureRound) => {
     const fixture = state.fixtures.filter((x) => +x.week === fixtureRound)[0]
-    return { fixtures: fixture.fixtures, updatedAt: fixture.updatedAt }
+    return {
+      fixtures: fixture.fixtures,
+      updatedAt: fixture.updatedAt,
+      updatedBy: fixture.updatedBy,
+    }
+  },
+
+  getUserName: (state, getters, rootState, rootGetters) => {
+    return rootState.user.name
   },
 }

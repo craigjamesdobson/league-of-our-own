@@ -29,9 +29,14 @@
             @click="updateFixtureCollection"
             >Save Gameweek {{ fixtureData.activeFixtureRound }}</button
           >
-          <div class="text-sm"
+          <div
+            v-if="fixtureData.updatedAt && fixtureData.updatedBy"
+            class="text-sm"
             >This fixture was lasted updated on
-            {{ new Date(fixtureData.updatedAt).toLocaleString() }}</div
+            <strong>{{
+              new Date(fixtureData.updatedAt).toLocaleString()
+            }}</strong>
+            by <strong>{{ fixtureData.updatedBy }}</strong></div
           >
         </div>
         <div
@@ -65,6 +70,7 @@ import Fixture from '@/components/Fixtures/Fixture.vue'
 import { useFixtureLogic } from './fixtureLogic'
 
 export default {
+  middleware: 'auth',
   components: {
     DraftedTeams,
     Fixture,

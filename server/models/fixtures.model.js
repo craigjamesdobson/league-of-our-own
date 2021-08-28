@@ -1,9 +1,11 @@
+const { string } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const fixturesSchema = new Schema(
   {
     week: String,
+    updatedBy: String,
     fixtures: [
       {
         _id: false,
@@ -18,7 +20,7 @@ const fixturesSchema = new Schema(
         },
         score: [Number, Number]
       },
-    ]
+    ],
   },
   {
     timestamps: true

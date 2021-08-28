@@ -11,14 +11,10 @@ import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,
   FETCH_PLAYERS,
-  FETCH_FIXTURES,
-  UPDATE_FIXTURESCORE,
-  STORE_PLAYERSTATS,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
 } from './mutation-types'
-import { initFixturesData } from '~/components/Fixtures/CompleteFixtures'
 
 interface User {
   name: string
@@ -30,7 +26,6 @@ interface State {
   playerData: any
   draftedTeamData: any
   teams: any
-  fixtures: any
   loading: boolean
   user: User
 }
@@ -174,10 +169,6 @@ export const getters = {
 
   getTeams: (state: State) => {
     return state.teams
-  },
-
-  getDraftedTeams: (state: State) => {
-    return state.draftedTeamData
   },
 
   getUser: (state: State) => {

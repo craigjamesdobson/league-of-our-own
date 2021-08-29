@@ -3,7 +3,7 @@
     <button
       class="flex items-center justify-center w-5 h-5 text-white rounded-l-sm  decrement bg-primary hover:bg-indigo-900 disabled:opacity-50 focus:outline-none animate"
       @click="decrement"
-      :disabled="value === 0"
+      :disabled="+value === 0"
     >
       -
     </button>

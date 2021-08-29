@@ -25,7 +25,7 @@
       <div v-else>
         <div class="flex items-center justify-between">
           <button
-            class="p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn"
+            class="flex items-center p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn update-fixture-collection-btn"
             @click="updateFixtureCollection"
             >Save Gameweek {{ fixtureData.activeFixtureRound }}</button
           >
@@ -96,3 +96,33 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+@keyframes rotate-forever {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.update-fixture-collection-btn {
+  &.loading {
+    &:after {
+      content: '';
+      animation-duration: 0.75s;
+      animation-iteration-count: infinite;
+      animation-name: rotate-forever;
+      animation-timing-function: linear;
+      height: 15px;
+      width: 15px;
+      border: 2px solid #ffffff;
+      border-right-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 10px;
+    }
+  }
+}
+</style>

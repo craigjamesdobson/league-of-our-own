@@ -15,12 +15,12 @@ const updateFixtures = catchAsync(async (req, res) => {
   try {
     await Fixtures.updateOne(
       { week: req.body.week },
-      { updatedBy: req.body.updatedBy },
       { $set: {fixtures: req.body.fixtures} }
     )
     res.status(httpStatus.OK).send({
       message: 'Fixtures have been updated'
     });
+    console.log('Fixtures have been updated')
   } catch {
       throw new ApiError(httpStatus.NOT_FOUND, 'Fixture not found');
   }

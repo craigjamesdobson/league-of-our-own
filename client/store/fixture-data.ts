@@ -117,8 +117,7 @@ export const actions = {
       '.js-update-fixture-collection-btn'
     )
 
-    const buttonPrevState = button.innerText
-    button.innerText = 'Saving...'
+    button.classList.add('loading')
 
     const userName = getters.getUserName
 
@@ -127,8 +126,6 @@ export const actions = {
     } catch (err) {
       throw err
     }
-
-    console.log(2)
 
     const selectedWeek = state.fixtures.filter(
       (x) => x.week === activeWeek.toString()
@@ -139,9 +136,9 @@ export const actions = {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000)
       })
-      button.innerHTML = buttonPrevState
+      button.classList.remove('loading')
     } catch (err) {
-      button.innerHTML = buttonPrevState
+      button.classList.remove('loading')
       throw err.response.data
     }
   },

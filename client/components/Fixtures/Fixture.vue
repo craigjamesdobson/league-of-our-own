@@ -46,7 +46,7 @@
         <PlayersForm
           :key="fixtureData.fixture.away.id"
           :team-id="fixtureData.fixture.away.id"
-          :player-stats="fixtureData.fixture.home.stats"
+          :player-stats="fixtureData.fixture.away.stats"
           @player-stats-change="
             storePlayerStats(
               fixtureData.selectedWeek,

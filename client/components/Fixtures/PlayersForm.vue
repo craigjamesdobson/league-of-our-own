@@ -38,7 +38,6 @@
                 :key="player.id"
                 :value="setPlayerStat(player.id, 'goalsScored').toString()"
                 :class="{ active: setPlayerStat(player.id, 'goalsScored') > 0 }"
-                :disabled="setPlayerStat(player.id, 'goalsScored') === 0"
                 @input-updated="
                   emitPlayerStats('goalsScored', $event, player.id)
                 "
@@ -49,7 +48,6 @@
                 :key="player.id"
                 :value="setPlayerStat(player.id, 'assists').toString()"
                 :class="{ active: setPlayerStat(player.id, 'assists') > 0 }"
-                :disabled="setPlayerStat(player.id, 'goalsScored') === 0"
                 @input-updated="emitPlayerStats('assists', $event, player.id)"
               ></customNumberInput>
             </span>
@@ -88,7 +86,9 @@
                 "
               />
             </span>
-            <span class="text-center">0</span>
+            <span class="text-center">{{
+              setPlayerStat(player.id, 'points')
+            }}</span>
           </div>
         </div>
       </div>
@@ -132,7 +132,9 @@ export default {
       )[0]
 
       const defaultValue =
-        stat === 'goalsScored' || stat === 'assists' ? 0 : false
+        stat === 'goalsScored' || stat === 'assists' || stat === 'points'
+          ? 0
+          : false
 
       return activePlayer?.[stat] ?? defaultValue
     }

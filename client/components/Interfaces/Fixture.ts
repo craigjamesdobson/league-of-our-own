@@ -3,6 +3,7 @@ export interface Stats {
   assists?: number
   cleanSheet?: boolean
   sentOff?: boolean
+  points?: number
 }
 
 export interface Team {

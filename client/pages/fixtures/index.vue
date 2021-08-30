@@ -27,32 +27,34 @@
           <button
             class="flex items-center p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn update-fixture-collection-btn"
             @click="updateFixtureCollection"
-            >Save Gameweek {{ fixtureData.activeFixtureRound }}</button
           >
+            Save Gameweek {{ fixtureData.activeFixtureRound }}
+          </button>
           <div
             v-if="fixtureData.updatedAt && fixtureData.updatedBy"
             class="text-sm"
-            >This fixture was lasted updated on
-            <strong>{{
-              new Date(fixtureData.updatedAt).toLocaleString()
-            }}</strong>
-            by <strong>{{ fixtureData.updatedBy }}</strong></div
           >
+            This fixture was lasted updated on
+            <strong>
+              {{ new Date(fixtureData.updatedAt).toLocaleString() }}
+            </strong>
+            by
+            <strong>{{ fixtureData.updatedBy }}</strong>
+          </div>
         </div>
         <div
           class="grid items-start grid-flow-row grid-cols-2 gap-4 auto-rows-max"
         >
           <div
-            v-for="(fixture, index) in fixtureData.filteredFixtures"
+            v-for="(fixture, index) in filteredFixtureData.fixtures"
             :key="index"
             class="flex flex-col justify-center"
           >
             <Fixture
-              :fixture-data="{
-                fixture: fixture,
-                fixtureID: index + 1,
-                selectedWeek: fixtureData.activeFixtureRound,
-              }"
+              :fixture-id="index + 1"
+              :fixture-data="fixture"
+              :fixture-week="fixtureData.activeFixtureRound"
+              :key="index + 1"
             ></Fixture>
           </div>
         </div>
@@ -79,6 +81,7 @@ export default {
     const {
       playerStats,
       fixtureData,
+      filteredFixtureData,
       storePlayerStats,
       filterFixtures,
       updateFixtureScore,
@@ -88,6 +91,7 @@ export default {
     return {
       fixtureData,
       filterFixtures,
+      filteredFixtureData,
       playerStats,
       storePlayerStats,
       updateFixtureScore,

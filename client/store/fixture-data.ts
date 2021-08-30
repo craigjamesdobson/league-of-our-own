@@ -16,7 +16,7 @@ interface Team {
   stats: []
 }
 
-interface fixture {
+interface Fixture {
   id: number
   home: Team[]
   away: Team[]
@@ -25,7 +25,7 @@ interface fixture {
 
 interface Weeks {
   week: string
-  fixtures: fixture[]
+  fixtures: Fixture[]
   updatedAt: string
   updatedBy?: string
 }
@@ -34,9 +34,9 @@ interface State {
   fixtures: Weeks[]
 }
 
-export const state: State = {
+export const state = (): State => ({
   fixtures: [],
-}
+})
 
 export const mutations = {
   [FETCH_FIXTURES](state: State, fixtures: any) {
@@ -52,7 +52,7 @@ export const mutations = {
       (x) => x.id === formData.selectedFixtureID
     )
 
-    selectedFixture[0].score = formData.score
+    this._vm.$set(selectedFixture[0], 'score', formData.score)
   },
 
   [STORE_PLAYERSTATS](state: State, formData: any) {
@@ -70,11 +70,19 @@ export const mutations = {
 
     if (activePlayerStats.length) {
       const currentStatType = formData.stats.statType
-      activePlayerStats[0][currentStatType] = formData.stats.playerStat
+
+      this._vm.$set(
+        activePlayerStats[0],
+        [currentStatType],
+        formData.stats.playerStat
+      )
+
+      activePlayerStats[0] = { ...activePlayerStats[0], points: 10 }
     } else {
       selectedFixture[0][formData.activeVenue].stats.push({
         playerID: formData.stats.playerID,
         [formData.stats.statType]: formData.stats.playerStat,
+        points: 10,
       })
     }
   },

@@ -18,7 +18,7 @@ import {
 
 interface User {
   name: string
-  tokens: []
+  tokens: string
   role: string
 }
 
@@ -30,7 +30,7 @@ interface State {
   user: User
 }
 
-export const state = () => ({
+export const state = (): State => ({
   playerData: {
     players: {
       players: [],
@@ -41,7 +41,6 @@ export const state = () => ({
   },
   draftedTeamData: {},
   teams: Teams,
-  fixtures: {},
   loading: true,
   user: {
     name: '',

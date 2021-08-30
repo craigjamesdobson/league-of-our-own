@@ -7,53 +7,43 @@
       <span
         class="flex items-center justify-center w-5 h-5 text-sm text-white rounded-full  bg-primary"
       >
-        {{ fixtureData.fixtureID }}
+        {{ fixtureId }}
       </span>
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div class="home js-fixture-container">
         <div class="flex justify-between mb-4 uppercase">
-          <h3>{{ fixtureData.fixture.home.name }}</h3>
+          <h3>{{ fixtureData.home.name }}</h3>
           <customNumberInput
-            :class="{ active: fixtureData.fixture.score[0] > 0 }"
-            :value="fixtureData.fixture.score[0].toString()"
+            :class="{ active: fixtureData.score[0] > 0 }"
+            :value="fixtureData.score[0].toString()"
             @input-updated="updateScore(0, $event)"
           ></customNumberInput>
         </div>
         <PlayersForm
-          :key="fixtureData.fixture.home.id"
-          :team-id="fixtureData.fixture.home.id"
-          :player-stats="fixtureData.fixture.home.stats"
+          :key="fixtureData.home.id"
+          :team-id="fixtureData.home.id"
+          :player-stats="fixtureData.home.stats"
           @player-stats-change="
-            storePlayerStats(
-              fixtureData.selectedWeek,
-              fixtureData.fixtureID,
-              'home',
-              $event
-            )
+            storePlayerStats(fixtureWeek, fixtureId, 'home', $event)
           "
         ></PlayersForm>
       </div>
       <div class="away js-fixture-container">
         <div class="flex justify-between mb-4 uppercase">
-          <h3>{{ fixtureData.fixture.away.name }}</h3>
+          <h3>{{ fixtureData.away.name }}</h3>
           <customNumberInput
-            :class="{ active: fixtureData.fixture.score[1] > 0 }"
-            :value="fixtureData.fixture.score[1].toString()"
+            :class="{ active: fixtureData.score[1] > 0 }"
+            :value="fixtureData.score[1].toString()"
             @input-updated="updateScore(1, $event)"
           ></customNumberInput>
         </div>
         <PlayersForm
-          :key="fixtureData.fixture.away.id"
-          :team-id="fixtureData.fixture.away.id"
-          :player-stats="fixtureData.fixture.away.stats"
+          :key="fixtureData.away.id"
+          :team-id="fixtureData.away.id"
+          :player-stats="fixtureData.away.stats"
           @player-stats-change="
-            storePlayerStats(
-              fixtureData.selectedWeek,
-              fixtureData.fixtureID,
-              'away',
-              $event
-            )
+            storePlayerStats(fixtureWeek, fixtureId, 'away', $event)
           "
         ></PlayersForm>
       </div>
@@ -73,22 +63,21 @@ export default {
   },
 
   props: {
+    fixtureId: Number,
     fixtureData: Object,
+    fixtureWeek: Number,
   },
 
   setup(props) {
     const { updateFixtureScore, storePlayerStats } = useFixtureLogic()
 
     const updateScore = (venue, value) => {
-      props.fixtureData.fixture.score[venue] = value
+      props.fixtureData.score[venue] = value
 
       const fixturePayload = {
-        score: [
-          props.fixtureData.fixture.score[0],
-          props.fixtureData.fixture.score[1],
-        ],
-        selectedFixtureID: props.fixtureData.fixtureID,
-        selectedWeek: props.fixtureData.selectedWeek,
+        score: [props.fixtureData.score[0], props.fixtureData.score[1]],
+        selectedFixtureID: props.fixtureId,
+        selectedWeek: props.fixtureWeek,
       }
 
       updateFixtureScore(fixturePayload)

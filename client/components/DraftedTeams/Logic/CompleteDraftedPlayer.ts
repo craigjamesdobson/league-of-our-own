@@ -1,5 +1,5 @@
-import { Player } from '../Players/Player'
-import { PlayerPositionShort } from '../Interfaces/PlayerPosition'
+import { Player } from '../../Players/Player'
+import { PlayerPositionShort } from '../../Interfaces/PlayerPosition'
 import { DraftedTransfer } from './DraftedTransfer'
 
 export class CompleteDraftedPlayer {

@@ -32,15 +32,18 @@ interface Weeks {
 
 interface State {
   fixtures: Weeks[]
+  fixturesLoaded: Boolean
 }
 
 export const state = (): State => ({
   fixtures: [],
+  fixturesLoaded: false,
 })
 
 export const mutations = {
   [FETCH_FIXTURES](state: State, fixtures: any) {
     state.fixtures = initFixturesData(fixtures)
+    state.fixturesLoaded = true
   },
 
   [UPDATE_FIXTURESCORE](state: State, formData: any) {
@@ -76,13 +79,10 @@ export const mutations = {
         [currentStatType],
         formData.stats.playerStat
       )
-
-      activePlayerStats[0] = { ...activePlayerStats[0], points: 10 }
     } else {
       selectedFixture[0][formData.activeVenue].stats.push({
         playerID: formData.stats.playerID,
         [formData.stats.statType]: formData.stats.playerStat,
-        points: 10,
       })
     }
   },

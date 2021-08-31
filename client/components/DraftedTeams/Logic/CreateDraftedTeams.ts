@@ -1,4 +1,4 @@
-import { DraftedTeamData } from '../Interfaces/DraftedTeamData'
+import { DraftedTeamData } from '@/components/Interfaces/DraftedTeamData'
 // import { PlayerList } from '../../components/Players/PlayerList'
 import { DraftedTeam } from './DraftedTeam'
 import { CompleteDraftedTeam } from './CompleteDraftedTeam'

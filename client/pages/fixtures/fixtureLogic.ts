@@ -14,6 +14,7 @@ interface fixtureData {
   filteredFixtures: Fixture[]
   updatedAt: any
   updatedBy: any
+  fixturesLoaded: boolean
 }
 
 interface playerStats {
@@ -35,10 +36,11 @@ const useFixtureLogic = () => {
 
   const fixtureData: fixtureData = reactive({
     fixturesTotal: 38,
-    activeFixtureRound: null,
+    activeFixtureRound: 1,
     filteredFixtures: [],
     updatedAt: null,
     updatedBy: null,
+    fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded)
   })
 
   const filteredFixtureData = computed(() =>

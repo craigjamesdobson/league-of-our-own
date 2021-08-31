@@ -60,7 +60,7 @@
         </div>
       </div>
       <div>
-        <DraftedTeams column-class="w-1/4"></DraftedTeams>
+        <DraftedTeams v-if="fixtureData.fixturesLoaded" :fixture-data="filteredFixtureData.fixtures" column-class="w-1/4"></DraftedTeams>
       </div>
     </div>
   </div>

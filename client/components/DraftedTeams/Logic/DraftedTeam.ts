@@ -1,5 +1,5 @@
-import { DraftedPlayer } from '../DraftedTeams/DraftedPlayer'
-import { DraftedTeamDataElements } from '../Interfaces/DraftedTeamDataElements'
+import { DraftedPlayer } from '@/components/DraftedTeams/Logic/DraftedPlayer'
+import { DraftedTeamDataElements } from '@/components/Interfaces/DraftedTeamDataElements'
 
 // Player class
 export class DraftedTeam {

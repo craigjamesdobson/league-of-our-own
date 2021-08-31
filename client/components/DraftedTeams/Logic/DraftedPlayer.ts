@@ -1,4 +1,4 @@
-import { DraftedPlayers } from '../Interfaces/DraftedPlayers'
+import { DraftedPlayers } from '@/components/Interfaces/DraftedPlayers'
 import { DraftedTransfer } from './DraftedTransfer'
 
 export class DraftedPlayer {

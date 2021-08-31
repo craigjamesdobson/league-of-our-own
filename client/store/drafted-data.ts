@@ -1,5 +1,5 @@
 import { FETCH_DRAFTEDTEAMS } from './mutation-types'
-import { initDraftedTeamData } from '@/components/DraftedTeams/CreateDraftedTeams'
+import { initDraftedTeamData } from '@/components/DraftedTeams/Logic/CreateDraftedTeams'
 import axios from '@/plugins/axios'
 
 interface State {

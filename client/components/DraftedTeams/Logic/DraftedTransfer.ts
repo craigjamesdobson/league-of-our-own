@@ -1,4 +1,4 @@
-import { DraftedTransferData } from '../Interfaces/DraftedTransferData'
+import { DraftedTransferData } from '@/components/Interfaces/DraftedTransferData'
 
 export class DraftedTransfer {
   public readonly transferId: number

@@ -116,7 +116,7 @@
           >
             <svg-icon
               class="w-full h-full px-2 modal--badge"
-              :name="selectedPlayer.teamShort"
+              :name="'teams/' + selectedPlayer.teamShort"
             />
             <div class="flex flex-row items-end justify-between">
               <div class="w-24">

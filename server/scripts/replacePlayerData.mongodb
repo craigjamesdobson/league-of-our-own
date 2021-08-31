@@ -8,10 +8,9 @@ use('league-of-our-own');
 
 // The drop() command destroys all data from a collection.
 // Make sure you run it against the correct database and collection.
-db.players.drop();
+//db.players.drop();
 
-// Insert a few documents into the sales collection.
-db.players.insertMany([
+const playerData = [
     {
       "chance_of_playing_next_round": null,
       "chance_of_playing_this_round": null,
@@ -39549,4 +39548,31 @@ db.players.insertMany([
       "penalties_order": null,
       "penalties_text": ""
     }
-  ],);
+  ]
+
+// Insert a few documents into the sales collection.
+
+playerData.forEach(player => {
+  db.players.findOneAndUpdate(
+    { id: player.id },
+    { 
+      $set: {
+        id: player.id,
+        code: player.code,
+        status: player.status,
+        news: player.news,
+        status: player.status,
+        team: player.team,
+        now_cost: player.now_cost,
+        cost_change_start_fall: player.cost_change_start_fall,
+        first_name: player.first_name,
+        second_name: player.second_name,
+        web_name: player.web_name,
+        squad_number: player.squad_number,
+        element_type: player.element_type,
+      }
+    }
+  )
+})
+
+

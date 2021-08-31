@@ -40,7 +40,7 @@ const useFixtureLogic = () => {
     filteredFixtures: [],
     updatedAt: null,
     updatedBy: null,
-    fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded)
+    fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded),
   })
 
   const filteredFixtureData = computed(() =>

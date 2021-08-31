@@ -86,9 +86,10 @@
                 "
               />
             </span>
-            <span class="text-center">{{
-              setPlayerStat(player.id, 'points')
-            }}</span>
+            <!-- {{ player.gameWeekStats[0] ? player.gameWeekStats[0].points : 0 }} -->
+            <span class="text-center">
+              {{ setPlayerStat(player.id, 'points') }}
+            </span>
           </div>
         </div>
       </div>

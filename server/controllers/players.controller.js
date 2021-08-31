@@ -6,19 +6,20 @@ const catchAsync = require('../utils/catchAsync');
 const getPlayers = catchAsync(async (req, res) => {
   const players = await Player.find({}).select(
     `-_id
-     id 
-     code 
-     status 
-     news team 
-     now_cost 
-     cost_change_start_fall 
-     first_name 
-     second_name 
-     web_name 
-     element_type 
-     goals_scored 
-     assists 
-     clean_sheets`
+      id
+      code
+      status
+      news
+      status
+      team
+      now_cost
+      cost_change_start_fall
+      first_name
+      second_name
+      web_name
+      squad_number
+      element_type
+      gameweek_stats`
   );
   res
     .status(httpStatus.OK)

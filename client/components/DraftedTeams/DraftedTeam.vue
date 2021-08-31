@@ -1,14 +1,7 @@
 <template>
   <div class="p-4 m-2 bg-white rounded-sm">
     <div
-      class="
-        flex
-        items-center
-        justify-between
-        p-2
-        mb-2
-        border-b border-gray-800
-      "
+      class="flex items-center justify-between p-2 mb-2 border-b border-gray-800 "
     >
       {{ team.teamName }}
       <span v-if="team.allowedTransfers">
@@ -44,7 +37,7 @@
           />
         </span>
         <span class="w-2/12 p-2">{{ player.teamShort }}</span>
-        <span class="w-5/12 p-2 text-center text-sm">{{ player.name }}</span>
+        <span class="w-5/12 p-2 text-sm text-center">{{ player.name }}</span>
         <span class="w-2/12 p-2">
           <!-- {{ setPlayerPoints(player.id) }} -->
         </span>
@@ -86,14 +79,7 @@
       >
         <div
           v-if="player.transfers.length"
-          class="
-            flex
-            items-center
-            justify-center
-            w-full
-            text-center
-            cursor-pointer
-          "
+          class="flex items-center justify-center w-full text-center cursor-pointer "
         >
           <img
             class="w-6 h-6 mr-4 border border-white rounded-full"
@@ -123,5 +109,3 @@ export default {
   },
 }
 </script>
-
-<style></style>

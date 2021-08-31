@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 
 import { PlayerPositionShort } from './PlayerPosition'
+import { GameweekStats } from './GameweekStats'
 
 export interface PlayerDataElements {
   id: number
@@ -14,7 +15,5 @@ export interface PlayerDataElements {
   second_name: string
   web_name: string
   element_type: PlayerPositionShort
-  goals_scored: number
-  assists: number
-  clean_sheets: number
+  gameweek_stats: GameweekStats
 }

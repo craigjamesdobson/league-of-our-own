@@ -1,4 +1,5 @@
 import teamsData from '@/static/teams.json'
+import { GameweekStats } from '../Interfaces/GameweekStats'
 import { PlayerDataElements } from '../Interfaces/PlayerDataElements'
 import { PlayerPositionShort } from '../Interfaces/PlayerPosition'
 
@@ -22,9 +23,7 @@ export class Player {
   public readonly secondName: string
   public readonly name: string
   public readonly price: string
-  public readonly goalsScored: number
-  public readonly assists: number
-  public readonly cleanSheets: number
+  public readonly gameWeekStats: GameweekStats
 
   // Construct player objects
   constructor(player: PlayerDataElements) {
@@ -42,9 +41,7 @@ export class Player {
     this.name = player.web_name
     this.playerType = player.element_type
 
-    this.goalsScored = player.goals_scored
-    this.assists = player.assists
-    this.cleanSheets = player.clean_sheets
+    this.gameWeekStats = player.gameweek_stats
 
     for (const team of teamsData) {
       if (this.teamID === team.id) {

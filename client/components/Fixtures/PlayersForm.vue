@@ -2,7 +2,19 @@
   <div class="flex flex-col accordion">
     <div v-for="(playerTypes, key, index) in filteredPlayerData" :key="index">
       <button
-        class="flex items-center justify-between w-full p-2 mb-4 text-sm text-white uppercase rounded-sm  accordion__header bg-primary"
+        class="
+          flex
+          items-center
+          justify-between
+          w-full
+          p-2
+          mb-4
+          text-sm text-white
+          uppercase
+          rounded-sm
+          accordion__header
+          bg-primary
+        "
         @click.stop="toggleAccordionBody"
       >
         <h4>
@@ -15,7 +27,16 @@
       </button>
       <div class="justify-between hidden mb-4 accordion__body">
         <div
-          class="p-2 mb-2 text-xs font-bold uppercase bg-white rounded-sm  player-form-grid"
+          class="
+            p-2
+            mb-2
+            text-xs
+            font-bold
+            uppercase
+            bg-white
+            rounded-sm
+            player-form-grid
+          "
         >
           <span>Name</span>
           <span>Goals</span>
@@ -28,7 +49,12 @@
           <div
             v-for="player in playerTypes"
             :key="player.id"
-            class="p-2 text-sm border-b border-gray-100  player-row player-form-grid"
+            class="
+              p-2
+              text-sm
+              border-b border-gray-100
+              player-row player-form-grid
+            "
           >
             <span class="flex text-xs">
               {{ player.name }}
@@ -36,8 +62,8 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                :value="setPlayerStat(player.id, 'goalsScored').toString()"
-                :class="{ active: setPlayerStat(player.id, 'goalsScored') > 0 }"
+                :value="setPlayerStat(player, 'goalsScored').toString()"
+                :class="{ active: setPlayerStat(player, 'goalsScored') > 0 }"
                 @input-updated="
                   emitPlayerStats('goalsScored', $event, player.id)
                 "
@@ -46,8 +72,8 @@
             <span>
               <customNumberInput
                 :key="player.id"
-                :value="setPlayerStat(player.id, 'assists').toString()"
-                :class="{ active: setPlayerStat(player.id, 'assists') > 0 }"
+                :value="setPlayerStat(player, 'assists').toString()"
+                :class="{ active: setPlayerStat(player, 'assists') > 0 }"
                 @input-updated="emitPlayerStats('assists', $event, player.id)"
               ></customNumberInput>
             </span>
@@ -57,10 +83,10 @@
                 :disabled="player.playerType > 2"
                 class="w-5 h-5 clean-sheet"
                 :class="{
-                  active: setPlayerStat(player.id, 'cleanSheet') === true,
+                  active: setPlayerStat(player, 'cleanSheet') === true,
                 }"
                 type="checkbox"
-                :checked="setPlayerStat(player.id, 'cleanSheet')"
+                :checked="setPlayerStat(player, 'cleanSheet')"
                 @change="
                   emitPlayerStats(
                     'cleanSheet',
@@ -76,19 +102,18 @@
                 :value="player.id"
                 class="w-5 h-5 sent-off"
                 :class="{
-                  active: setPlayerStat(player.id, 'sentOff') === true,
+                  active: setPlayerStat(player, 'sentOff') === true,
                 }"
                 type="checkbox"
-                :checked="setPlayerStat(player.id, 'sentOff')"
+                :checked="setPlayerStat(player, 'sentOff')"
                 @change="
                   emitPlayerStats('sentOff', $event.target.checked, player.id)
                   toggleCheckboxStatus($event)
                 "
               />
             </span>
-            <!-- {{ player.gameWeekStats[0] ? player.gameWeekStats[0].points : 0 }} -->
             <span class="text-center">
-              {{ setPlayerStat(player.id, 'points') }}
+              {{ setPlayerStat(player, 'points') }}
             </span>
           </div>
         </div>
@@ -111,6 +136,7 @@ export default {
       required: true,
     },
     playerStats: Array,
+    fixtureWeek: Number,
   },
   setup(props, { emit }) {
     const { store } = useContext()
@@ -127,24 +153,27 @@ export default {
       {}
     )
 
-    const setPlayerStat = (playerID, stat) => {
-      const activePlayer = props.playerStats.filter(
-        (x) => x.playerID === playerID
-      )[0]
-
+    // TODO: Must be a better way to do this...
+    const setPlayerStat = (player, stat) => {
       const defaultValue =
         stat === 'goalsScored' || stat === 'assists' || stat === 'points'
           ? 0
           : false
 
-      return activePlayer?.[stat] ?? defaultValue
+      const currentWeekStats = player.gameWeekStats[props.fixtureWeek - 1]
+
+      if (!currentWeekStats) return defaultValue
+
+      const currentStat = currentWeekStats[stat]
+
+      return currentStat ?? defaultValue
     }
 
-    const emitPlayerStats = (statType, playerStat, playerID) => {
+    const emitPlayerStats = (statType, statValue, playerID) => {
       emit('player-stats-change', {
         statType,
         playerID,
-        playerStat,
+        statValue,
       })
     }
 

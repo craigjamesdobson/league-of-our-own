@@ -1,6 +1,7 @@
 import { Player } from '../../Players/Player'
 import { PlayerPositionShort } from '../../Interfaces/PlayerPosition'
 import { DraftedTransfer } from './DraftedTransfer'
+import { GameweekStats } from '~/components/Interfaces/GameweekStats'
 
 export class CompleteDraftedPlayer {
   public readonly price: string
@@ -15,6 +16,7 @@ export class CompleteDraftedPlayer {
   private readonly status: string
   private readonly image: string
   private readonly imageLarge: string
+  private readonly gameWeekStats: GameweekStats
   private readonly transfers: DraftedTransfer[]
 
   constructor(player: Player, transfers: DraftedTransfer[]) {
@@ -30,6 +32,7 @@ export class CompleteDraftedPlayer {
     this.price = player.price
     this.image = player.image
     this.imageLarge = player.imageLarge
+    this.gameWeekStats = player.gameWeekStats
     this.transfers = transfers
   }
 }

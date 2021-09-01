@@ -11,6 +11,7 @@ import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,
   FETCH_PLAYERS,
+  UPDATE_PLAYERS,
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
@@ -69,6 +70,31 @@ export const mutations = {
 
   [FETCH_PLAYERS](state: State, playerData: any) {
     state.playerData = initPlayerData(playerData.players)
+  },
+
+  [UPDATE_PLAYERS](state: State, data: any) {
+    const player = state.playerData.players.players.filter(
+      (x) => x.id === data.playerStats.playerID
+    )[0]
+
+    const gameweekPlayerStats = player.gameWeekStats.filter(
+      (x) => x.gameweek === data.fixtureWeek
+    )[0]
+
+    if (gameweekPlayerStats) {
+      this._vm.$set(
+        player.gameWeekStats[0],
+        data.playerStats.statType,
+        data.playerStats.statValue
+      )
+    } else {
+      player.gameWeekStats.push({
+        gameweek: data.fixtureWeek,
+        [data.playerStats.statType]: data.playerStats.statValue,
+      })
+    }
+
+    console.log(player)
   },
 
   [GET_TEAMS](state: State, teams: any) {
@@ -135,6 +161,10 @@ export const actions = {
         commit('SET_LOAD', false)
         throw err.response.data
       })
+  },
+
+  async updatePlayers({ commit }: any, playerData) {
+    commit('UPDATE_PLAYERS', playerData)
   },
 
   logoutUser({ commit }: any) {

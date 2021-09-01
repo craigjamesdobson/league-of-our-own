@@ -1,11 +1,28 @@
 <template>
   <div>
     <div
-      class="flex items-center justify-between py-2 mb-2 text-xl border-t border-b  border-primary"
+      class="
+        flex
+        items-center
+        justify-between
+        py-2
+        mb-2
+        text-xl
+        border-t border-b border-primary
+      "
     >
       <span>Fixture</span>
       <span
-        class="flex items-center justify-center w-5 h-5 text-sm text-white rounded-full  bg-primary"
+        class="
+          flex
+          items-center
+          justify-center
+          w-5
+          h-5
+          text-sm text-white
+          rounded-full
+          bg-primary
+        "
       >
         {{ fixtureId }}
       </span>
@@ -24,9 +41,8 @@
           :key="fixtureData.home.id"
           :team-id="fixtureData.home.id"
           :player-stats="fixtureData.home.stats"
-          @player-stats-change="
-            storePlayerStats(fixtureWeek, fixtureId, 'home', $event)
-          "
+          :fixture-week="fixtureWeek"
+          @player-stats-change="storePlayerStats(fixtureWeek, $event)"
         ></PlayersForm>
       </div>
       <div class="away js-fixture-container">
@@ -42,9 +58,8 @@
           :key="fixtureData.away.id"
           :team-id="fixtureData.away.id"
           :player-stats="fixtureData.away.stats"
-          @player-stats-change="
-            storePlayerStats(fixtureWeek, fixtureId, 'away', $event)
-          "
+          :fixture-week="fixtureWeek"
+          @player-stats-change="storePlayerStats(fixtureWeek, $event)"
         ></PlayersForm>
       </div>
     </div>

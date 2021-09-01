@@ -23,7 +23,7 @@ export class Player {
   public readonly secondName: string
   public readonly name: string
   public readonly price: string
-  public readonly gameWeekStats: GameweekStats
+  public readonly gameWeekStats: GameweekStats[]
 
   // Construct player objects
   constructor(player: PlayerDataElements) {

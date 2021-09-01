@@ -1,5 +1,5 @@
 export interface GameweekStats {
-  week?: number
+  gameweek?: number
   goalsScored?: number
   assists?: number
   cleanSheet?: boolean

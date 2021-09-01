@@ -6,7 +6,11 @@ import {
   computed,
 } from '@nuxtjs/composition-api'
 import { Fixture } from '~/components/Interfaces/Fixture'
-import { PlayerPosition } from '~/components/Interfaces/PlayerPosition'
+import {
+  PlayerPosition,
+  PlayerPositionShort,
+} from '~/components/Interfaces/PlayerPosition'
+import { Player } from '~/components/Players/Player'
 
 interface fixtureData {
   fixturesTotal: number
@@ -65,48 +69,46 @@ const useFixtureLogic = () => {
   }
 
   const storePlayerStats = async (
-    week,
-    fixture,
-    venue,
+    fixtureWeek: number,
     playerStats: playerStats
   ) => {
-    await store.dispatch('fixture-data/storePlayerStats', {
-      activeWeek: week,
-      activeFixture: fixture,
-      activeVenue: venue,
-      stats: playerStats,
+    await store.dispatch('updatePlayers', {
+      fixtureWeek: fixtureWeek,
+      playerStats: playerStats,
     })
 
-    const selectedWeek = store.state['fixture-data'].fixtures.filter(
-      (x) => x.week === week.toString()
+    const player = store.getters.getPlayerData.players.players.filter(
+      (x) => x.id === playerStats.playerID
     )
 
-    const selectedFixture = selectedWeek[0].fixtures.filter(
-      (x) => x.id === fixture
-    )
+    // const selectedWeek = store.state['fixture-data'].fixtures.filter(
+    //   (x) => x.week === week.toString()
+    // )
 
-    const activePlayerStats = selectedFixture[0][venue].stats.filter(
-      (x) => x.playerID === playerStats.playerID
-    )
+    // const selectedFixture = selectedWeek[0].fixtures.filter(
+    //   (x) => x.id === fixture
+    // )
 
-    const pointsTotal = calculatePlayerPoints(activePlayerStats)
+    // const activePlayerStats = selectedFixture[0][venue].stats.filter(
+    //   (x) => x.playerID === playerStats.playerID
+    // )
 
-    await store.dispatch('fixture-data/storePlayerStats', {
-      activeWeek: week,
-      activeFixture: fixture,
-      activeVenue: venue,
-      stats: {
+    const pointsTotal = calculatePlayerPoints(player[0], fixtureWeek)
+
+    await store.dispatch('updatePlayers', {
+      fixtureWeek: fixtureWeek,
+      playerStats: {
         playerID: playerStats.playerID,
-        playerStat: pointsTotal,
         statType: 'points',
+        statValue: pointsTotal,
       },
     })
   }
 
-  const calculatePlayerPoints = (playerStats: playerStats) => {
-    const playerPos = store.state.playerData.players.players.filter(
-      (x) => x.id === playerStats[0].playerID
-    )[0].playerType
+  const calculatePlayerPoints = (player: any, fixtureWeek: number) => {
+    const gameWeekStats: playerStats = player.gameWeekStats.filter(
+      (x) => x.gameweek === fixtureWeek
+    )[0]
 
     let totalPoints = 0
 
@@ -114,41 +116,41 @@ const useFixtureLogic = () => {
     let cleanSheetTotal = 0
     let sentOffTotal = 10
 
-    switch (playerPos) {
-      case PlayerPosition.Goalkeeper:
+    switch (player.playerType) {
+      case PlayerPositionShort.GK:
         goalsMultiplier = 10
         cleanSheetTotal = 5
         break
-      case PlayerPosition.Defender:
+      case PlayerPositionShort.DEF:
         goalsMultiplier = 7
         cleanSheetTotal = 2
         break
-      case PlayerPosition.Midfielder:
+      case PlayerPositionShort.MID:
         goalsMultiplier = 5
         break
-      case PlayerPosition.Forward:
+      case PlayerPositionShort.FWD:
         goalsMultiplier = 3
         break
     }
 
-    if (playerStats[0].cleanSheet) {
+    if (gameWeekStats.cleanSheet) {
       totalPoints += cleanSheetTotal
     }
 
-    if (playerStats[0].sentOff) {
+    if (gameWeekStats.sentOff) {
       totalPoints -= sentOffTotal
     }
 
-    if (playerStats[0].assists) {
-      totalPoints += 3 * playerStats[0].assists
+    if (gameWeekStats.assists) {
+      totalPoints += 3 * gameWeekStats.assists
     }
 
-    if (playerStats[0].goalsScored) {
-      totalPoints += playerStats[0].goalsScored * goalsMultiplier
+    if (gameWeekStats.goalsScored) {
+      totalPoints += gameWeekStats.goalsScored * goalsMultiplier
 
-      if (playerStats[0].goalsScored === 2) {
+      if (gameWeekStats.goalsScored === 2) {
         totalPoints += 5
-      } else if (playerStats[0].goalsScored >= 3) {
+      } else if (gameWeekStats.goalsScored >= 3) {
         totalPoints += 10
       }
     }

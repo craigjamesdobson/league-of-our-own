@@ -163,6 +163,10 @@ export const actions = {
       })
   },
 
+  async filterPlayers({ commit }: any, playerData) {
+    commit('FILTER_PLAYERS', playerData)
+  },
+
   async updatePlayers({ commit }: any, playerData) {
     commit('UPDATE_PLAYERS', playerData)
   },

@@ -117,7 +117,7 @@ export default {
     }
 
     const filterPlayers = () => {
-      store.commit('UPDATE_PLAYERS', filterData)
+      store.dispatch('filterPlayers', filterData)
     }
 
     return {

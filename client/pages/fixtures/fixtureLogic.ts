@@ -155,8 +155,6 @@ const useFixtureLogic = () => {
       }
     }
 
-    console.log(totalPoints)
-
     return totalPoints
   }
 

@@ -93,8 +93,6 @@ export const mutations = {
         [data.playerStats.statType]: data.playerStats.statValue,
       })
     }
-
-    console.log(player)
   },
 
   [GET_TEAMS](state: State, teams: any) {

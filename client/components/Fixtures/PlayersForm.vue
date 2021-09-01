@@ -2,19 +2,7 @@
   <div class="flex flex-col accordion">
     <div v-for="(playerTypes, key, index) in filteredPlayerData" :key="index">
       <button
-        class="
-          flex
-          items-center
-          justify-between
-          w-full
-          p-2
-          mb-4
-          text-sm text-white
-          uppercase
-          rounded-sm
-          accordion__header
-          bg-primary
-        "
+        class="flex items-center justify-between w-full p-2 mb-4 text-sm text-white uppercase rounded-sm  accordion__header bg-primary"
         @click.stop="toggleAccordionBody"
       >
         <h4>
@@ -27,16 +15,7 @@
       </button>
       <div class="justify-between hidden mb-4 accordion__body">
         <div
-          class="
-            p-2
-            mb-2
-            text-xs
-            font-bold
-            uppercase
-            bg-white
-            rounded-sm
-            player-form-grid
-          "
+          class="p-2 mb-2 text-xs font-bold uppercase bg-white rounded-sm  player-form-grid"
         >
           <span>Name</span>
           <span>Goals</span>
@@ -49,12 +28,7 @@
           <div
             v-for="player in playerTypes"
             :key="player.id"
-            class="
-              p-2
-              text-sm
-              border-b border-gray-100
-              player-row player-form-grid
-            "
+            class="p-2 text-sm border-b border-gray-100  player-row player-form-grid"
           >
             <span class="flex text-xs">
               {{ player.name }}
@@ -160,7 +134,9 @@ export default {
           ? 0
           : false
 
-      const currentWeekStats = player.gameWeekStats[props.fixtureWeek - 1]
+      const currentWeekStats = player.gameWeekStats.filter(
+        (x) => x.gameweek === props.fixtureWeek
+      )[0]
 
       if (!currentWeekStats) return defaultValue
 

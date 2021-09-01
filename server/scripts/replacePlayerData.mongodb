@@ -40873,7 +40873,6 @@ playerData.forEach(player => {
         code: player.code,
         status: player.status,
         news: player.news,
-        status: player.status,
         team: player.team,
         now_cost: player.now_cost,
         cost_change_start_fall: player.cost_change_start_fall,
@@ -40882,6 +40881,9 @@ playerData.forEach(player => {
         web_name: player.web_name,
         squad_number: player.squad_number,
         element_type: player.element_type,
+      },
+      $setOnInsert: {
+        gameweek_stats: 
       }
     },
     { upsert: true, new: true }

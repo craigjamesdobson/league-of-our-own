@@ -83,7 +83,7 @@ export const mutations = {
 
     if (gameweekPlayerStats) {
       this._vm.$set(
-        player.gameWeekStats[0],
+        gameweekPlayerStats,
         data.playerStats.statType,
         data.playerStats.statValue
       )

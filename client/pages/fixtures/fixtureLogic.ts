@@ -6,11 +6,7 @@ import {
   computed,
 } from '@nuxtjs/composition-api'
 import { Fixture } from '~/components/Interfaces/Fixture'
-import {
-  PlayerPosition,
-  PlayerPositionShort,
-} from '~/components/Interfaces/PlayerPosition'
-import { Player } from '~/components/Players/Player'
+import { PlayerPositionShort } from '~/components/Interfaces/PlayerPosition'
 
 interface fixtureData {
   fixturesTotal: number
@@ -33,10 +29,6 @@ interface playerStats {
 const useFixtureLogic = () => {
   const { store } = useContext()
   const playerStats = ref<playerStats[]>([])
-
-  onMounted(() => {
-    store.dispatch('fixture-data/fetchFixtures')
-  })
 
   const fixtureData: fixtureData = reactive({
     fixturesTotal: 38,
@@ -80,18 +72,6 @@ const useFixtureLogic = () => {
     const player = store.getters.getPlayerData.players.players.filter(
       (x) => x.id === playerStats.playerID
     )
-
-    // const selectedWeek = store.state['fixture-data'].fixtures.filter(
-    //   (x) => x.week === week.toString()
-    // )
-
-    // const selectedFixture = selectedWeek[0].fixtures.filter(
-    //   (x) => x.id === fixture
-    // )
-
-    // const activePlayerStats = selectedFixture[0][venue].stats.filter(
-    //   (x) => x.playerID === playerStats.playerID
-    // )
 
     const pointsTotal = calculatePlayerPoints(player[0], fixtureWeek)
 

@@ -40862,6 +40862,21 @@ const playerData =
     }
 ]
 
+const defaultGamweekStats = [];
+
+
+for (let i = 1; i < 39; i++) {
+  defaultGamweekStats.push(
+  {
+    gameweek: i,
+    goalsScored: 0,
+    assists: 0,
+    cleanSheet: false,
+    sentOff: false,
+    points: 0,
+  });
+}
+
 // Insert a few documents into the sales collection.
 
 playerData.forEach(player => {
@@ -40881,10 +40896,8 @@ playerData.forEach(player => {
         web_name: player.web_name,
         squad_number: player.squad_number,
         element_type: player.element_type,
+        gameweek_stats: defaultGamweekStats,
       },
-      $setOnInsert: {
-        gameweek_stats: 
-      }
     },
     { upsert: true, new: true }
   )

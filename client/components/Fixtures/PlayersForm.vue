@@ -43,7 +43,7 @@
             <span class="flex">
               <input
                 :value="player.id"
-                :disabled="player.playerType > 2"
+                :disabled="player.playerType > 2 || oppositionScore > 0"
                 class="w-5 h-5 clean-sheet"
                 :class="{
                   active: getPlayerGameweekData(player).cleanSheet === true,
@@ -96,6 +96,7 @@ export default {
     },
     playerStats: Array,
     fixtureWeek: Number,
+    oppositionScore: Number,
   },
   setup(props, { emit }) {
     const { store } = useContext()

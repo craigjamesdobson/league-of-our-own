@@ -26,6 +26,31 @@ const getPlayers = catchAsync(async (req, res) => {
     .send({ message: 'Fetched players successfully.', players: players });
 });
 
+
+const updatePlayers = catchAsync(async (req, res) => {
+
+  try {
+    Player.bulkWrite(
+      req.body.map((player) => 
+        ({
+          updateOne: {
+            filter: { id: player.id },
+            update: { $set: { gameweek_stats: player.gameWeekStats } },
+          }
+        })
+      )
+    )
+    res.status(httpStatus.OK).send({
+        message: 'Players have been updated'
+    });
+    console.log('Players have been updated')
+  }
+  catch (err) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Player not found');
+  }
+});
+
 module.exports = {
   getPlayers,
+  updatePlayers,
 };

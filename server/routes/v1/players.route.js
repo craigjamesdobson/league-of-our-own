@@ -4,4 +4,6 @@ const playerController = require('../../controllers/players.controller');
 
 router.get('/', playerController.getPlayers);
 
+router.post('/update', playerController.updatePlayers);
+
 module.exports = router;

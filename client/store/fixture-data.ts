@@ -118,7 +118,7 @@ export const actions = {
   },
 
   async updateFixtureCollection(
-    { state, commit, getters }: any,
+    { state, commit, getters, rootState }: any,
     activeWeek: any
   ) {
     const button: HTMLButtonElement = document.querySelector(
@@ -139,11 +139,18 @@ export const actions = {
       (x) => x.week === activeWeek.toString()
     )
 
+    const gameWeekData = rootState.playerData.players.players.map((x) => {
+      return { id: x.id, gameWeekStats: x.gameWeekStats }
+    })
+
     try {
-      await axios.post('/v1/fixtures/update', ...selectedWeek)
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000)
-      })
+      await Promise.all([
+        axios.post('/v1/fixtures/update', ...selectedWeek),
+        axios.post('/v1/players/update', gameWeekData),
+        new Promise((resolve) => {
+          setTimeout(resolve, 1000)
+        }),
+      ])
       button.classList.remove('loading')
     } catch (err) {
       button.classList.remove('loading')

@@ -1,6 +1,6 @@
 <template>
   <div class="p-4 m-2 bg-white rounded-sm">
-    <div class="flex items-center justify-between p-2 mb-2 border-b border-gray-800">
+    <div class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800">
       {{ team.teamName }}
       <span v-if="team.allowedTransfers">
         <svg-icon class="w-5 h-5" name="icons/icon-transfer" title="transfers allowed" />
@@ -72,11 +72,16 @@
         </div>
       </div>
     </div>
+    <div class="flex justify-between p-2 pb-0">
+      <span>Total</span>
+      <strong>{{ totalPoints }}</strong>
+    </div>
   </div>
 </template>
 
 <script>
 import { loadFallbackImage } from '@/helpers/helpers'
+import { ref, watch, watchEffect } from '@vue/composition-api'
 
 export default {
   props: {
@@ -89,7 +94,25 @@ export default {
       return player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)[0]
     }
 
-    return { loadFallbackImage, getPlayerGameweekData }
+    const totalPoints = ref(0)
+
+    // TODO: Calculation is not taking into account transfers
+    const calculateTotalPoints = (team) => {
+      let points = 0
+      team.teamPlayers.forEach((player) => {
+        const gameWeekStats = player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)
+        points += gameWeekStats[0].points
+      })
+      totalPoints.value = points
+    }
+
+    calculateTotalPoints(props.team)
+
+    watch(props.team, (currentState, prevState) => {
+      calculateTotalPoints(currentState)
+    })
+
+    return { loadFallbackImage, totalPoints, getPlayerGameweekData }
   },
 }
 </script>

@@ -1,6 +1,5 @@
 {
   "semi": false,
   "singleQuote": true,
-  "htmlWhitespaceSensitivity": "ignore",
-  "printWidth": 150
+  "htmlWhitespaceSensitivity": "ignore"
 }

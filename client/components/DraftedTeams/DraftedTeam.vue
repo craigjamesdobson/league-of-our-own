@@ -1,9 +1,15 @@
 <template>
   <div class="p-4 m-2 bg-white rounded-sm">
-    <div class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800">
+    <div
+      class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800 "
+    >
       {{ team.teamName }}
       <span v-if="team.allowedTransfers">
-        <svg-icon class="w-5 h-5" name="icons/icon-transfer" title="transfers allowed" />
+        <svg-icon
+          class="w-5 h-5"
+          name="icons/icon-transfer"
+          title="transfers allowed"
+        />
       </span>
     </div>
     <div
@@ -15,27 +21,39 @@
       }"
     >
       <div
-        v-if="!player.transfers.length"
-        class="flex w-full border-b border-gray-100"
+        v-if="
+          !player.transfers.length ||
+          player.transfers[0].transferWeek > fixtureWeek
+        "
+        class="flex items-center w-full border-b border-gray-100"
         :class="{
           'opacity-25': player.isUnavailableForSeason,
-          'bg-red-500': getPlayerGameweekData(player).sentOff,
+          'bg-red-500 text-white':
+            dynamicView && getPlayerGameweekData(player).sentOff,
         }"
       >
         <span class="w-1/12 p-2">{{ player.id }}</span>
         <span class="w-2/12 p-2">
-          <img class="w-6 h-6 m-auto rounded-full shadow-md" :src="player.image" :alt="player.name" @error="loadFallbackImage" />
+          <img
+            class="w-6 h-6 m-auto rounded-full shadow-md"
+            :src="player.image"
+            :alt="player.name"
+            @error="loadFallbackImage"
+          />
         </span>
         <span class="w-2/12 p-2">{{ player.teamShort }}</span>
         <span class="w-5/12 p-2 text-sm text-center">{{ player.name }}</span>
-        <span class="w-2/12 p-2 text-right">
+        <span v-if="dynamicView" class="w-2/12 p-2 text-center">
           {{ getPlayerGameweekData(player).points }}
+        </span>
+        <span v-else class="w-2/12 p-2 text-center">
+          {{ player.price }}
         </span>
       </div>
       <div
         v-else
         :key="player.transfers[0].player.id"
-        class="flex w-full border-b border-gray-100 cursor-pointer"
+        class="flex items-center w-full border-b border-gray-100 cursor-pointer"
         :class="
               player.transfers[0].isCurrentWeekTransfer ? 'bg-yellow-500 text-gray-800' : 'bg-green-500 text-white',
             "
@@ -55,24 +73,40 @@
         <span class="w-5/12 p-2 text-center">
           {{ player.transfers[0].player.name }}
         </span>
-        <span class="w-2/12 p-2 text-right">
+        <span v-if="dynamicView" class="w-2/12 p-2 text-center">
           {{ getPlayerGameweekData(player.transfers[0].player).points }}
+        </span>
+        <span v-else class="w-2/12 p-2 text-center">
+          {{ player.transfers[0].player.price }}
         </span>
       </div>
       <div
+        v-if="
+          !player.transfers.length ||
+          player.transfers[0].transferWeek <= fixtureWeek
+        "
         class="flex flex-wrap justify-between w-full h-full"
         :class="{
-          'hidden absolute top-0 z-10 bg-red-600 text-white old-transfer hover:flex': player.transfers.length,
+          'hidden absolute top-0 z-10 bg-red-600 text-white old-transfer hover:flex':
+            player.transfers.length,
         }"
       >
-        <div v-if="player.transfers.length" class="flex items-center justify-center w-full text-center cursor-pointer">
-          <img class="w-6 h-6 mr-4 border border-white rounded-full" :src="player.image" :alt="player.name" @error="loadFallbackImage" />
+        <div
+          v-if="player.transfers.length"
+          class="flex items-center justify-center w-full text-center cursor-pointer "
+        >
+          <img
+            class="w-6 h-6 mr-4 border border-white rounded-full"
+            :src="player.image"
+            :alt="player.name"
+            @error="loadFallbackImage"
+          />
           {{ player.name }} was transferred out on week
           {{ player.transfers[0].transferWeek }}
         </div>
       </div>
     </div>
-    <div class="flex justify-between p-2 pb-0">
+    <div v-if="dynamicView" class="flex justify-between p-2 pb-0">
       <span>Total</span>
       <strong>{{ totalPoints }}</strong>
     </div>
@@ -81,32 +115,46 @@
 
 <script>
 import { loadFallbackImage } from '@/helpers/helpers'
-import { ref, watch, watchEffect } from '@vue/composition-api'
+import { ref, watch } from '@vue/composition-api'
 
 export default {
   props: {
     team: Object,
     fixtureWeek: Number,
+    dynamicView: Boolean,
   },
 
   setup(props) {
     const getPlayerGameweekData = (player) => {
-      return player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)[0]
+      return player.gameWeekStats.filter(
+        (x) => x.gameweek === props.fixtureWeek
+      )[0]
     }
 
     const totalPoints = ref(0)
 
-    // TODO: Calculation is not taking into account transfers
     const calculateTotalPoints = (team) => {
       let points = 0
       team.teamPlayers.forEach((player) => {
-        const gameWeekStats = player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)
+        let gameWeekStats = null
+        player.transfers.forEach((transferedPlayer) => {
+          if (transferedPlayer.transferWeek <= props.fixtureWeek) {
+            gameWeekStats = transferedPlayer.player.gameWeekStats.filter(
+              (x) => x.gameweek === props.fixtureWeek
+            )
+          }
+        })
+        if (gameWeekStats === null) {
+          gameWeekStats = player.gameWeekStats.filter(
+            (x) => x.gameweek === props.fixtureWeek
+          )
+        }
         points += gameWeekStats[0].points
       })
       totalPoints.value = points
     }
 
-    calculateTotalPoints(props.team)
+    if (props.dynamicView) calculateTotalPoints(props.team)
 
     watch(props.team, (currentState, prevState) => {
       calculateTotalPoints(currentState)

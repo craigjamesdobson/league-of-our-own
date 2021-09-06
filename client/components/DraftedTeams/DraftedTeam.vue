@@ -106,9 +106,11 @@
         </div>
       </div>
     </div>
-    <div v-if="dynamicView" class="flex justify-between p-2 pb-0">
+    <div v-if="dynamicView" class="flex justify-between pt-2">
       <span>Total</span>
-      <strong>{{ totalPoints }}</strong>
+      <strong class="w-2/12 text-center">
+        {{ getTeamGameweekData(team).points }}
+      </strong>
     </div>
   </div>
 </template>
@@ -116,6 +118,7 @@
 <script>
 import { loadFallbackImage } from '@/helpers/helpers'
 import { ref, watch } from '@vue/composition-api'
+import { useContext } from '@nuxtjs/composition-api'
 
 export default {
   props: {
@@ -131,36 +134,64 @@ export default {
       )[0]
     }
 
-    const totalPoints = ref(0)
-
-    const calculateTotalPoints = (team) => {
-      let points = 0
-      team.teamPlayers.forEach((player) => {
-        let gameWeekStats = null
-        player.transfers.forEach((transferedPlayer) => {
-          if (transferedPlayer.transferWeek <= props.fixtureWeek) {
-            gameWeekStats = transferedPlayer.player.gameWeekStats.filter(
-              (x) => x.gameweek === props.fixtureWeek
-            )
-          }
-        })
-        if (gameWeekStats === null) {
-          gameWeekStats = player.gameWeekStats.filter(
-            (x) => x.gameweek === props.fixtureWeek
-          )
-        }
-        points += gameWeekStats[0].points
-      })
-      totalPoints.value = points
+    const getTeamGameweekData = (team) => {
+      return team.gameWeekStats.filter(
+        (x) => x.gameweek === props.fixtureWeek
+      )[0]
     }
 
-    if (props.dynamicView) calculateTotalPoints(props.team)
+    const totalPoints = ref(0)
 
-    watch(props.team, (currentState, prevState) => {
-      calculateTotalPoints(currentState)
-    })
+    // const calculateGameweekStats = (team) => {
+    //   const gameweekData = {
+    //     goals: 0,
+    //     assists: 0,
+    //     redCards: 0,
+    //     cleanSheets: 0,
+    //     points: 0,
+    //   }
 
-    return { loadFallbackImage, totalPoints, getPlayerGameweekData }
+    //   team.teamPlayers.forEach((player) => {
+    //     let gameWeekStats = null
+    //     player.transfers.forEach((transferedPlayer) => {
+    //       if (transferedPlayer.transferWeek <= props.fixtureWeek) {
+    //         gameWeekStats = transferedPlayer.player.gameWeekStats.filter(
+    //           (x) => x.gameweek === props.fixtureWeek
+    //         )
+    //       }
+    //     })
+    //     if (gameWeekStats === null) {
+    //       gameWeekStats = player.gameWeekStats.filter(
+    //         (x) => x.gameweek === props.fixtureWeek
+    //       )
+    //     }
+
+    //     gameweekData.goals += gameWeekStats[0].goalsScored
+    //     gameweekData.assists += gameWeekStats[0].assists
+    //     gameweekData.redCards += gameWeekStats[0].sentOff ? 1 : 0
+    //     gameweekData.goals += gameWeekStats[0].cleanSheet ? 1 : 0
+    //     gameweekData.points += gameWeekStats[0].points
+    //   })
+
+    //   store.dispatch('drafted-data/updateDraftedTeams', {
+    //     teamID: team.teamID,
+    //     gameweekData: gameweekData,
+    //     fixtureWeek: props.fixtureWeek,
+    //   })
+    // }
+
+    // if (props.dynamicView) calculateGameweekStats(props.team)
+
+    // watch(props.team, (currentState, prevState) => {
+    //   calculateGameweekStats(currentState)
+    // })
+
+    return {
+      loadFallbackImage,
+      totalPoints,
+      getPlayerGameweekData,
+      getTeamGameweekData,
+    }
   },
 }
 </script>

@@ -8,6 +8,7 @@ const draftedTeamSchema = new Schema({
   team_email: String,
   allowed_transfers: Boolean,
   team_players: Array,
+  gameweek_stats: Array,
 });
 
 module.exports = mongoose.model('drafted-teams-2021_2022', draftedTeamSchema);

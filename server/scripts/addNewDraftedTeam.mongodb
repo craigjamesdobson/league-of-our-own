@@ -8,6 +8,20 @@ use('league-of-our-own');
 
 db['drafted-teams-2021_2022'].drop();
 
+const defaultGamweekStats = [];
+
+for (let i = 1; i < 39; i++) {
+  defaultGamweekStats.push(
+  {
+    gameweek: i,
+    goals: 0,
+    assists: 0,
+    cleanSheets: 0,
+    redCards: 0,
+    points: 0,
+  });
+}
+
 // Insert a few documents into the sales collection.
 db['drafted-teams-2021_2022'].insertMany([{
       "team_id": 1,
@@ -60,7 +74,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 2,
@@ -113,7 +128,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 3,
@@ -166,7 +182,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 4,
@@ -176,8 +193,14 @@ db['drafted-teams-2021_2022'].insertMany([{
       "allowed_transfers": false,
       "team_players": [
         {
-          "player_id": 257,
-          "transfers": []
+          "player_id": 1,
+          "transfers": [
+            {
+              "transfer_id": 257,
+              "transfer_week": 2,
+              "currentTransferDateExpiry" : "2021, 09, 10"
+            }
+          ]
         },
         {
           "player_id": 237,
@@ -219,7 +242,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 177,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 5,
@@ -272,7 +296,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 177,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 6,
@@ -325,7 +350,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 189,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 7,
@@ -378,7 +404,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 263,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 8,
@@ -431,7 +458,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 269,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 9,
@@ -484,7 +512,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 10,
@@ -537,7 +566,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 40,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 11,
@@ -590,7 +620,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 78,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 12,
@@ -643,7 +674,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 13,
@@ -696,7 +728,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 177,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 14,
@@ -749,7 +782,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 78,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 15,
@@ -802,7 +836,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 205,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 16,
@@ -855,7 +890,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 177,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 17,
@@ -908,7 +944,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 213,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 18,
@@ -961,7 +998,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 228,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 19,
@@ -1014,7 +1052,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 205,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 20,
@@ -1067,7 +1106,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 21,
@@ -1120,7 +1160,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 4,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 22,
@@ -1173,7 +1214,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 23,
@@ -1226,7 +1268,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 189,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 24,
@@ -1279,7 +1322,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 25,
@@ -1332,7 +1376,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 4,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 26,
@@ -1385,7 +1430,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 27,
@@ -1438,7 +1484,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 189,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 28,
@@ -1491,7 +1538,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 357,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 29,
@@ -1544,7 +1592,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 177,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 30,
@@ -1597,7 +1646,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 213,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 31,
@@ -1650,7 +1700,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 205,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 32,
@@ -1703,7 +1754,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 430,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 33,
@@ -1756,7 +1808,8 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 134,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     },
     {
       "team_id": 33,
@@ -1809,6 +1862,7 @@ db['drafted-teams-2021_2022'].insertMany([{
           "player_id": 4,
           "transfers": []
         }
-      ]
+      ],
+      "gameweek_stats": defaultGamweekStats
     }]
 );

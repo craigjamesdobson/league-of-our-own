@@ -1,3 +1,4 @@
+import { GameweekStats } from '~/components/Interfaces/GameweekStats'
 import { CompleteDraftedPlayer } from './CompleteDraftedPlayer'
 import { DraftedTeam } from './DraftedTeam'
 
@@ -11,6 +12,7 @@ export class CompleteDraftedTeam {
   private readonly teamValueAllowed: number
   private readonly totalTeamValue: number
   private readonly teamPlayers: CompleteDraftedPlayer[]
+  private readonly gameWeekStats: GameweekStats[]
 
   constructor(draftedTeam: DraftedTeam, players: any[]) {
     this.teamID = draftedTeam.teamID
@@ -21,8 +23,10 @@ export class CompleteDraftedTeam {
     this.allowedTransfers = draftedTeam.allowedTransfers
     this.teamValueAllowed = this.allowedTransfers ? 85 : 95
     this.teamPlayers = players.map(
-      (x) => new CompleteDraftedPlayer(x.player, x.transfers)
+      x => new CompleteDraftedPlayer(x.player, x.transfers)
     )
+
+    this.gameWeekStats = draftedTeam.gameWeekStats
 
     this.totalTeamValue = this.teamPlayers.reduce(
       (accumulator, current) => (accumulator += parseFloat(current.price)),

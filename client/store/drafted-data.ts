@@ -30,17 +30,6 @@ export const mutations = {
         (x) => x.gameweek === payload.fixtureWeek
       )
 
-      // selectedTeam.gameWeekStats.filter(
-      //   (x) => x.gameweek === payload.fixtureWeek
-      // )[0] = {
-      //   gameweek: teamStats.gameweek,
-      //   goals: teamStats.goals,
-      //   assists: teamStats.assists,
-      //   cleanSheets: teamStats.cleanSheets,
-      //   redCards: teamStats.redCards,
-      //   points: teamStats.points,
-      // }
-
       this._vm.$set(selectedTeam.gameWeekStats, teamGamweekIndex, {
         gameweek: teamStats.gameweek,
         goals: teamStats.goals,

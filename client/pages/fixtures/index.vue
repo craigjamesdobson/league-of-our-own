@@ -26,7 +26,7 @@
         <div class="flex items-center justify-between">
           <button
             class="flex items-center p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn update-fixture-collection-btn"
-            @click="updateFixtureCollection"
+            @click="updateHandler"
           >
             Save Gameweek {{ fixtureData.activeFixtureRound }}
           </button>
@@ -93,7 +93,7 @@ export default {
       storePlayerStats,
       filterFixtures,
       updateFixtureScore,
-      updateFixtureCollection,
+      updateHandler,
     } = useFixtureLogic()
 
     onMounted(() => {
@@ -107,7 +107,7 @@ export default {
       playerStats,
       storePlayerStats,
       updateFixtureScore,
-      updateFixtureCollection,
+      updateHandler,
     }
   },
 }

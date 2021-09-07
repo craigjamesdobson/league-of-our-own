@@ -83,8 +83,6 @@ const useFixtureLogic = () => {
         statValue: pointsTotal,
       },
     })
-
-    calculateGameweekStats(store.state['drafted-data'].draftedTeamData, player)
   }
 
   const completeTeamStats = {
@@ -92,9 +90,13 @@ const useFixtureLogic = () => {
     fixtureRound: fixtureData.activeFixtureRound,
   }
 
-  const calculateGameweekStats = (teams, updatedPlayer) => {
+  const calculateGameweekStats = async (teams) => {
+    const button: HTMLButtonElement = document.querySelector(
+      '.js-update-fixture-collection-btn'
+    )
+    button.classList.add('loading')
+
     completeTeamStats.gameweekData = []
-    let updateNeeded = false
     teams.forEach((team) => {
       const gameweekData = {
         gameweek: fixtureData.activeFixtureRound,
@@ -105,16 +107,6 @@ const useFixtureLogic = () => {
         cleanSheets: 0,
         points: 0,
       }
-
-      const hasUpdatedPlayer = team.teamPlayers.filter(
-        (x) => x.id === updatedPlayer[0].id
-      )
-
-      if (hasUpdatedPlayer.length === 0) {
-        return
-      }
-
-      updateNeeded = true
 
       team.teamPlayers.forEach((player) => {
         let gameWeekStats = null
@@ -141,7 +133,7 @@ const useFixtureLogic = () => {
       completeTeamStats.gameweekData.push(gameweekData)
     })
 
-    store.dispatch('drafted-data/updateDraftedTeams', {
+    await store.dispatch('drafted-data/updateDraftedTeams', {
       gameweekData: completeTeamStats,
       fixtureWeek: fixtureData.activeFixtureRound,
     })
@@ -209,12 +201,35 @@ const useFixtureLogic = () => {
     filterFixtures(fixtureData.activeFixtureRound)
   }
 
+  const toggleBtnLoadingState = (loading) => {
+    const button: HTMLButtonElement = document.querySelector(
+      '.js-update-fixture-collection-btn'
+    )
+
+    loading
+      ? button.classList.add('loading')
+      : button.classList.remove('loading')
+  }
+
+  const updateHandler = async () => {
+    toggleBtnLoadingState(true)
+
+    await Promise.all([
+      await updateFixtureCollection(),
+      await calculateGameweekStats(store.state['drafted-data'].draftedTeamData),
+      new Promise((resolve) => {
+        setTimeout(resolve, 1000)
+      }),
+    ])
+    toggleBtnLoadingState(false)
+  }
+
   return {
     fixtureData,
     filteredFixtureData,
     filterFixtures,
     updateFixtureScore,
-    updateFixtureCollection,
+    updateHandler,
     playerStats,
     storePlayerStats,
   }

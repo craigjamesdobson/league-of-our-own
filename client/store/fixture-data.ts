@@ -121,12 +121,6 @@ export const actions = {
     { state, commit, getters, rootState }: any,
     activeWeek: any
   ) {
-    const button: HTMLButtonElement = document.querySelector(
-      '.js-update-fixture-collection-btn'
-    )
-
-    button.classList.add('loading')
-
     const userName = getters.getUserName
 
     try {
@@ -147,13 +141,8 @@ export const actions = {
       await Promise.all([
         axios.post('/v1/fixtures/update', ...selectedWeek),
         axios.post('/v1/players/update', gameWeekData),
-        new Promise((resolve) => {
-          setTimeout(resolve, 1000)
-        }),
       ])
-      button.classList.remove('loading')
     } catch (err) {
-      button.classList.remove('loading')
       throw err.response.data
     }
   },

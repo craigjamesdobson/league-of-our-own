@@ -84,12 +84,7 @@ const useFixtureLogic = () => {
       },
     })
 
-    calculateGameweekStats(store.state['drafted-data'].draftedTeamData)
-  }
-
-  const updatePlayerPayload = {
-    fixtureWeek: fixtureData.activeFixtureRound,
-    completeTeamStats: [],
+    calculateGameweekStats(store.state['drafted-data'].draftedTeamData, player)
   }
 
   const completeTeamStats = {
@@ -97,9 +92,12 @@ const useFixtureLogic = () => {
     fixtureRound: fixtureData.activeFixtureRound,
   }
 
-  const calculateGameweekStats = (teams) => {
+  const calculateGameweekStats = (teams, updatedPlayer) => {
+    completeTeamStats.gameweekData = []
+    let updateNeeded = false
     teams.forEach((team) => {
       const gameweekData = {
+        gameweek: fixtureData.activeFixtureRound,
         teamID: team.teamID,
         goals: 0,
         assists: 0,
@@ -107,6 +105,17 @@ const useFixtureLogic = () => {
         cleanSheets: 0,
         points: 0,
       }
+
+      const hasUpdatedPlayer = team.teamPlayers.filter(
+        (x) => x.id === updatedPlayer[0].id
+      )
+
+      if (hasUpdatedPlayer.length === 0) {
+        return
+      }
+
+      updateNeeded = true
+
       team.teamPlayers.forEach((player) => {
         let gameWeekStats = null
 

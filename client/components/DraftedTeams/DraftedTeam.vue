@@ -55,7 +55,7 @@
         :key="player.transfers[0].player.id"
         class="flex items-center w-full border-b border-gray-100 cursor-pointer"
         :class="
-              player.transfers[0].isCurrentWeekTransfer ? 'bg-yellow-500 text-gray-800' : 'bg-green-500 text-white',
+              player.transfers[0].isCurrentWeekTransfer ? 'bg-yellow-300 text-gray-800' : 'bg-green-500 text-white',
             "
       >
         <span class="w-1/12 p-2">{{ player.transfers[0].player.id }}</span>
@@ -117,8 +117,6 @@
 
 <script>
 import { loadFallbackImage } from '@/helpers/helpers'
-import { ref, watch } from '@vue/composition-api'
-import { useContext } from '@nuxtjs/composition-api'
 
 export default {
   props: {
@@ -140,55 +138,8 @@ export default {
       )[0]
     }
 
-    const totalPoints = ref(0)
-
-    // const calculateGameweekStats = (team) => {
-    //   const gameweekData = {
-    //     goals: 0,
-    //     assists: 0,
-    //     redCards: 0,
-    //     cleanSheets: 0,
-    //     points: 0,
-    //   }
-
-    //   team.teamPlayers.forEach((player) => {
-    //     let gameWeekStats = null
-    //     player.transfers.forEach((transferedPlayer) => {
-    //       if (transferedPlayer.transferWeek <= props.fixtureWeek) {
-    //         gameWeekStats = transferedPlayer.player.gameWeekStats.filter(
-    //           (x) => x.gameweek === props.fixtureWeek
-    //         )
-    //       }
-    //     })
-    //     if (gameWeekStats === null) {
-    //       gameWeekStats = player.gameWeekStats.filter(
-    //         (x) => x.gameweek === props.fixtureWeek
-    //       )
-    //     }
-
-    //     gameweekData.goals += gameWeekStats[0].goalsScored
-    //     gameweekData.assists += gameWeekStats[0].assists
-    //     gameweekData.redCards += gameWeekStats[0].sentOff ? 1 : 0
-    //     gameweekData.goals += gameWeekStats[0].cleanSheet ? 1 : 0
-    //     gameweekData.points += gameWeekStats[0].points
-    //   })
-
-    //   store.dispatch('drafted-data/updateDraftedTeams', {
-    //     teamID: team.teamID,
-    //     gameweekData: gameweekData,
-    //     fixtureWeek: props.fixtureWeek,
-    //   })
-    // }
-
-    // if (props.dynamicView) calculateGameweekStats(props.team)
-
-    // watch(props.team, (currentState, prevState) => {
-    //   calculateGameweekStats(currentState)
-    // })
-
     return {
       loadFallbackImage,
-      totalPoints,
       getPlayerGameweekData,
       getTeamGameweekData,
     }

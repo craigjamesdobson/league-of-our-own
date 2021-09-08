@@ -128,7 +128,6 @@ export const actions = {
     } catch (err) {
       throw err
     }
-
     const selectedWeek = state.fixtures.filter(
       (x) => x.week === activeWeek.toString()
     )
@@ -138,7 +137,7 @@ export const actions = {
     })
 
     try {
-      await Promise.all([
+      return Promise.all([
         axios.post('/v1/fixtures/update', ...selectedWeek),
         axios.post('/v1/players/update', gameWeekData),
       ])

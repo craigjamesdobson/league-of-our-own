@@ -57,11 +57,17 @@ export const actions = {
       })
   },
 
-  async updateDraftedTeams({ commit }: any, payload) {
-    commit('UPDATE_DRAFTEDTEAMS', {
+  async updateDraftedTeams({ state, commit }: any, payload) {
+    await commit('UPDATE_DRAFTEDTEAMS', {
       fixtureWeek: payload.fixtureWeek,
       gameweekStats: payload.gameweekData,
     })
+
+    const gameWeekData = state.draftedTeamData.map((x) => {
+      return { id: x.teamID, gameWeekStats: x.gameWeekStats }
+    })
+
+    return axios.post('/v1/drafted-teams/update', gameWeekData)
   },
 }
 

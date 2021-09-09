@@ -23,7 +23,12 @@ export class Player {
   public readonly secondName: string
   public readonly name: string
   public readonly price: string
-  public readonly gameWeekStats: GameweekStats
+  public readonly gameWeekStats: any
+  public readonly totalPoints: any
+  public readonly totalGoals: any
+  public readonly totalAssists: any
+  public readonly totalRedCards: any
+  public readonly totalCleanSheets: any
 
   // Construct player objects
   constructor(player: PlayerDataElements) {
@@ -49,6 +54,22 @@ export class Player {
         this.teamShort = team.short_name
       }
     }
+
+    this.totalPoints = player.gameweek_stats
+      .map((stat) => stat.points)
+      .reduce((prev, next) => prev + next)
+    this.totalGoals = player.gameweek_stats
+      .map((stat) => stat.goalsScored)
+      .reduce((prev, next) => prev + next)
+    this.totalAssists = player.gameweek_stats
+      .map((stat) => +stat.assists)
+      .reduce((prev, next) => prev + next)
+    this.totalCleanSheets = player.gameweek_stats
+      .map((stat) => +stat.cleanSheet)
+      .reduce((prev, next) => prev + next)
+    this.totalRedCards = player.gameweek_stats
+      .map((stat) => +stat.sentOff)
+      .reduce((prev, next) => prev + next)
 
     // Create availability objects
     switch (true) {

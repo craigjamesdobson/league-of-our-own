@@ -15,5 +15,5 @@ export interface PlayerDataElements {
   second_name: string
   web_name: string
   element_type: PlayerPositionShort
-  gameweek_stats: GameweekStats
+  gameweek_stats: GameweekStats[]
 }

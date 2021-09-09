@@ -5,11 +5,7 @@
       class="flex flex-row w-full transition duration-500 ease-in-out  bg-offWhite dark:bg-gray-700"
     >
       <div class="flex flex-col w-full">
-        <div
-          class="sticky top-0 z-50 w-full p-4 mb-2 bg-white border-b-2 border-gray-300 "
-        >
-          <h1 class="text-2xl">Players</h1>
-        </div>
+        <Header></Header>
         <Nuxt class="flex mx-10 my-2" keep-alive />
       </div>
     </main>
@@ -20,10 +16,12 @@
 <script>
 import { useContext, computed } from '@nuxtjs/composition-api'
 import Sidebar from '@/components/Sidebar'
+import Header from '@/components/Header'
 
 export default {
   components: {
     Sidebar,
+    Header,
   },
   setup() {
     const { store } = useContext()

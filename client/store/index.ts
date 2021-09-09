@@ -198,6 +198,12 @@ export const getters = {
     }
   },
 
+  getSortedPlayerStat: (state: State) => (stat, amountToReturn: number) => {
+    return [...state.playerData.players.players]
+      .sort((a: Player, b: Player) => b[stat] - a[stat])
+      .slice(0, amountToReturn)
+  },
+
   getTeams: (state: State) => {
     return state.teams
   },

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-between">
     <h1>Hello {{ userData.name }}</h1>
-    <button class="p-2 border-primary border" @click="logoutHandler">
+    <button class="p-2 border border-primary" @click="logoutHandler">
       Log out
     </button>
   </div>

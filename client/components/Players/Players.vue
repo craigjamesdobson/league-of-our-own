@@ -154,26 +154,41 @@
                     {{ selectedPlayer.availabilityNews }}
                   </strong>
                 </div>
-                <ul class="flex flex-col items-end w-1/4 ml-auto">
-                  <li class="flex justify-between w-full">
-                    <span>Goals:</span>
-                    <strong>{{ selectedPlayer.goalsScored }}</strong>
-                  </li>
-                  <li class="flex justify-between w-full">
-                    <span>Assists:</span>
-                    <strong>{{ selectedPlayer.assists }}</strong>
-                  </li>
-                  <li
-                    v-if="
-                      selectedPlayer.playerType === 1 ||
-                      selectedPlayer.playerType === 2
-                    "
-                    class="flex justify-between w-full"
+                <div class="flex flex-col items-end w-1/4 ml-auto text-sm">
+                  <h4
+                    class="flex justify-end w-full pb-1 mb-1 uppercase border-b border-black "
                   >
-                    <span class="mr-2">Clean Sheets:</span>
-                    <strong>{{ selectedPlayer.cleanSheets }}</strong>
-                  </li>
-                </ul>
+                    Statistics
+                  </h4>
+                  <ul class="flex flex-col w-full">
+                    <li class="flex justify-between w-full">
+                      <span>Goals:</span>
+                      <strong>{{ selectedPlayer.totalGoals }}</strong>
+                    </li>
+                    <li class="flex justify-between w-full">
+                      <span>Assists:</span>
+                      <strong>{{ selectedPlayer.totalAssists }}</strong>
+                    </li>
+                    <li
+                      v-if="
+                        selectedPlayer.playerType === 1 ||
+                        selectedPlayer.playerType === 2
+                      "
+                      class="flex justify-between w-full"
+                    >
+                      <span class="mr-2">Clean Sheets:</span>
+                      <strong>{{ selectedPlayer.totalCleanSheets }}</strong>
+                    </li>
+                    <li class="flex justify-between w-full">
+                      <span class="mr-2">Red Cards:</span>
+                      <strong>{{ selectedPlayer.totalRedCards }}</strong>
+                    </li>
+                    <li class="flex justify-between w-full">
+                      <span class="mr-2">Points:</span>
+                      <strong>{{ selectedPlayer.totalPoints }}</strong>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

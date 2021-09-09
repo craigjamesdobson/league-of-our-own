@@ -26,9 +26,7 @@ const getPlayers = catchAsync(async (req, res) => {
     .send({ message: 'Fetched players successfully.', players: players });
 });
 
-
 const updatePlayers = catchAsync(async (req, res) => {
-
   try {
     Player.bulkWrite(
       req.body.map((player) => 

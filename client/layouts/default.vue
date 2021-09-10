@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { useContext, computed } from '@nuxtjs/composition-api'
+import { useContext, computed, onMounted } from '@nuxtjs/composition-api'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 
@@ -31,7 +31,9 @@ export default {
       store.dispatch('fetchUser')
     }
 
-    store.dispatch('fetchPlayers')
+    onMounted(async () => {
+      await store.dispatch('fetchPlayers')
+    })
     // store.dispatch('fetchDraftedTeams')
   },
 }

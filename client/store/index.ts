@@ -149,7 +149,7 @@ export const actions = {
   },
 
   async fetchPlayers({ commit, dispatch, state }: any) {
-    await axios
+    return await axios
       .get('/v1/players')
       .then((res) => {
         commit('FETCH_PLAYERS', res.data)

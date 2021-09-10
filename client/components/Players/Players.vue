@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col w-3/4">
-    <playerLoadingSkeleton v-if="isLoading"></playerLoadingSkeleton>
+    <div v-if="isLoading">
+      <h2 class="capitalize player-heading">Loading Players...</h2>
+      <playerLoadingSkeleton></playerLoadingSkeleton>
+    </div>
     <div
       v-for="(playerTypes, key, index) in filteredPlayerData"
       v-else
@@ -91,7 +94,7 @@
       <div
         class="flex items-center justify-center modal"
         :class="{
-          active: modalIsActive,
+          active: modalIsActive && !isLoading,
         }"
         @click.self="hidePlayerDataModal"
       >
@@ -162,12 +165,28 @@
                   </h4>
                   <ul class="flex flex-col w-full">
                     <li class="flex justify-between w-full">
-                      <span>Goals:</span>
-                      <strong>{{ selectedPlayer.totalGoals }}</strong>
+                      <span
+                        class="w-3/4 py-1 border-b border-r border-gray-100"
+                      >
+                        Goals:
+                      </span>
+                      <strong
+                        class="w-1/4 py-1 text-center border-b border-gray-100"
+                      >
+                        {{ selectedPlayer.totalGoals }}
+                      </strong>
                     </li>
                     <li class="flex justify-between w-full">
-                      <span>Assists:</span>
-                      <strong>{{ selectedPlayer.totalAssists }}</strong>
+                      <span
+                        class="w-3/4 py-1 border-b border-r border-gray-100"
+                      >
+                        Assists:
+                      </span>
+                      <strong
+                        class="w-1/4 py-1 text-center border-b border-gray-100"
+                      >
+                        {{ selectedPlayer.totalAssists }}
+                      </strong>
                     </li>
                     <li
                       v-if="
@@ -176,16 +195,40 @@
                       "
                       class="flex justify-between w-full"
                     >
-                      <span class="mr-2">Clean Sheets:</span>
-                      <strong>{{ selectedPlayer.totalCleanSheets }}</strong>
+                      <span
+                        class="w-3/4 py-1 border-b border-r border-gray-100"
+                      >
+                        Clean Sheets:
+                      </span>
+                      <strong
+                        class="w-1/4 py-1 text-center border-b border-gray-100"
+                      >
+                        {{ selectedPlayer.totalCleanSheets }}
+                      </strong>
                     </li>
                     <li class="flex justify-between w-full">
-                      <span class="mr-2">Red Cards:</span>
-                      <strong>{{ selectedPlayer.totalRedCards }}</strong>
+                      <span
+                        class="w-3/4 py-1 border-b border-r border-gray-100"
+                      >
+                        Red Cards:
+                      </span>
+                      <strong
+                        class="w-1/4 py-1 text-center border-b border-gray-100"
+                      >
+                        {{ selectedPlayer.totalRedCards }}
+                      </strong>
                     </li>
                     <li class="flex justify-between w-full">
-                      <span class="mr-2">Points:</span>
-                      <strong>{{ selectedPlayer.totalPoints }}</strong>
+                      <span
+                        class="w-3/4 py-1 border-b border-r border-gray-100"
+                      >
+                        Points:
+                      </span>
+                      <strong
+                        class="w-1/4 py-1 text-center border-b border-gray-100"
+                      >
+                        {{ selectedPlayer.totalPoints }}
+                      </strong>
                     </li>
                   </ul>
                 </div>
@@ -198,7 +241,15 @@
   </div>
 </template>
 <script>
-import { useContext, computed, ref } from '@nuxtjs/composition-api'
+import {
+  useContext,
+  computed,
+  ref,
+  useRoute,
+  useRouter,
+  onMounted,
+  watch,
+} from '@nuxtjs/composition-api'
 import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton'
 import { loadFallbackImage } from '@/helpers/helpers'
 
@@ -208,6 +259,8 @@ export default {
   },
   setup() {
     const { store } = useContext()
+    const route = useRoute()
+    const router = useRouter()
     const playerData = computed(
       () => store.getters.getPlayerData.players.players
     )
@@ -223,12 +276,38 @@ export default {
       selectedPlayer.value = { ...player[0] }
       modalIsActive.value = true
       document.querySelector('body').classList.add('overflow-hidden')
+      if (!route.value.query.playerid) {
+        router.replace({ query: { playerid: playerID } })
+      }
     }
 
     const hidePlayerDataModal = () => {
       modalIsActive.value = false
       document.querySelector('body').classList.remove('overflow-hidden')
+      router.replace({ query: null })
     }
+
+    onMounted(() => {
+      if (route.value.query.playerid) {
+        showPlayerDataModal(+route.value.query.playerid)
+      }
+    })
+
+    watch(playerData, (newValue, oldValue) => {
+      if (route.value.query.playerid) {
+        showPlayerDataModal(+route.value.query.playerid)
+      }
+    })
+
+    watch(
+      (to, from) => to.$route.query.playerid,
+      (newId) =>
+        setTimeout(() => {
+          if (newId) {
+            showPlayerDataModal(+newId)
+          }
+        }, 500)
+    )
 
     return {
       playerData,

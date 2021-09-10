@@ -33,6 +33,7 @@ interface State {
 
 export const state = (): State => ({
   playerData: {
+    // TODO: Figure out why the state is players.players...
     players: {
       players: [],
     },

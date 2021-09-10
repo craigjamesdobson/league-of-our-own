@@ -79,6 +79,7 @@
 
 <script>
 import { useContext, reactive, computed } from '@nuxtjs/composition-api'
+import { debounce } from 'lodash-es'
 
 export default {
   setup() {
@@ -116,9 +117,9 @@ export default {
       filterPlayers()
     }
 
-    const filterPlayers = () => {
+    const filterPlayers = debounce(() => {
       store.dispatch('filterPlayers', filterData)
-    }
+    }, 500)
 
     return {
       filterPlayers,

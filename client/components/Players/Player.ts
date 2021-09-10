@@ -58,27 +58,33 @@ export class Player {
     this.totalPoints = player.gameweek_stats
       .map((stat) => stat.points)
       .reduce((prev, next) => prev + next)
+
     this.totalGoals = player.gameweek_stats
       .map((stat) => stat.goalsScored)
       .reduce((prev, next) => prev + next)
+
     this.totalAssists = player.gameweek_stats
       .map((stat) => +stat.assists)
       .reduce((prev, next) => prev + next)
+
     this.totalCleanSheets = player.gameweek_stats
       .map((stat) => +stat.cleanSheet)
       .reduce((prev, next) => prev + next)
+
     this.totalRedCards = player.gameweek_stats
       .map((stat) => +stat.sentOff)
       .reduce((prev, next) => prev + next)
 
     // Create availability objects
     switch (true) {
-      case this.availabilityType === 'i':
+      case this.availabilityType === 'i' ||
+        this.availabilityType === 'n' ||
+        this.availabilityType === 'd':
         this.availabilityType = 'temporary-unavailable'
         this.isUnavailable = true
         this.availabilityNews = player.news
         break
-      case this.availabilityType === 'u' || this.availabilityType === 'n':
+      case this.availabilityType === 'u':
         this.availabilityType = 'unavailable-for-season'
         this.isUnavailable = true
         this.unavailableForSeason = true

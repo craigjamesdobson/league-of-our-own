@@ -1,15 +1,15 @@
 <template>
   <div>
-    <h2 class="player-heading capitalize">Loading...</h2>
     <div class="flex justify-between mb-4 bg-white rounded-xl">
-      <div class="py-2 px-4 border-r border-gray-100 w-full">
+      <div class="w-full px-4 py-2">
         <ul class="flex flex-wrap">
           <li
-            v-for="index in 60"
+            v-for="index in rows"
             :key="index"
-            class="player-row relative w-1/2 flex flex-col items-center justify-around border-b border-gray-100 text-sm"
+            class="relative flex flex-col items-center justify-around text-sm border-b border-gray-100  player-row"
+            :class="columnWidth"
           >
-            <div class="content-loader-row flex w-full">
+            <div class="flex w-full content-loader-row">
               <div class="w-1/12 p-2">
                 <span
                   class="content-loader"
@@ -27,7 +27,7 @@
               </div>
               <div class="w-5/12 p-2">
                 <span
-                  class="content-loader m-auto"
+                  class="m-auto content-loader"
                   :style="`width: ${Math.floor(Math.random() * 51) + 50}%;`"
                 ></span>
               </div>
@@ -51,7 +51,18 @@
   </div>
 </template>
 <script>
-export default {}
+export default {
+  props: {
+    rows: {
+      type: Number,
+      default: 60,
+    },
+    columnWidth: {
+      type: String,
+      default: 'w-1/2',
+    },
+  },
+}
 </script>
 <style lang="scss">
 @keyframes aniHorizontal {

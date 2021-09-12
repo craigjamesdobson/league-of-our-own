@@ -81,6 +81,11 @@ export default {
         icon: 'user-alt',
         path: '/players',
       },
+      {
+        title: 'Table',
+        icon: 'list-ol',
+        path: '/table',
+      },
     ])
     const authRoutes = reactive([
       {

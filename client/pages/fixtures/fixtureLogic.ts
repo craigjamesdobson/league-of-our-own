@@ -122,7 +122,7 @@ const useFixtureLogic = () => {
         gameweekData.goals += gameWeekStats[0].goalsScored
         gameweekData.assists += gameWeekStats[0].assists
         gameweekData.redCards += gameWeekStats[0].sentOff ? 1 : 0
-        gameweekData.goals += gameWeekStats[0].cleanSheet ? 1 : 0
+        gameweekData.cleanSheets += gameWeekStats[0].cleanSheet ? 1 : 0
         gameweekData.points += gameWeekStats[0].points
       })
       completeTeamStats.gameweekData.push(gameweekData)

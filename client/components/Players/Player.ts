@@ -23,12 +23,12 @@ export class Player {
   public readonly secondName: string
   public readonly name: string
   public readonly price: string
-  public readonly gameWeekStats: any
-  public readonly totalPoints: any
-  public readonly totalGoals: any
-  public readonly totalAssists: any
-  public readonly totalRedCards: any
-  public readonly totalCleanSheets: any
+  public readonly gameWeekStats: GameweekStats[]
+  public readonly totalPoints: number
+  public readonly totalGoals: number
+  public readonly totalAssists: number
+  public readonly totalRedCards: number
+  public readonly totalCleanSheets: number
 
   // Construct player objects
   constructor(player: PlayerDataElements) {

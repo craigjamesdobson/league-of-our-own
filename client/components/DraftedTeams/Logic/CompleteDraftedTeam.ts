@@ -12,7 +12,12 @@ export class CompleteDraftedTeam {
   private readonly teamValueAllowed: number
   private readonly totalTeamValue: number
   private readonly teamPlayers: CompleteDraftedPlayer[]
-  private readonly gameWeekStats: GameweekStats[]
+  private readonly gameWeekStats: any
+  public readonly totalPoints: number
+  public readonly totalGoals: number
+  public readonly totalAssists: number
+  public readonly totalRedCards: number
+  public readonly totalCleanSheets: number
 
   constructor(draftedTeam: DraftedTeam, players: any[]) {
     this.teamID = draftedTeam.teamID
@@ -23,7 +28,7 @@ export class CompleteDraftedTeam {
     this.allowedTransfers = draftedTeam.allowedTransfers
     this.teamValueAllowed = this.allowedTransfers ? 85 : 95
     this.teamPlayers = players.map(
-      x => new CompleteDraftedPlayer(x.player, x.transfers)
+      (x) => new CompleteDraftedPlayer(x.player, x.transfers)
     )
 
     this.gameWeekStats = draftedTeam.gameWeekStats
@@ -32,6 +37,26 @@ export class CompleteDraftedTeam {
       (accumulator, current) => (accumulator += parseFloat(current.price)),
       0
     )
+
+    this.totalPoints = draftedTeam.gameWeekStats
+      .map((stat: any) => stat.points)
+      .reduce((prev, next) => prev + next)
+
+    this.totalGoals = draftedTeam.gameWeekStats
+      .map((stat: any) => stat.goals)
+      .reduce((prev, next) => prev + next)
+
+    this.totalAssists = draftedTeam.gameWeekStats
+      .map((stat: any) => +stat.assists)
+      .reduce((prev, next) => prev + next)
+
+    this.totalCleanSheets = draftedTeam.gameWeekStats
+      .map((stat: any) => +stat.cleanSheets)
+      .reduce((prev, next) => prev + next)
+
+    this.totalRedCards = draftedTeam.gameWeekStats
+      .map((stat: any) => +stat.redCards)
+      .reduce((prev, next) => prev + next)
 
     let goalkeeperCount = 0
     let defenderCount = 0

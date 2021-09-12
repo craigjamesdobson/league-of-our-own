@@ -16,7 +16,7 @@ export class CompleteDraftedPlayer {
   private readonly status: string
   private readonly image: string
   private readonly imageLarge: string
-  private readonly gameWeekStats: GameweekStats
+  private readonly gameWeekStats: GameweekStats[]
   private readonly transfers: DraftedTransfer[]
 
   constructor(player: Player, transfers: DraftedTransfer[]) {

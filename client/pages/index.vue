@@ -25,7 +25,7 @@
             v-for="player in topGoalScorers"
             :key="player.id"
             @click="navigateToPlayerModal(player.id)"
-            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0"
+            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
           >
             <span
               class="flex justify-between col-span-3 p-1 border-r  border-offWhite"
@@ -66,7 +66,7 @@
             v-for="player in topAssists"
             @click="navigateToPlayerModal(player.id)"
             :key="player.id"
-            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0"
+            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
           >
             <span
               class="flex justify-between col-span-3 p-1 border-r  border-offWhite"
@@ -107,7 +107,7 @@
             v-for="player in topRedCards"
             @click="navigateToPlayerModal(player.id)"
             :key="player.id"
-            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0"
+            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
           >
             <span
               class="flex justify-between col-span-3 p-1 border-r  border-offWhite"
@@ -148,7 +148,7 @@
             v-for="player in topCleanSheets"
             @click="navigateToPlayerModal(player.id)"
             :key="player.id"
-            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0"
+            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
           >
             <span
               class="flex justify-between col-span-3 p-1 border-r  border-offWhite"
@@ -189,7 +189,7 @@
             v-for="player in topPoints"
             @click="navigateToPlayerModal(player.id)"
             :key="player.id"
-            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0"
+            class="grid justify-between grid-cols-4 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
           >
             <span
               class="flex justify-between col-span-3 p-1 border-r  border-offWhite"

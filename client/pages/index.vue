@@ -1,7 +1,7 @@
 <template>
   <div class="flex mx-10 my-2">
-    <div class="grid w-full grid-cols-2 gap-5">
-      <div class="grid w-full grid-cols-2 gap-1">
+    <div class="gap-1 custom-dashboard-grid">
+      <div class="grid w-full grid-cols-1 gap-1">
         <div class="p-4 bg-white rounded-sm">
           <div
             class="flex items-center justify-between pb-2 mb-4 border-b border-gray-800 "
@@ -208,29 +208,39 @@
           </div>
         </div>
       </div>
-      <div>
-        <h4>Top of the Table</h4>
-      </div>
+      <playerLoadingSkeleton
+        v-if="isLoading"
+        column-width="w-full"
+        :rows="38"
+      ></playerLoadingSkeleton>
+      <Table v-else :drafted-team-data="draftedTeamData"></Table>
     </div>
   </div>
 </template>
 
 <script>
-import { computed } from '@vue/composition-api'
+import { computed, ref } from '@vue/composition-api'
 import { useContext, useRouter } from '@nuxtjs/composition-api'
 import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton.vue'
+import Table from '@/components/Table/Table.vue'
 import { loadFallbackImage } from '@/helpers/helpers'
 
 export default {
   // TODO: Create consistent wrapper container for all pages
   components: {
     playerLoadingSkeleton,
+    Table,
   },
   setup(props) {
     const { store } = useContext()
     const router = useRouter()
 
     const isLoading = computed(() => store.getters.isLoading)
+    const mostRecentGameweek = ref(4)
+
+    let draftedTeamData = computed(() =>
+      store.getters['drafted-data/getSortedTeams'](mostRecentGameweek)
+    )
 
     const topGoalScorers = computed(() =>
       store.getters.getSortedPlayerStat('totalGoals', 5)
@@ -259,6 +269,7 @@ export default {
       topAssists,
       topRedCards,
       topCleanSheets,
+      draftedTeamData,
       loadFallbackImage,
       navigateToPlayerModal,
       topPoints,
@@ -268,3 +279,16 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.custom-dashboard-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-rows: 1fr;
+  grid-template-columns: 30% 70%;
+  justify-content: center;
+  align-content: space-evenly;
+  width: 100%;
+  height: 100%;
+}
+</style>

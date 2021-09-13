@@ -22,6 +22,7 @@ module.exports = {
     extend: {
       opacity: ['disabled'],
       border: ['last'],
+      margin: ['last'],
     },
   },
   plugins: [],

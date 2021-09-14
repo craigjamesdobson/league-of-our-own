@@ -55,7 +55,7 @@
         :key="player.transfers[0].player.id"
         class="flex items-center w-full border-b border-gray-100 cursor-pointer"
         :class="
-              player.transfers[0].isCurrentWeekTransfer ? 'bg-yellow-300 text-gray-800' : 'bg-green-500 text-white',
+              player.transfers[0].isCurrentWeekTransfer || player.transfers[0].transferWeek === fixtureWeek ? 'bg-yellow-300 text-gray-800' : 'bg-green-500 text-white',
             "
       >
         <span class="w-1/12 p-2">{{ player.transfers[0].player.id }}</span>
@@ -87,7 +87,7 @@
         "
         class="flex flex-wrap justify-between w-full h-full"
         :class="{
-          'hidden absolute top-0 z-10 bg-red-600 text-white old-transfer hover:flex':
+          'hidden absolute top-0 z-10 bg-blue-600 text-white old-transfer hover:flex':
             player.transfers.length,
         }"
       >

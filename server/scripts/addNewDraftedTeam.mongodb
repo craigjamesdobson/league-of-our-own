@@ -1866,3 +1866,80 @@ db['drafted-teams-2021_2022'].insertMany([{
       "gameweek_stats": defaultGamweekStats
     }]
 );
+
+db['drafted-teams-2021_2022'].update(
+  {team_id: 2},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 143,
+          "transfers": []
+        },
+        {
+          "player_id": 135,
+          "transfers": [
+            {
+              "transfer_id": 219,
+              "transfer_week": 2,
+              "currentTransferDateExpiry": "2021, 08, 23"
+            }
+          ]
+        },
+        {
+          "player_id": 16,
+          "transfers": []
+        },
+        {
+          "player_id": 370,
+          "transfers": []
+        },
+        {
+          "player_id": 326,
+          "transfers": []
+        },
+        {
+          "player_id": 33,
+          "transfers": [
+            {
+              "transfer_id": 325,
+              "transfer_week": 2,
+              "currentTransferDateExpiry": "2021, 08, 23"
+            },
+            {
+              "transfer_id": 484,
+              "transfer_week": 4,
+              "currentTransferDateExpiry": "2021, 09, 14"
+            }
+          ]
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 359,
+          "transfers": []
+        },
+        {
+          "player_id": 40,
+          "transfers": [
+            {
+              "transfer_id": 529,
+              "transfer_week": 2,
+              "currentTransferDateExpiry": "2021, 08, 24"
+            }
+          ]
+        },
+        {
+          "player_id": 189,
+          "transfers": []
+        },
+        {
+          "player_id": 357,
+          "transfers": []
+        }
+      ]
+      }
+   }
+)

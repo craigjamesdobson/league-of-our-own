@@ -34,7 +34,7 @@
             v-if="fixtureData.updatedAt && fixtureData.updatedBy"
             class="text-sm"
           >
-            This fixture was lasted updated on
+            This gameweek was lasted updated on
             <strong>
               {{ new Date(fixtureData.updatedAt).toLocaleString() }}
             </strong>

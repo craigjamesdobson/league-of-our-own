@@ -7,6 +7,7 @@ import {
 } from '@nuxtjs/composition-api'
 import { Fixture } from '~/components/Interfaces/Fixture'
 import { PlayerPositionShort } from '~/components/Interfaces/PlayerPosition'
+import Swal from 'sweetalert2'
 
 interface fixtureData {
   fixturesTotal: number
@@ -214,7 +215,23 @@ const useFixtureLogic = () => {
     try {
       await updateFixtureCollection()
       await calculateGameweekStats(store.state['drafted-data'].draftedTeamData)
+      Swal.fire({
+        position: 'top-start',
+        icon: 'success',
+        title: `Gameweek ${fixtureData.activeFixtureRound} has been saved`,
+        toast: true,
+        showConfirmButton: false,
+        timer: 2500,
+      })
     } catch (err) {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: `Error saving gameweek`,
+        toast: true,
+        showConfirmButton: false,
+        timer: 2500,
+      })
       throw err
     }
     toggleBtnLoadingState(false)

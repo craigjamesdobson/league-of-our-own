@@ -219,7 +219,7 @@
 </template>
 
 <script>
-import { computed, ref } from '@vue/composition-api'
+import { computed, onMounted, ref } from '@vue/composition-api'
 import { useContext, useRouter } from '@nuxtjs/composition-api'
 import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton.vue'
 import Table from '@/components/Table/Table.vue'

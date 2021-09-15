@@ -37,7 +37,7 @@ export default {
     },
     fixtureWeek: {
       type: Number,
-      default: 0,
+      default: 38,
     },
     dynamicView: Boolean,
   },

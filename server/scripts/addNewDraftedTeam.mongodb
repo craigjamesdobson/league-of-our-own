@@ -1868,26 +1868,24 @@ db['drafted-teams-2021_2022'].insertMany([{
 );
 
 db['drafted-teams-2021_2022'].update(
-  {team_id: 2},
+  {team_id: 30},
      { $set:
       {
         team_players: [
         {
-          "player_id": 143,
+          "player_id": 200,
           "transfers": []
         },
         {
-          "player_id": 135,
-          "transfers": [
-            {
-              "transfer_id": 219,
-              "transfer_week": 2,
-              "currentTransferDateExpiry": "2021, 08, 23"
-            }
-          ]
+          "player_id": 237,
+          "transfers": []
         },
         {
-          "player_id": 16,
+          "player_id": 252,
+          "transfers": []
+        },
+        {
+          "player_id": 185,
           "transfers": []
         },
         {
@@ -1895,48 +1893,39 @@ db['drafted-teams-2021_2022'].update(
           "transfers": []
         },
         {
-          "player_id": 326,
+          "player_id": 240,
           "transfers": []
-        },
-        {
-          "player_id": 33,
-          "transfers": [
-            {
-              "transfer_id": 325,
-              "transfer_week": 2,
-              "currentTransferDateExpiry": "2021, 08, 23"
-            },
-            {
-              "transfer_id": 484,
-              "transfer_week": 4,
-              "currentTransferDateExpiry": "2021, 09, 14"
-            }
-          ]
         },
         {
           "player_id": 233,
           "transfers": []
         },
         {
-          "player_id": 359,
+          "player_id": 251,
+          "transfers": [
+            {
+              "transfer_id": 268,
+              "transfer_week": 4,
+              "currentTransferDateExpiry": "2021, 09, 14"
+            }
+          ]
+        },
+        {
+          "player_id": 177,
           "transfers": []
         },
         {
           "player_id": 40,
           "transfers": [
             {
-              "transfer_id": 529,
-              "transfer_week": 2,
-              "currentTransferDateExpiry": "2021, 08, 24"
+              "transfer_id": 579,
+              "transfer_week": 4,
+              "currentTransferDateExpiry": "2021, 09, 14"
             }
           ]
         },
         {
-          "player_id": 189,
-          "transfers": []
-        },
-        {
-          "player_id": 357,
+          "player_id": 213,
           "transfers": []
         }
       ]

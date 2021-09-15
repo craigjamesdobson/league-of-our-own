@@ -1,10 +1,10 @@
 <template>
   <div>
     <div
-      class="p-2 px-4 pb-2 mb-1 font-bold bg-white border-b-2 rounded-sm rounded-t  custom-table-grid border-primary"
+      class="p-4 mb-1 text-xs font-bold bg-white border-b-2 rounded-sm rounded-t  custom-table-grid border-primary"
     >
       <span>POS</span>
-      <span>PREVIOUS WEEK</span>
+      <span>PRV WEEK</span>
       <span>TEAM</span>
       <span>GOALS</span>
       <span>ASSISTS</span>

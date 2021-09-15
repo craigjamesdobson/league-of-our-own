@@ -17,7 +17,7 @@ export class CompleteDraftedPlayer {
   private readonly image: string
   private readonly imageLarge: string
   private readonly gameWeekStats: GameweekStats[]
-  private readonly transfers: DraftedTransfer[]
+  public readonly transfers: DraftedTransfer[]
 
   constructor(player: Player, transfers: DraftedTransfer[]) {
     this.id = player.id

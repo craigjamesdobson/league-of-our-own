@@ -112,6 +112,12 @@
         {{ getTeamGameweekData(team).points }}
       </strong>
     </div>
+    <div v-else class="flex justify-between pt-2">
+      <span>Total</span>
+      <strong class="w-2/12 text-center">
+        {{ team.totalTeamValue }}
+      </strong>
+    </div>
   </div>
 </template>
 

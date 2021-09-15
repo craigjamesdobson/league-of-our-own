@@ -10,7 +10,7 @@ export class CompleteDraftedTeam {
   private readonly invalidErrorMsg: string[]
   private readonly allowedTransfers: boolean
   private readonly teamValueAllowed: number
-  private readonly totalTeamValue: number
+  private totalTeamValue: number
   private readonly teamPlayers: CompleteDraftedPlayer[]
   private readonly gameWeekStats: any
   public readonly totalPoints: number
@@ -33,10 +33,16 @@ export class CompleteDraftedTeam {
 
     this.gameWeekStats = draftedTeam.gameWeekStats
 
-    this.totalTeamValue = this.teamPlayers.reduce(
-      (accumulator, current) => (accumulator += parseFloat(current.price)),
-      0
-    )
+    this.totalTeamValue = 0
+
+    this.teamPlayers.forEach((player) => {
+      if (player.transfers.length > 0) {
+        this.totalTeamValue +=
+          +player.transfers[player.transfers.length - 1].player.price
+      } else {
+        this.totalTeamValue += +player.price
+      }
+    })
 
     this.totalPoints = draftedTeam.gameWeekStats
       .map((stat: any) => stat.points)

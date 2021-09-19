@@ -3,7 +3,10 @@
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800 "
     >
-      {{ team.teamName }}
+      <div class="flex flex-col">
+        {{ team.teamName }}
+        <span class="text-xs">{{ team.ownerName }}</span>
+      </div>
       <span v-if="team.allowedTransfers">
         <svg-icon
           class="w-5 h-5"

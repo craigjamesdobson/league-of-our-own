@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col">
-    <h1>Select a gameweek to view weekly table</h1>
     <div class="flex justify-between my-4">
       <button
         v-for="index in 38"
@@ -13,6 +12,14 @@
       >
         {{ index }}
       </button>
+    </div>
+    <div
+      role="alert"
+      class="flex flex-col self-start w-full px-4 py-3 mb-4 text-blue-700 bg-blue-100 border-t border-b border-blue-500 "
+    >
+      <p class="text-sm uppercase">
+        Please select a gameweek to view weekly table
+      </p>
     </div>
     <Table :drafted-team-data="draftedTeamData"></Table>
   </div>

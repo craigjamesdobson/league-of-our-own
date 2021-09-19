@@ -1,16 +1,32 @@
-import { FETCH_DRAFTEDTEAMS, UPDATE_DRAFTEDTEAMS } from './mutation-types'
+import {
+  FETCH_DRAFTEDTEAMS,
+  UPDATE_DRAFTEDTEAMS,
+  SET_WEEKLYDATA,
+} from './mutation-types'
 import { initDraftedTeamData } from '@/components/DraftedTeams/Logic/CreateDraftedTeams'
 import axios from '@/plugins/axios'
-import omit from 'lodash-es'
+import { DraftedTeam } from '~/components/DraftedTeams/Logic/DraftedTeam'
+import { GameweekStats } from '~/components/Interfaces/GameweekStats'
 
-interface State {
-  playerStats: any
-  draftedTeamData: any
+interface weeklyWinner {
+  teamName: string
+  teamOwner: string
 }
 
-export const state = () => ({
-  playerStats: [],
+interface weeklyWinners {
+  gameweek: number
+  points: number
+  winners: weeklyWinner[]
+}
+
+interface State {
+  draftedTeamData: any
+  weeklyWinners: weeklyWinners[]
+}
+
+export const state = (): State => ({
   draftedTeamData: [],
+  weeklyWinners: [],
 })
 
 export const mutations = {
@@ -41,6 +57,43 @@ export const mutations = {
       })
     })
   },
+  [SET_WEEKLYDATA](state: State) {
+    for (let i = 1; i <= 38; i++) {
+      let highestPoints = 0
+
+      // Loop through each gameweek and find the highest points
+      state.draftedTeamData.forEach((team: DraftedTeam) => {
+        const weekPoints = team.gameWeekStats.filter((x) => x.gameweek == i)[0]
+          .points
+        if (weekPoints > highestPoints) highestPoints = weekPoints
+      })
+
+      // If the highest points is zero return as gameweek has not been played
+      if (highestPoints === 0) return
+
+      // Push the data to the weekly winners array
+      state.weeklyWinners.push({
+        gameweek: i,
+        points: highestPoints,
+        winners: [],
+      })
+
+      // Find any teams within this gameweek which has the highest points total
+      state.draftedTeamData.forEach((team: DraftedTeam) => {
+        const weeklyPoints = team.gameWeekStats.filter(
+          (gameweekstats: GameweekStats) => gameweekstats.gameweek === i
+        )[0].points
+
+        // If the team has the highest points total push drafted team data to winners array
+        if (weeklyPoints === highestPoints) {
+          state.weeklyWinners[i - 1].winners.push({
+            teamName: team.teamName,
+            teamOwner: team.ownerName,
+          })
+        }
+      })
+    }
+  },
 }
 
 export const actions = {
@@ -52,6 +105,7 @@ export const actions = {
           draftedTeamData: res.data,
           playerData: playerData,
         })
+        commit('SET_WEEKLYDATA')
       })
       .catch((err) => {
         throw err.response.data
@@ -176,5 +230,9 @@ export const getters = {
         return b.totalPoints - a.totalPoints
       }
     })
+  },
+
+  getWeeklyWinners: (state: State) => {
+    return state.weeklyWinners
   },
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-row flex-wrap">
-    <h1 class="flex w-full">Teams</h1>
     <template v-if="draftedTeamData.length">
       <div
         v-for="team in draftedTeamData"

@@ -121,7 +121,7 @@
               class="w-full h-full px-2 modal--badge"
               :name="'teams/' + selectedPlayer.teamShort"
             />
-            <div class="flex flex-row items-end justify-between">
+            <div class="flex flex-row justify-between items-top">
               <div class="w-24">
                 <img
                   class="rounded-full"

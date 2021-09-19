@@ -1,20 +1,20 @@
 <template>
   <div class="flex flex-wrap">
-    <div class="grid w-full grid-cols-5 gap-5 mb-5">
+    <div class="grid w-full grid-cols-6 gap-5 mb-5">
       <playerLoadingSkeleton
         v-if="isLoading"
         column-width="w-full"
         :rows="20"
-        class="col-span-3"
+        class="col-span-4"
       ></playerLoadingSkeleton>
       <Table
         v-else
         :drafted-team-data="draftedTeamData"
         :teams-to-show="10"
-        class="col-span-3"
+        class="col-span-4"
       ></Table>
       <div class="flex flex-col col-span-2">
-        <div class="p-4 bg-white rounded-lg">
+        <div class="flex flex-col h-full p-4 bg-white rounded-lg">
           <div
             class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
           >
@@ -352,5 +352,9 @@ export default {
   width: 100%;
 
   @apply mb-6;
+}
+
+body {
+  overflow: hidden;
 }
 </style>

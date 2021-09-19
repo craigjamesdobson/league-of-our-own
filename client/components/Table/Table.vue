@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="p-4 mb-1 text-xs font-bold bg-white border-b-2  rounded-t-md custom-table-grid border-primary"
+      class="p-4 mb-2 text-xs font-bold bg-white border-b-2  rounded-t-md custom-table-grid border-primary"
     >
       <span>POS</span>
       <span>PRV WEEK</span>
@@ -16,7 +16,7 @@
     <div
       v-for="(team, index) in draftedTeamData.slice(0, teamsToShow)"
       :key="team.id"
-      class="p-2 px-4 mb-1 bg-white border-b border-gray-100 rounded-sm  custom-table-grid last:mb-0"
+      class="p-2 px-4 mb-1 bg-white border-b border-gray-100 rounded-sm  custom-table-grid last:mb-0 last:rounded-b-md"
     >
       <span class="flex items-center">
         <span class="w-5">{{ index + 1 }}</span>

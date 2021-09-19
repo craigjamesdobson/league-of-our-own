@@ -6,7 +6,7 @@
     >
       <div class="flex flex-col w-full">
         <Header></Header>
-        <Nuxt class="flex mx-10 my-10" keep-alive />
+        <Nuxt class="flex m-8" keep-alive />
       </div>
     </main>
     <portal-target name="modals"></portal-target>

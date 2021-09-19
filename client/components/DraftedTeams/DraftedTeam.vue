@@ -18,7 +18,7 @@
     <div
       v-for="player in team.teamPlayers"
       :key="player.playerName"
-      class="relative"
+      class="relative text-sm"
       :class="{
         'transferred-player': player.transfers.length,
       }"

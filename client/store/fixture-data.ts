@@ -5,7 +5,7 @@ import {
   FETCH_FIXTURES,
   UPDATE_FIXTURESCORE,
   STORE_PLAYERSTATS,
-  SET_UPDATEDBYUSER,
+  SET_UPDATEDBYUSER
 } from './mutation-types'
 import { initFixturesData } from '~/components/Fixtures/CompleteFixtures'
 
@@ -37,7 +37,7 @@ interface State {
 
 export const state = (): State => ({
   fixtures: [],
-  fixturesLoaded: false,
+  fixturesLoaded: false
 })
 
 export const mutations = {
@@ -82,7 +82,7 @@ export const mutations = {
     } else {
       selectedFixture[0][formData.activeVenue].stats.push({
         playerID: formData.stats.playerID,
-        [formData.stats.statType]: formData.stats.playerStat,
+        [formData.stats.statType]: formData.stats.playerStat
       })
     }
   },
@@ -94,7 +94,7 @@ export const mutations = {
 
     selectedWeek[0].updatedAt = new Date().toISOString()
     selectedWeek[0].updatedBy = payload.userName
-  },
+  }
 }
 
 export const actions = {
@@ -139,12 +139,12 @@ export const actions = {
     try {
       return Promise.all([
         axios.post('/v1/fixtures/update', ...selectedWeek),
-        axios.post('/v1/players/update', gameWeekData),
+        axios.post('/v1/players/update', gameWeekData)
       ])
     } catch (err) {
       throw err.response.data
     }
-  },
+  }
 }
 
 export const getters = {
@@ -157,11 +157,11 @@ export const getters = {
     return {
       fixtures: fixture.fixtures,
       updatedAt: fixture.updatedAt,
-      updatedBy: fixture.updatedBy,
+      updatedBy: fixture.updatedBy
     }
   },
 
   getUserName: (state, getters, rootState, rootGetters) => {
     return rootState.user.name
-  },
+  }
 }

@@ -22,6 +22,6 @@ export default {
     }
 
     return { userData, logoutHandler }
-  },
+  }
 }
 </script>

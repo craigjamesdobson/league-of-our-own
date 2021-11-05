@@ -27,18 +27,18 @@ import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton'
 export default {
   components: {
     DraftedTeam,
-    playerLoadingSkeleton,
+    playerLoadingSkeleton
   },
   props: {
     columnClass: {
       type: String,
-      required: true,
+      required: true
     },
     fixtureWeek: {
       type: Number,
-      default: 38,
+      default: 38
     },
-    dynamicView: Boolean,
+    dynamicView: Boolean
   },
   setup(props) {
     const { store } = useContext()
@@ -48,7 +48,7 @@ export default {
 
     const updatePlayerPayload = {
       fixtureWeek: props.fixtureWeek,
-      completeTeamStats: [],
+      completeTeamStats: []
     }
 
     const calculateGameweekStats = (teamData) => {
@@ -57,7 +57,7 @@ export default {
         assists: 0,
         redCards: 0,
         cleanSheets: 0,
-        points: 0,
+        points: 0
       }
 
       teamData.forEach((team) => {
@@ -101,9 +101,9 @@ export default {
 
     return {
       draftedTeamData,
-      calculateGameweekStats,
+      calculateGameweekStats
     }
-  },
+  }
 }
 </script>
 

@@ -12,7 +12,7 @@ import Filters from '@/components/Filters/Filters'
 export default {
   components: {
     Players,
-    Filters,
-  },
+    Filters
+  }
 }
 </script>

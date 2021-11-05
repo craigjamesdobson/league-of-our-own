@@ -4,26 +4,26 @@ module.exports = {
     extend: {
       fontFamily: {
         display: 'Bebas Neue, cursive',
-        sans: '"Karla", sans-serif',
+        sans: '"Karla", sans-serif'
       },
       colors: {
         primary: '#03044A',
-        offWhite: '#F0F3FA',
+        offWhite: '#F0F3FA'
       },
       spacing: {
-        sidebar: '18rem',
+        sidebar: '18rem'
       },
       zIndex: {
-        '-1': '-1',
-      },
-    },
+        '-1': '-1'
+      }
+    }
   },
   variants: {
     extend: {
       opacity: ['disabled'],
       border: ['last'],
-      margin: ['last'],
-    },
+      margin: ['last']
+    }
   },
   plugins: [],
   purge: {
@@ -36,10 +36,10 @@ module.exports = {
       'nuxt.config.js',
       // TypeScript
       'plugins/**/*.ts',
-      'nuxt.config.ts',
-    ],
+      'nuxt.config.ts'
+    ]
   },
   future: {
-    purgeLayersByDefault: true,
-  },
+    purgeLayersByDefault: true
+  }
 }

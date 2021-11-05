@@ -20,7 +20,7 @@ export function initPlayerData(playerData: any) {
 
   return {
     players,
-    filteredPlayers,
+    filteredPlayers
   }
 }
 

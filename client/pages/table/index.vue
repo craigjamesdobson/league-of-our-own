@@ -4,9 +4,16 @@
       <button
         v-for="index in 38"
         :key="index"
-        class="w-10 h-10 border rounded-sm  border-primary hover:bg-primary hover:text-white"
+        class="
+          w-10
+          h-10
+          border
+          rounded-sm
+          border-primary
+          hover:bg-primary hover:text-white
+        "
         :class="{
-          'bg-primary text-white': index === selectedGameweek,
+          'bg-primary text-white': index === selectedGameweek
         }"
         @click="selectedGameweek = index"
       >
@@ -15,7 +22,17 @@
     </div>
     <div
       role="alert"
-      class="flex flex-col self-start w-full px-4 py-3 mb-4 text-blue-700 bg-blue-100 border-t border-b border-blue-500 "
+      class="
+        flex flex-col
+        self-start
+        w-full
+        px-4
+        py-3
+        mb-4
+        text-blue-700
+        bg-blue-100
+        border-t border-b border-blue-500
+      "
     >
       <p class="text-sm uppercase">
         Please select a gameweek to view weekly table
@@ -31,7 +48,7 @@ import Table from '@/components/Table/Table.vue'
 
 export default {
   components: {
-    Table,
+    Table
   },
   setup() {
     const store = useStore()
@@ -47,6 +64,6 @@ export default {
     }
 
     return { draftedTeamData, selectedGameweek, changeTableData }
-  },
+  }
 }
 </script>

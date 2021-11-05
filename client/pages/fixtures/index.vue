@@ -5,9 +5,16 @@
       <button
         v-for="index in fixtureData.fixturesTotal"
         :key="index"
-        class="w-10 h-10 border rounded-sm  border-primary hover:bg-primary hover:text-white"
+        class="
+          w-10
+          h-10
+          border
+          rounded-sm
+          border-primary
+          hover:bg-primary hover:text-white
+        "
         :class="{
-          'bg-primary text-white': index === fixtureData.activeFixtureRound,
+          'bg-primary text-white': index === fixtureData.activeFixtureRound
         }"
         @click="filterFixtures(index)"
       >
@@ -17,7 +24,17 @@
     <div class="flex flex-col my-5">
       <div
         v-if="!fixtureData.filteredFixtures.length"
-        class="flex flex-col self-start w-full px-4 py-3 mb-4 text-blue-700 bg-blue-100 border-t border-b border-blue-500 "
+        class="
+          flex flex-col
+          self-start
+          w-full
+          px-4
+          py-3
+          mb-4
+          text-blue-700
+          bg-blue-100
+          border-t border-b border-blue-500
+        "
         role="alert"
       >
         <p class="text-sm">Please select a gameweek to view fixtures</p>
@@ -25,7 +42,19 @@
       <div v-else>
         <div class="flex items-center justify-between">
           <button
-            class="flex items-center p-2 mb-4 text-white border rounded-sm  border-primary bg-primary js-update-fixture-collection-btn update-fixture-collection-btn"
+            class="
+              flex
+              items-center
+              p-2
+              mb-4
+              text-white
+              border
+              rounded-sm
+              border-primary
+              bg-primary
+              js-update-fixture-collection-btn
+              update-fixture-collection-btn
+            "
             @click="updateHandler"
           >
             Save Gameweek {{ fixtureData.activeFixtureRound }}
@@ -54,7 +83,7 @@
               :fixture-id="index + 1"
               :fixture-data="fixture"
               :fixture-week="fixtureData.activeFixtureRound"
-              :key="index + 1"
+              :key="+index + 1"
             ></Fixture>
           </div>
         </div>
@@ -82,7 +111,7 @@ export default {
   middleware: 'auth',
   components: {
     DraftedTeams,
-    Fixture,
+    Fixture
   },
   setup() {
     const { store } = useContext()
@@ -93,7 +122,7 @@ export default {
       storePlayerStats,
       filterFixtures,
       updateFixtureScore,
-      updateHandler,
+      updateHandler
     } = useFixtureLogic()
 
     onMounted(() => {
@@ -107,9 +136,9 @@ export default {
       playerStats,
       storePlayerStats,
       updateFixtureScore,
-      updateHandler,
+      updateHandler
     }
-  },
+  }
 }
 </script>
 

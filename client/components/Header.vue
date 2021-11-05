@@ -11,8 +11,8 @@ export default {
   props: {
     headingTitle: {
       default: 'Page Title',
-      type: String,
-    },
-  },
+      type: String
+    }
+  }
 }
 </script>

@@ -6,7 +6,15 @@
           <li
             v-for="index in rows"
             :key="index"
-            class="relative flex flex-col items-center justify-around text-sm border-b border-gray-100  player-row"
+            class="
+              relative
+              flex flex-col
+              items-center
+              justify-around
+              text-sm
+              border-b border-gray-100
+              player-row
+            "
             :class="columnWidth"
           >
             <div class="flex w-full content-loader-row">
@@ -55,13 +63,13 @@ export default {
   props: {
     rows: {
       type: Number,
-      default: 60,
+      default: 60
     },
     columnWidth: {
       type: String,
-      default: 'w-1/2',
-    },
-  },
+      default: 'w-1/2'
+    }
+  }
 }
 </script>
 <style lang="scss">

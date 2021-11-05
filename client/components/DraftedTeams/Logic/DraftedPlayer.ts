@@ -1,7 +1,7 @@
 import { DraftedPlayers } from '@/components/Interfaces/DraftedPlayers'
 import { DraftedTransfer } from './DraftedTransfer'
 
-export class DraftedPlayer {
+export default class DraftedPlayer {
   public readonly playerID: number
   public readonly transfers: DraftedTransfer[]
 

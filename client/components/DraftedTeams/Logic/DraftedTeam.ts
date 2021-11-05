@@ -1,4 +1,4 @@
-import { DraftedPlayer } from '@/components/DraftedTeams/Logic/DraftedPlayer'
+import DraftedPlayer from '@/components/DraftedTeams/Logic/DraftedPlayer'
 import { DraftedTeamDataElements } from '@/components/Interfaces/DraftedTeamDataElements'
 import { GameweekStats } from '~/components/Interfaces/GameweekStats'
 

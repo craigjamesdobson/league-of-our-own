@@ -7,6 +7,7 @@
         :rows="20"
         class="col-span-4"
       ></playerLoadingSkeleton>
+
       <Table
         v-else
         :drafted-team-data="draftedTeamData"
@@ -16,7 +17,14 @@
       <div class="flex flex-col col-span-2">
         <div class="flex flex-col h-full p-4 bg-white rounded-lg">
           <div
-            class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+            class="
+              flex
+              items-center
+              justify-between
+              pb-2
+              mb-4
+              border-b border-primary
+            "
           >
             <h4 class="text-lg font-bold uppercase">Gameweek winners</h4>
             <svg-icon
@@ -24,13 +32,7 @@
               name="icon-star"
             />
           </div>
-          <playerLoadingSkeleton
-            v-if="isLoading"
-            column-width="w-full"
-            :rows="10"
-          ></playerLoadingSkeleton>
           <div
-            v-else
             class="flex justify-between p-2"
             v-for="(week, index) in weeklyWinners"
             :key="index"
@@ -47,7 +49,14 @@
     <div class="grid w-full grid-cols-5 gap-5">
       <div class="p-4 bg-white rounded-lg">
         <div
-          class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+          class="
+            flex
+            items-center
+            justify-between
+            pb-2
+            mb-4
+            border-b border-primary
+          "
         >
           <h4 class="text-lg font-bold uppercase">Sharp shooters</h4>
           <svg-icon
@@ -62,7 +71,15 @@
         ></playerLoadingSkeleton>
         <div
           v-else
-          class="grid justify-between grid-cols-5 text-xs font-bold uppercase border-b  border-offWhite"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            text-xs
+            font-bold
+            uppercase
+            border-b border-offWhite
+          "
         >
           <span class="col-span-3 p-1 border-r border-offWhite">Player</span>
           <span class="col-span-2 p-1 text-center">Goals</span>
@@ -71,7 +88,18 @@
           v-for="player in topGoalScorers"
           :key="player.id"
           @click="navigateToPlayerModal(player.id)"
-          class="grid justify-between grid-cols-5 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            border-b
+            cursor-pointer
+            player-stats-chart
+            border-offWhite
+            last:border-b-0
+            hover:bg-gray-100
+            animate
+          "
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -91,7 +119,14 @@
       </div>
       <div class="p-4 bg-white rounded-lg">
         <div
-          class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+          class="
+            flex
+            items-center
+            justify-between
+            pb-2
+            mb-4
+            border-b border-primary
+          "
         >
           <h4 class="text-lg font-bold uppercase">Player makers</h4>
           <svg-icon
@@ -106,7 +141,15 @@
         ></playerLoadingSkeleton>
         <div
           v-else
-          class="grid justify-between grid-cols-5 text-xs font-bold uppercase border-b  border-offWhite"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            text-xs
+            font-bold
+            uppercase
+            border-b border-offWhite
+          "
         >
           <span class="col-span-3 p-1 border-r border-offWhite">Player</span>
           <span class="col-span-2 p-1 text-center">Assists</span>
@@ -115,7 +158,18 @@
           v-for="player in topAssists"
           @click="navigateToPlayerModal(player.id)"
           :key="player.id"
-          class="grid justify-between grid-cols-5 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            border-b
+            cursor-pointer
+            player-stats-chart
+            border-offWhite
+            last:border-b-0
+            hover:bg-gray-100
+            animate
+          "
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -135,7 +189,14 @@
       </div>
       <div class="p-4 bg-white rounded-lg">
         <div
-          class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+          class="
+            flex
+            items-center
+            justify-between
+            pb-2
+            mb-4
+            border-b border-primary
+          "
         >
           <h4 class="text-lg font-bold uppercase">Hot heads</h4>
           <svg-icon
@@ -150,7 +211,15 @@
         ></playerLoadingSkeleton>
         <div
           v-else
-          class="grid justify-between grid-cols-5 text-xs font-bold uppercase border-b  border-offWhite"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            text-xs
+            font-bold
+            uppercase
+            border-b border-offWhite
+          "
         >
           <span class="col-span-3 p-1 border-r border-offWhite">Player</span>
           <span class="col-span-2 p-1 text-center whitespace-nowrap">
@@ -161,7 +230,18 @@
           v-for="player in topRedCards"
           @click="navigateToPlayerModal(player.id)"
           :key="player.id"
-          class="grid justify-between grid-cols-5 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            border-b
+            cursor-pointer
+            player-stats-chart
+            border-offWhite
+            last:border-b-0
+            hover:bg-gray-100
+            animate
+          "
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -181,7 +261,14 @@
       </div>
       <div class="p-4 bg-white rounded-lg">
         <div
-          class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+          class="
+            flex
+            items-center
+            justify-between
+            pb-2
+            mb-4
+            border-b border-primary
+          "
         >
           <h4 class="text-lg font-bold uppercase">Iron walls</h4>
           <svg-icon
@@ -196,7 +283,15 @@
         ></playerLoadingSkeleton>
         <div
           v-else
-          class="grid justify-between grid-cols-5 text-xs font-bold uppercase border-b  border-offWhite"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            text-xs
+            font-bold
+            uppercase
+            border-b border-offWhite
+          "
         >
           <span class="col-span-3 p-1 border-r border-offWhite">Player</span>
           <span class="col-span-2 p-1 text-center whitespace-nowrap">
@@ -207,7 +302,18 @@
           v-for="player in topCleanSheets"
           @click="navigateToPlayerModal(player.id)"
           :key="player.id"
-          class="grid justify-between grid-cols-5 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            border-b
+            cursor-pointer
+            player-stats-chart
+            border-offWhite
+            last:border-b-0
+            hover:bg-gray-100
+            animate
+          "
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -227,7 +333,14 @@
       </div>
       <div class="p-4 bg-white rounded-lg">
         <div
-          class="flex items-center justify-between pb-2 mb-4 border-b  border-primary"
+          class="
+            flex
+            items-center
+            justify-between
+            pb-2
+            mb-4
+            border-b border-primary
+          "
         >
           <h4 class="text-lg font-bold uppercase">Top performers</h4>
           <svg-icon
@@ -242,7 +355,15 @@
         ></playerLoadingSkeleton>
         <div
           v-else
-          class="grid justify-between grid-cols-5 text-xs font-bold uppercase border-b  border-offWhite"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            text-xs
+            font-bold
+            uppercase
+            border-b border-offWhite
+          "
         >
           <span class="col-span-3 p-1 border-r border-offWhite">Player</span>
           <span class="col-span-2 p-1 text-center whitespace-nowrap">
@@ -253,7 +374,18 @@
           v-for="player in topPoints"
           @click="navigateToPlayerModal(player.id)"
           :key="player.id"
-          class="grid justify-between grid-cols-5 border-b cursor-pointer  player-stats-chart border-offWhite last:border-b-0 hover:bg-gray-100 animate"
+          class="
+            grid
+            justify-between
+            grid-cols-5
+            border-b
+            cursor-pointer
+            player-stats-chart
+            border-offWhite
+            last:border-b-0
+            hover:bg-gray-100
+            animate
+          "
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -293,7 +425,7 @@ export default {
     const router = useRouter()
 
     const isLoading = computed(() => store.getters.isLoading)
-    const mostRecentGameweek = ref(5)
+    const mostRecentGameweek = ref(10)
 
     let draftedTeamData = computed(() =>
       store.getters['drafted-data/getSortedTeams'](mostRecentGameweek)

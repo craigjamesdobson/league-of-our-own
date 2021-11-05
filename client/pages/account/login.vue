@@ -1,6 +1,15 @@
 <template>
   <div
-    class="flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+    class="
+      flex
+      items-center
+      justify-center
+      bg-gray-50
+      py-12
+      px-4
+      sm:px-6
+      lg:px-8
+    "
   >
     <div class="max-w-md w-full space-y-8">
       <div>
@@ -14,10 +23,30 @@
         </h2>
         <div
           v-if="errMsg"
-          class="flex items-center p-3 mb-4 bg-red-200 rounded-b-sm border-t-2 shadow-sm border-red-700 text-red-700 text-sm"
+          class="
+            flex
+            items-center
+            p-3
+            mb-4
+            bg-red-200
+            rounded-b-sm
+            border-t-2
+            shadow-sm
+            border-red-700
+            text-red-700 text-sm
+          "
         >
           <span
-            class="flex items-center justify-center bg-red-300 w-5 h-5 mr-4 rounded-full"
+            class="
+              flex
+              items-center
+              justify-center
+              bg-red-300
+              w-5
+              h-5
+              mr-4
+              rounded-full
+            "
           >
             <svg
               aria-hidden="true"
@@ -56,7 +85,20 @@
                     type="email"
                     :class="classes"
                     autocomplete="email"
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:z-10 sm:text-sm"
+                    class="
+                      appearance-none
+                      relative
+                      block
+                      w-full
+                      px-3
+                      py-2
+                      border border-gray-300
+                      placeholder-gray-500
+                      text-gray-900
+                      rounded
+                      focus:outline-none focus:z-10
+                      sm:text-sm
+                    "
                     placeholder="Email address"
                   />
                   <font-awesome-icon
@@ -88,7 +130,20 @@
                     type="password"
                     autocomplete="new-password"
                     :class="classes"
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded focus:outline-none focus:z-10 sm:text-sm"
+                    class="
+                      appearance-none
+                      relative
+                      block
+                      w-full
+                      px-3
+                      py-2
+                      border border-gray-300
+                      placeholder-gray-500
+                      text-gray-900
+                      rounded
+                      focus:outline-none focus:z-10
+                      sm:text-sm
+                    "
                     placeholder="Password"
                   />
                   <font-awesome-icon
@@ -110,7 +165,26 @@
           <div>
             <button
               type="submit"
-              class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              class="
+                group
+                relative
+                w-full
+                flex
+                justify-center
+                py-2
+                px-4
+                border border-transparent
+                text-sm
+                font-medium
+                rounded-md
+                text-white
+                bg-primary
+                hover:bg-indigo-800
+                focus:outline-none
+                focus:ring-2
+                focus:ring-offset-2
+                focus:ring-indigo-500
+              "
             >
               Login
             </button>
@@ -128,14 +202,14 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 export default {
   components: {
     ValidationProvider,
-    ValidationObserver,
+    ValidationObserver
   },
   setup() {
     const { store } = useContext()
     const errMsg = ref('')
     const loginData = reactive({
       email: '',
-      password: '',
+      password: ''
     })
 
     const loginHandler = async () => {
@@ -146,7 +220,7 @@ export default {
       }
     }
     return { loginData, loginHandler, errMsg }
-  },
+  }
 }
 </script>
 

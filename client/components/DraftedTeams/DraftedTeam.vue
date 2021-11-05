@@ -1,7 +1,15 @@
 <template>
   <div class="p-4 m-2 bg-white rounded-sm">
     <div
-      class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800 "
+      class="
+        flex
+        items-center
+        justify-between
+        p-2
+        pt-0
+        mb-2
+        border-b border-gray-800
+      "
     >
       <div class="flex flex-col">
         {{ team.teamName }}
@@ -20,7 +28,7 @@
       :key="player.playerName"
       class="relative text-sm"
       :class="{
-        'transferred-player': player.transfers.length,
+        'transferred-player': player.transfers.length
       }"
     >
       <div
@@ -32,7 +40,7 @@
         :class="{
           'opacity-25': player.isUnavailableForSeason,
           'bg-red-500 text-white':
-            dynamicView && getPlayerGameweekData(player).sentOff,
+            dynamicView && getPlayerGameweekData(player).sentOff
         }"
       >
         <span class="w-1/12 p-2">{{ player.id }}</span>
@@ -91,12 +99,19 @@
         class="flex flex-wrap justify-between w-full h-full"
         :class="{
           'hidden absolute top-0 z-10 bg-blue-600 text-white old-transfer hover:flex':
-            player.transfers.length,
+            player.transfers.length
         }"
       >
         <div
           v-if="player.transfers.length"
-          class="flex items-center justify-center w-full text-center cursor-pointer "
+          class="
+            flex
+            items-center
+            justify-center
+            w-full
+            text-center
+            cursor-pointer
+          "
         >
           <img
             class="w-6 h-6 mr-4 border border-white rounded-full"
@@ -131,7 +146,7 @@ export default {
   props: {
     team: Object,
     fixtureWeek: Number,
-    dynamicView: Boolean,
+    dynamicView: Boolean
   },
 
   setup(props) {
@@ -150,8 +165,8 @@ export default {
     return {
       loadFallbackImage,
       getPlayerGameweekData,
-      getTeamGameweekData,
+      getTeamGameweekData
     }
-  },
+  }
 }
 </script>

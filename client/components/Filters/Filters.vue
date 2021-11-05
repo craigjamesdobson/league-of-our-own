@@ -10,7 +10,13 @@
           <input
             id="filter_name"
             v-model="filterData.filterName"
-            class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100  focus:outline-none"
+            class="
+              w-full
+              text-sm
+              placeholder-gray-800 placeholder-opacity-50
+              bg-gray-100
+              focus:outline-none
+            "
             type="text"
             name="filter_name"
             placeholder="Search Players..."
@@ -31,7 +37,13 @@
             id="filter_number"
             v-model="filterData.filterPrice"
             name="filter_number"
-            class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100  focus:outline-none"
+            class="
+              w-full
+              text-sm
+              placeholder-gray-800 placeholder-opacity-50
+              bg-gray-100
+              focus:outline-none
+            "
             @change="filterPlayers"
           >
             <option selected="selected" value="">All</option>
@@ -88,7 +100,7 @@ export default {
     const filterData = reactive({
       filterName: '',
       filterPrice: '',
-      filterTeam: null,
+      filterTeam: null
     })
     const pricesAvailable = [
       '4.0',
@@ -106,7 +118,7 @@ export default {
       '11.0',
       '11.5',
       '12.0',
-      '12.5',
+      '12.5'
     ]
 
     const selectfilteredTeam = (event) => {
@@ -127,9 +139,9 @@ export default {
       filterData,
       teamData,
       pricesAvailable,
-      selectfilteredTeam,
+      selectfilteredTeam
     }
-  },
+  }
 }
 </script>
 

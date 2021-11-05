@@ -1,21 +1,58 @@
 <template>
   <div class="flex h-5 number-input-container">
     <button
-      class="flex items-center justify-center w-5 h-5 text-white rounded-l-sm  decrement bg-primary hover:bg-indigo-900 disabled:opacity-50 focus:outline-none animate"
+      class="
+        flex
+        items-center
+        justify-center
+        w-5
+        h-5
+        text-white
+        rounded-l-sm
+        decrement
+        bg-primary
+        hover:bg-indigo-900
+        disabled:opacity-50
+        focus:outline-none
+        animate
+      "
       @click="decrement"
       :disabled="+value === 0"
     >
       -
     </button>
     <input
-      class="flex w-5 h-5 p-1 text-xs text-center border-t border-b appearance-none pointer-events-none  border-primary animate"
+      class="
+        flex
+        w-5
+        h-5
+        p-1
+        text-xs text-center
+        border-t border-b
+        appearance-none
+        pointer-events-none
+        border-primary
+        animate
+      "
       min="0"
       pattern="[0-9]*"
       type="number"
       :value="value"
     />
     <button
-      class="flex items-center justify-center w-5 h-5 text-white rounded-r-sm  bg-primary hover:bg-indigo-900 focus:outline-none animate"
+      class="
+        flex
+        items-center
+        justify-center
+        w-5
+        h-5
+        text-white
+        rounded-r-sm
+        bg-primary
+        hover:bg-indigo-900
+        focus:outline-none
+        animate
+      "
       @click="increment"
     >
       +
@@ -26,7 +63,7 @@
 <script>
 export default {
   props: {
-    value: String,
+    value: String
   },
   emits: ['input-updated'],
   setup(_, { emit }) {
@@ -61,7 +98,7 @@ export default {
       emit('input-updated', +numberInput.value)
     }
     return { increment, decrement }
-  },
+  }
 }
 </script>
 

@@ -19,5 +19,8 @@
     },
     "types": ["@types/node", "@nuxt/types"]
   },
+  "vueCompilerOptions": {
+    "experimentalCompatMode": 2
+  },
   "exclude": ["node_modules", ".nuxt", "dist"]
 }

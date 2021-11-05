@@ -22,9 +22,9 @@ export function initDraftedTeamData(
             (p) => p.id === t.transferId
           )[0],
           isCurrentWeekTransfer: t.isCurrentWeekTransfer,
-          transferWeek: t.transferWeek,
+          transferWeek: t.transferWeek
         }
-      }),
+      })
     }))
     return new CompleteDraftedTeam(draftedTeam, players)
   })

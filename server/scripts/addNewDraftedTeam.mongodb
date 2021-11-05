@@ -1868,16 +1868,16 @@ use('league-of-our-own');
 // );
 
 db['drafted-teams-2021_2022'].updateOne(
-  {team_id: 27},
+  {team_id: 32},
      { $set:
       {
         team_players: [
         {
-          "player_id": 257,
+          "player_id": 200,
           "transfers": []
         },
         {
-          "player_id": 237,
+          "player_id": 67,
           "transfers": []
         },
         {
@@ -1885,40 +1885,30 @@ db['drafted-teams-2021_2022'].updateOne(
           "transfers": []
         },
         {
-          "player_id": 185,
+          "player_id": 169,
           "transfers": []
         },
         {
-          "player_id": 429,
-          "transfers": []
+          "player_id": 273,
+          "transfers": [
+            {
+              "transfer_id": 56,
+              "transfer_week": 7,
+              "currentTransferDateExpiry": "2021, 10, 04"
+            }
+          ]
         },
         {
           "player_id": 233,
           "transfers": []
         },
         {
-          "player_id": 277,
-          "transfers": [
-            {
-              "transfer_id": 196,
-              "transfer_week": 5,
-              "currentTransferDateExpiry": "2021, 09, 21"
-            }
-          ]
-        },
-        {
-          "player_id": 33,
+          "player_id": 359,
           "transfers": []
         },
         {
-          "player_id": 40,
-          "transfers": [
-            {
-              "transfer_id": 579,
-              "transfer_week": 5,
-              "currentTransferDateExpiry": "2021, 09, 21"
-            }
-          ]
+          "player_id": 277,
+          "transfers": []
         },
         {
           "player_id": 78,
@@ -1926,13 +1916,11 @@ db['drafted-teams-2021_2022'].updateOne(
         },
         {
           "player_id": 189,
-          "transfers": [
-            {
-              "transfer_id": 529,
-              "transfer_week": 5,
-              "currentTransferDateExpiry": "2021, 09, 21"
-            }
-          ]
+          "transfers": []
+        },
+        {
+          "player_id": 430,
+          "transfers": []
         }
       ]
       }

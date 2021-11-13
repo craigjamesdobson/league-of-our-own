@@ -1,4 +1,6 @@
-export default {
+import { defineNuxtConfig } from '@nuxt/bridge'
+
+export default defineNuxtConfig({
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     title: 'League of our own',
@@ -26,8 +28,6 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:8080',
   },
-  ssr: false,
-
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [],
 
@@ -40,17 +40,15 @@ export default {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     '@nuxt/postcss8',
-    // https://go.nuxtjs.dev/typescript
-    '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/composition-api/module',
     '@nuxtjs/fontawesome',
     '@nuxtjs/svg-sprite',
   ],
 
   tailwindcss: {
     cssPath: '~/assets/tailwind.css',
+    viewer: false,
   },
 
   fontawesome: {
@@ -98,4 +96,5 @@ export default {
   server: {
     port: 3000, // default: 3000
   }, // other configs
-}
+  vite: true,
+})

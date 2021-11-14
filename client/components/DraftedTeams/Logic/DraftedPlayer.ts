@@ -1,7 +1,7 @@
-import { DraftedPlayers } from '@/components/Interfaces/DraftedPlayers'
-import { DraftedTransfer } from './DraftedTransfer'
+import DraftedPlayers from '@/components/Interfaces/DraftedPlayers'
+import DraftedTransfer from './DraftedTransfer'
 
-export default class DraftedPlayer {
+class DraftedPlayer {
   public readonly playerID: number
   public readonly transfers: DraftedTransfer[]
 
@@ -10,3 +10,5 @@ export default class DraftedPlayer {
     this.transfers = draftedPlayer.transfers.map((x) => new DraftedTransfer(x))
   }
 }
+
+export default DraftedPlayer

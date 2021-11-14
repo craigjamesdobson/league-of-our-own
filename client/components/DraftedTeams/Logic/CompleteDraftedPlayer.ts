@@ -1,9 +1,9 @@
-import { Player } from '../../Players/Player'
+import Player from '../../Players/Player'
 import { PlayerPositionShort } from '../../Interfaces/PlayerPosition'
-import { DraftedTransfer } from './DraftedTransfer'
-import { GameweekStats } from '~/components/Interfaces/GameweekStats'
+import DraftedTransfer from './DraftedTransfer'
+import GameweekStats from '~/components/Interfaces/GameweekStats'
 
-export class CompleteDraftedPlayer {
+class CompleteDraftedPlayer {
   public readonly price: string
   public readonly position: string
   private readonly id: number
@@ -36,3 +36,5 @@ export class CompleteDraftedPlayer {
     this.transfers = transfers
   }
 }
+
+export default CompleteDraftedPlayer

@@ -1,11 +1,10 @@
-import { DraftedTeamData } from '@/components/Interfaces/DraftedTeamData'
-// import { PlayerList } from '../../components/Players/PlayerList'
-import { DraftedTeam } from './DraftedTeam'
-import { CompleteDraftedTeam } from './CompleteDraftedTeam'
+import DraftedTeamData from '@/components/Interfaces/DraftedTeamData'
+import DraftedTeam from './DraftedTeam'
+import CompleteDraftedTeam from './CompleteDraftedTeam'
 
 // TODO: fix playerList so that its not using player.player
 // and can use the contructer commented out above
-export function initDraftedTeamData(
+function initDraftedTeamData(
   playerList: any,
   draftedTeamData: DraftedTeamData
 ) {
@@ -22,9 +21,9 @@ export function initDraftedTeamData(
             (p) => p.id === t.transferId
           )[0],
           isCurrentWeekTransfer: t.isCurrentWeekTransfer,
-          transferWeek: t.transferWeek
+          transferWeek: t.transferWeek,
         }
-      })
+      }),
     }))
     return new CompleteDraftedTeam(draftedTeam, players)
   })
@@ -37,3 +36,5 @@ function getDraftedTeamData(draftedTeamData: DraftedTeamData) {
     (draftedTeam) => new DraftedTeam(draftedTeam)
   )
 }
+
+export default initDraftedTeamData

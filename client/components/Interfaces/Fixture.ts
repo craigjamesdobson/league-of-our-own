@@ -1,4 +1,4 @@
-export interface Stats {
+interface Stats {
   goals?: number
   assists?: number
   cleanSheet?: boolean
@@ -6,14 +6,14 @@ export interface Stats {
   points?: number
 }
 
-export interface Team {
+interface Team {
   id: number
   name?: string
   shortName?: string
   stats: Stats[]
 }
 
-export interface Fixture {
+export default interface Fixture {
   id: number
   home: Team
   away: Team

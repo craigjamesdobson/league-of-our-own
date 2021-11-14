@@ -2,11 +2,9 @@
 
 import axios from '@/plugins/axios'
 import Teams from 'static/teams.json'
-import {
-  initPlayerData,
-  getFilteredPlayers,
-} from '@/components/Players/CreatePlayerData'
-import { Player } from '@/components/Players/Player'
+import initPlayerData from '@/components/Players/CreatePlayerData'
+import { getFilteredPlayers } from '@/components/Players/CreatePlayerData'
+import Player from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,

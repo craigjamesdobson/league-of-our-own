@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { DraftedTeamDataElements } from './DraftedTeamDataElements'
+import DraftedTeamDataElements from './DraftedTeamDataElements'
 
-export interface DraftedTeamData {
+export default interface DraftedTeamData {
   draftedTeams: DraftedTeamDataElements[]
 }

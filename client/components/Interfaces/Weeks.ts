@@ -1,6 +1,6 @@
-import { Fixture } from './Fixture'
+import Fixture from './Fixture'
 
-export interface Weeks {
+export default interface Weeks {
   week: string
   fixtures: Fixture[]
   updatedAt: string

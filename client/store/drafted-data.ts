@@ -3,10 +3,10 @@ import {
   UPDATE_DRAFTEDTEAMS,
   SET_WEEKLYDATA,
 } from './mutation-types'
-import { initDraftedTeamData } from '@/components/DraftedTeams/Logic/CreateDraftedTeams'
+import initDraftedTeamData from '@/components/DraftedTeams/Logic/CreateDraftedTeams'
 import axios from '@/plugins/axios'
-import { DraftedTeam } from '~/components/DraftedTeams/Logic/DraftedTeam'
-import { GameweekStats } from '~/components/Interfaces/GameweekStats'
+import DraftedTeam from '~/components/DraftedTeams/Logic/DraftedTeam'
+import GameweekStats from '~/components/Interfaces/GameweekStats'
 
 interface weeklyWinner {
   teamName: string

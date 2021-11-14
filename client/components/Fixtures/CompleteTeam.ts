@@ -1,7 +1,7 @@
 import Teams from 'static/teams.json'
 import { Stats, Team } from '../Interfaces/Fixture'
 
-export class CompleteTeam {
+class CompleteTeam {
   public readonly id: number
   public readonly name: string
   public readonly shortName: string
@@ -14,3 +14,5 @@ export class CompleteTeam {
     this.stats = matchTeam.stats
   }
 }
+
+export default CompleteTeam

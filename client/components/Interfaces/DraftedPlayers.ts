@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import { DraftedTransferData } from '../Interfaces/DraftedTransferData'
+import DraftedTransferData from '../Interfaces/DraftedTransferData'
 
-export interface DraftedPlayers {
+export default interface DraftedPlayers {
   player_id: number
   transfers: DraftedTransferData[]
 }

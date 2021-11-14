@@ -1,7 +1,7 @@
-import { Fixture } from '../Interfaces/Fixture'
-import { CompleteTeam } from './CompleteTeam'
+import Fixture from '../Interfaces/Fixture'
+import CompleteTeam from './CompleteTeam'
 
-export class CompleteFixture {
+class CompleteFixture {
   public readonly id: number
   public readonly home: CompleteTeam
   public readonly away: CompleteTeam
@@ -14,3 +14,5 @@ export class CompleteFixture {
     this.score = fixture.score
   }
 }
+
+export default CompleteFixture

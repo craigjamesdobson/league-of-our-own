@@ -1,13 +1,13 @@
 import teamsData from '@/static/teams.json'
-import { GameweekStats } from '../Interfaces/GameweekStats'
-import { PlayerDataElements } from '../Interfaces/PlayerDataElements'
+import GameweekStats from '../Interfaces/GameweekStats'
+import PlayerDataElements from '../Interfaces/PlayerDataElements'
 import { PlayerPositionShort } from '../Interfaces/PlayerPosition'
 
 const imageUrl =
   'https://resources.premierleague.com/premierleague/photos/players'
 
 // Player class
-export class Player {
+class Player {
   public readonly playerType: PlayerPositionShort
   public readonly id: number
   public readonly image: string
@@ -102,3 +102,5 @@ export class Player {
     return ((now + change) / 10).toFixed(1)
   }
 }
+
+export default Player

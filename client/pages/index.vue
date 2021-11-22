@@ -33,9 +33,9 @@
             />
           </div>
           <div
-            class="flex justify-between p-2"
             v-for="(week, index) in weeklyWinners"
             :key="index"
+            class="flex justify-between p-2"
           >
             Week {{ week.gameweek }}
             <span v-for="(team, i) in week.winners" :key="i">
@@ -87,7 +87,6 @@
         <div
           v-for="player in topGoalScorers"
           :key="player.id"
-          @click="navigateToPlayerModal(player.id)"
           class="
             grid
             justify-between
@@ -100,6 +99,7 @@
             hover:bg-gray-100
             animate
           "
+          @click="navigateToPlayerModal(player.id)"
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -156,7 +156,6 @@
         </div>
         <div
           v-for="player in topAssists"
-          @click="navigateToPlayerModal(player.id)"
           :key="player.id"
           class="
             grid
@@ -170,6 +169,7 @@
             hover:bg-gray-100
             animate
           "
+          @click="navigateToPlayerModal(player.id)"
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -228,7 +228,6 @@
         </div>
         <div
           v-for="player in topRedCards"
-          @click="navigateToPlayerModal(player.id)"
           :key="player.id"
           class="
             grid
@@ -242,6 +241,7 @@
             hover:bg-gray-100
             animate
           "
+          @click="navigateToPlayerModal(player.id)"
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -300,7 +300,6 @@
         </div>
         <div
           v-for="player in topCleanSheets"
-          @click="navigateToPlayerModal(player.id)"
           :key="player.id"
           class="
             grid
@@ -314,6 +313,7 @@
             hover:bg-gray-100
             animate
           "
+          @click="navigateToPlayerModal(player.id)"
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -372,7 +372,6 @@
         </div>
         <div
           v-for="player in topPoints"
-          @click="navigateToPlayerModal(player.id)"
           :key="player.id"
           class="
             grid
@@ -386,6 +385,7 @@
             hover:bg-gray-100
             animate
           "
+          @click="navigateToPlayerModal(player.id)"
         >
           <span
             class="flex justify-between col-span-3 p-1 border-r border-offWhite"
@@ -425,13 +425,13 @@ export default {
     const router = useRouter()
 
     const isLoading = computed(() => store.getters.isLoading)
-    const mostRecentGameweek = ref(10)
+    const mostRecentGameweek = ref(12)
 
-    let draftedTeamData = computed(() =>
+    const draftedTeamData = computed(() =>
       store.getters['drafted-data/getSortedTeams'](mostRecentGameweek)
     )
 
-    let weeklyWinners = computed(
+    const weeklyWinners = computed(
       () => store.getters['drafted-data/getWeeklyWinners']
     )
 

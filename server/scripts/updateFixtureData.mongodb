@@ -1,0 +1,137 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('league-of-our-own');
+
+const fixtures = [
+        {
+          "id": 1,
+          "home": {
+            "id": 1,
+            "stats": []
+          },
+          "away": {
+            "id": 16,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 2,
+          "home": {
+            "id": 3,
+            "stats": []
+          },
+          "away": {
+            "id": 18,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 3,
+          "home": {
+            "id": 4,
+            "stats": []
+          },
+          "away": {
+            "id": 17,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 4,
+          "home": {
+            "id": 5,
+            "stats": []
+          },
+          "away": {
+            "id": 19,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 5,
+          "home": {
+            "id": 6,
+            "stats": []
+          },
+          "away": {
+            "id": 10,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 6,
+          "home": {
+            "id": 7,
+            "stats": []
+          },
+          "away": {
+            "id": 8,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 7,
+          "home": {
+            "id": 9,
+            "stats": []
+          },
+          "away": {
+            "id": 14,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 8,
+          "home": {
+            "id": 11,
+            "stats": []
+          },
+          "away": {
+            "id": 2,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 9,
+          "home": {
+            "id": 12,
+            "stats": []
+          },
+          "away": {
+            "id": 20,
+            "stats": []
+          },
+          "score": [0, 0]
+        },
+        {
+          "id": 10,
+          "home": {
+            "id": 15,
+            "stats": []
+          },
+          "away": {
+            "id": 13,
+            "stats": []
+          },
+          "score": [0, 0]
+        }
+      ]
+
+// Run a find command to view items sold on April 4th, 2014.
+db["fixtures-2021-2022"].updateOne(
+  {week: "16"}, 
+  { '$set': {"fixtures": fixtures}},
+  //{ $unset: { updatedAt: "", updatedBy: "" } }
+);

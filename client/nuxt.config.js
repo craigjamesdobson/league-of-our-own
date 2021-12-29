@@ -28,6 +28,7 @@ export default defineNuxtConfig({
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:8080',
   },
+  ssr: false,
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: [],
 

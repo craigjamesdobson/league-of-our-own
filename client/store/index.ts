@@ -2,8 +2,10 @@
 
 import axios from '@/plugins/axios'
 import Teams from 'static/teams.json'
-import initPlayerData from '@/components/Players/CreatePlayerData'
-import { getFilteredPlayers } from '@/components/Players/CreatePlayerData'
+import initPlayerData, {
+  getFilteredPlayers,
+} from '@/components/Players/CreatePlayerData'
+
 import Player from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
@@ -44,7 +46,7 @@ export const state = (): State => ({
   loading: true,
   user: {
     name: '',
-    tokens: process.server ? '' : localStorage.getItem('token') || '',
+    tokens: localStorage.getItem('token') || '',
     role: '',
   },
 })

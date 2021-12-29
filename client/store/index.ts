@@ -2,11 +2,11 @@
 
 import axios from '@/plugins/axios'
 import Teams from 'static/teams.json'
-import {
-  initPlayerData,
-  getFilteredPlayers
+import initPlayerData, {
+  getFilteredPlayers,
 } from '@/components/Players/CreatePlayerData'
-import { Player } from '@/components/Players/Player'
+
+import Player from '@/components/Players/Player'
 import { PlayerPositionShort } from '@/components/Interfaces/PlayerPosition'
 import {
   FILTER_PLAYERS,
@@ -14,7 +14,7 @@ import {
   UPDATE_PLAYERS,
   GET_TEAMS,
   SET_USER,
-  SET_LOAD
+  SET_LOAD,
 } from './mutation-types'
 
 interface User {
@@ -35,11 +35,11 @@ export const state = (): State => ({
   playerData: {
     // TODO: Figure out why the state is players.players...
     players: {
-      players: []
+      players: [],
     },
     filteredPlayers: {
-      players: []
-    }
+      players: [],
+    },
   },
   draftedTeamData: {},
   teams: Teams,
@@ -47,8 +47,8 @@ export const state = (): State => ({
   user: {
     name: '',
     tokens: localStorage.getItem('token') || '',
-    role: ''
-  }
+    role: '',
+  },
 })
 
 export const mutations = {
@@ -91,14 +91,14 @@ export const mutations = {
     } else {
       player.gameWeekStats.push({
         gameweek: data.fixtureWeek,
-        [data.playerStats.statType]: data.playerStats.statValue
+        [data.playerStats.statType]: data.playerStats.statValue,
       })
     }
   },
 
   [GET_TEAMS](state: State, teams: any) {
     state.teams = teams
-  }
+  },
 }
 
 export const actions = {
@@ -133,7 +133,7 @@ export const actions = {
   async fetchUser({ commit, state }: any) {
     await axios
       .get('/v1/users', {
-        headers: { Authorization: `Bearer ${state.user.tokens}` }
+        headers: { Authorization: `Bearer ${state.user.tokens}` },
       })
       .then((res) => {
         commit('SET_USER', res.data)
@@ -174,7 +174,7 @@ export const actions = {
     commit('SET_USER', {})
     localStorage.removeItem('token')
     this.app.router.push('/account/login')
-  }
+  },
 }
 
 export const getters = {
@@ -195,7 +195,7 @@ export const getters = {
       ),
       forwards: state.playerData.filteredPlayers.players.filter(
         (p: Player) => p.playerType === PlayerPositionShort.FWD
-      )
+      ),
     }
   },
 
@@ -215,5 +215,5 @@ export const getters = {
 
   isLoggedIn: (state: State) => !!state.user.tokens,
 
-  isLoading: (state: State) => state.loading
+  isLoading: (state: State) => state.loading,
 }

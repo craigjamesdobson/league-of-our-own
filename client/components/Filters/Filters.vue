@@ -91,7 +91,6 @@
 
 <script>
 import { useContext, reactive, computed } from '@nuxtjs/composition-api'
-import { debounce } from 'lodash-es'
 
 export default {
   setup() {
@@ -100,7 +99,7 @@ export default {
     const filterData = reactive({
       filterName: '',
       filterPrice: '',
-      filterTeam: null
+      filterTeam: null,
     })
     const pricesAvailable = [
       '4.0',
@@ -118,7 +117,7 @@ export default {
       '11.0',
       '11.5',
       '12.0',
-      '12.5'
+      '12.5',
     ]
 
     const selectfilteredTeam = (event) => {
@@ -130,18 +129,18 @@ export default {
       filterPlayers()
     }
 
-    const filterPlayers = debounce(() => {
+    const filterPlayers = () => {
       store.dispatch('filterPlayers', filterData)
-    }, 500)
+    }
 
     return {
       filterPlayers,
       filterData,
       teamData,
       pricesAvailable,
-      selectfilteredTeam
+      selectfilteredTeam,
     }
-  }
+  },
 }
 </script>
 

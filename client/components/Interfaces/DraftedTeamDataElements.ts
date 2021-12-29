@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-import { DraftedPlayers } from './DraftedPlayers'
-import { GameweekStats } from './GameweekStats'
+import DraftedPlayers from './DraftedPlayers'
+import GameweekStats from './GameweekStats'
 
-export interface DraftedTeamDataElements {
+export default interface DraftedTeamDataElements {
   team_id: number
   team_name: string
   team_owner: string

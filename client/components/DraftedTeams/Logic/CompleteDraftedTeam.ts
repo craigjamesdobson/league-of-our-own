@@ -1,8 +1,8 @@
-import { GameweekStats } from '~/components/Interfaces/GameweekStats'
-import { CompleteDraftedPlayer } from './CompleteDraftedPlayer'
-import { DraftedTeam } from './DraftedTeam'
+import GameweekStats from '~/components/Interfaces/GameweekStats'
+import CompleteDraftedPlayer from './CompleteDraftedPlayer'
+import DraftedTeam from './DraftedTeam'
 
-export class CompleteDraftedTeam {
+class CompleteDraftedTeam {
   public readonly teamID: number
   public readonly teamName: string
   public readonly ownerName: string
@@ -116,3 +116,4 @@ export class CompleteDraftedTeam {
     }
   }
 }
+export default CompleteDraftedTeam

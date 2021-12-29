@@ -1,8 +1,8 @@
-import { Fixture } from '../Interfaces/Fixture'
+import Fixture from '../Interfaces/Fixture'
 import { Week } from '../Interfaces/Weeks'
-import { CompleteFixture } from './CompleteFixture'
+import CompleteFixture from './CompleteFixture'
 
-export class CompleteWeek {
+class CompleteWeek {
   public readonly week: string
   public readonly fixtures: Fixture[]
 
@@ -11,3 +11,5 @@ export class CompleteWeek {
     this.fixtures = week.fixtures.map((x) => new CompleteFixture(x))
   }
 }
+
+export default CompleteWeek

@@ -1,9 +1,8 @@
 import DraftedPlayer from '@/components/DraftedTeams/Logic/DraftedPlayer'
-import { DraftedTeamDataElements } from '@/components/Interfaces/DraftedTeamDataElements'
-import { GameweekStats } from '~/components/Interfaces/GameweekStats'
+import DraftedTeamDataElements from '@/components/Interfaces/DraftedTeamDataElements'
+import GameweekStats from '~/components/Interfaces/GameweekStats'
 
-// Player class
-export class DraftedTeam {
+class DraftedTeam {
   public readonly teamID: number
   public readonly teamName: string
   public readonly ownerName: string
@@ -20,3 +19,5 @@ export class DraftedTeam {
     this.gameWeekStats = draftedTeam.gameweek_stats
   }
 }
+
+export default DraftedTeam

@@ -1,7 +1,7 @@
-import { DraftedTransfer } from '@/components/DraftedTeams/Logic/DraftedTransfer'
-import { Player } from '../Players/Player'
+import DraftedTransfer from '@/components/DraftedTeams/Logic/DraftedTransfer'
+import Player from '../Players/Player'
 
-export interface CompleteDraftedPlayer {
+export default interface CompleteDraftedPlayer {
   player: Player
   transfers: DraftedTransfer[]
 }

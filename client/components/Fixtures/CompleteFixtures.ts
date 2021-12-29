@@ -1,7 +1,7 @@
-import { Weeks } from '../Interfaces/Weeks'
-import { CompleteFixture } from './CompleteFixture'
+import Weeks from '../Interfaces/Weeks'
+import CompleteFixture from './CompleteFixture'
 
-export class CompleteFixtures {
+class CompleteFixtures {
   public readonly week: String
   public readonly fixtures: Object
   public readonly updatedAt: String
@@ -15,6 +15,8 @@ export class CompleteFixtures {
   }
 }
 
-export function initFixturesData(weeks) {
+function initFixturesData(weeks) {
   return weeks.map((x) => new CompleteFixtures(x))
 }
+
+export default initFixturesData

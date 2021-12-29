@@ -1,7 +1,7 @@
 import { PlayerPositionShort } from '../Interfaces/PlayerPosition'
-import { Player } from './Player'
+import Player from './Player'
 
-export class PlayerList {
+class PlayerList {
   public players: Player[]
   public filteredPlayers: Player[]
 
@@ -83,3 +83,5 @@ export class PlayerList {
     return [players.slice(0, divisor), players.slice(divisor)]
   }
 }
+
+export default PlayerList

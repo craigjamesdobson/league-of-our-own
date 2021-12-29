@@ -21,7 +21,18 @@
             <li
               v-for="player in playerTypes"
               :key="player.id"
-              class="relative flex flex-col items-center justify-around w-full text-sm border-b border-gray-100 cursor-pointer  player-row lg:w-1/2"
+              class="
+                relative
+                flex flex-col
+                items-center
+                justify-around
+                w-full
+                text-sm
+                border-b border-gray-100
+                cursor-pointer
+                player-row
+                lg:w-1/2
+              "
               @click.stop="showPlayerDataModal(player.id)"
             >
               <div class="flex w-full">
@@ -43,7 +54,16 @@
                   :class="player.availabilityType"
                 >
                   <span
-                    class="flex justify-center w-3 h-3 mr-2 leading-tight bg-red-500 rounded-full "
+                    class="
+                      flex
+                      justify-center
+                      w-3
+                      h-3
+                      mr-2
+                      leading-tight
+                      bg-red-500
+                      rounded-full
+                    "
                   ></span>
                   Unavailable
                 </span>
@@ -53,7 +73,16 @@
                   :class="player.availabilityType"
                 >
                   <span
-                    class="flex justify-center w-3 h-3 mr-2 leading-tight bg-yellow-400 rounded-full "
+                    class="
+                      flex
+                      justify-center
+                      w-3
+                      h-3
+                      mr-2
+                      leading-tight
+                      bg-yellow-400
+                      rounded-full
+                    "
                   ></span>
                   Unavailable
                 </span>
@@ -63,7 +92,16 @@
                   :class="player.availabilityType"
                 >
                   <span
-                    class="flex justify-center w-3 h-3 mr-2 leading-tight bg-green-400 rounded-full "
+                    class="
+                      flex
+                      justify-center
+                      w-3
+                      h-3
+                      mr-2
+                      leading-tight
+                      bg-green-400
+                      rounded-full
+                    "
                   ></span>
                   Available
                 </span>
@@ -74,10 +112,29 @@
       </div>
       <div v-else>
         <div
-          class="flex items-center p-3 mb-4 text-sm text-blue-700 bg-blue-100 border-t border-b border-blue-500 rounded-b-sm shadow-sm "
+          class="
+            flex
+            items-center
+            p-3
+            mb-4
+            text-sm text-blue-700
+            bg-blue-100
+            border-t border-b border-blue-500
+            rounded-b-sm
+            shadow-sm
+          "
         >
           <span
-            class="flex items-center justify-center w-5 h-5 mr-4 bg-blue-700 rounded-full "
+            class="
+              flex
+              items-center
+              justify-center
+              w-5
+              h-5
+              mr-4
+              bg-blue-700
+              rounded-full
+            "
           >
             <font-awesome-icon
               class="text-white fa-xs"
@@ -131,7 +188,14 @@
                 />
               </div>
               <h4
-                class="flex flex-col items-end text-4xl leading-none text-right uppercase "
+                class="
+                  flex flex-col
+                  items-end
+                  text-4xl
+                  leading-none
+                  text-right
+                  uppercase
+                "
               >
                 <span class="mb-2 text-base">
                   {{ selectedPlayer.firstName }}
@@ -146,7 +210,16 @@
                   class="flex items-center flex-grow w-3/4 mr-4"
                 >
                   <span
-                    class="flex items-center justify-center w-5 h-5 mr-2 bg-gray-300 rounded-full "
+                    class="
+                      flex
+                      items-center
+                      justify-center
+                      w-5
+                      h-5
+                      mr-2
+                      bg-gray-300
+                      rounded-full
+                    "
                   >
                     <font-awesome-icon
                       class="text-gray-900 fa-xs"
@@ -159,7 +232,15 @@
                 </div>
                 <div class="flex flex-col items-end w-1/4 ml-auto text-sm">
                   <h4
-                    class="flex justify-end w-full pb-1 mb-1 uppercase border-b border-black "
+                    class="
+                      flex
+                      justify-end
+                      w-full
+                      pb-1
+                      mb-1
+                      uppercase
+                      border-b border-black
+                    "
                   >
                     Statistics
                   </h4>

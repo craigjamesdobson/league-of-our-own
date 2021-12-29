@@ -1,7 +1,7 @@
-import { DraftedTransferData } from '@/components/Interfaces/DraftedTransferData'
-import { CompleteDraftedPlayer } from './CompleteDraftedPlayer'
+import DraftedTransferData from '@/components/Interfaces/DraftedTransferData'
+import CompleteDraftedPlayer from './CompleteDraftedPlayer'
 
-export class DraftedTransfer {
+class DraftedTransfer {
   public readonly transferId: number
   public readonly transferWeek: number
   private readonly currentTransferDateExpiry: string
@@ -20,3 +20,5 @@ export class DraftedTransfer {
     }
   }
 }
+
+export default DraftedTransfer

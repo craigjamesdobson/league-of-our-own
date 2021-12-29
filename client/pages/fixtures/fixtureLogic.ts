@@ -3,9 +3,9 @@ import {
   ref,
   reactive,
   onMounted,
-  computed
+  computed,
 } from '@nuxtjs/composition-api'
-import { Fixture } from '~/components/Interfaces/Fixture'
+import Fixture from '~/components/Interfaces/Fixture'
 import { PlayerPositionShort } from '~/components/Interfaces/PlayerPosition'
 import Swal from 'sweetalert2'
 
@@ -37,7 +37,7 @@ const useFixtureLogic = () => {
     filteredFixtures: [],
     updatedAt: null,
     updatedBy: null,
-    fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded)
+    fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded),
   })
 
   const filteredFixtureData = computed(() =>
@@ -57,7 +57,7 @@ const useFixtureLogic = () => {
     store.dispatch('fixture-data/updateFixtureScore', {
       score: fixturePayload.score,
       selectedFixtureID: fixturePayload.selectedFixtureID,
-      activeWeek: fixturePayload.selectedWeek
+      activeWeek: fixturePayload.selectedWeek,
     })
   }
 
@@ -67,7 +67,7 @@ const useFixtureLogic = () => {
   ) => {
     await store.dispatch('updatePlayers', {
       fixtureWeek: fixtureWeek,
-      playerStats: playerStats
+      playerStats: playerStats,
     })
 
     const player = store.getters.getPlayerData.players.players.filter(
@@ -81,14 +81,14 @@ const useFixtureLogic = () => {
       playerStats: {
         playerID: playerStats.playerID,
         statType: 'points',
-        statValue: pointsTotal
-      }
+        statValue: pointsTotal,
+      },
     })
   }
 
   const completeTeamStats = {
     gameweekData: [],
-    fixtureRound: fixtureData.activeFixtureRound
+    fixtureRound: fixtureData.activeFixtureRound,
   }
 
   const calculateGameweekStats = async (teams) => {
@@ -101,7 +101,7 @@ const useFixtureLogic = () => {
         assists: 0,
         redCards: 0,
         cleanSheets: 0,
-        points: 0
+        points: 0,
       }
 
       team.teamPlayers.forEach((player) => {
@@ -131,7 +131,7 @@ const useFixtureLogic = () => {
 
     return await store.dispatch('drafted-data/updateDraftedTeams', {
       gameweekData: completeTeamStats,
-      fixtureWeek: fixtureData.activeFixtureRound
+      fixtureWeek: fixtureData.activeFixtureRound,
     })
   }
 
@@ -221,7 +221,7 @@ const useFixtureLogic = () => {
         title: `Gameweek ${fixtureData.activeFixtureRound} has been saved`,
         toast: true,
         showConfirmButton: false,
-        timer: 2500
+        timer: 2500,
       })
     } catch (err) {
       Swal.fire({
@@ -230,7 +230,7 @@ const useFixtureLogic = () => {
         title: `Error saving gameweek`,
         toast: true,
         showConfirmButton: false,
-        timer: 2500
+        timer: 2500,
       })
       throw err
     }
@@ -244,7 +244,7 @@ const useFixtureLogic = () => {
     updateFixtureScore,
     updateHandler,
     playerStats,
-    storePlayerStats
+    storePlayerStats,
   }
 }
 

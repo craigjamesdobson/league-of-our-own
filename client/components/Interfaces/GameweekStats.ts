@@ -1,4 +1,4 @@
-export interface GameweekStats {
+export default interface GameweekStats {
   gameweek?: number
   goalsScored?: number
   assists?: number

@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 
 import { PlayerPositionShort } from './PlayerPosition'
-import { GameweekStats } from './GameweekStats'
+import GameweekStats from './GameweekStats'
 
-export interface PlayerDataElements {
+export default interface PlayerDataElements {
   id: number
   code: string
   status: string

@@ -1,8 +1,8 @@
-import { PlayerDataElements } from '@/components/Interfaces/PlayerDataElements'
-import { Player } from './Player'
-import { PlayerList } from './PlayerList'
+import PlayerDataElements from '@/components/Interfaces/PlayerDataElements'
+import Player from './Player'
+import PlayerList from './PlayerList'
 
-export function generatePlayerData(playerData: PlayerDataElements[]) {
+function generatePlayerData(playerData: PlayerDataElements[]) {
   const players = playerData.map(
     (player: PlayerDataElements) => new Player(player)
   )
@@ -11,7 +11,7 @@ export function generatePlayerData(playerData: PlayerDataElements[]) {
   return playerList
 }
 
-export function initPlayerData(playerData: any) {
+function initPlayerData(playerData: any) {
   const players = generatePlayerData(playerData)
   const filteredPlayers = generatePlayerData(playerData)
 
@@ -20,7 +20,7 @@ export function initPlayerData(playerData: any) {
 
   return {
     players,
-    filteredPlayers
+    filteredPlayers,
   }
 }
 
@@ -50,3 +50,5 @@ export function getFilteredPlayers(
 
   return filteredPlayers
 }
+
+export default initPlayerData

@@ -38,9 +38,13 @@
             class="flex justify-between p-2"
           >
             Week {{ week.gameweek }}
-            <span v-for="(team, i) in week.winners" :key="i">
-              {{ team.teamName }}
-            </span>
+            <div v-if="!week.winners.length">N/A</div>
+            <div v-else>
+              <span v-for="(team, i) in week.winners" :key="i">
+                <span v-if="i >= 1 && i < week.winners.length">/</span>
+                {{ team.teamName }}
+              </span>
+            </div>
             {{ week.points }}
           </div>
         </div>
@@ -408,7 +412,7 @@
 </template>
 
 <script>
-import { computed, onMounted, ref } from '@vue/composition-api'
+import { computed, ref } from '@vue/composition-api'
 import { useContext, useRouter } from '@nuxtjs/composition-api'
 import playerLoadingSkeleton from '@/components/Common/playerLoadingSkeleton.vue'
 import Table from '@/components/Table/Table.vue'

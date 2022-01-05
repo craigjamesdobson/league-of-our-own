@@ -45,6 +45,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/fontawesome',
     '@nuxtjs/svg-sprite',
+    ['@pinia/nuxt', { disableVuex: false }],
   ],
 
   tailwindcss: {

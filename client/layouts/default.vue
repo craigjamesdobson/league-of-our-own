@@ -23,6 +23,7 @@
 
 <script>
 import { useContext, computed, onMounted } from '@nuxtjs/composition-api'
+import { useStore } from '@/stores/test'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 
@@ -34,6 +35,7 @@ export default {
   setup() {
     const { store } = useContext()
     const isLoggedIn = computed(() => store.getters.isLoggedIn)
+    const main = useStore()
 
     if (isLoggedIn.value) {
       store.dispatch('fetchUser')
@@ -41,6 +43,7 @@ export default {
 
     onMounted(async () => {
       await store.dispatch('fetchPlayers')
+      await main.fetchPlayers()
     })
     // store.dispatch('fetchDraftedTeams')
   },

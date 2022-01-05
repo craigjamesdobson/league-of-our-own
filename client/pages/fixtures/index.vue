@@ -14,7 +14,7 @@
           hover:bg-primary hover:text-white
         "
         :class="{
-          'bg-primary text-white': index === fixtureData.activeFixtureRound
+          'bg-primary text-white': index === fixtureData.activeFixtureRound,
         }"
         @click="filterFixtures(index)"
       >
@@ -41,24 +41,30 @@
       </div>
       <div v-else>
         <div class="flex items-center justify-between">
-          <button
-            class="
-              flex
-              items-center
-              p-2
-              mb-4
-              text-white
-              border
-              rounded-sm
-              border-primary
-              bg-primary
-              js-update-fixture-collection-btn
-              update-fixture-collection-btn
-            "
-            @click="updateHandler"
-          >
-            Save Gameweek {{ fixtureData.activeFixtureRound }}
-          </button>
+          <div class="flex items">
+            <button
+              class="
+                flex
+                items-center
+                p-2
+                mb-4
+                text-white
+                border
+                rounded-sm
+                border-primary
+                bg-primary
+                js-update-fixture-collection-btn
+                update-fixture-collection-btn
+              "
+              @click="updateHandler"
+            >
+              Save Gameweek {{ fixtureData.activeFixtureRound }}
+            </button>
+            <div>
+              <input id="incompleteGameweek" type="checkbox" />
+              <label for="incompleteGameweek">Incomplete Gameweek</label>
+            </div>
+          </div>
           <div
             v-if="fixtureData.updatedAt && fixtureData.updatedBy"
             class="text-sm"
@@ -80,10 +86,10 @@
             class="flex flex-col justify-center"
           >
             <Fixture
+              :key="+index + 1"
               :fixture-id="index + 1"
               :fixture-data="fixture"
               :fixture-week="fixtureData.activeFixtureRound"
-              :key="+index + 1"
             ></Fixture>
           </div>
         </div>
@@ -103,15 +109,15 @@
 <script lang="ts">
 import DraftedTeams from '@/components/DraftedTeams/DraftedTeams.vue'
 import Fixture from '@/components/Fixtures/Fixture.vue'
-import { useFixtureLogic } from './fixtureLogic'
 import { onMounted } from '@vue/composition-api'
 import { useContext } from '@nuxtjs/composition-api'
+import { useFixtureLogic } from './fixtureLogic'
 
 export default {
   middleware: 'auth',
   components: {
     DraftedTeams,
-    Fixture
+    Fixture,
   },
   setup() {
     const { store } = useContext()
@@ -122,7 +128,7 @@ export default {
       storePlayerStats,
       filterFixtures,
       updateFixtureScore,
-      updateHandler
+      updateHandler,
     } = useFixtureLogic()
 
     onMounted(() => {
@@ -136,9 +142,9 @@ export default {
       playerStats,
       storePlayerStats,
       updateFixtureScore,
-      updateHandler
+      updateHandler,
     }
-  }
+  },
 }
 </script>
 

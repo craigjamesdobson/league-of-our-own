@@ -374,14 +374,14 @@ export default {
       }
     })
 
-    watch(playerData, (newValue, oldValue) => {
+    watch(playerData, (_, __) => {
       if (route.value.query.playerid) {
         showPlayerDataModal(+route.value.query.playerid)
       }
     })
 
     watch(
-      (to, from) => to.$route.query.playerid,
+      (to, _) => to.$route.query.playerid,
       (newId) =>
         setTimeout(() => {
           if (newId) {

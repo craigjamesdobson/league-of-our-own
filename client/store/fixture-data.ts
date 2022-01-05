@@ -126,7 +126,7 @@ export const actions = {
     try {
       await commit('SET_UPDATEDBYUSER', { activeWeek, userName })
     } catch (err) {
-      throw err
+      throw err.response.data
     }
     const selectedWeek = state.fixtures.filter(
       (x) => x.week === activeWeek.toString()
@@ -137,10 +137,11 @@ export const actions = {
     })
 
     try {
-      return Promise.all([
+      const test = await Promise.all([
         axios.post('/v1/fixtures/update', ...selectedWeek),
         axios.post('/v1/players/update', gameWeekData),
       ])
+      console.log(test)
     } catch (err) {
       throw err.response.data
     }

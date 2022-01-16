@@ -1,0 +1,211 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('league-of-our-own');
+
+db['drafted-teams-2021_2022'].updateOne(
+  {team_id: 11},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 257,
+          "transfers": []
+        },
+        {
+          "player_id": 59,
+          "transfers": []
+        },
+        {
+          "player_id": 169,
+          "transfers": []
+        },
+        {
+          "player_id": 259,
+          "transfers": []
+        },
+        {
+          "player_id": 135,
+          "transfers": [
+            {
+              "transfer_id": 262,
+              "transfer_week": 21,
+              "currentTransferDateExpiry": "2022-01-03"
+            }
+          ]
+        },
+        {
+          "player_id": 359,
+          "transfers": []
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 251,
+          "transfers": []
+        },
+        {
+          "player_id": 177,
+          "transfers": []
+        },
+        {
+          "player_id": 269,
+          "transfers": [
+            {
+              "transfer_id": 6,
+              "transfer_week": 21,
+              "currentTransferDateExpiry": "2022-01-03"
+            }
+          ]
+        },
+        {
+          "player_id": 78,
+          "transfers": []
+        }
+      ]
+      }
+   }
+)
+
+db['drafted-teams-2021_2022'].updateOne(
+  {team_id: 10},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 353,
+          "transfers": []
+        },
+        {
+          "player_id": 229,
+          "transfers": []
+        },
+        {
+          "player_id": 237,
+          "transfers": []
+        },
+        {
+          "player_id": 135,
+          "transfers": [
+            {
+              "transfer_id": 121,
+              "transfer_week": 21,
+              "currentTransferDateExpiry": "2022-01-03"
+            }
+          ]
+        },
+        {
+          "player_id": 360,
+          "transfers": [
+            {
+              "transfer_id": 23,
+              "transfer_week": 21,
+              "currentTransferDateExpiry": "2022-01-03"
+            }
+          ]
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 251,
+          "transfers": []
+        },
+        {
+          "player_id": 215,
+          "transfers": []
+        },
+        {
+          "player_id": 430,
+          "transfers": []
+        },
+        {
+          "player_id": 189,
+          "transfers": []
+        },
+        {
+          "player_id": 40,
+          "transfers": []
+        }
+      ]
+      }
+   }
+)
+
+db['drafted-teams-2021_2022'].updateOne(
+  {team_id: 16},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 280,
+          "transfers": [
+            {
+              "transfer_id": 231,
+              "transfer_week": 3,
+              "currentTransferDateExpiry": "2021-08-30"
+            }
+          ]
+        },
+        {
+          "player_id": 275,
+          "transfers": []
+        },
+        {
+          "player_id": 142,
+          "transfers": []
+        },
+        {
+          "player_id": 249,
+          "transfers": []
+        },
+        {
+          "player_id": 208,
+          "transfers": []
+        },
+        {
+          "player_id": 255,
+          "transfers": []
+        },
+        {
+          "player_id": 240,
+          "transfers": []
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 357,
+          "transfers": [
+            {
+              "transfer_id": 529,
+              "transfer_week": 3,
+              "currentTransferDateExpiry": "2021-08-30"
+            }
+          ]
+        },
+        {
+          "player_id": 189,
+          "transfers": []
+        },
+        {
+          "player_id": 177,
+          "transfers": [
+            {
+              "transfer_id": 40,
+              "transfer_week": 21,
+              "currentTransferDateExpiry": "2022-01-03"
+            }
+          ]
+        }
+      ]
+      }
+   }
+)

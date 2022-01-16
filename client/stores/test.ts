@@ -22,7 +22,7 @@ interface State {
   user: User
 }
 
-export const useStore = defineStore('storeId', {
+export const useBaseStore = defineStore('baseStore', {
   // arrow function recommended for full type inference
   state: (): State => {
     return {

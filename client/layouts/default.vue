@@ -35,7 +35,7 @@ export default {
   setup() {
     const { store } = useContext()
     const isLoggedIn = computed(() => store.getters.isLoggedIn)
-    const main = useStore()
+    const baseStore = useStore()
 
     if (isLoggedIn.value) {
       store.dispatch('fetchUser')
@@ -43,7 +43,7 @@ export default {
 
     onMounted(async () => {
       await store.dispatch('fetchPlayers')
-      await main.fetchPlayers()
+      await baseStore.fetchPlayers()
     })
     // store.dispatch('fetchDraftedTeams')
   },

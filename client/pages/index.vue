@@ -429,7 +429,7 @@ export default {
     const router = useRouter()
 
     const isLoading = computed(() => store.getters.isLoading)
-    const mostRecentGameweek = ref(15)
+    const mostRecentGameweek = ref(24)
 
     const draftedTeamData = computed(() =>
       store.getters['drafted-data/getSortedTeams'](mostRecentGameweek)

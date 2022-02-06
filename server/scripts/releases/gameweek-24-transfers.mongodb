@@ -1,0 +1,158 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('league-of-our-own');
+
+// IRISH ROVERS - 3 transfers
+db['drafted-teams-2021_2022'].updateOne(
+  {team_id: 7},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 200,
+          "transfers": [
+            {
+              "transfer_id": 257,
+              "transfer_week": 24,
+              "currentTransferDateExpiry": "2022-02-22"
+            }
+          ]
+        },
+        {
+          "player_id": 275,
+          "transfers": []
+        },
+        {
+          "player_id": 273,
+          "transfers": []
+        },
+        {
+          "player_id": 229,
+          "transfers": []
+        },
+        {
+          "player_id": 237,
+          "transfers": []
+        },
+        {
+          "player_id": 233,
+          "transfers": []
+        },
+        {
+          "player_id": 33,
+          "transfers": [
+            {
+              "transfer_id": 212,
+              "transfer_week": 24,
+              "currentTransferDateExpiry": "2022-02-22"
+            }
+          ]
+        },
+        {
+          "player_id": 332,
+          "transfers": [
+            {
+              "transfer_id": 240,
+              "transfer_week": 24,
+              "currentTransferDateExpiry": "2022-02-22"
+            },
+            {
+              "transfer_id": 289,
+              "transfer_week": 7,
+              "currentTransferDateExpiry": "2021-10-04"
+            },
+          ]
+        },
+        {
+          "player_id": 205,
+          "transfers": []
+        },
+        {
+          "player_id": 337,
+          "transfers": []
+        },
+        {
+          "player_id": 263,
+          "transfers": []
+        }
+      ]
+      }
+   }
+)
+
+// INTER THE STAND - 1 transfer
+db['drafted-teams-2021_2022'].updateOne(
+  {team_id: 8},
+     { $set:
+      {
+        team_players: [
+        {
+          "player_id": 231,
+          "transfers": []
+        },
+        {
+          "player_id": 16,
+          "transfers": []
+        },
+        {
+          "player_id": 234,
+          "transfers": []
+        },
+        {
+          "player_id": 135,
+          "transfers": [
+            {
+              "transfer_id": 142,
+              "transfer_week": 13,
+              "currentTransferDateExpiry": "2021-11-29"
+            }
+          ]
+        },
+        {
+          "player_id": 275,
+          "transfers": []
+        },
+        {
+          "player_id": 240,
+          "transfers": []
+        },
+        {
+          "player_id": 359,
+          "transfers": []
+        },
+        {
+          "player_id": 265,
+          "transfers": []
+        },
+        {
+          "player_id": 337,
+          "transfers": []
+        },
+        {
+          "player_id": 4,
+          "transfers": [
+            {
+              "transfer_id": 6,
+              "transfer_week": 24,
+              "currentTransferDateExpiry": "2022-02-22"
+            }
+          ]
+        },
+        {
+          "player_id": 269,
+          "transfers": [
+            {
+              "transfer_id": 529,
+              "transfer_week": 5,
+              "currentTransferDateExpiry": "2021-09-21"
+            }
+          ]
+        }
+      ]
+      }
+   }
+)

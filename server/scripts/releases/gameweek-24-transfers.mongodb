@@ -56,15 +56,15 @@ db['drafted-teams-2021_2022'].updateOne(
           "player_id": 332,
           "transfers": [
             {
-              "transfer_id": 240,
-              "transfer_week": 24,
-              "currentTransferDateExpiry": "2022-02-22"
-            },
-            {
               "transfer_id": 289,
               "transfer_week": 7,
               "currentTransferDateExpiry": "2021-10-04"
             },
+            {
+              "transfer_id": 240,
+              "transfer_week": 24,
+              "currentTransferDateExpiry": "2022-02-22"
+            }
           ]
         },
         {

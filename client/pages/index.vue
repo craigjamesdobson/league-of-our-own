@@ -11,7 +11,7 @@
       <Table
         v-else
         :drafted-team-data="draftedTeamData"
-        :teams-to-show="10"
+        :teams-to-show="34"
         class="col-span-4"
       ></Table>
       <div class="flex flex-col col-span-2">

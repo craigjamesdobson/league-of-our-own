@@ -15,7 +15,9 @@
         class="col-span-4"
       ></Table>
       <div class="flex flex-col col-span-2">
-        <div class="flex flex-col h-full p-4 bg-white rounded-lg">
+        <div
+          class="flex flex-col h-full p-4 bg-white rounded-lg justify-around"
+        >
           <div
             class="
               flex
@@ -35,7 +37,7 @@
           <div
             v-for="(week, index) in weeklyWinners"
             :key="index"
-            class="flex justify-between p-2"
+            class="flex justify-between px-2"
           >
             Week {{ week.gameweek }}
             <div v-if="!week.winners.length">N/A</div>

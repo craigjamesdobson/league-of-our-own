@@ -158,7 +158,7 @@ export default {
     } = useFixtureLogic()
 
     onMounted(() => {
-      // store.dispatch('fixture-data/fetchFixtures')
+      store.dispatch('fixture-data/fetchFixtures')
     })
 
     return {

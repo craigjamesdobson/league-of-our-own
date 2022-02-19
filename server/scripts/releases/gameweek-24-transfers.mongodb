@@ -18,7 +18,7 @@ db['drafted-teams-2021_2022'].updateOne(
             {
               "transfer_id": 257,
               "transfer_week": 24,
-              "currentTransferDateExpiry": "2022-02-22"
+              "currentTransferDateExpiry": "2022-02-10"
             }
           ]
         },
@@ -48,7 +48,7 @@ db['drafted-teams-2021_2022'].updateOne(
             {
               "transfer_id": 212,
               "transfer_week": 24,
-              "currentTransferDateExpiry": "2022-02-22"
+              "currentTransferDateExpiry": "2022-02-10"
             }
           ]
         },
@@ -63,7 +63,7 @@ db['drafted-teams-2021_2022'].updateOne(
             {
               "transfer_id": 240,
               "transfer_week": 24,
-              "currentTransferDateExpiry": "2022-02-22"
+              "currentTransferDateExpiry": "2022-02-10"
             }
           ]
         },
@@ -138,7 +138,7 @@ db['drafted-teams-2021_2022'].updateOne(
             {
               "transfer_id": 6,
               "transfer_week": 24,
-              "currentTransferDateExpiry": "2022-02-22"
+              "currentTransferDateExpiry": "2022-02-10"
             }
           ]
         },

@@ -15,24 +15,25 @@ const updateFixtures = catchAsync(async (req, res) => {
   try {
     await Fixtures.updateOne(
       { week: req.body.week },
-      { 
+      {
         $set: {
-        fixtures: req.body.fixtures,
-        updatedBy: req.body.updatedBy,
-        updatedAt: req.body.updatedAt,
-        } 
+          fixtures: req.body.fixtures,
+          updatedBy: req.body.updatedBy,
+          updatedAt: req.body.updatedAt,
+          isIncomplete: req.body.isIncomplete,
+        },
       }
-    )
+    );
     res.status(httpStatus.OK).send({
-      message: 'Fixtures have been updated'
+      message: 'Fixtures have been updated',
     });
-    console.log('Fixtures have been updated')
+    console.log('Fixtures have been updated');
   } catch {
-      throw new ApiError(httpStatus.NOT_FOUND, 'Fixture not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Fixture not found');
   }
 });
 
 module.exports = {
   getFixtures,
-  updateFixtures
+  updateFixtures,
 };

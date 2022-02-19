@@ -6,6 +6,7 @@ import {
   UPDATE_FIXTURESCORE,
   STORE_PLAYERSTATS,
   SET_UPDATEDBYUSER,
+  UPDATE_GAMEWEEKSTATUS,
 } from './mutation-types'
 import initFixturesData from '~/components/Fixtures/CompleteFixtures'
 
@@ -26,6 +27,7 @@ interface Fixture {
 interface Weeks {
   week: string
   fixtures: Fixture[]
+  isIncomplete: Boolean
   updatedAt: string
   updatedBy?: string
 }
@@ -95,6 +97,13 @@ export const mutations = {
     selectedWeek[0].updatedAt = new Date().toISOString()
     selectedWeek[0].updatedBy = payload.userName
   },
+
+  [UPDATE_GAMEWEEKSTATUS](state: State, payload) {
+    const selectedWeek = state.fixtures.filter(
+      (x) => x.week === payload.activeWeek.toString()
+    )
+    selectedWeek[0].isIncomplete = payload.isIncomplete
+  },
 }
 
 export const actions = {
@@ -117,17 +126,17 @@ export const actions = {
     await commit('STORE_PLAYERSTATS', formData)
   },
 
+  async updateGameweekStatus({ commit }: any, formData: any) {
+    await commit('UPDATE_GAMEWEEKSTATUS', formData)
+  },
+
   async updateFixtureCollection(
     { state, commit, getters, rootState }: any,
     activeWeek: any
   ) {
     const userName = getters.getUserName
 
-    try {
-      await commit('SET_UPDATEDBYUSER', { activeWeek, userName })
-    } catch (err) {
-      throw err
-    }
+    await commit('SET_UPDATEDBYUSER', { activeWeek, userName })
     const selectedWeek = state.fixtures.filter(
       (x) => x.week === activeWeek.toString()
     )
@@ -156,6 +165,7 @@ export const getters = {
     const fixture = state.fixtures.filter((x) => +x.week === fixtureRound)[0]
     return {
       fixtures: fixture.fixtures,
+      isIncomplete: fixture.isIncomplete,
       updatedAt: fixture.updatedAt,
       updatedBy: fixture.updatedBy,
     }

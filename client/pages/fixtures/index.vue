@@ -14,7 +14,7 @@
           hover:bg-primary hover:text-white
         "
         :class="{
-          'bg-primary text-white': index === fixtureData.activeFixtureRound
+          'bg-primary text-white': index === fixtureData.activeFixtureRound,
         }"
         @click="filterFixtures(index)"
       >
@@ -41,24 +41,36 @@
       </div>
       <div v-else>
         <div class="flex items-center justify-between">
-          <button
-            class="
-              flex
-              items-center
-              p-2
-              mb-4
-              text-white
-              border
-              rounded-sm
-              border-primary
-              bg-primary
-              js-update-fixture-collection-btn
-              update-fixture-collection-btn
-            "
-            @click="updateHandler"
-          >
-            Save Gameweek {{ fixtureData.activeFixtureRound }}
-          </button>
+          <div class="flex items-center mb-4">
+            <button
+              class="
+                flex
+                items-center
+                p-2
+                mr-4
+                text-white
+                border
+                rounded-sm
+                border-primary
+                bg-primary
+                js-update-fixture-collection-btn
+                update-fixture-collection-btn
+              "
+              @click="updateHandler"
+            >
+              Save Gameweek {{ fixtureData.activeFixtureRound }}
+            </button>
+            <input
+              id="incomplete-week"
+              v-model="fixtureData.isIncomplete"
+              class="mr-2 w-5 h-5"
+              type="checkbox"
+              @change="updateGameweekStatus"
+            />
+            <label for="incomplete-week" class="text-sm">
+              This week is incomplete ({{ fixtureData.isIncomplete }})
+            </label>
+          </div>
           <div
             v-if="fixtureData.updatedAt && fixtureData.updatedBy"
             class="text-sm"
@@ -72,6 +84,25 @@
           </div>
         </div>
         <div
+          v-if="fixtureData.isIncomplete"
+          role="alert"
+          class="
+            flex flex-col
+            self-start
+            w-full
+            px-4
+            py-3
+            mb-4
+            text-blue-700
+            bg-blue-100
+            border-t border-b border-blue-500
+          "
+        >
+          <p class="text-sm uppercase">
+            This gameweek is incomplete so scores will not be added to total
+          </p>
+        </div>
+        <div
           class="grid items-start grid-flow-row grid-cols-2 gap-4 auto-rows-max"
         >
           <div
@@ -80,10 +111,10 @@
             class="flex flex-col justify-center"
           >
             <Fixture
+              :key="+index + 1"
               :fixture-id="index + 1"
               :fixture-data="fixture"
               :fixture-week="fixtureData.activeFixtureRound"
-              :key="+index + 1"
             ></Fixture>
           </div>
         </div>
@@ -103,15 +134,15 @@
 <script lang="ts">
 import DraftedTeams from '@/components/DraftedTeams/DraftedTeams.vue'
 import Fixture from '@/components/Fixtures/Fixture.vue'
-import { useFixtureLogic } from './fixtureLogic'
 import { onMounted } from '@vue/composition-api'
 import { useContext } from '@nuxtjs/composition-api'
+import { useFixtureLogic } from './fixtureLogic'
 
 export default {
   middleware: 'auth',
   components: {
     DraftedTeams,
-    Fixture
+    Fixture,
   },
   setup() {
     const { store } = useContext()
@@ -122,11 +153,12 @@ export default {
       storePlayerStats,
       filterFixtures,
       updateFixtureScore,
-      updateHandler
+      updateGameweekStatus,
+      updateHandler,
     } = useFixtureLogic()
 
     onMounted(() => {
-      store.dispatch('fixture-data/fetchFixtures')
+      // store.dispatch('fixture-data/fetchFixtures')
     })
 
     return {
@@ -136,9 +168,10 @@ export default {
       playerStats,
       storePlayerStats,
       updateFixtureScore,
-      updateHandler
+      updateGameweekStatus,
+      updateHandler,
     }
-  }
+  },
 }
 </script>
 

@@ -1,18 +1,13 @@
-import {
-  useContext,
-  ref,
-  reactive,
-  onMounted,
-  computed,
-} from '@nuxtjs/composition-api'
+import { useContext, ref, reactive, computed } from '@nuxtjs/composition-api'
+import Swal from 'sweetalert2'
 import Fixture from '~/components/Interfaces/Fixture'
 import { PlayerPositionShort } from '~/components/Interfaces/PlayerPosition'
-import Swal from 'sweetalert2'
 
 interface fixtureData {
   fixturesTotal: number
   activeFixtureRound: number
   filteredFixtures: Fixture[]
+  isIncomplete: false
   updatedAt: any
   updatedBy: any
   fixturesLoaded: boolean
@@ -35,6 +30,7 @@ const useFixtureLogic = () => {
     fixturesTotal: 38,
     activeFixtureRound: 1,
     filteredFixtures: [],
+    isIncomplete: false,
     updatedAt: null,
     updatedBy: null,
     fixturesLoaded: computed(() => store.state['fixture-data'].fixturesLoaded),
@@ -49,6 +45,7 @@ const useFixtureLogic = () => {
   const filterFixtures = (fixtureRound: number) => {
     fixtureData.activeFixtureRound = fixtureRound
     fixtureData.filteredFixtures = filteredFixtureData.value.fixtures
+    fixtureData.isIncomplete = filteredFixtureData.value.isIncomplete
     fixtureData.updatedAt = filteredFixtureData.value.updatedAt
     fixtureData.updatedBy = filteredFixtureData.value.updatedBy
   }
@@ -66,8 +63,8 @@ const useFixtureLogic = () => {
     playerStats: playerStats
   ) => {
     await store.dispatch('updatePlayers', {
-      fixtureWeek: fixtureWeek,
-      playerStats: playerStats,
+      fixtureWeek,
+      playerStats,
     })
 
     const player = store.getters.getPlayerData.players.players.filter(
@@ -77,7 +74,7 @@ const useFixtureLogic = () => {
     const pointsTotal = calculatePlayerPoints(player[0], fixtureWeek)
 
     await store.dispatch('updatePlayers', {
-      fixtureWeek: fixtureWeek,
+      fixtureWeek,
       playerStats: {
         playerID: playerStats.playerID,
         statType: 'points',
@@ -144,7 +141,7 @@ const useFixtureLogic = () => {
 
     let goalsMultiplier = 0
     let cleanSheetTotal = 0
-    let sentOffTotal = 10
+    const sentOffTotal = 10
 
     switch (player.playerType) {
       case PlayerPositionShort.GK:
@@ -199,6 +196,15 @@ const useFixtureLogic = () => {
     return res
   }
 
+  const updateGameweekStatus = async () => {
+    const res = await store.dispatch('fixture-data/updateGameweekStatus', {
+      activeWeek: fixtureData.activeFixtureRound,
+      isIncomplete: fixtureData.isIncomplete,
+    })
+
+    return res
+  }
+
   const toggleBtnLoadingState = (loading) => {
     const button: HTMLButtonElement = document.querySelector(
       '.js-update-fixture-collection-btn'
@@ -245,6 +251,7 @@ const useFixtureLogic = () => {
     updateHandler,
     playerStats,
     storePlayerStats,
+    updateGameweekStatus,
   }
 }
 

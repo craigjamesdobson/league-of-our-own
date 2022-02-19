@@ -6,24 +6,25 @@ const fixturesSchema = new Schema(
   {
     week: String,
     updatedBy: String,
+    isIncomplete: Boolean,
     fixtures: [
       {
         _id: false,
         id: Number,
         home: {
           id: Number,
-          stats: Array
+          stats: Array,
         },
         away: {
           id: Number,
-          stats: Array
+          stats: Array,
         },
-        score: [Number, Number]
+        score: [Number, Number],
       },
     ],
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

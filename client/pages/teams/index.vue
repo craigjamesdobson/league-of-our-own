@@ -17,9 +17,9 @@ export default {
     return {
       DraftedTeams,
       draftedTeamData,
-      loadFallbackImage
+      loadFallbackImage,
     }
-  }
+  },
 }
 </script>
 

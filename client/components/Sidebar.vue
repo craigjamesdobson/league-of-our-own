@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import { reactive, useContext, computed, ref } from '@nuxtjs/composition-api'
+import { reactive, useContext, computed } from '@nuxtjs/composition-api'
 
 export default {
   setup() {
@@ -124,33 +124,33 @@ export default {
       {
         title: 'Dashboard',
         icon: 'chart-area',
-        path: '/'
+        path: '/',
       },
       {
         title: 'Teams',
         icon: 'users',
-        path: '/teams'
+        path: '/teams',
       },
       {
         title: 'Players',
         icon: 'user-alt',
-        path: '/players'
+        path: '/players',
       },
       {
         title: 'Table',
         icon: 'list-ol',
-        path: '/table'
-      }
+        path: '/table',
+      },
     ])
     const authRoutes = reactive([
       {
         title: 'Fixtures',
         icon: 'calendar-alt',
-        path: '/fixtures'
-      }
+        path: '/fixtures',
+      },
     ])
     return { routes, authRoutes, isLoggedIn }
-  }
+  },
 }
 </script>
 

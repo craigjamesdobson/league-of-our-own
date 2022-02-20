@@ -15,6 +15,7 @@ import {
   GET_TEAMS,
   SET_USER,
   SET_LOAD,
+  SET_PAGETITLE,
 } from './mutation-types'
 
 interface User {
@@ -28,6 +29,7 @@ interface State {
   draftedTeamData: any
   teams: any
   loading: boolean
+  pageTitle: string
   user: User
 }
 
@@ -44,6 +46,7 @@ export const state = (): State => ({
   draftedTeamData: {},
   teams: Teams,
   loading: true,
+  pageTitle: 'League of our own',
   user: {
     name: '',
     tokens: localStorage.getItem('token') || '',
@@ -58,6 +61,10 @@ export const mutations = {
 
   [SET_LOAD](state: State, isLoading: boolean) {
     state.loading = isLoading
+  },
+
+  [SET_PAGETITLE](state: State, pageTitle: string) {
+    state.pageTitle = pageTitle
   },
 
   [FILTER_PLAYERS](state: State, filterData: any) {
@@ -175,6 +182,10 @@ export const actions = {
     localStorage.removeItem('token')
     this.app.router.push('/account/login')
   },
+
+  setPageTitle({ commit }: any, pageTitle) {
+    commit('SET_PAGETITLE', pageTitle)
+  },
 }
 
 export const getters = {
@@ -216,4 +227,6 @@ export const getters = {
   isLoggedIn: (state: State) => !!state.user.tokens,
 
   isLoading: (state: State) => state.loading,
+
+  getPageTitle: (state: State) => state.pageTitle,
 }

@@ -22,7 +22,12 @@
 </template>
 
 <script>
-import { useContext, computed, onMounted } from '@nuxtjs/composition-api'
+import {
+  useContext,
+  computed,
+  onMounted,
+  useRoute,
+} from '@nuxtjs/composition-api'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header'
 
@@ -33,11 +38,22 @@ export default {
   },
   setup() {
     const { store } = useContext()
+    const route = useRoute()
     const isLoggedIn = computed(() => store.getters.isLoggedIn)
 
     if (isLoggedIn.value) {
       store.dispatch('fetchUser')
     }
+
+    watch(
+      () => route.value,
+      (to, from) => {
+        store.dispatch(
+          'setPageTitle',
+          route.value.name === 'index' ? 'Dashboard' : route.value.name
+        )
+      }
+    )
 
     onMounted(async () => {
       await store.dispatch('fetchPlayers')

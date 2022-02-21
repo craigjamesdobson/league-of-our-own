@@ -13,7 +13,7 @@
           hover:bg-primary hover:text-white
         "
         :class="{
-          'bg-primary text-white': index === selectedGameweek
+          'bg-primary text-white': index === selectedGameweek,
         }"
         @click="selectedGameweek = index"
       >
@@ -21,6 +21,7 @@
       </button>
     </div>
     <div
+      v-if="selectedGameweek === 1"
       role="alert"
       class="
         flex flex-col
@@ -38,6 +39,22 @@
         Please select a gameweek to view weekly table
       </p>
     </div>
+    <div
+      v-if="isIncomplete"
+      role="alert"
+      class="
+        flex flex-col
+        self-start
+        w-full
+        px-4
+        py-3
+        mb-4
+        bg-yellow-100
+        border-t border-b border-yellow-500
+      "
+    >
+      <p class="text-sm uppercase">This gameweek is currently incomplete</p>
+    </div>
     <Table :drafted-team-data="draftedTeamData"></Table>
   </div>
 </template>
@@ -48,22 +65,24 @@ import Table from '@/components/Table/Table.vue'
 
 export default {
   components: {
-    Table
+    Table,
   },
   setup() {
     const store = useStore()
     const selectedGameweek = ref(1)
+    const isIncomplete = computed(() =>
+      store.getters['fixture-data/isIncompleteWeek'](selectedGameweek)
+    )
     let draftedTeamData = computed(() =>
       store.getters['drafted-data/getSortedTeams'](selectedGameweek)
     )
-
     const changeTableData = () => {
       draftedTeamData = ref(
         store.getters['drafted-data/getSortedTeams'](selectedGameweek)
       )
     }
 
-    return { draftedTeamData, selectedGameweek, changeTableData }
-  }
+    return { draftedTeamData, selectedGameweek, changeTableData, isIncomplete }
+  },
 }
 </script>

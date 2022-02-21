@@ -174,4 +174,13 @@ export const getters = {
   getUserName: (state, getters, rootState, rootGetters) => {
     return rootState.user.name
   },
+
+  isIncompleteWeek: (state: State) => (fixtureRound) => {
+    return state.fixtures.filter((x) => +x.week === fixtureRound.value)[0]
+      .isIncomplete
+  },
+
+  getIncompleteWeeks: (state: State) => {
+    return state.fixtures.filter((x) => x.isIncomplete)
+  },
 }

@@ -2,16 +2,42 @@
   <div class="flex flex-col accordion">
     <div v-for="(playerTypes, key, index) in filteredPlayerData" :key="index">
       <button
-        class="flex items-center justify-between w-full p-2 mb-4 text-sm text-white uppercase rounded-sm accordion__header bg-primary"
+        class="
+          flex
+          items-center
+          justify-between
+          w-full
+          p-2
+          mb-4
+          text-sm text-white
+          uppercase
+          rounded-sm
+          accordion__header
+          bg-primary
+        "
         @click.stop="toggleAccordionBody"
       >
         <h4>
           {{ key }}
         </h4>
-        <svg-icon class="w-5 h-5 text-white fill-current" name="icons/icon-chevron-down" />
+        <svg-icon
+          class="w-5 h-5 text-white fill-current"
+          name="icons/icon-chevron-down"
+        />
       </button>
       <div class="justify-between hidden mb-4 accordion__body">
-        <div class="p-2 mb-2 text-xs font-bold uppercase bg-white rounded-sm player-form-grid">
+        <div
+          class="
+            p-2
+            mb-2
+            text-xs
+            font-bold
+            uppercase
+            bg-white
+            rounded-sm
+            player-form-grid
+          "
+        >
           <span>Name</span>
           <span>Goals</span>
           <span>Assists</span>
@@ -20,22 +46,43 @@
           <span>Points</span>
         </div>
         <div class="flex flex-col w-full bg-white rounded-sm">
-          <div v-for="player in playerTypes" :key="player.id" class="p-2 text-sm border-b border-gray-100 player-row player-form-grid">
+          <div
+            v-for="player in playerTypes"
+            :key="player.id"
+            class="
+              p-2
+              text-sm
+              border-b border-gray-100
+              player-row player-form-grid
+            "
+          >
             <span class="flex text-xs">
               {{ player.name }}
             </span>
             <span>
               <customNumberInput
                 :key="player.id"
-                :value="player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)[0].goalsScored.toString()"
-                :class="{ active: getPlayerGameweekData(player).goalsScored > 0 }"
-                @input-updated="emitPlayerStats('goalsScored', $event, player.id)"
+                :value="
+                  player.gameWeekStats
+                    .filter((x) => x.gameweek === props.fixtureWeek)[0]
+                    .goalsScored.toString()
+                "
+                :class="{
+                  active: getPlayerGameweekData(player).goalsScored > 0,
+                }"
+                @input-updated="
+                  emitPlayerStats('goalsScored', $event, player.id)
+                "
               ></customNumberInput>
             </span>
             <span>
               <customNumberInput
                 :key="player.id"
-                :value="player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)[0].assists.toString()"
+                :value="
+                  player.gameWeekStats
+                    .filter((x) => x.gameweek === props.fixtureWeek)[0]
+                    .assists.toString()
+                "
                 :class="{ active: getPlayerGameweekData(player).assists > 0 }"
                 @input-updated="emitPlayerStats('assists', $event, player.id)"
               ></customNumberInput>
@@ -51,7 +98,11 @@
                 type="checkbox"
                 :checked="getPlayerGameweekData(player).cleanSheet"
                 @change="
-                  emitPlayerStats('cleanSheet', $event.target.checked, player.id)
+                  emitPlayerStats(
+                    'cleanSheet',
+                    $event.target.checked,
+                    player.id
+                  )
                   toggleCheckboxStatus($event)
                 "
               />
@@ -103,13 +154,20 @@ export default {
 
     const playerData = computed(() => store.getters.getFilteredPlayerData)
 
-    const filteredPlayerData = Object.entries(playerData.value).reduce((acc, curr) => {
-      acc[curr[0]] = [...curr[1].filter((player) => player.teamID === props.teamId)]
-      return acc
-    }, {})
+    const filteredPlayerData = Object.entries(playerData.value).reduce(
+      (acc, curr) => {
+        acc[curr[0]] = [
+          ...curr[1].filter((player) => player.teamID === props.teamId),
+        ]
+        return acc
+      },
+      {}
+    )
 
     const getPlayerGameweekData = (player) => {
-      return player.gameWeekStats.filter((x) => x.gameweek === props.fixtureWeek)[0]
+      return player.gameWeekStats.filter(
+        (x) => x.gameweek === props.fixtureWeek
+      )[0]
     }
 
     const emitPlayerStats = (statType, statValue, playerID) => {
@@ -123,7 +181,9 @@ export default {
     const toggleCheckboxStatus = (e) => {
       const isChecked = e.target.checked
 
-      isChecked ? e.target.classList.add('active') : e.target.classList.remove('active')
+      isChecked
+        ? e.target.classList.add('active')
+        : e.target.classList.remove('active')
     }
 
     const toggleAccordionBody = (event) => {
@@ -136,7 +196,9 @@ export default {
         return
       }
 
-      accordionContainer.querySelectorAll('.accordion__body').forEach((x) => x.classList.add('hidden'))
+      accordionContainer
+        .querySelectorAll('.accordion__body')
+        .forEach((x) => x.classList.add('hidden'))
 
       accordionBody.classList.remove('hidden')
     }

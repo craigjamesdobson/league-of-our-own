@@ -57,6 +57,7 @@ export default {
 
     onMounted(async () => {
       await store.dispatch('fetchPlayers')
+      store.dispatch('fixture-data/fetchFixtures')
     })
     // store.dispatch('fetchDraftedTeams')
   },

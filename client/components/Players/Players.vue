@@ -9,7 +9,7 @@
       v-else
       :key="index"
     >
-      <h2 class="capitalize player-heading">
+      <h2 class="capitalize mb-4 text-2xl px-4">
         {{ key }}
       </h2>
       <div

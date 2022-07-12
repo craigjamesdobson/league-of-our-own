@@ -36,7 +36,7 @@ const createCollection = <T = DocumentData>(
 };
 
 // Import all your model types
-import { Player } from '../types/Player';
+import { Player } from '../modules/players/types/Player';
 
 // export all your collections
 export const playersCollection = createCollection<Player>(

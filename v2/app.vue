@@ -1,17 +1,16 @@
 <template>
   <div>
-    <ul>
-      <li v-for='player in playerStore.playerList'>
-      {{ player.web_name }}
-      </li>
-    </ul>
+    <NuxtLayout>
+      <Players></Players>
+    </NuxtLayout>
   </div>
 </template>
 
 <script setup>
 import { usePlayersStore } from '~/stores/players'
+import { Players } from './.nuxt/components';
 
-const players = playerStore.playerList
+const playerStore = usePlayersStore()
 
 onMounted(() => {
   playerStore.fetchPlayerData();

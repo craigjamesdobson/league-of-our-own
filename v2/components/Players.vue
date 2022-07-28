@@ -1,11 +1,6 @@
 <template>
   <div>
-    <!-- <ul class='grid grid-cols-2 mb-4' v-for='(position, name) in playerStore.getFilteredPlayers'>
-      <h1 class='text-3xl col-span-2 mb-4'>{{ name }}</h1>
-      <li v-for='player in position'>
-        {{ player.web_name }}
-      </li>
-    </ul> -->
+    <PlayerModal></PlayerModal>
     <div
       v-for="(playerTypes, key, index) in playerStore.getFilteredPlayers"
       :key="index"
@@ -18,9 +13,10 @@
         class="flex justify-between mb-4 rounded-sm"
       >
         <div class="w-full border-r border-gray-100">
-          <ul class="grid grid-cols-2 gap-1">
-            <li
+          <div class="grid grid-cols-2 gap-1">
+            <div
               v-for="player in playerTypes"
+              @click="toggleModal(true, player.id)"
               :key="player.id"
               class="relative bg-white flex flex-col items-center justify-around w-full text-sm border-b border-gray-100 cursor-pointer"
             >
@@ -31,13 +27,11 @@
                     class="w-6 h-6 rounded-full shadow-md"
                     :src="player.image"
                     :alt="player.webName"
-                    @error="loadFallbackImage"
+                    @error="loadPlayerFallbackImage"
                   />
                 </span>
                 <span class="w-2/12 p-2">{{ player.teamNameShort }}</span>
-                <span class="w-5/12 p-2 text-center">{{
-                  player.webName
-                }}</span>
+                <span class="w-5/12 p-2 text-center">{{ player.webName }}</span>
                 <span class="w-2/12 p-2">{{ player.price }}</span>
                 <span
                   v-if="player.unavailableForSeason"
@@ -70,8 +64,8 @@
                   Available
                 </span>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -80,11 +74,9 @@
 
 <script setup>
 import { usePlayersStore } from '@/stores/players';
-import { loadFallbackImage } from '@/composables/helpers';
+import { loadPlayerFallbackImage } from '@/composables/helpers';
+import { usePlayerModal } from '~~/modules/players/modal';
 
+const { toggleModal } = usePlayerModal();
 const playerStore = usePlayersStore();
-
-onMounted(() => {
-  playerStore.fetchPlayerData();
-});
 </script>

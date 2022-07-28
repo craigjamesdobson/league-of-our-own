@@ -3,7 +3,7 @@ export const selectObjProperties = (obj: Object, ...args: string[]): Object => {
   return Object.assign(...args.map((d) => ({ [d]: obj[d] })));
 };
 
-export const loadFallbackImage = (e) => {
+export const loadPlayerFallbackImage = (e) => {
   e.target.src =
     'https://platform-static-files.s3.amazonaws.com/premierleague/photos/players/40x40/Photo-Missing.png';
 };

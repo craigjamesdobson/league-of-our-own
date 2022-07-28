@@ -1,19 +1,16 @@
 <template>
   <div>
     <NuxtLayout>
-      <Players></Players>
+      <NuxtPage />
     </NuxtLayout>
+    <div id="modals"></div>
   </div>
 </template>
 
 <script setup>
-import { usePlayersStore } from '~/stores/players'
-import { Players } from './.nuxt/components';
+import { usePlayersStore } from '~/stores/players';
 
-const playerStore = usePlayersStore()
+const playerStore = usePlayersStore();
 
-onMounted(() => {
-  playerStore.fetchPlayerData();
-
-})
+await playerStore.getPlayerSettings();
 </script>

@@ -44,3 +44,9 @@ export const playersCollection = createCollection<Player>(
   '2022-2023',
   'players'
 );
+
+export const settingsCollection = createCollection(
+  'season',
+  '2022-2023',
+  'settings'
+);

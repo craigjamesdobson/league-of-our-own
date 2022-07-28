@@ -1,0 +1,40 @@
+.modal {
+  @apply inset-0;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(30, 30, 30, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.5);
+  transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
+  z-index: 50;
+  overflow-y: auto;
+
+  &.-active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+  }
+
+  &__inner {
+    @apply bg-white rounded-xl p-8 shadow-2xl relative overflow-hidden z-10;
+    width: 36rem;
+  }
+
+  &__badge {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    opacity: 0.1;
+    left: -20%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: -1;
+    pointer-events: none;
+  }
+}

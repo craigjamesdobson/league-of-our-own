@@ -28,6 +28,6 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
-  buildModules: ['@pinia/nuxt'],
-  modules: ['@nuxtjs/tailwindcss'],
+  buildModules: ['@pinia/nuxt', 'unplugin-icons/nuxt'],
+  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss'],
 });

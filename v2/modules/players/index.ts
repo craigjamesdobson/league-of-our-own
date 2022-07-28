@@ -1,8 +1,8 @@
 import { Player } from '~~/modules/players/types/Player';
-import { IMAGE_CDN } from './settings';
-import { TEAM_DATA } from '../teams/settings';
+import { IMAGE_CDN } from './constants';
+import { TEAM_DATA } from '../teams/constants';
 
-export const createPlayerData = (playerData: Player[]): Player[] => {
+const createPlayerData = (playerData: Player[]): Player[] => {
   return playerData.map((player) => {
     return {
       id: player.id,
@@ -58,3 +58,5 @@ const getAvailabilityData = (player: Player) => {
       };
   }
 };
+
+export { createPlayerData };

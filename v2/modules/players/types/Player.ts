@@ -3,6 +3,10 @@ export interface Player {
   code: number;
   firstName: string;
   secondName: string;
+  goalsScored: number;
+  assists: number;
+  cleanSheets: number;
+  redCards: number;
   webName: string;
   teamName: string;
   teamNameShort: string;
@@ -18,4 +22,7 @@ export interface Player {
   team?: number;
   now_cost?: number;
   cost_change_start_fall?: number;
+  goals_scored?: number;
+  red_cards?: number;
+  clean_sheets?: number;
 }

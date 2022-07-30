@@ -78,7 +78,7 @@
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.totalGoals }}
+                      {{ selectedPlayer.goalsScored }}
                     </strong>
                   </li>
                   <li class="flex justify-between w-full">
@@ -88,7 +88,7 @@
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.totalAssists }}
+                      {{ selectedPlayer.assists }}
                     </strong>
                   </li>
                   <li
@@ -104,7 +104,7 @@
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.totalCleanSheets }}
+                      {{ selectedPlayer.cleanSheets }}
                     </strong>
                   </li>
                   <li class="flex justify-between w-full">
@@ -114,7 +114,7 @@
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.totalRedCards }}
+                      {{ selectedPlayer.redCards }}
                     </strong>
                   </li>
                   <li class="flex justify-between w-full">

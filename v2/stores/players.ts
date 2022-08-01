@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia';
-import { onSnapshot, doc, getDoc, getDocs } from 'firebase/firestore';
+import { doc, getDoc, getDocs } from 'firebase/firestore';
 import { playersCollection, settingsCollection } from '@/firebase/useDB';
 import { Player } from '~~/modules/players/types/Player';
 import { PlayerPosition } from '~~/modules/players/types/PlayerPosition';
 import { createPlayerData } from '~~/modules/players';
+import {
+  localStorageGet,
+  localStorageHas,
+  localStorageSet,
+} from '@/composables/localStorage';
 
 interface State {
   players: Player[];
@@ -26,24 +31,23 @@ export const usePlayersStore = defineStore({
     async getPlayerSettings() {
       const settingsDocRef = doc(settingsCollection, 'players');
       const settingsDoc = await getDoc(settingsDocRef);
-      const updatedTime = settingsDoc.data();
-      console.log(updatedTime);
 
-      const updatedat = localStorage.getItem('updated-at');
-
-      if (updatedat && updatedat === settingsDoc.data().updatedAt) {
-        this.players = JSON.parse(localStorage.getItem('players'));
-        this.updatedAt = updatedat;
+      if (
+        localStorageHas('updated-at') &&
+        localStorageGet('updated-at') === settingsDoc.data().updatedAt
+      ) {
+        this.players = localStorageGet('players');
+        this.updatedAt = localStorageGet('updated-at');
       } else {
         const playerDocs = await getDocs(playersCollection);
-        const players = [];
-        const playerData = playerDocs.docs.forEach((player) =>
-          players.push(player.data())
-        );
+        const players = playerDocs.docs.map((player) => player.data());
+
         this.players = createPlayerData(players);
+
+        localStorageSet('updated-at', settingsDoc.data().updatedAt);
+        localStorageSet('players', this.players);
+
         this.isLoaded = true;
-        localStorage.setItem('updated-at', settingsDoc.data().updatedAt);
-        localStorage.setItem('players', JSON.stringify(this.players));
       }
     },
 

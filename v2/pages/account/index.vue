@@ -30,7 +30,9 @@ const loading = ref(false);
 const updatePlayerData = async () => {
   loading.value = true;
   await playerStore.updatePlayerData(playerData.value);
-  loading.value = false;
+  setTimeout(() => {
+    loading.value = false;
+  }, 2500);
 };
 </script>
 

@@ -1,5 +1,11 @@
 import { defineStore } from 'pinia';
-import { doc, getDoc, getDocs, writeBatch } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  getDocs,
+  writeBatch,
+  updateDoc,
+} from 'firebase/firestore';
 import {
   firestore,
   playersCollection,
@@ -82,11 +88,14 @@ export const usePlayersStore = defineStore({
           playerDocRef
             ? batch.update(playerDocRef, newPlayerData)
             : batch.set(playerDocRef, newPlayerData);
-
-          batch.set(playerDocRef, newPlayerData, { merge: true });
         });
         try {
           await batch.commit();
+          const settingsDocRef = doc(settingsCollection, 'players');
+          await updateDoc(settingsDocRef, {
+            updatedAt: Date.now(),
+          });
+          console.log(`updated ${block.length} players at ${Date.now()}`);
         } catch (err) {
           console.log(err);
         }

@@ -5,6 +5,8 @@ import {
   getDocs,
   writeBatch,
   updateDoc,
+  serverTimestamp,
+  setDoc,
 } from 'firebase/firestore';
 import {
   firestore,
@@ -68,38 +70,23 @@ export const usePlayersStore = defineStore({
     async updatePlayerData(playerData) {
       const parsedData = JSON.parse(playerData);
 
-      let blocks = parsedData;
+      for (let [index, value] of parsedData.entries()) {
+        const playerDocRef = doc(playersCollection, value.id.toString());
 
-      if (parsedData.length > 500) {
-        blocks = [
-          parsedData.splice(0, Math.ceil(parsedData.length / 2)),
-          parsedData.splice(-Math.ceil(parsedData.length / 2)),
-        ];
-      }
-
-      blocks.forEach(async (block) => {
-        const batch = writeBatch(firestore);
-        block.forEach((newPlayerData) => {
-          const playerDocRef = doc(
-            playersCollection,
-            newPlayerData.id.toString()
-          );
-
-          playerDocRef
-            ? batch.update(playerDocRef, newPlayerData)
-            : batch.set(playerDocRef, newPlayerData);
-        });
-        try {
-          await batch.commit();
-          const settingsDocRef = doc(settingsCollection, 'players');
-          await updateDoc(settingsDocRef, {
-            updatedAt: Date.now(),
+        if (playerDocRef) {
+          await updateDoc(playerDocRef, {
+            ...value,
+            timestamp: serverTimestamp(),
           });
-          console.log(`updated ${block.length} players at ${Date.now()}`);
-        } catch (err) {
-          console.log(err);
+        } else {
+          await setDoc(playerDocRef, {
+            ...value,
+            timestamp: serverTimestamp(),
+          });
         }
-      });
+
+        console.log(`${index} players updated`);
+      }
     },
   },
   getters: {

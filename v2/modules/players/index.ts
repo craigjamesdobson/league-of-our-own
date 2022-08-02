@@ -43,6 +43,7 @@ const getAvailabilityData = (player: Player) => {
   switch (true) {
     case player.status === 'i' ||
       player.status === 'n' ||
+      player.status === 's' ||
       player.status === 'd':
       return {
         status: 'temporary-unavailable',

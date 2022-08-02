@@ -26,7 +26,7 @@
 
     <nuxt-link
       v-if="!isLoggedIn"
-      to="/account/login"
+      to="/account"
       class="flex items-center justify-center w-10 h-10 text-center bg-white rounded-full"
     >
       <UiwLogin></UiwLogin>

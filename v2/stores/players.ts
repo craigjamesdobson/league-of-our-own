@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
-import { doc, getDoc, getDocs } from 'firebase/firestore';
-import { playersCollection, settingsCollection } from '@/firebase/useDB';
+import { doc, getDoc, getDocs, writeBatch } from 'firebase/firestore';
+import {
+  firestore,
+  playersCollection,
+  settingsCollection,
+} from '@/firebase/useDB';
 import { Player } from '~~/modules/players/types/Player';
 import { PlayerPosition } from '~~/modules/players/types/PlayerPosition';
 import { createPlayerData } from '~~/modules/players';
@@ -53,6 +57,40 @@ export const usePlayersStore = defineStore({
 
     setSelectedPlayer(playerID: number) {
       this.selectedPlayer = this.players.filter((x) => x.id === playerID)[0];
+    },
+
+    async updatePlayerData(playerData) {
+      const parsedData = JSON.parse(playerData);
+
+      let blocks = parsedData;
+
+      if (parsedData.length > 500) {
+        blocks = [
+          parsedData.splice(0, Math.ceil(parsedData.length / 2)),
+          parsedData.splice(-Math.ceil(parsedData.length / 2)),
+        ];
+      }
+
+      blocks.forEach(async (block) => {
+        const batch = writeBatch(firestore);
+        block.forEach((newPlayerData) => {
+          const playerDocRef = doc(
+            playersCollection,
+            newPlayerData.id.toString()
+          );
+
+          playerDocRef
+            ? batch.update(playerDocRef, newPlayerData)
+            : batch.set(playerDocRef, newPlayerData);
+
+          batch.set(playerDocRef, newPlayerData, { merge: true });
+        });
+        try {
+          await batch.commit();
+        } catch (err) {
+          console.log(err);
+        }
+      });
     },
   },
   getters: {

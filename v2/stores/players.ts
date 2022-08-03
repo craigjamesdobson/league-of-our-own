@@ -110,6 +110,12 @@ export const usePlayersStore = defineStore({
           );
         }
       }
+      const settingsDocRef = doc(settingsCollection, 'players');
+
+      // Set the "capital" field of the city 'DC'
+      await updateDoc(settingsDocRef, {
+        updatedAt: Date.now(),
+      });
     },
   },
   getters: {

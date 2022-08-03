@@ -17,6 +17,7 @@
     >
       Update Players
     </button>
+    <div class="update-log"></div>
   </div>
 </template>
 
@@ -30,9 +31,8 @@ const loading = ref(false);
 const updatePlayerData = async () => {
   loading.value = true;
   await playerStore.updatePlayerData(playerData.value);
-  setTimeout(() => {
-    loading.value = false;
-  }, 2500);
+  playerData.value = '';
+  loading.value = false;
 };
 </script>
 

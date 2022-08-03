@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { isEqual } from 'lodash-es';
 import {
   doc,
   getDoc,
@@ -46,7 +47,8 @@ export const usePlayersStore = defineStore({
 
       if (
         localStorageHas('updated-at') &&
-        localStorageGet('updated-at') === settingsDoc.data().updatedAt
+        localStorageGet('updated-at') ===
+          settingsDoc.data().updatedAt.toString()
       ) {
         this.players = localStorageGet('players');
         this.updatedAt = localStorageGet('updated-at');
@@ -70,22 +72,43 @@ export const usePlayersStore = defineStore({
     async updatePlayerData(playerData) {
       const parsedData = JSON.parse(playerData);
 
-      for (let [index, value] of parsedData.entries()) {
-        const playerDocRef = doc(playersCollection, value.id.toString());
+      const updateLog = document.querySelector('.update-log');
 
-        if (playerDocRef) {
-          await updateDoc(playerDocRef, {
-            ...value,
-            timestamp: serverTimestamp(),
-          });
-        } else {
-          await setDoc(playerDocRef, {
-            ...value,
-            timestamp: serverTimestamp(),
-          });
+      for (const newPlayerData of parsedData) {
+        const playerDocRef = doc(
+          playersCollection,
+          newPlayerData.id.toString()
+        );
+        const playerDocSnap = await getDoc(playerDocRef);
+
+        if (!playerDocSnap.exists()) {
+          await setDoc(
+            doc(playersCollection, newPlayerData.id.toString()),
+            newPlayerData
+          );
+          updateLog.insertAdjacentHTML(
+            'afterend',
+            `<p style="color: green;">${newPlayerData.web_name} added</p>`
+          );
+
+          continue;
         }
 
-        console.log(`${index} players updated`);
+        if (
+          playerDocSnap.exists() &&
+          isEqual(playerDocSnap.data(), newPlayerData)
+        ) {
+          updateLog.insertAdjacentHTML(
+            'afterend',
+            `<p style="color: gray;">${newPlayerData.web_name} has no changes</p>`
+          );
+        } else {
+          await updateDoc(playerDocRef, newPlayerData);
+          updateLog.insertAdjacentHTML(
+            'afterend',
+            `<p style="color: blue;">${newPlayerData.web_name} updated</p>`
+          );
+        }
       }
     },
   },

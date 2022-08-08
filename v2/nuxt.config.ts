@@ -28,6 +28,7 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
+  target: 'static',
   buildModules: ['@pinia/nuxt', 'unplugin-icons/nuxt'],
   modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss'],
 });

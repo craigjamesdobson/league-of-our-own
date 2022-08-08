@@ -1,19 +1,7 @@
 import { defineStore } from 'pinia';
 import { isEqual } from 'lodash-es';
-import {
-  doc,
-  getDoc,
-  getDocs,
-  writeBatch,
-  updateDoc,
-  serverTimestamp,
-  setDoc,
-} from 'firebase/firestore';
-import {
-  firestore,
-  playersCollection,
-  settingsCollection,
-} from '@/firebase/useDB';
+import { doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore';
+import { playersCollection, settingsCollection } from '@/firebase/useDB';
 import { Player } from '~~/modules/players/types/Player';
 import { PlayerPosition } from '~~/modules/players/types/PlayerPosition';
 import { createPlayerData } from '~~/modules/players';
@@ -112,7 +100,6 @@ export const usePlayersStore = defineStore({
       }
       const settingsDocRef = doc(settingsCollection, 'players');
 
-      // Set the "capital" field of the city 'DC'
       await updateDoc(settingsDocRef, {
         updatedAt: Date.now(),
       });

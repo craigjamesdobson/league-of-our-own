@@ -93,8 +93,8 @@
                   </li>
                   <li
                     v-if="
-                      selectedPlayer.playerType === 1 ||
-                      selectedPlayer.playerType === 2
+                      selectedPlayer.position === 1 ||
+                      selectedPlayer.position === 2
                     "
                     class="flex justify-between w-full"
                   >

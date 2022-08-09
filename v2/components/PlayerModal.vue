@@ -2,7 +2,7 @@
   <div>
     <div
       class="flex items-center justify-center modal"
-      :class="{ '-active': mv }"
+      :class="{ '-active': modalVisible }"
       @click.self="toggleModal(false)"
     >
       <div v-if="selectedPlayer" class="px-4 modal__content">
@@ -23,7 +23,7 @@
         >
           <img
             class="modal__badge"
-            :src="getImageUrl(selectedPlayer.teamNameShort.toLowerCase())"
+            :src="getImageUrl(selectedPlayer.teamNameShort?.toLowerCase())"
           />
           <div class="flex flex-row justify-between items-top">
             <div class="w-24">
@@ -142,8 +142,6 @@ import CharmCircleCross from '~icons/charm/circle-cross';
 import { usePlayerModal } from '~/modules/players/modal';
 import { getImageUrl } from '@/composables/helpers';
 const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
-
-const mv = computed(() => modalVisible.value);
 </script>
 
 <style lang="scss" scoped>

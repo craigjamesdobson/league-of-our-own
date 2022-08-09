@@ -4,6 +4,7 @@ const usePlayerModal = () => {
   const playerStore = usePlayersStore();
   const selectedPlayer = computed(() => playerStore.getSelectedPlayer);
   const router = useRouter();
+  const route = useRoute();
   const modalVisible = ref(false);
 
   const toggleModal = (showModal: boolean, playerID?: number) => {
@@ -16,6 +17,11 @@ const usePlayerModal = () => {
       router.push({ path: 'players' });
     }
   };
+
+  if (route.query.id) {
+    playerStore.setSelectedPlayer(+route.query.id);
+    modalVisible.value = true;
+  }
 
   watch(selectedPlayer, () => {
     modalVisible.value = true;

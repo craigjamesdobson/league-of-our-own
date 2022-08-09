@@ -80,12 +80,9 @@
 import { TEAM_DATA } from '@/modules/teams/constants';
 import { PRICE_BREAKS } from '@/modules/filters/constants';
 import { useFilters } from '@/modules/filters';
+import { getImageUrl } from '@/composables/helpers';
 
 const { filterData, playerStore, selectfilteredTeam } = useFilters();
-
-function getImageUrl(name) {
-  return new URL(`/assets/svg/teams/${name}.svg`, import.meta.url).href;
-}
 </script>
 
 <style lang="scss" scoped>

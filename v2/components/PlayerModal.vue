@@ -23,7 +23,7 @@
         >
           <img
             class="modal__badge"
-            :src="getDynamicImage(selectedPlayer.teamNameShort)"
+            :src="getImageUrl(selectedPlayer.teamNameShort)"
           />
           <div class="flex flex-row justify-between items-top">
             <div class="w-24">
@@ -140,7 +140,7 @@
 import MdiAlertCircleOutline from '~icons/mdi/alert-circle-outline';
 import CharmCircleCross from '~icons/charm/circle-cross';
 import { usePlayerModal } from '~/modules/players/modal';
-import { getDynamicImage } from '@/composables/helpers';
+import { getImageUrl } from '@/composables/helpers';
 const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 
 const mv = computed(() => modalVisible.value);

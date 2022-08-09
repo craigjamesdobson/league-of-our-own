@@ -64,7 +64,7 @@
           >
             <img
               class="w-full h-full px-2"
-              :src="'/assets/svg/teams/' + team.short_name + '.svg'"
+              :src="getImageUrl(team.short_name.toLowerCase())"
             />
           </div>
         </div>
@@ -82,6 +82,10 @@ import { PRICE_BREAKS } from '@/modules/filters/constants';
 import { useFilters } from '@/modules/filters';
 
 const { filterData, playerStore, selectfilteredTeam } = useFilters();
+
+function getImageUrl(name) {
+  return new URL(`/assets/svg/teams/${name}.svg`, import.meta.url).href;
+}
 </script>
 
 <style lang="scss" scoped>

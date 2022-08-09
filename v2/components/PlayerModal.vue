@@ -23,7 +23,7 @@
         >
           <img
             class="modal__badge"
-            :src="getImageUrl(selectedPlayer.teamNameShort)"
+            :src="getImageUrl(selectedPlayer.teamNameShort.toLowerCase())"
           />
           <div class="flex flex-row justify-between items-top">
             <div class="w-24">

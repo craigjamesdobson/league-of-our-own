@@ -13,6 +13,7 @@ import {
 
 interface State {
   players: Player[];
+  filteredPlayers: Player[];
   selectedPlayer: Player;
   updatedAt: string;
   isLoaded: boolean;
@@ -23,6 +24,7 @@ export const usePlayersStore = defineStore({
   state: (): State => {
     return {
       players: [] as Player[],
+      filteredPlayers: [] as Player[],
       selectedPlayer: {} as Player,
       updatedAt: null,
       isLoaded: false,
@@ -39,12 +41,14 @@ export const usePlayersStore = defineStore({
           settingsDoc.data().updatedAt.toString()
       ) {
         this.players = localStorageGet('players');
+        this.filteredPlayers = this.players;
         this.updatedAt = localStorageGet('updated-at');
       } else {
         const playerDocs = await getDocs(playersCollection);
         const players = playerDocs.docs.map((player) => player.data());
 
         this.players = createPlayerData(players);
+        this.filteredPlayers = this.players;
 
         localStorageSet('updated-at', settingsDoc.data().updatedAt);
         localStorageSet('players', this.players);
@@ -119,18 +123,46 @@ export const usePlayersStore = defineStore({
 
     stateIsLoaded: (state) => state.isLoaded,
 
-    getFilteredPlayers: (state) => {
+    getFilteredPlayers:
+      (state) =>
+      ({ filterName, filterPrice, filterTeam }) => {
+        let filteredPlayers = state.players;
+        if (filterName) {
+          filteredPlayers = filteredPlayers.filter((p) =>
+            p.webName
+              .normalize('NFD')
+              .replace(/[\u0300-\u036F]/g, '')
+              .toLowerCase()
+              .includes(filterName)
+          );
+        }
+
+        if (filterPrice) {
+          filteredPlayers = filteredPlayers.filter((player) =>
+            player.price.includes(filterPrice)
+          );
+        }
+
+        if (filterTeam) {
+          filteredPlayers = filteredPlayers.filter(
+            (p) => p.team === filterTeam
+          );
+        }
+        state.filteredPlayers = filteredPlayers;
+      },
+
+    getFilteredPlayersByPosition: (state) => {
       return {
-        goalkeepers: state.players
+        goalkeepers: state.filteredPlayers
           .filter((x) => x.position === PlayerPosition.GOALKEEPER)
           .sort((a, b) => a.team - b.team),
-        defenders: state.players
+        defenders: state.filteredPlayers
           .filter((x) => x.position === PlayerPosition.DEFENDER)
           .sort((a, b) => a.team - b.team),
-        midfielders: state.players
+        midfielders: state.filteredPlayers
           .filter((x) => x.position === PlayerPosition.MIDFIELDER)
           .sort((a, b) => a.team - b.team),
-        forwards: state.players
+        forwards: state.filteredPlayers
           .filter((x) => x.position === PlayerPosition.FORWARD)
           .sort((a, b) => a.team - b.team),
       };

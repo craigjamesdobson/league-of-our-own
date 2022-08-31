@@ -2,7 +2,9 @@
   <div>
     <PlayerModal></PlayerModal>
     <div
-      v-for="(playerTypes, key, index) in playerStore.getFilteredPlayers"
+      v-for="(
+        playerTypes, key, index
+      ) in playerStore.getFilteredPlayersByPosition"
       :key="index"
     >
       <h2 class="uppercase mb-4 text-2xl px-4">

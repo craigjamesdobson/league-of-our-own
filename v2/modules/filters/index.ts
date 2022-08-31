@@ -15,6 +15,7 @@ const useFilters = () => {
       .forEach((e) => e.classList.remove('active'));
     event.currentTarget.classList.add('active');
     filterData.filterTeam = +event.currentTarget.dataset.teamid;
+    playerStore.getFilteredPlayers(filterData);
   };
 
   return { filterData, playerStore, selectfilteredTeam };

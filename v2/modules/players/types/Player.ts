@@ -11,6 +11,7 @@ export interface Player {
   teamName: string;
   teamNameShort: string;
   position: number;
+  price: string;
   image: string;
   imageLarge: string;
   status: string;

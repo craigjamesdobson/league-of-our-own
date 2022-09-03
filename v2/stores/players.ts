@@ -133,7 +133,7 @@ export const usePlayersStore = defineStore({
               .normalize('NFD')
               .replace(/[\u0300-\u036F]/g, '')
               .toLowerCase()
-              .includes(filterName)
+              .includes(filterName.toLowerCase())
           );
         }
 

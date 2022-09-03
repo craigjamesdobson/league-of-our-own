@@ -9,16 +9,20 @@ const useFilters = () => {
     filterTeam: null,
   });
 
+  const setFilteredPlayers = () => {
+    playerStore.getFilteredPlayers(filterData);
+  };
+
   const selectfilteredTeam = (event) => {
     document
       .querySelectorAll('.icon-container')
       .forEach((e) => e.classList.remove('active'));
     event.currentTarget.classList.add('active');
     filterData.filterTeam = +event.currentTarget.dataset.teamid;
-    playerStore.getFilteredPlayers(filterData);
+    setFilteredPlayers();
   };
 
-  return { filterData, playerStore, selectfilteredTeam };
+  return { filterData, playerStore, selectfilteredTeam, setFilteredPlayers };
 };
 
 export { useFilters };

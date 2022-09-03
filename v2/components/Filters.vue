@@ -14,7 +14,7 @@
             type="text"
             name="filter_name"
             placeholder="Search Players..."
-            @keyup="filterPlayers"
+            @keyup="setFilteredPlayers"
           />
           <font-awesome-icon
             :icon="['fa', 'search']"
@@ -32,7 +32,7 @@
             v-model="filterData.filterPrice"
             name="filter_number"
             class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
-            @change="filterPlayers"
+            @change="setFilteredPlayers"
           >
             <option selected="selected" value="">All</option>
             <option v-for="price in PRICE_BREAKS" :key="price" :value="price">
@@ -48,10 +48,7 @@
         >
           Filter by team
           <button title="clear team selection" @click="selectfilteredTeam">
-            <font-awesome-icon
-              :icon="['fa', 'redo']"
-              class="text-gray-900 fa-sm"
-            />
+            <SystemUiconsReset></SystemUiconsReset>
           </button>
         </label>
         <div class="flex flex-wrap -mx-2 -mb-1 cursor-pointer">
@@ -81,8 +78,10 @@ import { TEAM_DATA } from '@/modules/teams/constants';
 import { PRICE_BREAKS } from '@/modules/filters/constants';
 import { useFilters } from '@/modules/filters';
 import { getImageUrl } from '@/composables/helpers';
+import SystemUiconsReset from '~icons/system-uicons/reset';
 
-const { filterData, playerStore, selectfilteredTeam } = useFilters();
+const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers } =
+  useFilters();
 </script>
 
 <style lang="scss" scoped>

@@ -6,7 +6,7 @@
 
     <div class="flex items-center rounded-full">
       <!-- Header -->
-      <LogoIcon class="h-10 w-10 fill-white" />
+      <Icon class="text-white" size="48" name="carbon:soccer" />
     </div>
 
     <div>
@@ -17,8 +17,18 @@
             to="/players"
             class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-white transition duration-300 ease-in-out bg-indigo-800 bg-opacity-25 rounded-md hover:opacity-100"
           >
-            <IcRoundGroups></IcRoundGroups>
+            <Icon
+              size="24"
+              name="material-symbols:patient-list-outline-rounded"
+            />
             <span class="hidden ml-4 capitalize">Players</span>
+          </nuxt-link>
+          <nuxt-link
+            to="/teams"
+            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-white transition duration-300 ease-in-out bg-indigo-800 bg-opacity-25 rounded-md hover:opacity-100"
+          >
+            <Icon size="24" name="fluent:people-team-24-regular" />
+            <span class="hidden ml-4 capitalize">Teams</span>
           </nuxt-link>
         </li>
       </ul>
@@ -29,7 +39,7 @@
       to="/account"
       class="flex items-center justify-center w-10 h-10 text-center bg-white rounded-full"
     >
-      <UiwLogin></UiwLogin>
+      <Icon name="uiw:login" size="24" />
     </nuxt-link>
     <nuxt-link
       v-else-if="isLoggedIn"
@@ -42,17 +52,13 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
-import LogoIcon from './icons/LogoIcon.vue';
-import PhUserCircleDuotone from '~icons/ph/user-circle-duotone';
-import UiwLogin from '~icons/uiw/login';
-import IcRoundGroups from '~icons/ic/round-groups';
+import { reactive } from "vue";
 
 const routes = reactive([
   {
-    title: 'Players',
-    icon: 'IcRoundGroups',
-    path: '/players',
+    title: "Players",
+    icon: "IcRoundGroups",
+    path: "/players",
   },
 ]);
 </script>

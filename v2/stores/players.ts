@@ -1,15 +1,19 @@
-import { defineStore } from 'pinia';
-import { isEqual } from 'lodash-es';
-import { doc, getDoc, getDocs, updateDoc, setDoc } from 'firebase/firestore';
-import { playersCollection, settingsCollection } from '@/firebase/useDB';
-import { Player } from '~~/modules/players/types/Player';
-import { PlayerPosition } from '~~/modules/players/types/PlayerPosition';
-import { createPlayerData } from '~~/modules/players';
+import { defineStore } from "pinia";
+import { isEqual } from "lodash-es";
+import { doc, getDoc, getDocs, updateDoc, setDoc } from "firebase/firestore";
+import {
+  playersCollection,
+  settingsCollection,
+  teamsCollection,
+} from "@/firebase/useDB";
+import { Player } from "~~/modules/players/types/Player";
+import { PlayerPosition } from "~~/modules/players/types/PlayerPosition";
+import { createPlayerData } from "~~/modules/players";
 import {
   localStorageGet,
   localStorageHas,
   localStorageSet,
-} from '@/composables/localStorage';
+} from "@/composables/localStorage";
 
 interface State {
   players: Player[];
@@ -20,7 +24,7 @@ interface State {
 }
 
 export const usePlayersStore = defineStore({
-  id: 'player-store',
+  id: "player-store",
   state: (): State => {
     return {
       players: [] as Player[],
@@ -32,17 +36,17 @@ export const usePlayersStore = defineStore({
   },
   actions: {
     async getPlayerSettings() {
-      const settingsDocRef = doc(settingsCollection, 'players');
+      const settingsDocRef = doc(settingsCollection, "players");
       const settingsDoc = await getDoc(settingsDocRef);
 
       if (
-        localStorageHas('updated-at') &&
-        localStorageGet('updated-at') ===
+        localStorageHas("updated-at") &&
+        localStorageGet("updated-at") ===
           settingsDoc.data().updatedAt.toString()
       ) {
-        this.players = localStorageGet('players');
+        this.players = localStorageGet("players");
         this.filteredPlayers = this.players;
-        this.updatedAt = localStorageGet('updated-at');
+        this.updatedAt = localStorageGet("updated-at");
       } else {
         const playerDocs = await getDocs(playersCollection);
         const players = playerDocs.docs.map((player) => player.data());
@@ -50,8 +54,8 @@ export const usePlayersStore = defineStore({
         this.players = createPlayerData(players);
         this.filteredPlayers = this.players;
 
-        localStorageSet('updated-at', settingsDoc.data().updatedAt);
-        localStorageSet('players', this.players);
+        localStorageSet("updated-at", settingsDoc.data().updatedAt);
+        localStorageSet("players", this.players);
 
         this.isLoaded = true;
       }
@@ -61,10 +65,10 @@ export const usePlayersStore = defineStore({
       this.selectedPlayer = this.players.filter((x) => x.id === playerID)[0];
     },
 
-    async updatePlayerData(playerData) {
+    async updatePlayerData(playerData: any) {
       const parsedData = JSON.parse(playerData);
 
-      const updateLog = document.querySelector('.update-log');
+      const updateLog = document.querySelector(".update-log");
 
       for (const newPlayerData of parsedData) {
         const playerDocRef = doc(
@@ -79,7 +83,7 @@ export const usePlayersStore = defineStore({
             newPlayerData
           );
           updateLog.insertAdjacentHTML(
-            'afterend',
+            "afterend",
             `<p style="color: green;">${newPlayerData.web_name} added</p>`
           );
 
@@ -91,22 +95,45 @@ export const usePlayersStore = defineStore({
           isEqual(playerDocSnap.data(), newPlayerData)
         ) {
           updateLog.insertAdjacentHTML(
-            'afterend',
+            "afterend",
             `<p style="color: gray;">${newPlayerData.web_name} has no changes</p>`
           );
         } else {
           await updateDoc(playerDocRef, newPlayerData);
           updateLog.insertAdjacentHTML(
-            'afterend',
+            "afterend",
             `<p style="color: blue;">${newPlayerData.web_name} updated</p>`
           );
         }
       }
-      const settingsDocRef = doc(settingsCollection, 'players');
+      const settingsDocRef = doc(settingsCollection, "players");
 
       await updateDoc(settingsDocRef, {
         updatedAt: Date.now(),
       });
+    },
+
+    async updateTeamData(teamData: any) {
+      const parsedData = JSON.parse(teamData);
+
+      const updateLog = document.querySelector(".update-log");
+
+      for (const newTeamData of parsedData) {
+        const teamDocRef = doc(teamsCollection, newTeamData.team_id.toString());
+        const teamDocSnap = await getDoc(teamDocRef);
+
+        if (!teamDocSnap.exists()) {
+          await setDoc(
+            doc(teamsCollection, newTeamData.team_id.toString()),
+            newTeamData
+          );
+
+          updateLog.insertAdjacentHTML(
+            "afterend",
+            `<p style="color: green;">${newTeamData.team_name} added</p>`
+          );
+        }
+      }
     },
   },
   getters: {
@@ -130,8 +157,8 @@ export const usePlayersStore = defineStore({
         if (filterName) {
           filteredPlayers = filteredPlayers.filter((p) =>
             p.webName
-              .normalize('NFD')
-              .replace(/[\u0300-\u036F]/g, '')
+              .normalize("NFD")
+              .replace(/[\u0300-\u036F]/g, "")
               .toLowerCase()
               .includes(filterName.toLowerCase())
           );

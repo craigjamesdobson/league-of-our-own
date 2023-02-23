@@ -74,16 +74,15 @@
 </template>
 
 <script setup>
-import { TEAM_DATA } from '@/modules/teams/constants';
-import { PRICE_BREAKS } from '@/modules/filters/constants';
-import { useFilters } from '@/modules/filters';
-import { getImageUrl } from '@/composables/helpers';
-import SystemUiconsReset from '~icons/system-uicons/reset';
+import { TEAM_DATA } from "@/modules/teams/constants";
+import { PRICE_BREAKS } from "@/modules/filters/constants";
+import { useFilters } from "@/modules/filters";
+import { getImageUrl } from "@/composables/helpers";
 
 const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers } =
   useFilters();
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/components/filters.scss';
+@import "@/assets/components/filters.scss";
 </style>

@@ -7,7 +7,8 @@
     >
       <div v-if="selectedPlayer" class="px-4 modal__content">
         <div class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer">
-          <CharmCircleCross
+          <Icon
+            name="mdi:alert-circle-outline"
             @click="toggleModal(false)"
             class="text-white w-12 h-12"
           />
@@ -50,7 +51,8 @@
                 class="flex items-center flex-grow w-3/4 mr-4"
               >
                 <span class="flex items-center justify-center w-5 h-5 mr-2">
-                  <MdiAlertCircleOutline
+                  <Icon
+                    name="mdi:alert-circle-outline"
                     class="text-white rounded-full bg-green-500"
                     :class="{
                       'bg-yellow-500':
@@ -58,7 +60,7 @@
                         selectedPlayer.isUnavailable,
                       'bg-red-500': selectedPlayer.unavailableForSeason,
                     }"
-                  ></MdiAlertCircleOutline>
+                  />
                 </span>
                 <p class="text-sm">
                   {{ selectedPlayer.news }}
@@ -137,13 +139,12 @@
   </div>
 </template>
 <script setup>
-import MdiAlertCircleOutline from '~icons/mdi/alert-circle-outline';
-import CharmCircleCross from '~icons/charm/circle-cross';
-import { usePlayerModal } from '~/modules/players/modal';
-import { getImageUrl } from '@/composables/helpers';
+import { getImageUrl } from "@/composables/helpers";
+import { usePlayerModal } from "~/modules/players/modal";
+
 const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/components/modal.scss';
+@import "@/assets/components/modal.scss";
 </style>

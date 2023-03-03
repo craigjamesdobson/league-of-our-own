@@ -12,27 +12,13 @@
     <div>
       <ul class="flex flex-col">
         <!-- Links -->
-        <li>
+        <li v-for="route in routes">
           <nuxt-link
-            to="/"
+            :to="route.path"
             class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
           >
-            <Icon size="24" name="material-symbols:home-outline-rounded" />
-            <span class="hidden ml-4 capitalize">Dashboard</span>
-          </nuxt-link>
-          <nuxt-link
-            to="/players"
-            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
-          >
-            <Icon size="24" name="material-symbols:list-alt-outline-rounded" />
-            <span class="hidden ml-4 capitalize">Players</span>
-          </nuxt-link>
-          <nuxt-link
-            to="/teams"
-            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
-          >
-            <Icon size="24" name="fluent:people-team-24-regular" />
-            <span class="hidden ml-4 capitalize">Teams</span>
+            <Icon size="24" :name="route.icon" />
+            <span class="hidden ml-4 capitalize">{{ route.name }}</span>
           </nuxt-link>
         </li>
       </ul>
@@ -41,7 +27,7 @@
     <nuxt-link
       v-if="!isLoggedIn"
       to="/account"
-      class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-full hover:bg-offWhite hover:text-primary"
+      class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite rounded-full transition duration-300 ease-in-out hover:bg-offWhite hover:text-primary"
     >
       <Icon name="uil:setting" size="24"></Icon>
     </nuxt-link>
@@ -55,7 +41,25 @@
   </nav>
 </template>
 
-<script setup></script>
+<script setup>
+const routes = reactive([
+  {
+    title: "Dashboard",
+    icon: "material-symbols:home-outline-rounded",
+    path: "/",
+  },
+  {
+    title: "Players",
+    icon: "material-symbols:list-alt-outline-rounded",
+    path: "/players",
+  },
+  {
+    title: "Teams",
+    icon: "fluent:people-team-24-regular",
+    path: "/teams",
+  },
+]);
+</script>
 
 <style scoped>
 .router-link-exact-active {

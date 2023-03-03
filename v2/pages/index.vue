@@ -8,10 +8,8 @@
       >
         League of our own
       </h1>
-      <span class="text-xl text-neutral-800">ESTABLISHED. 1995</span>
+      <span class="text-xl text-neutral-800">ESTABLISHED. 1989/1990</span>
     </div>
   </div>
 </template>
-<script setup>
-onMounted(() => console.log("index mounted"));
-</script>
+<script setup></script>

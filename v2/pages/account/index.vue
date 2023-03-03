@@ -13,7 +13,6 @@
     <button
       :class="{ 'pointer-events-none opacity-25': loading }"
       class="flex bg-primary text-white p-2"
-      @click="updatePlayerData"
     >
       Update Players
     </button>
@@ -29,7 +28,6 @@
     <button
       :class="{ 'pointer-events-none opacity-25': loading }"
       class="flex bg-primary text-white p-2"
-      @click="updateTeamData"
     >
       Update Teams
     </button>

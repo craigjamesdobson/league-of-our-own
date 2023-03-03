@@ -72,7 +72,7 @@
                 >
                   Statistics
                 </h4>
-                <ul class="flex flex-col w-full">
+                <ul class="flex flex-col w-full text-xs">
                   <li class="flex justify-between w-full">
                     <span class="w-3/4 py-1 border-b border-r border-gray-100">
                       Goals:

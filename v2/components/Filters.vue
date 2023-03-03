@@ -68,7 +68,7 @@
       </div>
     </div>
     <div class="text-xs text-right">
-      Players last update at: {{ playerStore.getPlayersUpdatedDate }}
+      Players last updated on: {{ playerStore.getPlayersUpdatedDate }}
     </div>
   </div>
 </template>

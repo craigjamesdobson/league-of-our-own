@@ -6,7 +6,7 @@
 
     <div class="flex items-center rounded-full">
       <!-- Header -->
-      <Icon class="text-white" size="48" name="carbon:soccer" />
+      <Icon class="text-offWhite" size="48" name="carbon:soccer" />
     </div>
 
     <div>
@@ -14,18 +14,22 @@
         <!-- Links -->
         <li>
           <nuxt-link
-            to="/players"
-            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-white transition duration-300 ease-in-out bg-indigo-800 bg-opacity-25 rounded-md hover:opacity-100"
+            to="/"
+            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
           >
-            <Icon
-              size="24"
-              name="material-symbols:patient-list-outline-rounded"
-            />
+            <Icon size="24" name="material-symbols:home-outline-rounded" />
+            <span class="hidden ml-4 capitalize">Dashboard</span>
+          </nuxt-link>
+          <nuxt-link
+            to="/players"
+            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
+          >
+            <Icon size="24" name="material-symbols:list-alt-outline-rounded" />
             <span class="hidden ml-4 capitalize">Players</span>
           </nuxt-link>
           <nuxt-link
             to="/teams"
-            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-white transition duration-300 ease-in-out bg-indigo-800 bg-opacity-25 rounded-md hover:opacity-100"
+            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
           >
             <Icon size="24" name="fluent:people-team-24-regular" />
             <span class="hidden ml-4 capitalize">Teams</span>
@@ -37,34 +41,24 @@
     <nuxt-link
       v-if="!isLoggedIn"
       to="/account"
-      class="flex items-center justify-center w-10 h-10 text-center bg-white rounded-full"
+      class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-full hover:bg-offWhite hover:text-primary"
     >
-      <Icon name="uiw:login" size="24" />
+      <Icon name="uil:setting" size="24"></Icon>
     </nuxt-link>
     <nuxt-link
       v-else-if="isLoggedIn"
       to="/account"
-      class="flex items-center justify-center w-10 h-10 text-center bg-white rounded-full"
+      class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-full hover:bg-white hover:text-primary"
     >
-      <PhUserCircleDuotone></PhUserCircleDuotone>
+      <Icon name="uil:setting"></Icon>
     </nuxt-link>
   </nav>
 </template>
 
-<script setup>
-import { reactive } from "vue";
-
-const routes = reactive([
-  {
-    title: "Players",
-    icon: "IcRoundGroups",
-    path: "/players",
-  },
-]);
-</script>
+<script setup></script>
 
 <style scoped>
-.nuxt-link-exact-active {
-  @apply bg-opacity-100;
+.router-link-exact-active {
+  @apply bg-offWhite text-primary;
 }
 </style>

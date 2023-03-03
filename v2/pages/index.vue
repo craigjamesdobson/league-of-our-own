@@ -4,8 +4,5 @@
   </div>
 </template>
 <script setup>
-  onMounted(() => console.log('index mounted'))
+onMounted(() => console.log("index mounted"));
 </script>
-<style lang="">
-  
-</style>

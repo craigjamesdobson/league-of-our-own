@@ -4,10 +4,10 @@ import { doc, getDoc, getDocs, updateDoc, setDoc } from "firebase/firestore";
 import {
   playersCollection,
   settingsCollection,
-  teamsCollection,
+  draftedTeamsCollection,
 } from "@/firebase/useDB";
-import { Player } from "~~/modules/players/types/Player";
-import { PlayerPosition } from "~~/modules/players/types/PlayerPosition";
+import { Player } from "~~/modules/players/interaces/Player";
+import { PlayerPosition } from "~~/modules/players/interaces/PlayerPosition";
 import { createPlayerData } from "~~/modules/players";
 import {
   localStorageGet,
@@ -119,12 +119,15 @@ export const usePlayersStore = defineStore({
       const updateLog = document.querySelector(".update-log");
 
       for (const newTeamData of parsedData) {
-        const teamDocRef = doc(teamsCollection, newTeamData.team_id.toString());
+        const teamDocRef = doc(
+          draftedTeamsCollection,
+          newTeamData.team_id.toString()
+        );
         const teamDocSnap = await getDoc(teamDocRef);
 
         if (!teamDocSnap.exists()) {
           await setDoc(
-            doc(teamsCollection, newTeamData.team_id.toString()),
+            doc(draftedTeamsCollection, newTeamData.team_id.toString()),
             newTeamData
           );
 

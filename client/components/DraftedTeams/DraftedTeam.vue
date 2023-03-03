@@ -28,7 +28,7 @@
       :key="player.playerName"
       class="relative text-sm"
       :class="{
-        'transferred-player': player.transfers.length,
+        'bg-green-500': player.transfers.length,
       }"
     >
       <div

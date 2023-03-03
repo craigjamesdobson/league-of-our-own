@@ -1,4 +1,4 @@
-import DraftedTeamData from '@/components/Interfaces/DraftedTeamData'
+import DraftedTeamData from '~/../v2/components/DraftedTeams/Interfaces/DraftedTeamData'
 import DraftedTeam from './DraftedTeam'
 import CompleteDraftedTeam from './CompleteDraftedTeam'
 
@@ -12,12 +12,12 @@ function initDraftedTeamData(
 
   const draftedTeams = draftedTeamList.map((draftedTeam) => {
     const players = draftedTeam.teamPlayers.map((player) => ({
-      player: playerList.players.players.filter(
+      player: playerList.filter(
         (p) => p.id === player.playerID
       )[0],
       transfers: player.transfers.map((t) => {
         return {
-          player: playerList.players.players.filter(
+          player: playerList.filter(
             (p) => p.id === t.transferId
           )[0],
           isCurrentWeekTransfer: t.isCurrentWeekTransfer,

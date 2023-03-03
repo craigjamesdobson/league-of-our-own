@@ -1,5 +1,5 @@
-import Fixture from '../Interfaces/Fixture'
-import { Week } from '../Interfaces/Weeks'
+import Fixture from '../../../v2/components/Interfaces/Fixture'
+import { Week } from '../../../v2/components/Interfaces/Weeks'
 import CompleteFixture from './CompleteFixture'
 
 class CompleteWeek {

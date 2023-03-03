@@ -1,9 +1,9 @@
-import { Player } from '~~/modules/players/types/Player';
-import { IMAGE_CDN } from './constants';
-import { TEAM_DATA } from '../teams/constants';
+import { Player } from "~~/modules/players/interaces/Player";
+import { IMAGE_CDN } from "./constants";
+import { TEAM_DATA } from "../teams/constants";
 
-const createPlayerData = (playerData: Player[]): Player[] => {
-  return playerData.map((player) => {
+const createPlayerData = (rawPlayerData: RawPlayerData[]): Player[] => {
+  return rawPlayerData.map((player) => {
     return {
       id: player.id,
       code: player.code,
@@ -16,7 +16,6 @@ const createPlayerData = (playerData: Player[]): Player[] => {
       cleanSheets: player.clean_sheets,
       redCards: player.red_cards,
       price: getPlayerCost(player.now_cost, player.cost_change_start_fall),
-      status: player.status,
       news: player.news,
       position: player.element_type,
       image: `${IMAGE_CDN}/40x40/p${player.code}.png`,
@@ -31,7 +30,7 @@ const getPlayerCost = (now: number, change: number): string => {
   return ((now + change) / 10).toFixed(1);
 };
 
-const getTeamData = (player: Player) => {
+const getTeamData = (player: RawPlayerData) => {
   const playerTeam = TEAM_DATA.filter((x) => x.id === player.team)[0];
   return {
     teamName: playerTeam.name,
@@ -39,25 +38,25 @@ const getTeamData = (player: Player) => {
   };
 };
 
-const getAvailabilityData = (player: Player) => {
+const getAvailabilityData = (player: RawPlayerData) => {
   switch (true) {
-    case player.status === 'i' ||
-      player.status === 'n' ||
-      player.status === 's' ||
-      player.status === 'd':
+    case player.status === "i" ||
+      player.status === "n" ||
+      player.status === "s" ||
+      player.status === "d":
       return {
-        status: 'temporary-unavailable',
+        status: "temporary-unavailable",
         isUnavailable: true,
       };
-    case player.status === 'u':
+    case player.status === "u":
       return {
-        status: 'unavailable-for-season',
+        status: "unavailable-for-season",
         isUnavailable: true,
         unavailableForSeason: true,
       };
     default:
       return {
-        status: 'available',
+        status: "available",
         isUnavailable: false,
         unavailableForSeason: false,
       };

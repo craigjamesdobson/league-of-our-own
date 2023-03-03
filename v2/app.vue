@@ -8,9 +8,13 @@
 </template>
 
 <script setup>
-import { usePlayersStore } from '~/stores/players';
+import { usePlayersStore } from "~/stores/players";
 
 const playerStore = usePlayersStore();
 
 await playerStore.getPlayerSettings();
 </script>
+
+<style lang="scss">
+@import "@/assets/components/layout";
+</style>

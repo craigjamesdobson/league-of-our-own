@@ -1,5 +1,5 @@
 import Teams from 'static/teams.json'
-import { Stats, Team } from '../Interfaces/Fixture'
+import { Stats, Team } from '../../../v2/components/Interfaces/Fixture'
 
 class CompleteTeam {
   public readonly id: number

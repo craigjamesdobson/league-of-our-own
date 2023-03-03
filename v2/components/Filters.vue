@@ -84,5 +84,5 @@ const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers } =
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/components/filters.scss";
+@import "@/assets/components/filters";
 </style>

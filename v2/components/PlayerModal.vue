@@ -8,7 +8,7 @@
       <div v-if="selectedPlayer" class="px-4 modal__content">
         <div class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer">
           <Icon
-            name="mdi:alert-circle-outline"
+            name="system-uicons:cross-circle"
             @click="toggleModal(false)"
             class="text-white w-12 h-12"
           />
@@ -32,7 +32,7 @@
                 class="rounded-full"
                 :src="selectedPlayer.imageLarge"
                 :alt="selectedPlayer.name"
-                @error="loadFallbackImage"
+                @error="loadPlayerFallbackImage"
               />
             </div>
             <h4
@@ -141,10 +141,11 @@
 <script setup>
 import { getImageUrl } from "@/composables/helpers";
 import { usePlayerModal } from "~/modules/players/modal";
+import { loadPlayerFallbackImage } from "@/composables/helpers";
 
 const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/components/modal.scss";
+@import "@/assets/components/modal";
 </style>

@@ -15,8 +15,8 @@ function initPlayerData(playerData: any) {
   const players = generatePlayerData(playerData)
   const filteredPlayers = generatePlayerData(playerData)
 
-  players.players.sort((a, b) => a.teamID - b.teamID)
-  filteredPlayers.players.sort((a, b) => a.teamID - b.teamID)
+  players.sort((a, b) => a.teamID - b.teamID)
+  filteredPlayers.sort((a, b) => a.teamID - b.teamID)
 
   return {
     players,

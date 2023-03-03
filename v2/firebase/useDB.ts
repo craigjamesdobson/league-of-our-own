@@ -6,6 +6,7 @@ import {
   collection,
   DocumentData,
 } from "firebase/firestore";
+import { RawDraftedTeamData } from "~~/modules/drafted-teams/interfaces/RawDraftedTeamData";
 
 // Init the firebase app
 export const firebaseApp = initializeApp({
@@ -36,7 +37,7 @@ const createCollection = <T = DocumentData>(
 };
 
 // Import all your model types
-import { Player } from "../modules/players/types/Player";
+import { Player } from "../modules/players/interaces/Player";
 
 // export all your collections
 export const playersCollection = createCollection<Player>(
@@ -45,7 +46,7 @@ export const playersCollection = createCollection<Player>(
   "players"
 );
 
-export const teamsCollection = createCollection<Player>(
+export const draftedTeamsCollection = createCollection<RawDraftedTeamData>(
   "season",
   "2022-2023",
   "drafted-teams"

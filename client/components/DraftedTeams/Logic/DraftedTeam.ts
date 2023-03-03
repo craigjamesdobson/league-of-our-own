@@ -1,6 +1,6 @@
 import DraftedPlayer from '@/components/DraftedTeams/Logic/DraftedPlayer'
-import DraftedTeamDataElements from '@/components/Interfaces/DraftedTeamDataElements'
-import GameweekStats from '~/components/Interfaces/GameweekStats'
+import DraftedTeamDataElements from '~/../v2/components/DraftedTeams/Interfaces/DraftedTeamDataElements'
+import GameweekStats from '~/../v2/components/Interfaces/GameweekStats'
 
 class DraftedTeam {
   public readonly teamID: number

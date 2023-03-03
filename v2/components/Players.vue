@@ -7,7 +7,7 @@
       ) in playerStore.getFilteredPlayersByPosition"
       :key="index"
     >
-      <h2 class="uppercase mb-4 text-2xl px-4">
+      <h2 class="main-heading">
         {{ key }}
       </h2>
       <div
@@ -33,37 +33,34 @@
                   />
                 </span>
                 <span class="w-2/12 p-2">{{ player.teamNameShort }}</span>
-                <span class="w-5/12 p-2 text-center">{{ player.webName }}</span>
-                <span class="w-2/12 p-2">{{ player.price }}</span>
+                <span class="w-6/12 p-2 text-center">{{ player.webName }}</span>
+                <span class="w-2/12 p-2 text-center">{{ player.price }}</span>
                 <span
                   v-if="player.unavailableForSeason"
-                  class="flex items-center w-2/12 p-2 text-xs"
+                  class="flex items-center w-1/12 p-2 justify-end"
                   :class="player.availabilityType"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-red-500 rounded-full"
                   ></span>
-                  Unavailable
                 </span>
                 <span
                   v-if="player.isUnavailable && !player.unavailableForSeason"
-                  class="flex items-center w-2/12 p-2 text-xs"
+                  class="flex items-center w-1/12 p-2 justify-end"
                   :class="player.availabilityType"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-yellow-400 rounded-full"
                   ></span>
-                  Unavailable
                 </span>
                 <span
                   v-else-if="!player.isUnavailable"
-                  class="flex items-center w-2/12 p-2 text-xs"
+                  class="flex items-center w-1/12 p-2 justify-end"
                   :class="player.availabilityType"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-green-400 rounded-full"
                   ></span>
-                  Available
                 </span>
               </div>
             </div>

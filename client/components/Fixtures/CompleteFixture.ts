@@ -1,4 +1,4 @@
-import Fixture from '../Interfaces/Fixture'
+import Fixture from '../../../v2/components/Interfaces/Fixture'
 import CompleteTeam from './CompleteTeam'
 
 class CompleteFixture {

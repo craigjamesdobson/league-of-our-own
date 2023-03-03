@@ -1,6 +1,6 @@
 import { useContext, ref, reactive, computed } from '@nuxtjs/composition-api'
 import Swal from 'sweetalert2'
-import Fixture from '~/components/Interfaces/Fixture'
+import Fixture from '~/../v2/components/Interfaces/Fixture'
 import { PlayerPositionShort } from '~/components/Interfaces/PlayerPosition'
 
 interface fixtureData {

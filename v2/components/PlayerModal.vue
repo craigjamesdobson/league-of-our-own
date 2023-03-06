@@ -1,3 +1,10 @@
+<script setup>
+import { getImageUrl, loadPlayerFallbackImage } from '@/composables/helpers'
+import { usePlayerModal } from '~/modules/players/modal'
+
+const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal()
+</script>
+
 <template lang="">
   <div>
     <div
@@ -9,23 +16,23 @@
         <div class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer">
           <Icon
             name="system-uicons:cross-circle"
-            @click="toggleModal(false)"
             class="text-white w-12 h-12"
+            @click="toggleModal(false)"
           />
         </div>
         <div
           class="modal__inner"
           :class="{
             'border-4 border-yellow-300':
-              !selectedPlayer.unavailableForSeason &&
-              selectedPlayer.isUnavailable,
+              !selectedPlayer.unavailableForSeason
+              && selectedPlayer.isUnavailable,
             'border-4 border-red-500': selectedPlayer.unavailableForSeason,
           }"
         >
           <img
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.teamNameShort?.toLowerCase())"
-          />
+          >
           <div class="flex flex-row justify-between items-top">
             <div class="w-24">
               <img
@@ -33,7 +40,7 @@
                 :src="selectedPlayer.imageLarge"
                 :alt="selectedPlayer.name"
                 @error="loadPlayerFallbackImage"
-              />
+              >
             </div>
             <h4
               class="flex flex-col items-end text-4xl leading-none text-right uppercase"
@@ -56,8 +63,8 @@
                     class="text-white rounded-full bg-green-500"
                     :class="{
                       'bg-yellow-500':
-                        !selectedPlayer.unavailableForSeason &&
-                        selectedPlayer.isUnavailable,
+                        !selectedPlayer.unavailableForSeason
+                        && selectedPlayer.isUnavailable,
                       'bg-red-500': selectedPlayer.unavailableForSeason,
                     }"
                   />
@@ -95,8 +102,8 @@
                   </li>
                   <li
                     v-if="
-                      selectedPlayer.position === 1 ||
-                      selectedPlayer.position === 2
+                      selectedPlayer.position === 1
+                        || selectedPlayer.position === 2
                     "
                     class="flex justify-between w-full"
                   >
@@ -138,13 +145,6 @@
     </div>
   </div>
 </template>
-<script setup>
-import { getImageUrl } from "@/composables/helpers";
-import { usePlayerModal } from "~/modules/players/modal";
-import { loadPlayerFallbackImage } from "@/composables/helpers";
-
-const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
-</script>
 
 <style lang="scss" scoped>
 @import "@/assets/components/modal";

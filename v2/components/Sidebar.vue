@@ -1,3 +1,23 @@
+<script setup>
+const routes = reactive([
+  {
+    title: 'Dashboard',
+    icon: 'material-symbols:home-outline-rounded',
+    path: '/',
+  },
+  {
+    title: 'Players',
+    icon: 'material-symbols:list-alt-outline-rounded',
+    path: '/players',
+  },
+  {
+    title: 'Teams',
+    icon: 'fluent:people-team-24-regular',
+    path: '/teams',
+  },
+])
+</script>
+
 <template>
   <nav
     class="sticky top-0 flex flex-col items-center justify-between h-screen p-4 bg-primary"
@@ -12,7 +32,7 @@
     <div>
       <ul class="flex flex-col">
         <!-- Links -->
-        <li v-for="route in routes">
+        <li v-for="route in routes" :key="route.title">
           <nuxt-link
             :to="route.path"
             class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-md hover:bg-offWhite hover:text-primary"
@@ -29,37 +49,17 @@
       to="/account"
       class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite rounded-full transition duration-300 ease-in-out hover:bg-offWhite hover:text-primary"
     >
-      <Icon name="uil:setting" size="24"></Icon>
+      <Icon name="uil:setting" size="24" />
     </nuxt-link>
     <nuxt-link
       v-else-if="isLoggedIn"
       to="/account"
       class="flex flex-col items-center justify-center w-10 h-10 text-base text-offWhite transition duration-300 ease-in-out border border-offWhite rounded-full hover:bg-white hover:text-primary"
     >
-      <Icon name="uil:setting"></Icon>
+      <Icon name="uil:setting" />
     </nuxt-link>
   </nav>
 </template>
-
-<script setup>
-const routes = reactive([
-  {
-    title: "Dashboard",
-    icon: "material-symbols:home-outline-rounded",
-    path: "/",
-  },
-  {
-    title: "Players",
-    icon: "material-symbols:list-alt-outline-rounded",
-    path: "/players",
-  },
-  {
-    title: "Teams",
-    icon: "fluent:people-team-24-regular",
-    path: "/teams",
-  },
-]);
-</script>
 
 <style scoped>
 .router-link-exact-active {

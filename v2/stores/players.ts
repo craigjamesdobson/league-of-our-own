@@ -1,74 +1,84 @@
-import { defineStore } from "pinia";
-import { isEqual } from "lodash-es";
-import { doc, getDoc, getDocs, updateDoc, setDoc } from "firebase/firestore";
+import { defineStore } from 'pinia';
+import { isEqual } from 'lodash-es';
+import { doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import {
-  playersCollection,
-  settingsCollection,
   draftedTeamsCollection,
-} from "@/firebase/useDB";
-import { Player } from "~~/modules/players/interaces/Player";
-import { PlayerPosition } from "~~/modules/players/interaces/PlayerPosition";
-import { createPlayerData } from "~~/modules/players";
+  playersCollection,
+  settingsCollection
+} from '@/firebase/useDB';
+import type { Player } from '~~/modules/players/interaces/Player';
+import { PlayerPosition } from '~~/modules/players/interaces/PlayerPosition';
+import { createPlayerData } from '~~/modules/players';
 import {
   localStorageGet,
   localStorageHas,
-  localStorageSet,
-} from "@/composables/localStorage";
+  localStorageSet
+} from '@/composables/localStorage';
+
+interface FilterData {
+  filterName: string
+  filterPrice: string
+  filterTeam: number | undefined
+}
 
 interface State {
-  players: Player[];
-  filteredPlayers: Player[];
-  selectedPlayer: Player;
-  updatedAt: string;
-  isLoaded: boolean;
+  players: Player[]
+  filteredPlayers: Player[]
+  selectedPlayer: Player
+  updatedAt: string
+  isLoaded: boolean
 }
 
 export const usePlayersStore = defineStore({
-  id: "player-store",
+  id: 'player-store',
   state: (): State => {
     return {
-      players: [] as Player[],
-      filteredPlayers: [] as Player[],
+      players: [],
+      filteredPlayers: [],
       selectedPlayer: {} as Player,
-      updatedAt: null,
-      isLoaded: false,
+      updatedAt: '',
+      isLoaded: false
     };
   },
   actions: {
-    async getPlayerSettings() {
-      const settingsDocRef = doc(settingsCollection, "players");
+    async getPlayerSettings () {
+      const settingsDocRef = doc(settingsCollection, 'players');
       const settingsDoc = await getDoc(settingsDocRef);
 
+      if (!settingsDoc.exists()) { return; }
+
       if (
-        localStorageHas("updated-at") &&
-        localStorageGet("updated-at") ===
+        localStorageHas('updated-at') &&
+        localStorageGet('updated-at') ===
           settingsDoc.data().updatedAt.toString()
       ) {
-        this.players = localStorageGet("players");
+        this.players = localStorageGet('players') as Player[];
         this.filteredPlayers = this.players;
-        this.updatedAt = localStorageGet("updated-at");
+        this.updatedAt = localStorageGet('updated-at') as string;
       } else {
         const playerDocs = await getDocs(playersCollection);
-        const players = playerDocs.docs.map((player) => player.data());
+        const players = playerDocs.docs.map(player => player.data());
 
         this.players = createPlayerData(players);
         this.filteredPlayers = this.players;
 
-        localStorageSet("updated-at", settingsDoc.data().updatedAt);
-        localStorageSet("players", this.players);
+        localStorageSet('updated-at', settingsDoc.data().updatedAt);
+        localStorageSet('players', this.players);
 
         this.isLoaded = true;
       }
     },
 
-    setSelectedPlayer(playerID: number) {
-      this.selectedPlayer = this.players.filter((x) => x.id === playerID)[0];
+    setSelectedPlayer (playerID: number) {
+      this.selectedPlayer = this.players.filter(x => x.id === playerID)[0];
     },
 
-    async updatePlayerData(playerData: any) {
+    async updatePlayerData (playerData: string) {
       const parsedData = JSON.parse(playerData);
 
-      const updateLog = document.querySelector(".update-log");
+      const updateLog = document.querySelector('.update-log');
+
+      if (!updateLog) { throw new Error('No log element'); }
 
       for (const newPlayerData of parsedData) {
         const playerDocRef = doc(
@@ -83,8 +93,8 @@ export const usePlayersStore = defineStore({
             newPlayerData
           );
           updateLog.insertAdjacentHTML(
-            "afterend",
-            `<p style="color: green;">${newPlayerData.web_name} added</p>`
+            'afterend',
+              `<p style="color: green;">${newPlayerData.web_name} added</p>`
           );
 
           continue;
@@ -95,28 +105,30 @@ export const usePlayersStore = defineStore({
           isEqual(playerDocSnap.data(), newPlayerData)
         ) {
           updateLog.insertAdjacentHTML(
-            "afterend",
+            'afterend',
             `<p style="color: gray;">${newPlayerData.web_name} has no changes</p>`
           );
         } else {
           await updateDoc(playerDocRef, newPlayerData);
           updateLog.insertAdjacentHTML(
-            "afterend",
+            'afterend',
             `<p style="color: blue;">${newPlayerData.web_name} updated</p>`
           );
         }
       }
-      const settingsDocRef = doc(settingsCollection, "players");
+      const settingsDocRef = doc(settingsCollection, 'players');
 
       await updateDoc(settingsDocRef, {
-        updatedAt: Date.now(),
+        updatedAt: Date.now()
       });
     },
 
-    async updateTeamData(teamData: any) {
+    async updateTeamData (teamData: string) {
       const parsedData = JSON.parse(teamData);
 
-      const updateLog = document.querySelector(".update-log");
+      const updateLog = document.querySelector('.update-log');
+
+      if (!updateLog) { throw new Error('No log element'); }
 
       for (const newTeamData of parsedData) {
         const teamDocRef = doc(
@@ -132,70 +144,70 @@ export const usePlayersStore = defineStore({
           );
 
           updateLog.insertAdjacentHTML(
-            "afterend",
+            'afterend',
             `<p style="color: green;">${newTeamData.team_name} added</p>`
           );
         }
       }
-    },
+    }
   },
   getters: {
-    playerList: (state) => state.players,
+    playerList: state => state.players,
 
     getPlayerByID: (state) => {
       return (playerID: number) =>
-        state.players.filter((player) => player.id === +playerID)[0];
+        state.players.filter(player => player.id === +playerID)[0];
     },
 
-    getSelectedPlayer: (state) => state.selectedPlayer,
+    getSelectedPlayer: state => state.selectedPlayer,
 
-    getPlayersUpdatedDate: (state) => new Date(+state.updatedAt).toDateString(),
+    getPlayersUpdatedDate: state => new Date(+state.updatedAt).toDateString(),
 
-    stateIsLoaded: (state) => state.isLoaded,
+    stateIsLoaded: state => state.isLoaded,
 
     getFilteredPlayers:
-      (state) =>
-      ({ filterName, filterPrice, filterTeam }) => {
-        let filteredPlayers = state.players;
-        if (filterName) {
-          filteredPlayers = filteredPlayers.filter((p) =>
-            p.webName
-              .normalize("NFD")
-              .replace(/[\u0300-\u036F]/g, "")
-              .toLowerCase()
-              .includes(filterName.toLowerCase())
-          );
-        }
+      state =>
+        ({ filterName, filterPrice, filterTeam }: FilterData) => {
+          let filteredPlayers = state.players;
+          if (filterName) {
+            filteredPlayers = filteredPlayers.filter(p =>
+              p.webName
+                .normalize('NFD')
+                .replace(/[\u0300-\u036F]/g, '')
+                .toLowerCase()
+                .includes(filterName.toLowerCase())
+            );
+          }
 
-        if (filterPrice) {
-          filteredPlayers = filteredPlayers.filter((player) =>
-            player.price.includes(filterPrice)
-          );
-        }
+          if (filterPrice) {
+            filteredPlayers = filteredPlayers.filter(player =>
+              player.price.includes(filterPrice)
+            );
+          }
 
-        if (filterTeam) {
-          filteredPlayers = filteredPlayers.filter(
-            (p) => p.team === filterTeam
-          );
-        }
-        state.filteredPlayers = filteredPlayers;
-      },
+          if (filterTeam) {
+            filteredPlayers = filteredPlayers.filter(
+              p => p.team === filterTeam
+            );
+          }
+          state.filteredPlayers = filteredPlayers;
+        },
 
     getFilteredPlayersByPosition: (state) => {
       return {
         goalkeepers: state.filteredPlayers
-          .filter((x) => x.position === PlayerPosition.GOALKEEPER)
+          .filter(x => x.position === PlayerPosition.GOALKEEPER)
           .sort((a, b) => a.team - b.team),
         defenders: state.filteredPlayers
-          .filter((x) => x.position === PlayerPosition.DEFENDER)
+          .filter(x => x.position === PlayerPosition.DEFENDER)
           .sort((a, b) => a.team - b.team),
         midfielders: state.filteredPlayers
-          .filter((x) => x.position === PlayerPosition.MIDFIELDER)
+          .filter(x => x.position === PlayerPosition.MIDFIELDER)
           .sort((a, b) => a.team - b.team),
         forwards: state.filteredPlayers
-          .filter((x) => x.position === PlayerPosition.FORWARD)
-          .sort((a, b) => a.team - b.team),
+          .filter(x => x.position === PlayerPosition.FORWARD)
+          .sort((a, b) => a.team - b.team)
       };
-    },
-  },
+    }
+  }
 });

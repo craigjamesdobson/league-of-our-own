@@ -1,15 +1,15 @@
+<script setup>
+</script>
+
 <template lang="">
   <div class="players-container">
-    <Players></Players>
+    <Players />
     <div>
-      <Filters></Filters>
+      <Filters />
     </div>
   </div>
 </template>
-<script setup>
-import { usePlayersStore } from '~/stores/players';
-const playerStore = usePlayersStore();
-</script>
+
 <style lang="css">
 .players-container {
   @apply grid gap-4;

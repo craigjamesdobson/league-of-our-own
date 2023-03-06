@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/DraftedTeamData'
+
+const props = defineProps({
+  draftedTeam: Object as PropType<DraftedTeamData>,
+})
+</script>
+
 <template>
   <div class="p-4 m-2 bg-white rounded-sm">
     <div
@@ -19,19 +27,19 @@
       class="relative text-sm"
       :class="{
         'bg-yellow-200':
-          player.transfers.length &&
-          !player.transfers.at(-1)?.isCurrentWeekTransfer,
+          player.transfers.length
+          && !player.transfers.at(-1)?.isCurrentWeekTransfer,
         'bg-green-200': player.transfers.at(-1)?.isCurrentWeekTransfer,
       }"
     >
       <DraftedPlayer
         v-if="!player.transfers.length"
-        :draftedPlayer="player"
-      ></DraftedPlayer>
+        :drafted-player="player"
+      />
       <DraftedPlayer
         v-else
-        :draftedPlayer="player.transfers.at(-1)"
-      ></DraftedPlayer>
+        :drafted-player="player.transfers.at(-1)"
+      />
     </div>
     <div class="flex justify-between pt-2">
       <span>Total</span>
@@ -41,11 +49,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { DraftedTeamData } from "@/modules/drafted-teams/interfaces/DraftedTeamData";
-
-const props = defineProps({
-  draftedTeam: Object as PropType<DraftedTeamData>,
-});
-</script>

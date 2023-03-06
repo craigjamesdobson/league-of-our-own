@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import type {
+  CompleteDraftedPlayer,
+  DraftedTransfer,
+} from '@/modules/drafted-teams/interfaces/DraftedTeamData'
+
+const props = defineProps({
+  draftedPlayer: Object as PropType<CompleteDraftedPlayer | DraftedTransfer>,
+})
+</script>
+
 <template>
   <div
     class="flex items-center w-full border-b border-gray-100"
@@ -12,7 +23,7 @@
         :src="props.draftedPlayer?.image"
         :alt="props.draftedPlayer?.webName"
         @error="loadPlayerFallbackImage"
-      />
+      >
     </span>
     <span class="w-2/12 p-2">{{ props.draftedPlayer?.teamNameShort }}</span>
     <span class="w-5/12 p-2 text-sm text-center">{{
@@ -23,16 +34,5 @@
     </span>
   </div>
 </template>
-
-<script setup lang="ts">
-import {
-  CompleteDraftedPlayer,
-  DraftedTransfer,
-} from "~~/modules/drafted-teams/interfaces/DraftedTeamData";
-
-const props = defineProps({
-  draftedPlayer: Object as PropType<CompleteDraftedPlayer | DraftedTransfer>,
-});
-</script>
 
 <style scoped></style>

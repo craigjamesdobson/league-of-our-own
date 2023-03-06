@@ -1,6 +1,45 @@
-import { Player } from "~~/modules/players/interaces/Player";
-import { IMAGE_CDN } from "./constants";
-import { TEAM_DATA } from "../teams/constants";
+import { TEAM_DATA } from '../teams/constants';
+import { IMAGE_CDN } from './constants';
+import type { RawPlayerData } from './interaces/RawPlayerData';
+import type { Player } from '~~/modules/players/interaces/Player';
+
+const getPlayerCost = (now: number, change: number): string => {
+  return ((now + change) / 10).toFixed(1);
+};
+
+const getTeamData = (player: RawPlayerData) => {
+  const playerTeam = TEAM_DATA.filter(x => x.id === player.team)[0];
+  return {
+    teamName: playerTeam.name,
+    teamNameShort: playerTeam.short_name
+  };
+};
+
+const getAvailabilityData = (player: RawPlayerData) => {
+  switch (true) {
+    case player.status === 'i' ||
+      player.status === 'n' ||
+      player.status === 's' ||
+      player.status === 'd':
+      return {
+        status: 'temporary-unavailable',
+        isUnavailable: true,
+        unavailableForSeason: false
+      };
+    case player.status === 'u':
+      return {
+        status: 'unavailable-for-season',
+        isUnavailable: true,
+        unavailableForSeason: true
+      };
+    default:
+      return {
+        status: 'available',
+        isUnavailable: false,
+        unavailableForSeason: false
+      };
+  }
+};
 
 const createPlayerData = (rawPlayerData: RawPlayerData[]): Player[] => {
   return rawPlayerData.map((player) => {
@@ -21,46 +60,9 @@ const createPlayerData = (rawPlayerData: RawPlayerData[]): Player[] => {
       image: `${IMAGE_CDN}/40x40/p${player.code}.png`,
       imageLarge: `${IMAGE_CDN}/250x250/p${player.code}.png`,
       ...getTeamData(player),
-      ...getAvailabilityData(player),
+      ...getAvailabilityData(player)
     };
   });
-};
-
-const getPlayerCost = (now: number, change: number): string => {
-  return ((now + change) / 10).toFixed(1);
-};
-
-const getTeamData = (player: RawPlayerData) => {
-  const playerTeam = TEAM_DATA.filter((x) => x.id === player.team)[0];
-  return {
-    teamName: playerTeam.name,
-    teamNameShort: playerTeam.short_name,
-  };
-};
-
-const getAvailabilityData = (player: RawPlayerData) => {
-  switch (true) {
-    case player.status === "i" ||
-      player.status === "n" ||
-      player.status === "s" ||
-      player.status === "d":
-      return {
-        status: "temporary-unavailable",
-        isUnavailable: true,
-      };
-    case player.status === "u":
-      return {
-        status: "unavailable-for-season",
-        isUnavailable: true,
-        unavailableForSeason: true,
-      };
-    default:
-      return {
-        status: "available",
-        isUnavailable: false,
-        unavailableForSeason: false,
-      };
-  }
 };
 
 export { createPlayerData };

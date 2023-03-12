@@ -26,5 +26,5 @@ export default defineNuxtConfig({
     }
   },
   ssr: false,
-  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-icon']
+  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-icon', '@nuxtjs/fontaine']
 });

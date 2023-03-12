@@ -1,11 +1,11 @@
 <script setup>
-import { TEAM_DATA } from '@/modules/teams/constants'
-import { PRICE_BREAKS } from '@/modules/filters/constants'
-import { useFilters } from '@/modules/filters'
-import { getImageUrl } from '@/composables/helpers'
+import { TEAM_DATA } from '@/modules/teams/constants';
+import { PRICE_BREAKS } from '@/modules/filters/constants';
+import { useFilters } from '@/modules/filters';
+import { getImageUrl } from '@/composables/helpers';
 
 const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers }
-  = useFilters()
+  = useFilters();
 </script>
 
 <template>
@@ -15,27 +15,33 @@ const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers }
     </h2>
     <div class="justify-between p-4 mb-4 bg-white rounded-sm">
       <div class="pb-3 mb-3 border-b border-gray-100">
-        <label class="flex mb-2 text-xs" for="filter_name">
+        <label
+          class="flex mb-2 text-xs"
+          for="filter_name"
+        >
           Filter by name
         </label>
         <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
           <input
             id="filter_name"
             v-model="filterData.filterName"
-            class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
+            class="w-full text-xs placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
             type="text"
             name="filter_name"
             placeholder="Search Players..."
             @keyup="setFilteredPlayers"
           >
-          <font-awesome-icon
-            :icon="['fa', 'search']"
-            class="text-gray-400 fa-xs"
+          <Icon
+            size="22"
+            name="mdi:person-search-outline"
           />
         </div>
       </div>
       <div class="pb-3 mb-3 border-b border-gray-100">
-        <label class="flex mb-2 text-xs" for="filter_name">
+        <label
+          class="flex mb-2 text-xs"
+          for="filter_name"
+        >
           Filter by price
         </label>
         <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
@@ -46,10 +52,17 @@ const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers }
             class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
             @change="setFilteredPlayers"
           >
-            <option selected="selected" value="">
+            <option
+              selected="selected"
+              value=""
+            >
               All
             </option>
-            <option v-for="price in PRICE_BREAKS" :key="price" :value="price">
+            <option
+              v-for="price in PRICE_BREAKS"
+              :key="price"
+              :value="price"
+            >
               {{ price }}
             </option>
           </select>
@@ -61,9 +74,14 @@ const { filterData, playerStore, selectfilteredTeam, setFilteredPlayers }
           for="filter_name"
         >
           Filter by team
-          <button title="clear team selection" @click="selectfilteredTeam">
-            <SystemUiconsReset />
-          </button>
+          <button
+            title="clear team selection"
+            @click="selectfilteredTeam"
+          >
+            <Icon
+              size="20"
+              name="carbon:reset"
+            /></button>
         </label>
         <div class="flex flex-wrap -mx-2 -mb-1 cursor-pointer">
           <div

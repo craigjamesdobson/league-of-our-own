@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/DraftedTeamData'
+import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/DraftedTeamData';
 
 const props = defineProps({
   draftedTeam: Object as PropType<DraftedTeamData>,
-})
+});
 </script>
 
 <template>
@@ -18,7 +18,10 @@ const props = defineProps({
         }}</span>
       </div>
       <span v-if="props.draftedTeam?.allowedTransfers">
-        <Icon size="24" name="ic:round-swap-horiz" />
+        <Icon
+          size="24"
+          name="ic:round-swap-horiz"
+        />
       </span>
     </div>
     <div

@@ -1,49 +1,34 @@
 <script setup>
-import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { usePlayersStore } from '~/stores/players';
+import { useVuelidate } from '@vuelidate/core';
+import { required, email, minLength, helpers } from '@vuelidate/validators';
+import { useAccountStore } from '@/stores/account';
+
+const accountStore = useAccountStore();
+accountStore.setUserData();
+
+const userData = computed(() => accountStore.getUserData);
 
 const formData = reactive({
   email: '',
-  password: ''
+  password: '',
 });
 
-const user = reactive({
-  email: null,
-  isSignedIn: false
+const rules = computed(() => {
+  return {
+    email: {
+      required: helpers.withMessage('The email field is required', required),
+      email: helpers.withMessage('Invalid email format', email),
+    },
+    password: {
+      required: helpers.withMessage('The password field is required', required),
+      minLength: minLength(6),
+    },
+  };
 });
 
-onMounted(() => {
-  const auth = getAuth();
-  const user = auth.currentUser;
+const v$ = useVuelidate(rules, formData);
 
-  if (user) {
-    user.email = auth.currentUser.email;
-    user.isSignedIn = true;
-  }
-});
-
-const auth = getAuth();
-const signInUser = () => {
-  signInWithEmailAndPassword(auth, formData.email, formData.password)
-    .then((userCredential) => {
-      // Signed in
-      console.log(user);
-      user.email = userCredential.user.email;
-      user.isSignedIn = true;
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    });
-};
-
-const signOutUser = () => {
-  signOut(auth).then(() => {
-  // Sign-out successful.
-  }).catch((error) => {
-    throw new Error(error);
-  });
-};
 const playerStore = usePlayersStore();
 const playerData = ref('');
 const teamData = ref('');
@@ -67,44 +52,61 @@ const updateTeamData = async () => {
 
 <template>
   <div class="flex flex-col items-center justify-center h-full">
-    <h1 class="main-heading">
-      Admin Login
+    <h1 class="flex items-center main-heading">
+      <span>Admin Login</span>
+      <button
+        title="Sign out"
+        @click.prevent="accountStore.signOutUser"
+      >
+        <Icon
+          class="ml-2"
+          name="la:sign-out-alt"
+        />
+      </button>
     </h1>
-    <div v-if="user.isSignedIn">
-      <p>Hello {{ user.email }}</p>
-      <textarea
-        id=""
-        v-model="playerData"
-        name="player-data"
-        cols="50"
-        rows="10"
-        placeholder="Paste player data here..."
-      />
-      <button
-        :class="{ 'pointer-events-none opacity-25': loading }"
-        class="flex p-2 text-white bg-primary"
-      >
-        Update Players
-      </button>
-      <textarea
-        id=""
-        v-model="teamData"
-        name="team-data"
-        cols="50"
-        rows="10"
-        placeholder="Paste team data here..."
-      />
-      <button
-        :class="{ 'pointer-events-none opacity-25': loading }"
-        class="flex p-2 text-white bg-primary"
-        @click="updateTeamData"
-      >
-        Update Teams
-      </button>
+    <div v-if="userData.isSignedIn">
+      <p class="m-4 text-center underline">
+        Hello {{ userData.email }}
+      </p>
+      <div class="flex gap-4">
+        <div class="flex flex-col items-start gap-4">
+          <textarea
+            id=""
+            v-model="playerData"
+            class="p-2 text-sm rounded-md"
+            name="player-data"
+            cols="75"
+            rows="20"
+            placeholder="Paste player data here..."
+          />
+          <button
+            :class="{ 'pointer-events-none opacity-25': loading }"
+            class="flex p-2 text-white bg-primary"
+            @click="updatePlayerData"
+          >
+            Update Players
+          </button>
+        </div>
+        <div class="flex flex-col items-start gap-4">
+          <textarea
+            id=""
+            v-model="teamData"
+            class="p-2 text-sm rounded-md"
+            name="team-data"
+            cols="75"
+            rows="20"
+            placeholder="Paste team data here..."
+          />
+          <button
+            :class="{ 'pointer-events-none opacity-25': loading }"
+            class="flex p-2 text-white bg-primary"
+            @click="updateTeamData"
+          >
+            Update Teams
+          </button>
+        </div>
+      </div>
       <div class="update-log" />
-      <button @click="signOutUser">
-        Sign out
-      </button>
     </div>
     <div
       v-else
@@ -114,39 +116,41 @@ const updateTeamData = async () => {
         class="flex flex-col gap-6"
         action=""
       >
-        <div class="relative flex flex-col">
-          <label
-            class="mb-2 text-xs"
-            for="email"
-          >Email</label>
-          <input
-            id="email"
-            v-model="formData.email"
-            class="px-2 py-2 bg-white border rounded-md peer"
-            type="email"
-          >
-        </div>
-        <div class="relative flex flex-col">
-          <label
-            class="mb-2 text-xs"
-            for="password"
-          >Password</label>
-          <input
-            id="password"
-            v-model="formData.password"
-            class="px-2 py-2 bg-white border rounded-md peer"
-            type="password"
-          >
-        </div>
+        <FormField
+          v-model="formData.email"
+          label="Email"
+          :validation="v$.email"
+          icon="material-symbols:alternate-email"
+        />
+        <FormField
+          v-model="formData.password"
+          label="Password"
+          :validation="v$.password"
+          icon="mdi:password-outline"
+        />
         <button
           class="px-1 py-2 text-white rounded-md bg-primary"
-          @click.prevent="signInUser"
+          :class="{'opacity-50'
+            :v$.$invalid
+          }"
+          :disabled="v$.$invalid"
+          @click.prevent="accountStore.signInUser(formData)"
         >
           Log In
+        </button>
+        <button
+          class="underline"
+          @click.prevent="accountStore.resetUserPassword(formData.email)"
+        >
+          Reset Password
         </button>
       </form>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+input {
+  @apply focus:outline-none
+}
+</style>

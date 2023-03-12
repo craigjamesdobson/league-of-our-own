@@ -1,0 +1,15 @@
+.filter-container {
+  @apply self-start sticky;
+  top: 20px;
+}
+
+.icon-container {
+  @apply transition-all duration-200 ease-in-out h-8;
+  width: 10%;
+  filter: grayscale(1);
+
+  &.active {
+    filter: grayscale(0);
+    transform: scale(1.2);
+  }
+}

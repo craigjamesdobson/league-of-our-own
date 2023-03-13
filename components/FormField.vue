@@ -5,19 +5,6 @@
       :for="label"
     >{{ label }}</label>
     <div class="relative flex flex-col">
-      <input
-        :id="label"
-        :v-model="modelValue"
-        :class="{
-          'border !border-red-500 rounded-b-none': validation?.$error,
-          'border !border-green-400 ': !validation?.$invalid,
-        }"
-        class="p-2 pl-10 bg-white border rounded-md border-primary focus:outline-none"
-        :type="label.toLocaleLowerCase()"
-        autocomplete="chrome-off"
-        @change="validation?.$touch"
-        @input="$emit('update:modelValue', $event?.target?.value)"
-      >
       <Icon
         class="absolute text-primary left-4 top-3"
         :class="{
@@ -26,6 +13,25 @@
         }"
         :name="icon"
       />
+      <input
+        :id="label"
+        :v-model="modelValue"
+        :class="{
+          'border !border-red-500 rounded-b-none': validation?.$error,
+          'border !border-green-400 ': !validation?.$invalid,
+        }"
+        class="p-2 pl-10 bg-white border rounded-md border-primary focus:outline-none"
+        :type="fieldType"
+        autocomplete="chrome-off"
+        @change="validation?.$touch"
+        @input="$emit('update:modelValue', $event?.target?.value)"
+      >
+      <button v-if="label === 'Password'" @click.prevent="fieldType = fieldType === 'password' ? 'text' : 'password'">
+        <Icon
+          class="absolute text-primary right-4 top-3"
+          :name="fieldType === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'"
+        />
+      </button>
     </div>
     <div
       v-if="validation.$error"
@@ -47,6 +53,8 @@ const props = defineProps({
   validation: String,
   icon: String,
 });
+
+const fieldType = ref(props.label.toLowerCase())
 
 defineEmits(['update:modelValue']);
 </script>

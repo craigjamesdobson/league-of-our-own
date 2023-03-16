@@ -31,6 +31,11 @@ export const useDraftedTeamsStore = defineStore({
   },
 
   getters: {
-    getDraftedTeams: state => state.draftedTeams
+    getDraftedTeams: state => state.draftedTeams,
+    getDraftedTeamsWithTransfers: state => state.draftedTeams.filter(x => x.allowedTransfers),
+    getDraftedTeamByID: (state) => {
+      return (draftedTeamID: number) =>
+        state.draftedTeams.filter(draftedTeam => draftedTeam.teamID === +draftedTeamID)[0];
+    },
   }
 });

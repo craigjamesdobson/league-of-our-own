@@ -1,8 +1,4 @@
-<script setup lang="ts">
-import { useDraftedTeamsStore } from '~~/stores/draftedTeams';
-const draftedTeamsStore = useDraftedTeamsStore();
-draftedTeamsStore.fetchDraftedTeams();
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div>

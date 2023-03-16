@@ -1,9 +1,12 @@
 <script setup>
-import { usePlayersStore } from '~/stores/players';
+import { usePlayersStore } from '@/stores/players';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const playerStore = usePlayersStore();
-
 await playerStore.getPlayerSettings();
+
+const draftedTeamsStore = useDraftedTeamsStore();
+await draftedTeamsStore.fetchDraftedTeams();
 </script>
 
 <template>

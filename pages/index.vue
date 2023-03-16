@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template lang="">
   <div
     class="flex items-center justify-center h-full text-primary font-display"

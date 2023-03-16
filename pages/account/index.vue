@@ -7,8 +7,13 @@ const {
   updatePlayerData, 
   updateTeamData, 
   formData, 
-  accountStore 
+  accountStore,
+  draftedTeamsStore
 } = useAccount();
+
+const selectedTeamID = ref(0);
+
+const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+selectedTeamID.value));
 </script>
 
 <template>
@@ -49,22 +54,48 @@ const {
           </button>
         </div>
         <div class="flex flex-col items-start gap-4">
-          <textarea
-            id=""
-            v-model="teamData"
-            class="p-2 text-sm rounded-md"
-            name="team-data"
-            cols="75"
-            rows="20"
-            placeholder="Paste team data here..."
-          />
-          <button
-            :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex p-2 text-white bg-primary"
-            @click="updateTeamData"
+          <select
+            id="drafted-teams"
+            v-model="selectedTeamID"
+            name="drafted-teams"
+            class="p-2"
           >
-            Update Teams
-          </button>
+            <option
+              disabled
+              value="0"
+            >
+              Select a team to edit
+            </option>
+            <option
+              v-for="draftedTeam in draftedTeamsStore.getDraftedTeamsWithTransfers"
+              :key="draftedTeam.teamID"
+              :value="draftedTeam.teamID"
+              class="uppercase"
+            >
+              {{ draftedTeam.teamName }}
+            </option>
+          </select>
+          <DraftedTeam
+            v-if="activeDraftedTeam"
+            :drafted-team="activeDraftedTeam"
+          >
+            <textarea
+              id=""
+              v-model="teamData"
+              class="p-2 text-sm rounded-md"
+              name="team-data"
+              cols="75"
+              rows="20"
+              placeholder="Paste team data here..."
+            />
+            <button
+              :class="{ 'pointer-events-none opacity-25': loading }"
+              class="flex p-2 text-white bg-primary"
+              @click="updateTeamData"
+            >
+              Update Teams
+            </button>
+          </draftedteam>
         </div>
       </div>
       <div class="update-log" />

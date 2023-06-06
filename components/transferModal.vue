@@ -8,7 +8,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 <template lang="">
   <div>
     <div
-      class="flex items-center justify-center modal"
+      class="flex items-center justify-center modal -active"
       :class="{ '-active': modalVisible }"
       @click.self="toggleModal(false)"
     >

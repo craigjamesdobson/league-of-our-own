@@ -34,7 +34,16 @@ const useFilters = () => {
     setFilteredPlayers();
   };
 
-  return { filterData, playerStore, selectfilteredTeam, setFilteredPlayers };
+  const resetFilteredTeams = () => {
+    document
+      .querySelectorAll('.icon-container')
+      .forEach(e => e.classList.remove('active'));
+
+    filterData.filterTeam = undefined;
+    setFilteredPlayers();
+  };
+
+  return { filterData, playerStore, selectfilteredTeam, resetFilteredTeams, setFilteredPlayers };
 };
 
 export { useFilters };

@@ -20,7 +20,7 @@ const routes = reactive([
 
 <template>
   <nav
-    class="sticky top-0 flex flex-col items-center justify-between h-screen p-4 bg-primary"
+    class="fixed bottom-0 z-10 flex items-center justify-between w-full p-4 xl:flex-col xl:sticky xl:top-0 xl:h-screen xl:w-auto bg-primary"
   >
     <!-- SideNavBar -->
 
@@ -34,7 +34,7 @@ const routes = reactive([
     </div>
 
     <div>
-      <ul class="flex flex-col">
+      <ul class="flex gap-4 xl:flex-col">
         <!-- Links -->
         <li
           v-for="route in routes"
@@ -42,7 +42,7 @@ const routes = reactive([
         >
           <nuxt-link
             :to="route.path"
-            class="flex flex-col items-center justify-center w-10 h-10 mb-8 text-base transition duration-300 ease-in-out border rounded-md text-offWhite border-offWhite hover:bg-offWhite hover:text-primary"
+            class="flex flex-col items-center justify-center w-10 h-10 text-base transition duration-300 ease-in-out border rounded-xl xl:mb-8 text-offWhite border-offWhite hover:bg-offWhite hover:text-primary"
           >
             <Icon
               size="24"

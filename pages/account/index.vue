@@ -6,17 +6,24 @@ const {
   v$, 
   updatePlayerData, 
   updateTeamData, 
-  formData, 
+  formData,
+  loading,
   accountStore,
-  draftedTeamsStore
+  draftedTeamsStore,
+  playerData
 } = useAccount();
 
 const selectedTeamID = ref(0);
 
 const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+selectedTeamID.value));
+
+const createRawTeamData = () => console.log(activeDraftedTeam.value.teamPlayers?.map(x => x.id));
+
+const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x.id));
 </script>
 
 <template>
+  <TransferModal />
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="flex items-center main-heading">
       <span>Admin Login</span>
@@ -34,8 +41,8 @@ const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+s
       <p class="m-4 text-center underline">
         Hello {{ userData.email }}
       </p>
-      <div class="flex gap-4">
-        <div class="flex flex-col items-start gap-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col gap-4">
           <textarea
             id=""
             v-model="playerData"
@@ -58,7 +65,7 @@ const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+s
             id="drafted-teams"
             v-model="selectedTeamID"
             name="drafted-teams"
-            class="p-2"
+            class="w-full p-2 m-2"
           >
             <option
               disabled
@@ -75,27 +82,22 @@ const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+s
               {{ draftedTeam.teamName }}
             </option>
           </select>
-          <DraftedTeam
+          <div
             v-if="activeDraftedTeam"
-            :drafted-team="activeDraftedTeam"
+            class="w-full"
           >
-            <textarea
-              id=""
-              v-model="teamData"
-              class="p-2 text-sm rounded-md"
-              name="team-data"
-              cols="75"
-              rows="20"
-              placeholder="Paste team data here..."
+            <DraftedTeam
+              :drafted-team="activeDraftedTeam"
+              class="w-full"
             />
             <button
               :class="{ 'pointer-events-none opacity-25': loading }"
-              class="flex p-2 text-white bg-primary"
-              @click="updateTeamData"
+              class="flex w-full p-2 m-2 text-white bg-primary"
+              @click="createRawTeamData"
             >
               Update Teams
             </button>
-          </draftedteam>
+          </div>
         </div>
       </div>
       <div class="update-log" />

@@ -2,8 +2,13 @@
 import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/DraftedTeamData';
 
 const props = defineProps({
-  draftedTeam: Object as PropType<DraftedTeamData>,
+  draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
+  isEditable: { type: Boolean, default: false }
 });
+
+const createRawTeamData = () => {
+  console.log(props.draftedTeam);
+};
 </script>
 
 <template>
@@ -38,10 +43,16 @@ const props = defineProps({
       <DraftedPlayer
         v-if="!player.transfers.length"
         :drafted-player="player"
+        :model-value="player.id"
+        :is-editable="props.isEditable"
+        @update:model-value="newValue => player.id = newValue"
       />
       <DraftedPlayer
-        v-else
+        v-else-if="player.transfers.at(-1) !== null"
         :drafted-player="player.transfers.at(-1)"
+        :is-editable="props.isEditable"
+        :model-value="player.transfers.at(-1)?.id"
+        @update:model-value="newValue => player.transfers.at(-1).id = newValue"
       />
     </div>
     <div class="flex justify-between pt-2">

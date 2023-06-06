@@ -4,15 +4,17 @@
 <template lang="">
   <div class="players-container">
     <Players />
-    <div>
-      <Filters />
-    </div>
+    <Filters />
   </div>
 </template>
 
-<style lang="css">
+<style lang="scss">
+
 .players-container {
-  @apply grid gap-4;
-  grid-template-columns: 0.75fr 0.25fr;
+  @apply grid gap-4 grid-cols-1;
+  
+  @media (min-width: 1280px) { 
+    grid-template-columns: 0.7fr 0.3fr;
+  }
 }
 </style>

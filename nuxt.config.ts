@@ -26,5 +26,14 @@ export default defineNuxtConfig({
     }
   },
   ssr: false,
-  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-icon', '@nuxtjs/fontaine']
+  modules: ['@vueuse/nuxt', '@nuxtjs/tailwindcss', '@pinia/nuxt', 'nuxt-icon', '@nuxtjs/fontaine'],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "@/assets/components/layout.scss" as *;',
+        },
+      },
+    },
+  },
 });

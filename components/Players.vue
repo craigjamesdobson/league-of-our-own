@@ -1,10 +1,10 @@
 <script setup>
-import { usePlayersStore } from '@/stores/players'
-import { loadPlayerFallbackImage } from '@/composables/helpers'
-import { usePlayerModal } from '~~/modules/players/modal'
+import { usePlayersStore } from '@/stores/players';
+import { loadPlayerFallbackImage } from '@/composables/helpers';
+import { usePlayerModal } from '~~/modules/players/modal';
 
-const { toggleModal } = usePlayerModal()
-const playerStore = usePlayersStore()
+const { toggleModal } = usePlayerModal();
+const playerStore = usePlayersStore();
 </script>
 
 <template>
@@ -24,14 +24,14 @@ const playerStore = usePlayersStore()
         class="flex justify-between mb-4 rounded-sm"
       >
         <div class="w-full border-r border-gray-100">
-          <div class="grid grid-cols-2 gap-1">
+          <div class="grid grid-cols-1 gap-1 md:grid-cols-2">
             <div
               v-for="player in playerTypes"
               :key="player.id"
-              class="relative bg-white flex flex-col items-center justify-around w-full text-sm border-b border-gray-100 cursor-pointer"
+              class="relative flex flex-col items-center justify-around w-full text-sm bg-white border-b border-gray-100 cursor-pointer"
               @click="toggleModal(true, player.id)"
             >
-              <div class="flex w-full items-center">
+              <div class="flex items-center w-full">
                 <span class="w-1/12 p-2">{{ player.id }}</span>
                 <span class="w-1/12 p-2">
                   <img
@@ -46,7 +46,7 @@ const playerStore = usePlayersStore()
                 <span class="w-2/12 p-2 text-center">{{ player.price }}</span>
                 <span
                   v-if="player.unavailableForSeason"
-                  class="flex items-center w-1/12 p-2 justify-end"
+                  class="flex items-center justify-end w-1/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span
@@ -55,7 +55,7 @@ const playerStore = usePlayersStore()
                 </span>
                 <span
                   v-if="player.isUnavailable && !player.unavailableForSeason"
-                  class="flex items-center w-1/12 p-2 justify-end"
+                  class="flex items-center justify-end w-1/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span
@@ -64,7 +64,7 @@ const playerStore = usePlayersStore()
                 </span>
                 <span
                   v-else-if="!player.isUnavailable"
-                  class="flex items-center w-1/12 p-2 justify-end"
+                  class="flex items-center justify-end w-1/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span

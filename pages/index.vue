@@ -11,7 +11,7 @@
         />
       </div>
       <h1
-        class="text-[72px] uppercase tracking-wider font-black border-b mb-6 border-primary"
+        class="text-4xl md:text-[72px] md:leading-[72px] uppercase tracking-wider font-black border-b mb-6 border-primary"
       >
         League of our own
       </h1>

@@ -59,8 +59,10 @@ const useAccount = () => {
         v$,
         updatePlayerData,
         updateTeamData,
+        playerData,
         formData,
         accountStore,
+        loading,
         draftedTeamsStore
     };
 };

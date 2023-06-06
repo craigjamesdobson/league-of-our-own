@@ -1,6 +1,10 @@
 .filter-container {
-  @apply self-start sticky;
-  top: 20px;
+  @apply fixed bottom-20 bg-white left-0 right-0 p-4 border-t border-primary;
+
+  @media (min-width: 1280px) { 
+    @apply self-start sticky bg-transparent p-0 border-t-0;
+    top: 20px;
+  }
 }
 
 .icon-container {

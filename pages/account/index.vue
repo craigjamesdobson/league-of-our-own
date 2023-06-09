@@ -23,7 +23,7 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
 </script>
 
 <template>
-  <TransferModal />
+  <!-- <TransferModal /> -->
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="flex items-center main-heading">
       <span>Admin Login</span>
@@ -41,7 +41,7 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
       <p class="m-4 text-center underline">
         Hello {{ userData.email }}
       </p>
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
           <textarea
             id=""

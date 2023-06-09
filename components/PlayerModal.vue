@@ -36,7 +36,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.teamNameShort?.toLowerCase())"
           >
-          <div class="flex flex-row justify-between items-top">
+          <div class="flex flex-row justify-between gap-4 items-top">
             <div class="w-24">
               <img
                 class="rounded-full"
@@ -55,7 +55,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
             </h4>
           </div>
           <div class="mt-6 rounded-lg inner">
-            <div class="flex items-end justify-between">
+            <div class="flex flex-col items-start justify-between gap-4 xl:items-end xl:flex-row">
               <div
                 v-if="selectedPlayer.news"
                 class="flex items-center flex-grow w-3/4 mr-4"
@@ -76,7 +76,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                   {{ selectedPlayer.news }}
                 </p>
               </div>
-              <div class="flex flex-col items-end w-1/4 ml-auto text-sm">
+              <div class="flex flex-col items-end w-full text-sm xl:w-1/4 xl:ml-auto">
                 <h4
                   class="flex justify-end w-full pb-1 mb-1 uppercase border-b border-black"
                 >

@@ -1,5 +1,5 @@
 .filter-container {
-  @apply fixed bottom-20 bg-white left-0 right-0 p-4 border-t border-primary;
+  @apply fixed bottom-20 bg-white left-0 right-0 border-t border-primary;
 
   @media (min-width: 1280px) { 
     @apply self-start sticky bg-transparent p-0 border-t-0;

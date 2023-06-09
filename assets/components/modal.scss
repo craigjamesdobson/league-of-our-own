@@ -22,8 +22,11 @@
   }
 
   &__inner {
-    @apply bg-white rounded-xl p-8 shadow-2xl relative overflow-hidden z-10;
-    width: 36rem;
+    @apply bg-white rounded-xl p-8 shadow-2xl relative overflow-hidden z-10 w-auto;
+
+    @media (min-width: 1280px) { 
+      @apply w-[36rem]
+    }
   }
 
   &__badge {

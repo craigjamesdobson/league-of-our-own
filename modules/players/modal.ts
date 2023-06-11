@@ -12,6 +12,7 @@ const usePlayerModal = () => {
       router.push({ path: 'players', query: { id: playerID } });
       playerStore.setSelectedPlayer(playerID);
       modalVisible.value = true;
+      document.body.classList.add('overflow-hidden');
     } else {
       modalVisible.value = false;
       router.push({ path: 'players' });

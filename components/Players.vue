@@ -1,7 +1,7 @@
 <script setup>
 import { usePlayersStore } from '@/stores/players';
 import { loadPlayerFallbackImage } from '@/composables/helpers';
-import { usePlayerModal } from '~~/modules/players/modal';
+import { usePlayerModal } from '/modules/players/modal';
 
 const { toggleModal } = usePlayerModal();
 const playerStore = usePlayersStore();

@@ -1,7 +1,7 @@
 import { TEAM_DATA } from '../teams/constants';
 import { IMAGE_CDN } from './constants';
 import type { RawPlayerData } from './interaces/RawPlayerData';
-import type { Player } from '~~/modules/players/interaces/Player';
+import type { Player } from '../../modules/players/interaces/Player';
 
 const getPlayerCost = (now: number, change: number): string => {
   return ((now + change) / 10).toFixed(1);

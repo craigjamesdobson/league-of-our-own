@@ -5,15 +5,15 @@ import {
   draftedTeamsCollection,
   playersCollection,
   settingsCollection
-} from '@/firebase/useDB';
-import type { Player } from '~~/modules/players/interaces/Player';
-import { PlayerPosition } from '~~/modules/players/interaces/PlayerPosition';
-import { createPlayerData } from '~~/modules/players';
+} from './../firebase/useDB';
+import type { Player } from '../modules/players/interaces/Player';
+import { PlayerPosition } from '../modules/players/interaces/PlayerPosition';
+import { createPlayerData } from '../modules/players';
 import {
   localStorageGet,
   localStorageHas,
   localStorageSet
-} from '@/composables/localStorage';
+} from '../composables/localStorage';
 
 interface FilterData {
   filterName: string

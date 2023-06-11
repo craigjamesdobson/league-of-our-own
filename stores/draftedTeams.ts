@@ -2,9 +2,9 @@
 import { getDocs } from 'firebase/firestore';
 import { defineStore } from 'pinia';
 import { usePlayersStore } from './players';
-import { draftedTeamsCollection } from '~~/firebase/useDB';
-import { initDraftedTeamData } from '~~/modules/drafted-teams';
-import { DraftedTeamData } from '~~/modules/drafted-teams/interfaces/DraftedTeamData';
+import { draftedTeamsCollection } from '../firebase/useDB';
+import { initDraftedTeamData } from '../modules/drafted-teams';
+import { DraftedTeamData } from '../modules/drafted-teams/interfaces/DraftedTeamData';
 
 export const useDraftedTeamsStore = defineStore({
   id: 'drafted-teams-store',

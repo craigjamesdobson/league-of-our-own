@@ -8,8 +8,8 @@ import {
   collection,
   getFirestore
 } from 'firebase/firestore';
-import type { RawDraftedTeamData } from '@/modules/drafted-teams/interfaces/RawDraftedTeamData';
-import type { RawPlayerData } from '~~/modules/players/interaces/RawPlayerData';
+import type { RawDraftedTeamData } from '../modules/drafted-teams/interfaces/RawDraftedTeamData';
+import type { RawPlayerData } from '../modules/players/interaces/RawPlayerData';
 
 // Import all your model types
 

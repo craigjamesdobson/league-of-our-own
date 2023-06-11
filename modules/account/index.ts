@@ -1,8 +1,8 @@
-import { usePlayersStore } from '~/stores/players';
+import { usePlayersStore } from '../../stores/players';
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength, helpers } from '@vuelidate/validators';
-import { useAccountStore } from '@/stores/account';
-import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import { useAccountStore } from '../../stores/account';
+import { useDraftedTeamsStore } from '../../stores/draftedTeams';
 
 const useAccount = () => {
     

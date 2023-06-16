@@ -1,7 +1,7 @@
 <script setup>
+import { usePlayerModal } from '@/modules/players/modal';
 import { usePlayersStore } from '@/stores/players';
 import { loadPlayerFallbackImage } from '@/composables/helpers';
-import { usePlayerModal } from '/modules/players/modal';
 
 const { toggleModal } = usePlayerModal();
 const playerStore = usePlayersStore();
@@ -39,7 +39,7 @@ const playerStore = usePlayersStore();
                     :src="player.image"
                     :alt="player.webName"
                     @error="loadPlayerFallbackImage"
-                  >
+                  />
                 </span>
                 <span class="w-2/12 p-2">{{ player.teamNameShort }}</span>
                 <span class="w-6/12 p-2 text-center">{{ player.webName }}</span>

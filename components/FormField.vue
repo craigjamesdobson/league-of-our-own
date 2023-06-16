@@ -1,9 +1,6 @@
 <template>
   <div class="relative flex flex-col mb-2">
-    <label
-      class="mb-2 text-xs"
-      :for="label"
-    >{{ label }}</label>
+    <label class="mb-2 text-xs" :for="label">{{ label }}</label>
     <div class="relative flex flex-col">
       <Icon
         class="absolute text-primary left-4 top-3"
@@ -25,14 +22,18 @@
         autocomplete="chrome-off"
         @change="validation?.$touch"
         @input="$emit('update:modelValue', $event?.target?.value)"
-      >
+      />
       <button
         v-if="label === 'Password'"
-        @click.prevent="fieldType = fieldType === 'password' ? 'text' : 'password'"
+        @click.prevent="
+          fieldType = fieldType === 'password' ? 'text' : 'password'
+        "
       >
         <Icon
           class="absolute text-primary right-4 top-3"
-          :name="fieldType === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'"
+          :name="
+            fieldType === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'
+          "
         />
       </button>
     </div>
@@ -44,17 +45,30 @@
         v-for="error in validation.$errors"
         :key="error.$uid"
         class="text-xs text-white"
-      >{{ error.$message }}</span>
+        >{{ error.$message }}</span
+      >
     </div>
   </div>
 </template>
 
 <script setup>
 const props = defineProps({
-  label: String,
-  modelValue: String,
-  validation: Object,
-  icon: String,
+  label: {
+    type: String,
+    default: '',
+  },
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  validation: {
+    type: Object,
+    default: () => {},
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
 });
 
 const fieldType = ref(props.label.toLowerCase());
@@ -62,6 +76,4 @@ const fieldType = ref(props.label.toLowerCase());
 defineEmits(['update:modelValue']);
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

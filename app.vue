@@ -19,5 +19,5 @@ await draftedTeamsStore.fetchDraftedTeams();
 </template>
 
 <style lang="scss">
-@import "@/assets/components/layout";
+@import '@/assets/components/layout';
 </style>

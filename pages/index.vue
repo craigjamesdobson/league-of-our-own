@@ -3,12 +3,10 @@
     class="flex items-center justify-center h-full text-primary font-display"
   >
     <div class="flex flex-col p-10 text-center bg-white rounded-sm">
-      <div class="flex self-center p-4 rounded-full justify-items-center bg-primary">
-        <Icon
-          class="text-offWhite"
-          size="64"
-          name="carbon:soccer"
-        />
+      <div
+        class="flex self-center p-4 rounded-full justify-items-center bg-primary"
+      >
+        <Icon class="text-offWhite" size="64" name="carbon:soccer" />
       </div>
       <h1
         class="text-4xl md:text-[72px] md:leading-[72px] uppercase tracking-wider font-black border-b mb-6 border-primary"

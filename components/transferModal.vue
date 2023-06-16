@@ -12,10 +12,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
       :class="{ '-active': modalVisible }"
       @click.self="toggleModal(false)"
     >
-      <div
-        v-if="selectedPlayer"
-        class="px-4 modal__content"
-      >
+      <div v-if="selectedPlayer" class="px-4 modal__content">
         <div class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer">
           <Icon
             name="system-uicons:cross-circle"
@@ -27,15 +24,15 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
           class="modal__inner"
           :class="{
             'border-4 border-yellow-300':
-              !selectedPlayer.unavailableForSeason
-              && selectedPlayer.isUnavailable,
+              !selectedPlayer.unavailableForSeason &&
+              selectedPlayer.isUnavailable,
             'border-4 border-red-500': selectedPlayer.unavailableForSeason,
           }"
         >
           <img
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.teamNameShort?.toLowerCase())"
-          >
+          />
           <div class="flex flex-row justify-between items-top">
             <div class="w-24">
               <img
@@ -43,7 +40,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                 :src="selectedPlayer.imageLarge"
                 :alt="selectedPlayer.name"
                 @error="loadPlayerFallbackImage"
-              >
+              />
             </div>
             <h4
               class="flex flex-col items-end text-4xl leading-none text-right uppercase"
@@ -66,8 +63,8 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                     class="text-white bg-green-500 rounded-full"
                     :class="{
                       'bg-yellow-500':
-                        !selectedPlayer.unavailableForSeason
-                        && selectedPlayer.isUnavailable,
+                        !selectedPlayer.unavailableForSeason &&
+                        selectedPlayer.isUnavailable,
                       'bg-red-500': selectedPlayer.unavailableForSeason,
                     }"
                   />
@@ -105,8 +102,8 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                   </li>
                   <li
                     v-if="
-                      selectedPlayer.position === 1
-                        || selectedPlayer.position === 2
+                      selectedPlayer.position === 1 ||
+                      selectedPlayer.position === 2
                     "
                     class="flex justify-between w-full"
                   >
@@ -140,5 +137,5 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 </template>
 
 <style lang="scss" scoped>
-@import "@/assets/components/modal";
+@import '@/assets/components/modal';
 </style>

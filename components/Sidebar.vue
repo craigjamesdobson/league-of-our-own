@@ -26,28 +26,18 @@ const routes = reactive([
 
     <div class="flex items-center rounded-full">
       <!-- Header -->
-      <Icon
-        class="text-offWhite"
-        size="48"
-        name="carbon:soccer"
-      />
+      <Icon class="text-offWhite" size="48" name="carbon:soccer" />
     </div>
 
     <div>
       <ul class="flex gap-4 xl:flex-col">
         <!-- Links -->
-        <li
-          v-for="route in routes"
-          :key="route.title"
-        >
+        <li v-for="route in routes" :key="route.title">
           <nuxt-link
             :to="route.path"
             class="flex flex-col items-center justify-center w-10 h-10 text-base transition duration-300 ease-in-out border rounded-xl xl:mb-8 text-offWhite border-offWhite hover:bg-offWhite hover:text-primary"
           >
-            <Icon
-              size="24"
-              :name="route.icon"
-            />
+            <Icon size="24" :name="route.icon" />
             <span class="hidden ml-4 capitalize">{{ route.name }}</span>
           </nuxt-link>
         </li>

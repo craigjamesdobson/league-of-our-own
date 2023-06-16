@@ -1,8 +1,11 @@
-import type { Player } from '../players/interaces/Player';
-import type { DraftedTeamData, CompleteDraftedPlayer } from './interfaces/DraftedTeamData';
+import type { Player } from '../players/interfaces/Player';
+import type {
+  DraftedTeamData,
+  CompleteDraftedPlayer,
+} from './interfaces/DraftedTeamData';
 import type {
   RawDraftedPlayerData,
-  RawDraftedTeamData
+  RawDraftedTeamData,
 } from '@/modules/drafted-teams/interfaces/RawDraftedTeamData';
 
 const setDraftedPlayersData = (
@@ -12,16 +15,17 @@ const setDraftedPlayersData = (
   return rawDraftedPlayerData.map((rawDraftedPlayer) => {
     return {
       ...playerList.filter(
-        player => player.id === rawDraftedPlayer.player_id
+        (player) => player.id === rawDraftedPlayer.player_id
       )[0],
       transfers: rawDraftedPlayer.transfers.map((rawTransferData) => {
         return {
-          ...playerList.filter(p => p.id === rawTransferData.transfer_id)[0],
+          ...playerList.filter((p) => p.id === rawTransferData.transfer_id)[0],
           isCurrentWeekTransfer:
-            new Date(rawTransferData.current_transfer_expiry_date) >= new Date(),
-          transferWeek: rawTransferData.transfer_week
+            new Date(rawTransferData.current_transfer_expiry_date) >=
+            new Date(),
+          transferWeek: rawTransferData.transfer_week,
         };
-      })
+      }),
     };
   });
 };
@@ -29,7 +33,7 @@ const setDraftedPlayersData = (
 const setTotalTeamPrice = (draftedTeamData: DraftedTeamData[]) => {
   draftedTeamData.forEach((draftedTeam) => {
     draftedTeam.totalTeamValue = draftedTeam.teamPlayers
-      .map(draftedPlayer => +draftedPlayer.price)
+      .map((draftedPlayer) => +draftedPlayer.price)
       .reduce((prev, next) => prev + next);
   });
 };
@@ -37,11 +41,9 @@ const setTotalTeamPrice = (draftedTeamData: DraftedTeamData[]) => {
 const setTeamValidity = (draftedTeamData: DraftedTeamData[]) => {
   draftedTeamData.forEach((draftedTeam) => {
     if (draftedTeam.allowedTransfers) {
-      draftedTeam.isInvalidTeam =
-        draftedTeam.totalTeamValue > 85;
+      draftedTeam.isInvalidTeam = draftedTeam.totalTeamValue > 85;
     } else {
-      draftedTeam.isInvalidTeam =
-        draftedTeam.totalTeamValue > 95;
+      draftedTeam.isInvalidTeam = draftedTeam.totalTeamValue > 95;
     }
   });
 };
@@ -70,7 +72,7 @@ const initDraftedTeamData = (
         totalGoals: undefined,
         totalAssists: undefined,
         totalRedCards: undefined,
-        totalCleanSheets: undefined
+        totalCleanSheets: undefined,
       };
     }
   );

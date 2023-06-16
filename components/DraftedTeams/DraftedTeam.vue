@@ -3,12 +3,8 @@ import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/Drafted
 
 const props = defineProps({
   draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
-  isEditable: { type: Boolean, default: false }
+  isEditable: { type: Boolean, default: false },
 });
-
-const createRawTeamData = () => {
-  console.log(props.draftedTeam);
-};
 </script>
 
 <template>
@@ -23,10 +19,7 @@ const createRawTeamData = () => {
         }}</span>
       </div>
       <span v-if="props.draftedTeam?.allowedTransfers">
-        <Icon
-          size="24"
-          name="ic:round-swap-horiz"
-        />
+        <Icon size="24" name="ic:round-swap-horiz" />
       </span>
     </div>
     <div
@@ -35,8 +28,8 @@ const createRawTeamData = () => {
       class="relative text-sm"
       :class="{
         'bg-yellow-200':
-          player.transfers.length
-          && !player.transfers.at(-1)?.isCurrentWeekTransfer,
+          player.transfers.length &&
+          !player.transfers.at(-1)?.isCurrentWeekTransfer,
         'bg-green-200': player.transfers.at(-1)?.isCurrentWeekTransfer,
       }"
     >
@@ -45,14 +38,16 @@ const createRawTeamData = () => {
         :drafted-player="player"
         :model-value="player.id"
         :is-editable="props.isEditable"
-        @update:model-value="newValue => player.id = newValue"
+        @update:model-value="(newValue) => (player.id = newValue)"
       />
       <DraftedPlayer
         v-else-if="player.transfers.at(-1) !== null"
         :drafted-player="player.transfers.at(-1)"
         :is-editable="props.isEditable"
         :model-value="player.transfers.at(-1)?.id"
-        @update:model-value="newValue => player.transfers.at(-1).id = newValue"
+        @update:model-value="
+          (newValue) => (player.transfers.at(-1).id = newValue)
+        "
       />
     </div>
     <div class="flex justify-between pt-2">

@@ -20,7 +20,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1210,
     strength_defence_home: 1190,
     strength_defence_away: 1220,
-    pulse_id: 1
+    pulse_id: 1,
   },
   {
     code: 7,
@@ -43,7 +43,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1110,
     strength_defence_home: 1090,
     strength_defence_away: 1090,
-    pulse_id: 2
+    pulse_id: 2,
   },
   {
     code: 91,
@@ -66,7 +66,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1130,
     strength_defence_home: 1060,
     strength_defence_away: 1100,
-    pulse_id: 127
+    pulse_id: 127,
   },
   {
     code: 94,
@@ -89,7 +89,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1150,
     strength_defence_home: 1080,
     strength_defence_away: 1120,
-    pulse_id: 130
+    pulse_id: 130,
   },
   {
     code: 36,
@@ -112,7 +112,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1160,
     strength_defence_home: 1100,
     strength_defence_away: 1120,
-    pulse_id: 131
+    pulse_id: 131,
   },
   {
     code: 8,
@@ -135,7 +135,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1300,
     strength_defence_home: 1250,
     strength_defence_away: 1290,
-    pulse_id: 4
+    pulse_id: 4,
   },
   {
     code: 31,
@@ -158,7 +158,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1160,
     strength_defence_home: 1080,
     strength_defence_away: 1160,
-    pulse_id: 6
+    pulse_id: 6,
   },
   {
     code: 11,
@@ -181,7 +181,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1090,
     strength_defence_home: 1110,
     strength_defence_away: 1110,
-    pulse_id: 7
+    pulse_id: 7,
   },
   {
     code: 54,
@@ -204,7 +204,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1040,
     strength_defence_home: 1120,
     strength_defence_away: 1070,
-    pulse_id: 34
+    pulse_id: 34,
   },
   {
     code: 13,
@@ -227,7 +227,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1080,
     strength_defence_home: 1150,
     strength_defence_away: 1160,
-    pulse_id: 26
+    pulse_id: 26,
   },
   {
     code: 2,
@@ -250,7 +250,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1070,
     strength_defence_home: 1100,
     strength_defence_away: 1100,
-    pulse_id: 9
+    pulse_id: 9,
   },
   {
     code: 14,
@@ -273,7 +273,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1350,
     strength_defence_home: 1340,
     strength_defence_away: 1350,
-    pulse_id: 10
+    pulse_id: 10,
   },
   {
     code: 43,
@@ -296,7 +296,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1360,
     strength_defence_home: 1340,
     strength_defence_away: 1360,
-    pulse_id: 11
+    pulse_id: 11,
   },
   {
     code: 1,
@@ -319,7 +319,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1190,
     strength_defence_home: 1190,
     strength_defence_away: 1200,
-    pulse_id: 12
+    pulse_id: 12,
   },
   {
     code: 4,
@@ -342,7 +342,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1030,
     strength_defence_home: 1040,
     strength_defence_away: 1070,
-    pulse_id: 23
+    pulse_id: 23,
   },
   {
     code: 17,
@@ -350,7 +350,7 @@ export const TEAM_DATA = [
     form: null,
     id: 16,
     loss: 0,
-    name: 'Nott\'m Forest',
+    name: "Nott'm Forest",
     played: 0,
     points: 0,
     position: 0,
@@ -365,7 +365,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1040,
     strength_defence_home: 1040,
     strength_defence_away: 1030,
-    pulse_id: 15
+    pulse_id: 15,
   },
   {
     code: 20,
@@ -388,7 +388,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1140,
     strength_defence_home: 1120,
     strength_defence_away: 1090,
-    pulse_id: 20
+    pulse_id: 20,
   },
   {
     code: 6,
@@ -411,7 +411,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1200,
     strength_defence_home: 1210,
     strength_defence_away: 1210,
-    pulse_id: 21
+    pulse_id: 21,
   },
   {
     code: 21,
@@ -434,7 +434,7 @@ export const TEAM_DATA = [
     strength_attack_away: 1150,
     strength_defence_home: 1160,
     strength_defence_away: 1180,
-    pulse_id: 25
+    pulse_id: 25,
   },
   {
     code: 39,
@@ -457,6 +457,6 @@ export const TEAM_DATA = [
     strength_attack_away: 1160,
     strength_defence_home: 1080,
     strength_defence_away: 1100,
-    pulse_id: 38
-  }
+    pulse_id: 38,
+  },
 ];

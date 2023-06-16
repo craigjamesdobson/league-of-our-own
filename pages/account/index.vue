@@ -1,25 +1,25 @@
 <script setup>
 import { useAccount } from '@/modules/account/';
 
-const { 
-  userData, 
-  v$, 
-  updatePlayerData, 
-  updateTeamData, 
+const {
+  userData,
+  v$,
+  updatePlayerData,
   formData,
   loading,
   accountStore,
   draftedTeamsStore,
-  playerData
+  playerData,
 } = useAccount();
 
 const selectedTeamID = ref(0);
 
-const activeDraftedTeam = computed(() => draftedTeamsStore.getDraftedTeamByID(+selectedTeamID.value));
+const activeDraftedTeam = computed(() =>
+  draftedTeamsStore.getDraftedTeamByID(+selectedTeamID.value)
+);
 
-const createRawTeamData = () => console.log(activeDraftedTeam.value.teamPlayers?.map(x => x.id));
-
-const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x.id));
+const createRawTeamData = () =>
+  console.log(activeDraftedTeam.value.teamPlayers?.map((x) => x.id));
 </script>
 
 <template>
@@ -27,20 +27,12 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="flex items-center main-heading">
       <span>Admin Login</span>
-      <button
-        title="Sign out"
-        @click.prevent="accountStore.signOutUser"
-      >
-        <Icon
-          class="ml-2"
-          name="la:sign-out-alt"
-        />
+      <button title="Sign out" @click.prevent="accountStore.signOutUser">
+        <Icon class="ml-2" name="la:sign-out-alt" />
       </button>
     </h1>
     <div v-if="userData.isSignedIn">
-      <p class="m-4 text-center underline">
-        Hello {{ userData.email }}
-      </p>
+      <p class="m-4 text-center underline">Hello {{ userData.email }}</p>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
           <textarea
@@ -67,12 +59,7 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
             name="drafted-teams"
             class="w-full p-2 m-2"
           >
-            <option
-              disabled
-              value="0"
-            >
-              Select a team to edit
-            </option>
+            <option disabled value="0">Select a team to edit</option>
             <option
               v-for="draftedTeam in draftedTeamsStore.getDraftedTeamsWithTransfers"
               :key="draftedTeam.teamID"
@@ -82,14 +69,8 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
               {{ draftedTeam.teamName }}
             </option>
           </select>
-          <div
-            v-if="activeDraftedTeam"
-            class="w-full"
-          >
-            <DraftedTeam
-              :drafted-team="activeDraftedTeam"
-              class="w-full"
-            />
+          <div v-if="activeDraftedTeam" class="w-full">
+            <DraftedTeam :drafted-team="activeDraftedTeam" class="w-full" />
             <button
               :class="{ 'pointer-events-none opacity-25': loading }"
               class="flex w-full p-2 m-2 text-white bg-primary"
@@ -106,10 +87,7 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
       v-else
       class="flex flex-col justify-center p-10 mb-4 bg-white rounded-md w-96"
     >
-      <form
-        class="flex flex-col gap-6"
-        action=""
-      >
+      <form class="flex flex-col gap-6" action="">
         <FormField
           v-model="formData.email"
           label="Email"
@@ -124,9 +102,7 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
         />
         <button
           class="px-1 py-2 text-white rounded-md bg-primary"
-          :class="{'opacity-50'
-            :v$.$invalid
-          }"
+          :class="{ 'opacity-50': v$.$invalid }"
           :disabled="v$.$invalid"
           @click.prevent="accountStore.signInUser(formData)"
         >
@@ -145,6 +121,6 @@ const playerIDs = computed(() => activeDraftedTeam.value.teamPlayers?.map(x => x
 
 <style lang="scss" scoped>
 input {
-  @apply focus:outline-none
+  @apply focus:outline-none;
 }
 </style>

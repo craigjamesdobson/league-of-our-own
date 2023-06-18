@@ -1,11 +1,13 @@
 <script setup>
 import { useAccount } from '@/modules/account/';
 
+definePageMeta({
+  middleware: ['auth'],
+});
+
 const {
   userData,
-  v$,
   updatePlayerData,
-  formData,
   loading,
   accountStore,
   draftedTeamsStore,
@@ -82,39 +84,6 @@ const createRawTeamData = () =>
         </div>
       </div>
       <div class="update-log" />
-    </div>
-    <div
-      v-else
-      class="flex flex-col justify-center p-10 mb-4 bg-white rounded-md w-96"
-    >
-      <form class="flex flex-col gap-6" action="">
-        <FormField
-          v-model="formData.email"
-          label="Email"
-          :validation="v$.email"
-          icon="material-symbols:alternate-email"
-        />
-        <FormField
-          v-model="formData.password"
-          label="Password"
-          :validation="v$.password"
-          icon="mdi:password-outline"
-        />
-        <button
-          class="px-1 py-2 text-white rounded-md bg-primary"
-          :class="{ 'opacity-50': v$.$invalid }"
-          :disabled="v$.$invalid"
-          @click.prevent="accountStore.signInUser(formData)"
-        >
-          Log In
-        </button>
-        <button
-          class="underline"
-          @click.prevent="accountStore.resetUserPassword(formData.email)"
-        >
-          Reset Password
-        </button>
-      </form>
     </div>
   </div>
 </template>

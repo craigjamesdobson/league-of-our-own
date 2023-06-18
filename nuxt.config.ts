@@ -1,5 +1,13 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
 export default defineNuxtConfig({
+  modules: [
+    '@vueuse/nuxt',
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt',
+    'nuxt-icon',
+    '@nuxtjs/fontaine',
+    'nuxt-vuefire',
+  ],
   app: {
     head: {
       title: 'League of our own',
@@ -26,23 +34,6 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
-  modules: [
-    '@vueuse/nuxt',
-    '@nuxtjs/tailwindcss',
-    '@pinia/nuxt',
-    'nuxt-icon',
-    '@nuxtjs/fontaine',
-    'nuxt-vuefire',
-  ],
-  vite: {
-    css: {
-      preprocessorOptions: {
-        scss: {
-          additionalData: '@use "@/assets/components/layout.scss" as *;',
-        },
-      },
-    },
-  },
   vuefire: {
     auth: true,
     config: {

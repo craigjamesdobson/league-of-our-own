@@ -1,12 +1,17 @@
 <script setup>
+import { monitorUserStatus } from './modules/account/auth';
 import { usePlayersStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
-const playerStore = usePlayersStore();
-await playerStore.getPlayerSettings();
+onMounted(() => {
+  const playerStore = usePlayersStore();
+  playerStore.getPlayerSettings();
 
-const draftedTeamsStore = useDraftedTeamsStore();
-await draftedTeamsStore.fetchDraftedTeams();
+  const draftedTeamsStore = useDraftedTeamsStore();
+  draftedTeamsStore.fetchDraftedTeams();
+
+  monitorUserStatus();
+});
 </script>
 
 <template>

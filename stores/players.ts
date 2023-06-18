@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { isEqual } from 'lodash-es';
 import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { useCollection, useDocument, useFirestore } from 'vuefire';
+import { useDocument, useFirestore } from 'vuefire';
 import type { Player } from '../modules/players/interfaces/Player';
 import { PlayerPosition } from '../modules/players/interfaces/PlayerPosition';
 import { createPlayerData } from '../modules/players';
@@ -10,7 +10,7 @@ import {
   localStorageHas,
   localStorageSet,
 } from '../composables/localStorage';
-import { RawPlayerData } from '~~/modules/players/interfaces/RawPlayerData';
+import { RawPlayerData } from '../modules/players/interfaces/RawPlayerData';
 
 interface FilterData {
   filterName: string;
@@ -24,6 +24,10 @@ interface State {
   selectedPlayer: Player;
   updatedAt: string;
   isLoaded: boolean;
+}
+
+interface SettingsData {
+  updatedAt: string;
 }
 
 export const usePlayersStore = defineStore({
@@ -40,17 +44,21 @@ export const usePlayersStore = defineStore({
   actions: {
     async getPlayerSettings() {
       const db = useFirestore();
-      const settingsDoc = await useDocument(
-        doc(db, 'season', '2022-2023', 'settings', 'players')
-      ).promise.value;
+      const { data: settingsData, promise: settingsLoaded } =
+        useDocument<SettingsData>(
+          doc(db, 'season', '2022-2023', 'settings', 'players')
+        );
 
-      if (!settingsDoc) {
+      await settingsLoaded.value;
+
+      if (!settingsData.value) {
         return;
       }
 
       if (
         localStorageHas('updated-at') &&
-        localStorageGet('updated-at') === settingsDoc.updatedAt.toString()
+        localStorageGet('updated-at') ===
+          settingsData.value.updatedAt.toString()
       ) {
         this.players = localStorageGet('players') as Player[];
         this.filteredPlayers = this.players;

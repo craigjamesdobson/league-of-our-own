@@ -15,17 +15,16 @@
     "@pinia/nuxt": "^0.4.7",
     "@vuelidate/core": "^2.0.0",
     "@vuelidate/validators": "^2.0.0",
-    "@vueuse/nuxt": "^9.13.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "firebase": "^9.22.2",
     "lodash-es": "^4.17.21",
     "notyf": "^3.10.0",
+    "vuefire": "^3.1.0",
     "nuxt-vuefire": "^0.1.6",
     "pinia": "^2.0.32",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.5",
-    "vuefire": "^3.1.0"
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.26",
@@ -33,6 +32,8 @@
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "@vueuse/core": "^10.2.0",
+    "@vueuse/nuxt": "^10.2.0",
     "eslint": "^8.42.0",
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-vue": "^9.9.0",

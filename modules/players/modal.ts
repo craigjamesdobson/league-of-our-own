@@ -16,7 +16,10 @@ const usePlayerModal = () => {
     } else {
       modalVisible.value = false;
       router.push({ path: 'players' });
+      document.body.classList.add('overflow-hidden');
     }
+
+    document.body.classList.toggle('overflow-hidden', modalVisible.value);
   };
 
   if (route.query.id) {

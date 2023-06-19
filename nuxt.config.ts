@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@nuxtjs/fontaine',
     'nuxt-vuefire',
+    '@nuxt/devtools',
   ],
   app: {
     head: {

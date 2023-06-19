@@ -20,14 +20,15 @@
     "firebase": "^9.22.2",
     "lodash-es": "^4.17.21",
     "notyf": "^3.10.0",
-    "vuefire": "^3.1.0",
     "nuxt-vuefire": "^0.1.6",
     "pinia": "^2.0.32",
     "prettier": "^2.8.8",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "vuefire": "^3.1.0"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.26",
+    "@nuxt/devtools": "^0.6.1",
     "@nuxtjs/fontaine": "^0.2.4",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.54.0",

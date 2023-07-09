@@ -6,7 +6,6 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-icon',
     '@nuxtjs/fontaine',
-    'nuxt-vuefire',
   ],
   app: {
     head: {
@@ -34,16 +33,4 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
-  vuefire: {
-    auth: true,
-    config: {
-      apiKey: 'AIzaSyBMjHznJ_pmwBcn-ys1f-1dFVLzAw6hEeo',
-      authDomain: 'league-of-our-own-63fa1.firebaseapp.com',
-      projectId: 'league-of-our-own-63fa1',
-      storageBucket: 'league-of-our-own-63fa1.appspot.com',
-      messagingSenderId: '861637204204',
-      appId: '1:861637204204:web:229369b4f531434e9aadc9',
-      measurementId: 'G-FWYYJ66CWG',
-    },
-  },
 });

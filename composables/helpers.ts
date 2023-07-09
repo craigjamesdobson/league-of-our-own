@@ -1,5 +1,5 @@
 const selectObjProperties = (obj: object, ...args: string[]): object => {
-  // @ts-expect-error: this shouldnt be erroring...
+  // @ts-expect-error: this should not be erroring...
   return Object.assign(...args.map((d) => ({ [d]: obj[d] })));
 };
 

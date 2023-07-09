@@ -1,22 +1,27 @@
-import { useCurrentUser } from 'vuefire';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useAccountStore } from '~~/stores/account';
 
 const monitorUserStatus = () => {
+  const accountStore = useAccountStore();
+  const userData = computed(() => accountStore.getUserData);
   const router = useRouter();
-  const route = useRoute();
-  const user = useCurrentUser();
 
-  watch(user, (user, prevUser) => {
-    if (prevUser && !user) {
-      // user logged out
-      router.push({
-        path: '/account/login',
-        query: {
-          redirect: route.fullPath,
-        },
-      });
-    } else if (user && typeof route.query.redirect === 'string') {
-      // user logged in
-      router.push(route.query.redirect);
+  watch(userData, (value) => {
+    if (value.isSignedIn) {
+      router.push('/account');
+    } else {
+      router.push('/account/login');
+    }
+  });
+
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log(user);
+      // ...
+    } else {
+      // User is signed out
+      // ...
     }
   });
 };

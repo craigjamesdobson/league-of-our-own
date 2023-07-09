@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { isEqual } from 'lodash-es';
-import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { useDocument, useFirestore } from 'vuefire';
+import { doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import type { Player } from '../modules/players/interfaces/Player';
 import { PlayerPosition } from '../modules/players/interfaces/PlayerPosition';
 import { createPlayerData } from '../modules/players';
@@ -10,7 +9,11 @@ import {
   localStorageHas,
   localStorageSet,
 } from '../composables/localStorage';
-import { RawPlayerData } from '../modules/players/interfaces/RawPlayerData';
+import {
+  draftedTeamsCollection,
+  playersCollection,
+  settingsCollection,
+} from './../firebase/useDB';
 
 interface FilterData {
   filterName: string;
@@ -26,10 +29,6 @@ interface State {
   isLoaded: boolean;
 }
 
-interface SettingsData {
-  updatedAt: string;
-}
-
 export const usePlayersStore = defineStore({
   id: 'player-store',
   state: (): State => {
@@ -43,35 +42,29 @@ export const usePlayersStore = defineStore({
   },
   actions: {
     async getPlayerSettings() {
-      const db = useFirestore();
-      const { data: settingsData, promise: settingsLoaded } =
-        useDocument<SettingsData>(
-          doc(db, 'season', '2022-2023', 'settings', 'players')
-        );
+      const settingsDocRef = doc(settingsCollection, 'players');
+      const settingsDoc = await getDoc(settingsDocRef);
 
-      await settingsLoaded.value;
-
-      if (!settingsData.value) {
+      if (!settingsDoc.exists()) {
         return;
       }
 
       if (
         localStorageHas('updated-at') &&
         localStorageGet('updated-at') ===
-          settingsData.value.updatedAt.toString()
+          settingsDoc.data().updatedAt.toString()
       ) {
         this.players = localStorageGet('players') as Player[];
         this.filteredPlayers = this.players;
         this.updatedAt = localStorageGet('updated-at') as string;
       } else {
-        const playerDocs = await useCollection<RawPlayerData>(
-          collection(db, 'season', '2022-2023', 'players')
-        ).promise.value;
+        const playerDocs = await getDocs(playersCollection);
+        const players = playerDocs.docs.map((player) => player.data());
 
-        this.players = createPlayerData(playerDocs);
+        this.players = createPlayerData(players);
         this.filteredPlayers = this.players;
 
-        localStorageSet('updated-at', settingsDoc.updatedAt);
+        localStorageSet('updated-at', settingsDoc.data().updatedAt);
         localStorageSet('players', this.players);
 
         this.isLoaded = true;

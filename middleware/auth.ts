@@ -1,16 +1,13 @@
-import { getCurrentUser } from 'vuefire';
+import { useAccountStore } from '../stores/account';
 
 // middleware/auth.ts
-export default defineNuxtRouteMiddleware(async (to, _) => {
-  const user = await getCurrentUser();
-
+export default defineNuxtRouteMiddleware(() => {
+  const accountStore = useAccountStore();
+  const userData = computed(() => accountStore.getUserData);
   // redirect the user to the login page
-  if (!user) {
+  if (!userData.value.isSignedIn) {
     return navigateTo({
       path: '/account/login',
-      query: {
-        redirect: to.fullPath,
-      },
     });
   }
 });

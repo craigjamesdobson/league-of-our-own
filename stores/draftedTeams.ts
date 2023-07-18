@@ -1,11 +1,10 @@
 // stores/counter.js
-import { collection } from 'firebase/firestore';
+import { getDocs } from 'firebase/firestore';
 import { defineStore } from 'pinia';
-import { useCollection, useFirestore } from 'vuefire';
 import { initDraftedTeamData } from '../modules/drafted-teams';
 import { DraftedTeamData } from '../modules/drafted-teams/interfaces/DraftedTeamData';
 import { usePlayersStore } from './players';
-import { RawDraftedTeamData } from '~~/modules/drafted-teams/interfaces/RawDraftedTeamData';
+import { draftedTeamsCollection } from '~~/firebase/useDB';
 
 export const useDraftedTeamsStore = defineStore({
   id: 'drafted-teams-store',
@@ -17,16 +16,13 @@ export const useDraftedTeamsStore = defineStore({
 
   actions: {
     async fetchDraftedTeams() {
-      const db = useFirestore();
-      const draftedTeamsDocRef = await useCollection<RawDraftedTeamData>(
-        collection(db, 'season', '2022-2023', 'drafted-teams')
-      ).promise.value;
-
+      const teamsDocs = await getDocs(draftedTeamsCollection);
       const playerStore = usePlayersStore();
+      const draftedTeams = teamsDocs.docs.map((team) => team.data());
 
       this.draftedTeams = initDraftedTeamData(
         playerStore.playerList,
-        draftedTeamsDocRef
+        draftedTeams
       );
     },
   },

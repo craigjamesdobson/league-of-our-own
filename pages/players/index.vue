@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template lang="">
-  <div class="players-container">
+  <div class="mb-36 players-container xl:mb-0">
     <Players />
     <Filters />
   </div>

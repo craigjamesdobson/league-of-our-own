@@ -17,12 +17,12 @@ const filtersVisible = ref(false);
 
 <template>
   <div class="filter-container">
-    <div class="flex flex-row items-center justify-between p-4 xl:mb-4 xl:p-0">
+    <div
+      class="flex flex-row cursor-pointer items-center justify-between p-4 xl:mb-4 xl:p-0"
+      @click.prevent="filtersVisible = !filtersVisible"
+    >
       <h2 class="!mb-0 !text-xl main-heading">Filters</h2>
-      <button
-        class="xl:hidden"
-        @click.prevent="filtersVisible = !filtersVisible"
-      >
+      <button class="xl:hidden">
         <Icon
           v-if="filtersVisible"
           class="fill-slate-900"

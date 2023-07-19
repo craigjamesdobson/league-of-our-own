@@ -5,16 +5,16 @@ const routes = reactive([
     icon: 'material-symbols:home-outline-rounded',
     path: '/',
   },
-  {
-    title: 'Players',
-    icon: 'material-symbols:list-alt-outline-rounded',
-    path: '/players',
-  },
-  {
-    title: 'Teams',
-    icon: 'fluent:people-team-24-regular',
-    path: '/teams',
-  },
+  // {
+  //   title: 'Players',
+  //   icon: 'material-symbols:list-alt-outline-rounded',
+  //   path: '/players',
+  // },
+  // {
+  //   title: 'Teams',
+  //   icon: 'fluent:people-team-24-regular',
+  //   path: '/teams',
+  // },
 ]);
 </script>
 
@@ -44,12 +44,12 @@ const routes = reactive([
       </ul>
     </div>
 
-    <nuxt-link
+    <!-- <nuxt-link
       to="/account"
       class="flex flex-col items-center justify-center w-10 h-10 text-base transition duration-300 ease-in-out border rounded-full text-offWhite border-offWhite hover:bg-white hover:text-primary"
     >
       <Icon name="uil:setting" />
-    </nuxt-link>
+    </nuxt-link> -->
   </nav>
 </template>
 

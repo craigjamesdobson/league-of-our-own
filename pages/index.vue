@@ -11,7 +11,7 @@
       <h1
         class="text-4xl md:text-[72px] md:leading-[72px] uppercase tracking-wider font-black border-b mb-6 border-primary"
       >
-        League of our own
+        League of our own [DEV]
       </h1>
       <span class="text-xl text-neutral-800">ESTABLISHED. 1989/1990</span>
     </div>

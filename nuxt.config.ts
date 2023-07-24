@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-icon',
     '@nuxtjs/fontaine',
+    '@vue-macros/nuxt',
   ],
   app: {
     head: {

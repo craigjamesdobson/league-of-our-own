@@ -29,7 +29,7 @@ defineEmits(['update:modelValue']);
       class="w-1/12 p-2"
       :value="props.modelValue"
       @input="
-        $emit('update:modelValue', (<HTMLInputElement>$event.target).value)
+        $emit('update:modelValue', +(<HTMLInputElement>$event.target).value)
       "
     />
     <span v-else class="w-1/12 p-2">{{ props.draftedPlayer?.id }}</span>

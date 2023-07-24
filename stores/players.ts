@@ -14,6 +14,7 @@ import {
   playersCollection,
   settingsCollection,
 } from './../firebase/useDB';
+import { RawPlayerData } from '~~/modules/players/interfaces/RawPlayerData';
 
 interface FilterData {
   filterName: string;
@@ -22,6 +23,7 @@ interface FilterData {
 }
 
 interface State {
+  rawPlayers: RawPlayerData[];
   players: Player[];
   filteredPlayers: Player[];
   selectedPlayer: Player;
@@ -33,6 +35,7 @@ export const usePlayersStore = defineStore({
   id: 'player-store',
   state: (): State => {
     return {
+      rawPlayers: [],
       players: [],
       filteredPlayers: [],
       selectedPlayer: {} as Player,

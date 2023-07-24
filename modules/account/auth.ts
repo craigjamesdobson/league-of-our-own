@@ -17,7 +17,6 @@ const monitorUserStatus = () => {
   const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      console.log(user);
       // ...
     } else {
       // User is signed out

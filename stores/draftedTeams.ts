@@ -5,11 +5,13 @@ import { initDraftedTeamData } from '../modules/drafted-teams';
 import { DraftedTeamData } from '../modules/drafted-teams/interfaces/DraftedTeamData';
 import { usePlayersStore } from './players';
 import { draftedTeamsCollection } from '~~/firebase/useDB';
+import { RawDraftedTeamData } from '~~/modules/drafted-teams/interfaces/RawDraftedTeamData';
 
 export const useDraftedTeamsStore = defineStore({
   id: 'drafted-teams-store',
   state: () => {
     return {
+      rawDraftedTeams: [] as RawDraftedTeamData[],
       draftedTeams: [] as DraftedTeamData[],
     };
   },
@@ -20,6 +22,8 @@ export const useDraftedTeamsStore = defineStore({
       const playerStore = usePlayersStore();
       const draftedTeams = teamsDocs.docs.map((team) => team.data());
 
+      this.rawDraftedTeams = draftedTeams;
+
       this.draftedTeams = initDraftedTeamData(
         playerStore.playerList,
         draftedTeams
@@ -28,13 +32,14 @@ export const useDraftedTeamsStore = defineStore({
   },
 
   getters: {
+    getRawDraftedTeams: (state) => state.rawDraftedTeams,
     getDraftedTeams: (state) => state.draftedTeams,
     getDraftedTeamsWithTransfers: (state) =>
       state.draftedTeams.filter((x) => x.allowedTransfers),
     getDraftedTeamByID: (state) => {
       return (draftedTeamID: number) =>
-        state.draftedTeams.filter(
-          (draftedTeam) => draftedTeam.teamID === +draftedTeamID
+        state.rawDraftedTeams.filter(
+          (draftedTeam) => draftedTeam.team_id === +draftedTeamID
         )[0];
     },
   },

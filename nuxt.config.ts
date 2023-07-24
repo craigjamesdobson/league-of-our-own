@@ -32,5 +32,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+  runtimeConfig: {
+    public: {
+      gtagId: 'G-YL6X3M2488',
+    },
+  },
   ssr: false,
 });

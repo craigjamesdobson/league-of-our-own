@@ -62,6 +62,7 @@ const useAccount = () => {
     updatePlayerData,
     updateTeamData,
     playerData,
+    teamData,
     formData,
     accountStore,
     loading,

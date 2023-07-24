@@ -7,21 +7,13 @@ definePageMeta({
 
 const {
   userData,
+  teamData,
   updatePlayerData,
+  updateTeamData,
   loading,
   accountStore,
-  draftedTeamsStore,
   playerData,
 } = useAccount();
-
-const selectedTeamID = ref(0);
-
-const activeDraftedTeam = computed(() =>
-  draftedTeamsStore.getDraftedTeamByID(+selectedTeamID.value)
-);
-
-const createRawTeamData = () =>
-  console.log(activeDraftedTeam.value.teamPlayers?.map((x) => x.id));
 </script>
 
 <template>
@@ -48,39 +40,29 @@ const createRawTeamData = () =>
           />
           <button
             :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex p-2 text-white bg-primary"
+            class="flex self-start p-2 text-white rounded-md bg-primary"
             @click="updatePlayerData"
           >
             Update Players
           </button>
         </div>
-        <div class="flex flex-col items-start gap-4">
-          <select
-            id="drafted-teams"
-            v-model="selectedTeamID"
-            name="drafted-teams"
-            class="w-full p-2 m-2"
+        <div class="flex flex-col gap-4">
+          <textarea
+            id=""
+            v-model="teamData"
+            class="p-2 text-sm rounded-md"
+            name="player-data"
+            cols="75"
+            rows="20"
+            placeholder="Paste player data here..."
+          />
+          <button
+            :class="{ 'pointer-events-none opacity-25': loading }"
+            class="flex self-start p-2 text-white rounded-md bg-primary"
+            @click="updateTeamData"
           >
-            <option disabled value="0">Select a team to edit</option>
-            <option
-              v-for="draftedTeam in draftedTeamsStore.getDraftedTeamsWithTransfers"
-              :key="draftedTeam.teamID"
-              :value="draftedTeam.teamID"
-              class="uppercase"
-            >
-              {{ draftedTeam.teamName }}
-            </option>
-          </select>
-          <div v-if="activeDraftedTeam" class="w-full">
-            <DraftedTeam :drafted-team="activeDraftedTeam" class="w-full" />
-            <button
-              :class="{ 'pointer-events-none opacity-25': loading }"
-              class="flex w-full p-2 m-2 text-white bg-primary"
-              @click="createRawTeamData"
-            >
-              Update Teams
-            </button>
-          </div>
+            Update Teams
+          </button>
         </div>
       </div>
       <div class="update-log" />

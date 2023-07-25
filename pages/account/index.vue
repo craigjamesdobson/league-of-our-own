@@ -54,7 +54,7 @@ const {
             name="player-data"
             cols="75"
             rows="20"
-            placeholder="Paste player data here..."
+            placeholder="Paste team data here..."
           />
           <button
             :class="{ 'pointer-events-none opacity-25': loading }"

@@ -12,8 +12,11 @@ const {
   updateTeamData,
   loading,
   accountStore,
+  draftedTeamStore,
   playerData,
 } = useAccount();
+
+draftedTeamStore.fetchDraftedTeams();
 </script>
 
 <template>

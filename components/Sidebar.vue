@@ -15,6 +15,11 @@ const routes = reactive([
     icon: 'fluent:people-team-24-regular',
     path: '/teams',
   },
+  {
+    title: 'Rules',
+    icon: 'ic:outline-rule',
+    path: '/rules',
+  },
 ]);
 </script>
 

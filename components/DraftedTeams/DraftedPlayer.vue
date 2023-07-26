@@ -13,7 +13,11 @@ const props = defineProps({
   modelValue: { type: Number, default: null },
 });
 
-defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const handleModelEmit = (value: any) => {
+  emit('update:modelValue', value);
+};
 </script>
 
 <template>
@@ -28,9 +32,7 @@ defineEmits(['update:modelValue']);
       type="text"
       class="w-1/12 p-2"
       :value="props.modelValue"
-      @input="
-        $emit('update:modelValue', (<HTMLInputElement>$event.target).value)
-      "
+      @input="handleModelEmit"
     />
     <span v-else class="w-1/12 p-2">{{ props.draftedPlayer?.id }}</span>
     <span class="w-2/12 p-2">

@@ -1,11 +1,11 @@
 <script setup>
 import { monitorUserStatus } from './modules/account/auth';
-// import { usePlayersStore } from '@/stores/players';
+import { usePlayersStore } from '@/stores/players';
 // import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 onMounted(() => {
-  // const playerStore = usePlayersStore();
-  // playerStore.getPlayerSettings();
+  const playerStore = usePlayersStore();
+  playerStore.getPlayerSettings();
 
   // const draftedTeamsStore = useDraftedTeamsStore();
   // draftedTeamsStore.fetchDraftedTeams();

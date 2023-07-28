@@ -65,6 +65,7 @@ export const usePlayersStore = defineStore({
         this.filteredPlayers = this.players;
 
         localStorageSet('updated-at', settingsDoc.data().updatedAt);
+        this.updatedAt = settingsDoc.data().updatedAt;
         localStorageSet('players', this.players);
 
         this.isLoaded = true;

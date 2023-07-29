@@ -43,7 +43,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
               />
             </div>
             <h4
-              class="flex flex-col items-end text-4xl leading-none text-right uppercase"
+              class="flex flex-col items-end text-2xl leading-none text-right uppercase md:text-4xl"
             >
               <span class="mb-2 text-base">
                 {{ selectedPlayer.firstName }}

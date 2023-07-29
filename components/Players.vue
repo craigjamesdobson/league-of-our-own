@@ -33,7 +33,7 @@ const playerStore = usePlayersStore();
             >
               <div class="flex items-center w-full">
                 <span class="w-1/12 p-2">{{ player.id }}</span>
-                <span class="w-1/12 p-2">
+                <span class="w-2/12 p-2">
                   <img
                     class="w-6 h-6 rounded-full shadow-md"
                     :src="player.image"
@@ -41,12 +41,12 @@ const playerStore = usePlayersStore();
                     @error="loadPlayerFallbackImage"
                   />
                 </span>
-                <span class="w-2/12 p-2">{{ player.teamNameShort }}</span>
-                <span class="w-6/12 p-2 text-center">{{ player.webName }}</span>
-                <span class="w-2/12 p-2 text-center">{{ player.price }}</span>
+                <span class="w-1/12 p-2">{{ player.teamNameShort }}</span>
+                <span class="w-5/12 p-2 text-center">{{ player.webName }}</span>
+                <span class="w-1/12 p-2 text-center">{{ player.price }}</span>
                 <span
                   v-if="player.unavailableForSeason"
-                  class="flex items-center justify-end w-1/12 p-2"
+                  class="flex items-center justify-end w-2/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span
@@ -55,7 +55,7 @@ const playerStore = usePlayersStore();
                 </span>
                 <span
                   v-if="player.isUnavailable && !player.unavailableForSeason"
-                  class="flex items-center justify-end w-1/12 p-2"
+                  class="flex items-center justify-end w-2/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span
@@ -64,7 +64,7 @@ const playerStore = usePlayersStore();
                 </span>
                 <span
                   v-else-if="!player.isUnavailable"
-                  class="flex items-center justify-end w-1/12 p-2"
+                  class="flex items-center justify-end w-2/12 p-2"
                   :class="player.availabilityType"
                 >
                   <span

@@ -1,5 +1,5 @@
 <script setup>
-import { useAccount } from '@/modules/account/';
+import { useAccount } from '@/logic/account/';
 
 definePageMeta({
   middleware: ['auth'],
@@ -12,11 +12,8 @@ const {
   updateTeamData,
   loading,
   accountStore,
-  draftedTeamStore,
   playerData,
 } = useAccount();
-
-draftedTeamStore.fetchDraftedTeams();
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup>
-import { TEAM_DATA } from '@/modules/teams/constants';
-import { PRICE_BREAKS } from '@/modules/filters/constants';
-import { useFilters } from '@/modules/filters';
+import { TEAM_DATA } from '@/logic/teams/constants';
+import { PRICE_BREAKS } from '@/logic/filters/constants';
+import { useFilters } from '@/logic/filters';
 import { getImageUrl } from '@/composables/helpers';
 
 const {
@@ -18,7 +18,7 @@ const filtersVisible = ref(false);
 <template>
   <div class="filter-container">
     <div
-      class="flex flex-row cursor-pointer items-center justify-between p-4 xl:mb-4 xl:p-0"
+      class="flex flex-row items-center justify-between p-4 cursor-pointer xl:mb-4 xl:p-0"
       @click.prevent="filtersVisible = !filtersVisible"
     >
       <h2 class="!mb-0 !text-xl main-heading">Filters</h2>

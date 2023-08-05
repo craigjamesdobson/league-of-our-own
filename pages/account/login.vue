@@ -1,5 +1,5 @@
 <script setup>
-import { useAccount } from '@/modules/account';
+import { useAccount } from '@/logic/account';
 
 const { v$, formData, accountStore } = useAccount();
 </script>

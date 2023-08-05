@@ -1,4 +1,4 @@
-import type { Player } from '~~/modules/players/interfaces/Player';
+import { Player } from '../../players/interfaces/Player';
 interface DraftedTransfer extends Player {
   isCurrentWeekTransfer: boolean;
   transferWeek: number;

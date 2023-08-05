@@ -2,7 +2,7 @@
 import type {
   CompleteDraftedPlayer,
   DraftedTransfer,
-} from '@/modules/drafted-teams/interfaces/DraftedTeamData';
+} from '@/logic/drafted-teams/interfaces/DraftedTeamData';
 
 const props = defineProps({
   draftedPlayer: {

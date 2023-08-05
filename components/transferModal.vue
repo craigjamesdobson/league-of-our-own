@@ -1,6 +1,6 @@
 <script setup>
 import { getImageUrl, loadPlayerFallbackImage } from '@/composables/helpers';
-import { usePlayerModal } from '~/modules/players/modal';
+import { usePlayerModal } from '@/logic/players/modal';
 
 const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
 </script>

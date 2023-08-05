@@ -1,14 +1,11 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength, helpers } from '@vuelidate/validators';
-import { usePlayersStore } from '../../stores/players';
-import { useAccountStore } from '../../stores/account';
-import { useDraftedTeamsStore } from '~~/stores/draftedTeams';
+import { useAccountStore } from '@/stores/account';
+import { usePlayersStore } from '@/stores/players';
 
 const useAccount = () => {
   const accountStore = useAccountStore();
   accountStore.setUserData();
-
-  const draftedTeamStore = useDraftedTeamsStore();
 
   const userData = computed(() => accountStore.getUserData);
 
@@ -64,7 +61,6 @@ const useAccount = () => {
     teamData,
     formData,
     accountStore,
-    draftedTeamStore,
     loading,
   };
 };

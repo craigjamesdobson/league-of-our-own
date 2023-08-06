@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
 import { isEqual } from 'lodash-es';
 import { doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
-import type { Player } from '../modules/players/interfaces/Player';
-import { PlayerPosition } from '../modules/players/interfaces/PlayerPosition';
-import { createPlayerData } from '../modules/players';
+import type { Player } from '../logic/players/interfaces/Player';
+import { PlayerPosition } from '../logic/players/interfaces/PlayerPosition';
+import { createPlayerData } from '../logic/players';
 import {
   localStorageGet,
   localStorageHas,

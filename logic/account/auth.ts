@@ -1,5 +1,5 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useAccountStore } from '~~/stores/account';
+import { useAccountStore } from '@/stores/account';
 
 const monitorUserStatus = () => {
   const accountStore = useAccountStore();

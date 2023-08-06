@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import type { CollectionReference, DocumentData } from 'firebase/firestore';
 import { collection, getFirestore } from 'firebase/firestore';
-import type { RawDraftedTeamData } from '../modules/drafted-teams/interfaces/RawDraftedTeamData';
-import type { RawPlayerData } from '../modules/players/interfaces/RawPlayerData';
+import type { RawDraftedTeamData } from '@/logic/drafted-teams/interfaces/RawDraftedTeamData';
+import type { RawPlayerData } from '@/logic/players/interfaces/RawPlayerData';
 
 // Import all your model types
 

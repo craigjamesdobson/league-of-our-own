@@ -6,7 +6,7 @@ import type {
 import type {
   RawDraftedPlayerData,
   RawDraftedTeamData,
-} from '@/modules/drafted-teams/interfaces/RawDraftedTeamData';
+} from '@/logic/drafted-teams/interfaces/RawDraftedTeamData';
 
 const setDraftedPlayersData = (
   rawDraftedPlayerData: RawDraftedPlayerData[],

@@ -1,5 +1,5 @@
 <script setup>
-import { usePlayerModal } from '@/modules/players/modal';
+import { usePlayerModal } from '@/logic/players/modal';
 import { usePlayersStore } from '@/stores/players';
 import { loadPlayerFallbackImage } from '@/composables/helpers';
 

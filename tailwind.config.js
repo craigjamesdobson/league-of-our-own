@@ -25,6 +25,6 @@ module.exports = {
       margin: ['last'],
     },
   },
-  content: ['./modules/**/*.ts'],
+  content: ['./logic/**/*.ts'],
   plugins: [],
 };

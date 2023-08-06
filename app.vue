@@ -1,5 +1,5 @@
 <script setup>
-import { monitorUserStatus } from './modules/account/auth';
+import { monitorUserStatus } from './logic/account/auth';
 import { usePlayersStore } from '@/stores/players';
 // import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 

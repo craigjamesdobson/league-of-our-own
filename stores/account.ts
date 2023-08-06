@@ -7,9 +7,6 @@ import {
   onAuthStateChanged,
   sendPasswordResetEmail,
 } from 'firebase/auth';
-import { Notyf } from 'notyf';
-import 'notyf/notyf.min.css';
-const notyf = new Notyf();
 
 interface UserData {
   uid: string | null;
@@ -65,10 +62,6 @@ export const useAccountStore = defineStore({
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Unknown error';
-        notyf.error({
-          message: errorMessage,
-          position: { x: 'right', y: 'top' },
-        });
         throw new Error(errorMessage);
       }
     },

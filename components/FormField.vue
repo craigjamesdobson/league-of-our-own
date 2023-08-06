@@ -18,22 +18,18 @@
           'border !border-green-400 ': !validation?.$invalid,
         }"
         class="p-2 pl-10 bg-white border rounded-md border-primary focus:outline-none"
-        :type="fieldType"
+        :type="label"
         autocomplete="chrome-off"
         @change="validation?.$touch"
         @input="$emit('update:modelValue', $event?.target?.value)"
       />
       <button
         v-if="label === 'Password'"
-        @click.prevent="
-          fieldType = fieldType === 'password' ? 'text' : 'password'
-        "
+        @click.prevent="label === 'password' ? 'text' : 'password'"
       >
         <Icon
           class="absolute text-primary right-4 top-3"
-          :name="
-            fieldType === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'
-          "
+          :name="label === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'"
         />
       </button>
     </div>
@@ -52,7 +48,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   label: {
     type: String,
     default: '',
@@ -70,8 +66,6 @@ const props = defineProps({
     default: '',
   },
 });
-
-const fieldType = ref(props.label.toLowerCase());
 
 defineEmits(['update:modelValue']);
 </script>

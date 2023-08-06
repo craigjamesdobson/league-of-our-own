@@ -1,10 +1,9 @@
-// stores/counter.js
 import { getDocs } from 'firebase/firestore';
 import { defineStore } from 'pinia';
-import { initDraftedTeamData } from '../modules/drafted-teams';
-import { DraftedTeamData } from '../modules/drafted-teams/interfaces/DraftedTeamData';
+import { initDraftedTeamData } from '../logic/drafted-teams';
+import { DraftedTeamData } from '../logic/drafted-teams/interfaces/DraftedTeamData';
+import { draftedTeamsCollection } from '../firebase/useDB';
 import { usePlayersStore } from './players';
-import { draftedTeamsCollection } from '~~/firebase/useDB';
 
 export const useDraftedTeamsStore = defineStore({
   id: 'drafted-teams-store',

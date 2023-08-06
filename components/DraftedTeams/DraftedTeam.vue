@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DraftedTeamData } from '@/modules/drafted-teams/interfaces/DraftedTeamData';
+import type { DraftedTeamData } from '@/logic/drafted-teams/interfaces/DraftedTeamData';
 
 const props = defineProps({
   draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },

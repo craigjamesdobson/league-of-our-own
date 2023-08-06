@@ -1,4 +1,3 @@
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useAccountStore } from '@/stores/account';
 
 const monitorUserStatus = () => {
@@ -11,17 +10,6 @@ const monitorUserStatus = () => {
       router.push('/account');
     } else {
       router.push('/account/login');
-    }
-  });
-
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log(user);
-      // ...
-    } else {
-      // User is signed out
-      // ...
     }
   });
 };

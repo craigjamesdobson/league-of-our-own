@@ -27,7 +27,10 @@ export const useDraftedTeamsStore = defineStore({
   },
 
   getters: {
-    getDraftedTeams: (state) => state.draftedTeams,
+    getDraftedTeams: (state) =>
+      state.draftedTeams.sort((a, b) =>
+        a.teamName.toLowerCase().localeCompare(b.teamName.toLowerCase())
+      ),
     getDraftedTeamsWithTransfers: (state) =>
       state.draftedTeams.filter((x) => x.allowedTransfers),
     getDraftedTeamByID: (state) => {

@@ -1,14 +1,14 @@
 <script setup>
 import { monitorUserStatus } from './logic/account/auth';
 import { usePlayersStore } from '@/stores/players';
-// import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 onMounted(() => {
   const playerStore = usePlayersStore();
   playerStore.getPlayerSettings();
 
-  // const draftedTeamsStore = useDraftedTeamsStore();
-  // draftedTeamsStore.fetchDraftedTeams();
+  const draftedTeamsStore = useDraftedTeamsStore();
+  draftedTeamsStore.fetchDraftedTeams();
 
   monitorUserStatus();
 });

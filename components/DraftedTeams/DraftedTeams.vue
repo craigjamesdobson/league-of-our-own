@@ -1,4 +1,5 @@
 <script setup>
+import DraftedTeam from './DraftedTeam';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 const draftedTeamsStore = useDraftedTeamsStore();
 </script>

@@ -41,27 +41,36 @@ const getAvailabilityData = (player: RawPlayerData) => {
   }
 };
 
-const createPlayerData = (rawPlayerData: RawPlayerData[]): Player[] => {
-  return rawPlayerData.map((player) => {
-    return {
-      id: player.id,
-      code: player.code,
-      team: player.team,
-      webName: player.web_name,
-      firstName: player.first_name,
-      secondName: player.second_name,
-      goalsScored: player.goals_scored,
-      assists: player.assists,
-      cleanSheets: player.clean_sheets,
-      redCards: player.red_cards,
-      price: getPlayerCost(player.now_cost, player.cost_change_start_fall),
-      news: player.news,
-      position: player.element_type,
-      image: `${IMAGE_CDN}/40x40/p${player.code}.png`,
-      imageLarge: `${IMAGE_CDN}/250x250/p${player.code}.png`,
-      ...getTeamData(player),
-      ...getAvailabilityData(player),
-    };
+const createPlayerData = (
+  rawPlayerData: RawPlayerData[]
+): Promise<Player[]> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const playerData = rawPlayerData.map((player) => {
+        return {
+          id: player.id,
+          code: player.code,
+          team: player.team,
+          webName: player.web_name,
+          firstName: player.first_name,
+          secondName: player.second_name,
+          goalsScored: player.goals_scored,
+          assists: player.assists,
+          cleanSheets: player.clean_sheets,
+          redCards: player.red_cards,
+          price: getPlayerCost(player.now_cost, player.cost_change_start_fall),
+          news: player.news,
+          position: player.element_type,
+          image: `${IMAGE_CDN}/40x40/p${player.code}.png`,
+          imageLarge: `${IMAGE_CDN}/250x250/p${player.code}.png`,
+          ...getTeamData(player),
+          ...getAvailabilityData(player),
+        };
+      });
+      resolve(playerData);
+    } catch (error) {
+      reject(error);
+    }
   });
 };
 

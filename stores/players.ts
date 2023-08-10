@@ -57,11 +57,12 @@ export const usePlayersStore = defineStore({
         this.players = localStorageGet('players') as Player[];
         this.filteredPlayers = this.players;
         this.updatedAt = localStorageGet('updated-at') as string;
+        this.isLoaded = true;
       } else {
         const playerDocs = await getDocs(playersCollection);
         const players = playerDocs.docs.map((player) => player.data());
 
-        this.players = createPlayerData(players);
+        this.players = await createPlayerData(players);
         this.filteredPlayers = this.players;
 
         localStorageSet('updated-at', settingsDoc.data().updatedAt);

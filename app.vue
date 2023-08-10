@@ -3,12 +3,12 @@ import { monitorUserStatus } from './logic/account/auth';
 import { usePlayersStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
-onMounted(() => {
+onMounted(async () => {
   const playerStore = usePlayersStore();
-  playerStore.getPlayerSettings();
+  await playerStore.getPlayerSettings();
 
   const draftedTeamsStore = useDraftedTeamsStore();
-  draftedTeamsStore.fetchDraftedTeams();
+  await draftedTeamsStore.fetchDraftedTeams();
 
   monitorUserStatus();
 });

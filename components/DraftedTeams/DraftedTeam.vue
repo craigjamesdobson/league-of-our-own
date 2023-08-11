@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import DraftedPlayer from './DraftedPlayer.vue';
 import type { DraftedTeamData } from '@/logic/drafted-teams/interfaces/DraftedTeamData';
-
 const props = defineProps({
   draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
-  isEditable: { type: Boolean, default: false },
 });
 </script>
 
@@ -33,21 +32,10 @@ const props = defineProps({
         'bg-green-200': player.transfers.at(-1)?.isCurrentWeekTransfer,
       }"
     >
-      <DraftedPlayer
-        v-if="!player.transfers.length"
-        :drafted-player="player"
-        :model-value="player.id"
-        :is-editable="props.isEditable"
-        @update:model-value="(newValue) => (player.id = newValue)"
-      />
+      <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
       <DraftedPlayer
         v-else-if="player.transfers.at(-1) !== null"
         :drafted-player="player.transfers.at(-1)"
-        :is-editable="props.isEditable"
-        :model-value="player.transfers.at(-1)?.id"
-        @update:model-value="
-          (newValue) => (player.transfers.at(-1).id = newValue)
-        "
       />
     </div>
     <div class="flex justify-between pt-2">

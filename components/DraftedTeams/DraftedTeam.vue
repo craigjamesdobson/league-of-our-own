@@ -4,6 +4,8 @@ import type { DraftedTeamData } from '@/logic/drafted-teams/interfaces/DraftedTe
 const props = defineProps({
   draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
 });
+
+const isHovered = ref(false);
 </script>
 
 <template>
@@ -36,10 +38,26 @@ const props = defineProps({
       }"
     >
       <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
-      <DraftedPlayer
+      <div
         v-else-if="player.transfers.at(-1) !== null"
-        :drafted-player="player.transfers.at(-1)"
-      />
+        class="cursor-pointer"
+        @mouseover="isHovered = true"
+        @mouseleave="isHovered = false"
+      >
+        <DraftedPlayer
+          :is-transfer="true"
+          :drafted-player="player.transfers.at(-1)"
+        />
+        <div
+          class="absolute left-0 z-10 flex items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
+          :class="{
+            '!visible': isHovered,
+          }"
+        >
+          {{ player.webName }} was transferred out in gameweek
+          {{ player.transfers.at(-1)?.transferWeek }}
+        </div>
+      </div>
     </div>
     <div class="flex justify-between pt-2">
       <span>Total</span>

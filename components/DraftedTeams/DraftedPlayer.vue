@@ -9,15 +9,8 @@ const props = defineProps({
     type: Object as PropType<CompleteDraftedPlayer | DraftedTransfer>,
     default: null,
   },
-  isEditable: { type: Boolean, default: false },
-  modelValue: { type: Number, default: null },
+  isTransfer: { type: Boolean, default: false },
 });
-
-const emit = defineEmits(['update:modelValue']);
-
-const handleModelEmit = (value: any) => {
-  emit('update:modelValue', value);
-};
 </script>
 
 <template>
@@ -27,14 +20,7 @@ const handleModelEmit = (value: any) => {
       'opacity-25': props.draftedPlayer?.unavailableForSeason,
     }"
   >
-    <input
-      v-if="props.isEditable"
-      type="text"
-      class="w-1/12 p-2"
-      :value="props.modelValue"
-      @input="handleModelEmit"
-    />
-    <span v-else class="w-1/12 p-2">{{ props.draftedPlayer?.id }}</span>
+    <span class="w-1/12 p-2">{{ props.draftedPlayer?.id }}</span>
     <span class="w-2/12 p-2">
       <img
         class="w-6 h-6 m-auto rounded-full shadow-md"
@@ -44,9 +30,14 @@ const handleModelEmit = (value: any) => {
       />
     </span>
     <span class="w-2/12 p-2">{{ props.draftedPlayer?.teamNameShort }}</span>
-    <span class="w-5/12 p-2 text-sm text-center">{{
-      props.draftedPlayer?.webName
-    }}</span>
+    <span class="w-5/12 p-2 text-sm text-center"
+      >{{ props.draftedPlayer?.webName }}
+      <Icon
+        v-if="props.isTransfer"
+        class="ml-2"
+        size="18"
+        name="ic:round-swap-horiz"
+    /></span>
     <span class="w-2/12 p-2 text-center">
       {{ props.draftedPlayer?.price }}
     </span>

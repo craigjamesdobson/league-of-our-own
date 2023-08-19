@@ -10,6 +10,9 @@ const props = defineProps({
   <div class="p-4 m-2 bg-white rounded-sm">
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800"
+      :class="{
+        'bg-red-200': props.draftedTeam?.isInvalidTeam,
+      }"
     >
       <div class="flex flex-col uppercase">
         <span class="font-black">{{ props.draftedTeam?.teamName }}</span>

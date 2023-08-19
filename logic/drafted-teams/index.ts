@@ -32,9 +32,17 @@ const setDraftedPlayersData = (
 
 const setTotalTeamPrice = (draftedTeamData: DraftedTeamData[]) => {
   draftedTeamData.forEach((draftedTeam) => {
-    draftedTeam.totalTeamValue = draftedTeam.teamPlayers
-      .map((draftedPlayer) => +draftedPlayer.price)
-      .reduce((prev, next) => prev + next);
+    let totalTeamValue = 0;
+    draftedTeam.teamPlayers.forEach((draftedPlayer) => {
+      if (draftedPlayer.transfers.length > 0) {
+        totalTeamValue += parseFloat(
+          draftedPlayer.transfers[draftedPlayer.transfers.length - 1].price
+        );
+      } else {
+        totalTeamValue += parseFloat(draftedPlayer.price);
+      }
+    });
+    draftedTeam.totalTeamValue = totalTeamValue;
   });
 };
 

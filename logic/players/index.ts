@@ -63,7 +63,8 @@ const createPlayerData = (
           position: player.element_type,
           image: `${IMAGE_CDN}/40x40/p${player.code}.png`,
           imageLarge: `${IMAGE_CDN}/250x250/p${player.code}.png`,
-          ...getTeamData(player),
+          teamName: player.team_name,
+          teamNameShort: player.team_short_name,
           ...getAvailabilityData(player),
         };
       });

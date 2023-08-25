@@ -42,34 +42,41 @@ export const usePlayersStore = defineStore({
   },
   actions: {
     async getPlayerSettings() {
-      const settingsDocRef = doc(settingsCollection, 'players');
-      const settingsDoc = await getDoc(settingsDocRef);
+      const supabase = useSupabaseClient();
 
-      if (!settingsDoc.exists()) {
-        return;
-      }
+      try {
+        const { data, error } = await supabase.from('players').select(`
+          id,
+          code,
+          team,
+          web_name,
+          first_name,
+          second_name,
+          goals_scored,
+          assists,
+          clean_sheets,
+          red_cards,
+          now_cost,
+          cost_change_start_fall,
+          status,
+          news,
+          element_type,
+          ...teams ( team_name:name, team_short_name:short_name )
+        `);
 
-      if (
-        localStorageHas('updated-at') &&
-        localStorageGet('updated-at') ===
-          settingsDoc.data().updatedAt.toString()
-      ) {
-        this.players = localStorageGet('players') as Player[];
+        if (error) {
+          console.error('Error fetching data:', error.message);
+          return;
+        }
+        this.players = await createPlayerData(data);
         this.filteredPlayers = this.players;
-        this.updatedAt = localStorageGet('updated-at') as string;
         this.isLoaded = true;
-      } else {
-        const playerDocs = await getDocs(playersCollection);
-        const players = playerDocs.docs.map((player) => player.data());
-
-        this.players = await createPlayerData(players);
-        this.filteredPlayers = this.players;
-
-        localStorageSet('updated-at', settingsDoc.data().updatedAt);
-        this.updatedAt = settingsDoc.data().updatedAt;
-        localStorageSet('players', this.players);
-
-        this.isLoaded = true;
+      } catch (error) {
+        if (typeof error === 'object' && error !== null && 'message' in error) {
+          console.error('Error:', (error as Error).message);
+        } else {
+          console.error('An unknown error occurred.');
+        }
       }
     },
 
@@ -86,47 +93,18 @@ export const usePlayersStore = defineStore({
         throw new Error('No log element');
       }
 
-      for (const newPlayerData of parsedData) {
-        const playerDocRef = doc(
-          playersCollection,
-          newPlayerData.id.toString()
-        );
-        const playerDocSnap = await getDoc(playerDocRef);
+      const supabase = useSupabaseClient();
 
-        if (!playerDocSnap.exists()) {
-          await setDoc(
-            doc(playersCollection, newPlayerData.id.toString()),
-            newPlayerData
-          );
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: green;">${newPlayerData.web_name} added</p>`
-          );
+      const { data, error } = await supabase
+        .from('players')
+        .upsert(parsedData)
+        .select();
 
-          continue;
-        }
-
-        if (
-          playerDocSnap.exists() &&
-          isEqual(playerDocSnap.data(), newPlayerData)
-        ) {
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: gray;">${newPlayerData.web_name} has no changes</p>`
-          );
-        } else {
-          await updateDoc(playerDocRef, newPlayerData);
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: blue;">${newPlayerData.web_name} updated</p>`
-          );
-        }
+      if (error) {
+        console.error('Error fetching data:', error.message);
+      } else {
+        console.log('Data:', data);
       }
-      const settingsDocRef = doc(settingsCollection, 'players');
-
-      await updateDoc(settingsDocRef, {
-        updatedAt: Date.now(),
-      });
     },
 
     async updateTeamData(teamData: string) {

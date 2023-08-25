@@ -6,6 +6,8 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-icon',
     '@nuxtjs/fontaine',
+    '@nuxtjs/supabase',
+    '@nuxt/devtools',
   ],
   app: {
     head: {
@@ -38,4 +40,7 @@ export default defineNuxtConfig({
     },
   },
   ssr: false,
+  supabase: {
+    redirect: false,
+  },
 });

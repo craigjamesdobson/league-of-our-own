@@ -26,7 +26,9 @@
   },
   "devDependencies": {
     "@iconify/json": "^2.2.26",
+    "@nuxt/devtools": "^0.8.0",
     "@nuxtjs/fontaine": "^0.2.4",
+    "@nuxtjs/supabase": "^1.0.2",
     "@types/lodash-es": "^4.17.6",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",

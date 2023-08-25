@@ -10,7 +10,7 @@ onMounted(async () => {
   const draftedTeamsStore = useDraftedTeamsStore();
   await draftedTeamsStore.fetchDraftedTeams();
 
-  monitorUserStatus();
+  // monitorUserStatus();
 });
 </script>
 

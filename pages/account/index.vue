@@ -2,7 +2,7 @@
 import { useAccount } from '@/logic/account/';
 
 definePageMeta({
-  middleware: ['auth'],
+  // middleware: ['auth'],
 });
 
 const {

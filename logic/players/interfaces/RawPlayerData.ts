@@ -21,6 +21,8 @@ interface RawPlayerData {
   status: string;
   team: number;
   team_code: number;
+  team_name: string;
+  team_short_name: string;
   web_name: string;
   yellow_cards: number;
 }

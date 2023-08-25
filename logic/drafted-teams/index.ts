@@ -21,7 +21,7 @@ const setDraftedPlayersData = (
         return {
           ...playerList.filter((p) => p.id === rawTransferData.transfer_id)[0],
           isCurrentWeekTransfer:
-            new Date(rawTransferData.current_transfer_expiry_date) >=
+            new Date(rawTransferData.current_transfer_date_expiry) >=
             new Date(),
           transferWeek: rawTransferData.transfer_week,
         };

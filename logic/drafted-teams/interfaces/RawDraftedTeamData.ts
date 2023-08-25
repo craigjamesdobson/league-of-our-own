@@ -1,5 +1,5 @@
 interface RawDraftedPlayerTransferData {
-  current_transfer_expiry_date: string;
+  current_transfer_date_expiry: string;
   transfer_id: number;
   transfer_week: number;
 }

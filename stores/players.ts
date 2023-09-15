@@ -155,6 +155,12 @@ export const usePlayersStore = defineStore({
             'afterend',
             `<p style="color: green;">${newTeamData.team_name} added</p>`
           );
+        } else {
+          await updateDoc(teamDocRef, newTeamData);
+          updateLog.insertAdjacentHTML(
+            'afterend',
+            `<p style="color: blue;">${newTeamData.team_name} updated</p>`
+          );
         }
       }
     },

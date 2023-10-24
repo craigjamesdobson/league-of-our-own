@@ -6,6 +6,12 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-icon',
     '@nuxtjs/fontaine',
+    [
+      '@nuxtjs/google-adsense',
+      {
+        id: 'ca-pub-2688671235446223',
+      },
+    ],
   ],
   app: {
     head: {

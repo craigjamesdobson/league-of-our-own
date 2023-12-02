@@ -45,10 +45,16 @@ const props = defineProps({
           :drafted-player="player.transfers.at(-1)"
         />
         <div
-          class="prev-transfer absolute left-0 z-10 flex items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
+          class="prev-transfer absolute left-0 z-10 gap-5 flex flex-col items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
         >
-          {{ player.webName }} was transferred out in gameweek
-          {{ player.transfers.at(-1)?.transferWeek }}
+          <div v-if="player.transfers[1]">
+            {{ player.transfers[0].webName }} was transferred out in gameweek
+            {{ player.transfers[1].transferWeek }}
+          </div>
+          <div>
+            {{ player.webName }} was transferred out in gameweek
+            {{ player.transfers[0].transferWeek }}
+          </div>
         </div>
       </div>
     </div>

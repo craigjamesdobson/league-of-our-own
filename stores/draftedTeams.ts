@@ -15,6 +15,14 @@ export const useDraftedTeamsStore = defineStore({
 
   actions: {
     async fetchDraftedTeams() {
+      const supabase = useSupabaseClient();
+
+      const { data, error } = await supabase
+        .from('drafted_teams_view')
+        .select();
+
+      console.log(data);
+
       const teamsDocs = await getDocs(draftedTeamsCollection);
       const playerStore = usePlayersStore();
       const draftedTeams = teamsDocs.docs.map((team) => team.data());

@@ -1,97 +1,33 @@
-// stores/counter.js
+import { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
+import { Database } from 'types/database.types';
 
-interface UserData {
-  uid: string | null;
-  email: string | null;
-  isSignedIn: boolean;
-}
+export const useAccountStore = defineStore('account', () => {
+  const supabase = useSupabaseClient<Database>();
+  const userData = useSupabaseUser();
 
-interface State {
-  userData: UserData;
-}
+  const user: Ref<User | null> = ref(userData);
 
-export const useAccountStore = defineStore({
-  id: 'account-store',
-  state: (): State => {
-    return {
-      userData: {
-        uid: null,
-        email: null,
-        isSignedIn: false,
-      },
-    };
-  },
+  const userIsLoggedIn = computed(() => user.value !== null);
 
-  actions: {
-    setUserData() {
-      const auth = getAuth();
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          this.userData = {
-            uid: user.uid,
-            email: user.email,
-            isSignedIn: true,
-          };
-        }
-      });
-    },
+  const setUserData = (userData: User) => {
+    user.value = userData;
+  };
 
-    async signInUser(formData: { email: string; password: string }) {
-      const auth = getAuth();
-      try {
-        const userCredentials = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        this.userData = {
-          uid: userCredentials.user.uid,
-          email: userCredentials.user.email,
-          isSignedIn: true,
-        };
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Unknown error';
-        throw new Error(errorMessage);
-      }
-    },
+  const signUserIn = async (credentials: {
+    email: string;
+    password: string;
+  }) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
 
-    async signOutUser() {
-      const auth = getAuth();
-      try {
-        await signOut(auth);
-        this.userData = {
-          uid: null,
-          email: null,
-          isSignedIn: false,
-        };
-      } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Unknown error');
-      }
-    },
+    if (error) {
+      throw new Error(error.message);
+    }
+    setUserData(data.user);
+  };
 
-    async resetUserPassword(email: string) {
-      const auth = getAuth();
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert(`Password reset has been sent to ${email}`);
-      } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Unknown error');
-      }
-    },
-  },
-
-  getters: {
-    getUserData: (state) => state.userData,
-  },
+  return { user, userIsLoggedIn, setUserData, signUserIn };
 });

@@ -2,11 +2,10 @@
 import { useAccount } from '@/logic/account/';
 
 definePageMeta({
-  // middleware: ['auth'],
+  middleware: ['auth'],
 });
 
 const {
-  userData,
   teamData,
   updatePlayerData,
   updateTeamData,
@@ -25,8 +24,10 @@ const {
         <Icon class="ml-2" name="la:sign-out-alt" />
       </button>
     </h1>
-    <div v-if="userData.isSignedIn">
-      <p class="m-4 text-center underline">Hello {{ userData.email }}</p>
+    <div v-if="accountStore.userIsLoggedIn">
+      <p class="m-4 text-center underline">
+        Hello {{ accountStore.user.email }}
+      </p>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
           <textarea

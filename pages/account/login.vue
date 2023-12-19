@@ -32,7 +32,7 @@ const { v$, formData, accountStore } = useAccount();
           class="px-1 py-2 text-white rounded-md bg-primary"
           :class="{ 'opacity-50': v$.$invalid }"
           :disabled="v$.$invalid"
-          @click.prevent="accountStore.signInUser(formData)"
+          @click.prevent="accountStore.signUserIn(formData)"
         >
           Log In
         </button>

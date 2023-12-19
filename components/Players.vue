@@ -39,45 +39,47 @@ const playerStore = usePlayersStore();
           <div class="grid grid-cols-1 gap-1 md:grid-cols-2">
             <div
               v-for="player in playerTypes"
-              :key="player.id"
+              :key="player.player_id"
               class="relative flex flex-col items-center justify-around w-full text-sm bg-white border-b border-gray-100 cursor-pointer"
-              @click="toggleModal(true, player.id)"
+              @click="toggleModal(true, player.player_id)"
             >
               <div class="flex items-center w-full">
-                <span class="w-1/12 p-2">{{ player.id }}</span>
+                <span class="w-1/12 p-2">{{ player.player_id }}</span>
                 <span class="w-2/12 p-2">
                   <img
                     class="w-6 h-6 rounded-full shadow-md"
                     :src="player.image"
-                    :alt="player.webName"
+                    :alt="player.web_name"
                     @error="loadPlayerFallbackImage"
                   />
                 </span>
-                <span class="w-1/12 p-2">{{ player.teamNameShort }}</span>
-                <span class="w-5/12 p-2 text-center">{{ player.webName }}</span>
-                <span class="w-1/12 p-2 text-center">{{ player.price }}</span>
+                <span class="w-1/12 p-2">{{ player.team_short_name }}</span>
+                <span class="w-5/12 p-2 text-center">{{
+                  player.web_name
+                }}</span>
+                <span class="w-1/12 p-2 text-center">{{ player.cost }}</span>
                 <span
-                  v-if="player.unavailableForSeason"
+                  v-if="player.unavailable_for_season"
                   class="flex items-center justify-end w-2/12 p-2"
-                  :class="player.availabilityType"
+                  :class="player.status"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-red-500 rounded-full"
                   />
                 </span>
                 <span
-                  v-if="player.isUnavailable && !player.unavailableForSeason"
+                  v-if="player.is_unavailable && !player.unavailable_for_season"
                   class="flex items-center justify-end w-2/12 p-2"
-                  :class="player.availabilityType"
+                  :class="player.status"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-yellow-400 rounded-full"
                   />
                 </span>
                 <span
-                  v-else-if="!player.isUnavailable"
+                  v-else-if="!player.is_unavailable"
                   class="flex items-center justify-end w-2/12 p-2"
-                  :class="player.availabilityType"
+                  :class="player.status"
                 >
                   <span
                     class="flex justify-center w-3 h-3 mr-2 leading-tight bg-green-400 rounded-full"

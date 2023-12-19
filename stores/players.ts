@@ -1,19 +1,6 @@
 import { defineStore } from 'pinia';
-import { isEqual } from 'lodash-es';
-import { doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import type { Player } from '../logic/players/interfaces/Player';
 import { PlayerPosition } from '../logic/players/interfaces/PlayerPosition';
-import { createPlayerData } from '../logic/players';
-import {
-  localStorageGet,
-  localStorageHas,
-  localStorageSet,
-} from '../composables/localStorage';
-import {
-  draftedTeamsCollection,
-  playersCollection,
-  settingsCollection,
-} from './../firebase/useDB';
 
 interface FilterData {
   filterName: string;
@@ -45,30 +32,13 @@ export const usePlayersStore = defineStore({
       const supabase = useSupabaseClient();
 
       try {
-        const { data, error } = await supabase.from('players').select(`
-          id,
-          code,
-          team,
-          web_name,
-          first_name,
-          second_name,
-          goals_scored,
-          assists,
-          clean_sheets,
-          red_cards,
-          now_cost,
-          cost_change_start_fall,
-          status,
-          news,
-          element_type,
-          ...teams ( team_name:name, team_short_name:short_name )
-        `);
+        const { data, error } = await supabase.from('players_view').select(`*`);
 
         if (error) {
           console.error('Error fetching data:', error.message);
           return;
         }
-        this.players = await createPlayerData(data);
+        this.players = data;
         this.filteredPlayers = this.players;
         this.isLoaded = true;
       } catch (error) {
@@ -81,61 +51,69 @@ export const usePlayersStore = defineStore({
     },
 
     setSelectedPlayer(playerID: number) {
-      this.selectedPlayer = this.players.filter((x) => x.id === playerID)[0];
+      this.selectedPlayer = this.players.filter(
+        (x) => x.player_id === playerID
+      )[0];
     },
 
-    async updatePlayerData(playerData: string) {
-      const parsedData = JSON.parse(playerData);
+    // async updatePlayerData(playerData: string) {
+    //   const parsedData = JSON.parse(playerData);
 
-      const updateLog = document.querySelector('.update-log');
+    //   const updateLog = document.querySelector('.update-log');
 
-      if (!updateLog) {
-        throw new Error('No log element');
-      }
+    //   if (!updateLog) {
+    //     throw new Error('No log element');
+    //   }
 
-      const supabase = useSupabaseClient();
+    //   const supabase = useSupabaseClient();
 
-      const { data, error } = await supabase
-        .from('players')
-        .upsert(parsedData)
-        .select();
+    //   const { data, error } = await supabase
+    //     .from('players')
+    //     .upsert(parsedData)
+    //     .select();
 
-      if (error) {
-        console.error('Error fetching data:', error.message);
-      } else {
-        console.log('Data:', data);
-      }
-    },
+    //   if (error) {
+    //     console.error('Error fetching data:', error.message);
+    //   } else {
+    //     console.log('Data:', data);
+    //   }
+    // },
 
-    async updateTeamData(teamData: string) {
-      const parsedData = JSON.parse(teamData);
+    // async updateTeamData(teamData: string) {
+    //   const parsedData = JSON.parse(teamData);
 
-      const updateLog = document.querySelector('.update-log');
+    //   const updateLog = document.querySelector('.update-log');
 
-      if (!updateLog) {
-        throw new Error('No log element');
-      }
+    //   if (!updateLog) {
+    //     throw new Error('No log element');
+    //   }
 
-      for (const newTeamData of parsedData) {
-        const teamDocRef = doc(
-          draftedTeamsCollection,
-          newTeamData.team_id.toString()
-        );
-        const teamDocSnap = await getDoc(teamDocRef);
+    //   for (const newTeamData of parsedData) {
+    //     const teamDocRef = doc(
+    //       draftedTeamsCollection,
+    //       newTeamData.team_id.toString()
+    //     );
+    //     const teamDocSnap = await getDoc(teamDocRef);
 
-        if (!teamDocSnap.exists()) {
-          await setDoc(
-            doc(draftedTeamsCollection, newTeamData.team_id.toString()),
-            newTeamData
-          );
+    //     if (!teamDocSnap.exists()) {
+    //       await setDoc(
+    //         doc(draftedTeamsCollection, newTeamData.team_id.toString()),
+    //         newTeamData
+    //       );
 
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: green;">${newTeamData.team_name} added</p>`
-          );
-        }
-      }
-    },
+    //       updateLog.insertAdjacentHTML(
+    //         'afterend',
+    //         `<p style="color: green;">${newTeamData.team_name} added</p>`
+    //       );
+    //     } else {
+    //       await updateDoc(teamDocRef, newTeamData);
+    //       updateLog.insertAdjacentHTML(
+    //         'afterend',
+    //         `<p style="color: blue;">${newTeamData.team_name} updated</p>`
+    //       );
+    //     }
+    //   }
+    // },
   },
   getters: {
     playerList: (state) => state.players,
@@ -157,7 +135,7 @@ export const usePlayersStore = defineStore({
         let filteredPlayers = state.players;
         if (filterName) {
           filteredPlayers = filteredPlayers.filter((p) =>
-            p.webName
+            p.web_name
               .normalize('NFD')
               .replace(/[\u0300-\u036F]/g, '')
               .toLowerCase()
@@ -167,7 +145,7 @@ export const usePlayersStore = defineStore({
 
         if (filterPrice) {
           filteredPlayers = filteredPlayers.filter((player) =>
-            player.price.includes(filterPrice)
+            player.cost.includes(filterPrice)
           );
         }
 

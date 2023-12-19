@@ -24,20 +24,20 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
           class="modal__inner"
           :class="{
             'border-4 border-yellow-300':
-              !selectedPlayer.unavailableForSeason &&
-              selectedPlayer.isUnavailable,
-            'border-4 border-red-500': selectedPlayer.unavailableForSeason,
+              !selectedPlayer.unavailable_for_season &&
+              selectedPlayer.is_unavailable,
+            'border-4 border-red-500': selectedPlayer.unavailable_for_season,
           }"
         >
           <img
             class="modal__badge"
-            :src="getImageUrl(selectedPlayer.teamNameShort?.toLowerCase())"
+            :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
           />
           <div class="flex flex-row justify-between gap-4 items-top">
             <div class="w-24">
               <img
                 class="rounded-full"
-                :src="selectedPlayer.imageLarge"
+                :src="selectedPlayer.image_large"
                 :alt="selectedPlayer.name"
                 @error="loadPlayerFallbackImage"
               />
@@ -46,9 +46,9 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
               class="flex flex-col items-end text-2xl leading-none text-right uppercase md:text-4xl"
             >
               <span class="mb-2 text-base">
-                {{ selectedPlayer.firstName }}
+                {{ selectedPlayer.first_name }}
               </span>
-              {{ selectedPlayer.secondName }}
+              {{ selectedPlayer.second_name }}
             </h4>
           </div>
           <div class="mt-6 rounded-lg inner">
@@ -65,9 +65,9 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                     class="text-white bg-green-500 rounded-full"
                     :class="{
                       'bg-yellow-500':
-                        !selectedPlayer.unavailableForSeason &&
-                        selectedPlayer.isUnavailable,
-                      'bg-red-500': selectedPlayer.unavailableForSeason,
+                        !selectedPlayer.unavailable_for_season &&
+                        selectedPlayer.is_unavailable,
+                      'bg-red-500': selectedPlayer.unavailable_for_season,
                     }"
                   />
                 </span>
@@ -91,7 +91,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.goalsScored }}
+                      {{ selectedPlayer.goals_scored }}
                     </strong>
                   </li>
                   <li class="flex justify-between w-full">
@@ -117,7 +117,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.cleanSheets }}
+                      {{ selectedPlayer.clean_sheets }}
                     </strong>
                   </li>
                   <li class="flex justify-between w-full">
@@ -127,7 +127,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
                     <strong
                       class="w-1/4 py-1 text-center border-b border-gray-100"
                     >
-                      {{ selectedPlayer.redCards }}
+                      {{ selectedPlayer.red_cards }}
                     </strong>
                   </li>
                 </ul>

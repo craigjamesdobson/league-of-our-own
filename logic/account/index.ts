@@ -2,12 +2,11 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength, helpers } from '@vuelidate/validators';
 import { useAccountStore } from '@/stores/account';
 import { usePlayersStore } from '@/stores/players';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const useAccount = () => {
   const accountStore = useAccountStore();
-  accountStore.setUserData();
-
-  const userData = computed(() => accountStore.getUserData);
+  const draftedTeamsStore = useDraftedTeamsStore();
 
   const formData = reactive({
     email: '',
@@ -47,13 +46,12 @@ const useAccount = () => {
 
   const updateTeamData = async () => {
     loading.value = true;
-    await playerStore.updateTeamData(teamData.value);
+    await draftedTeamsStore.upsertTeamData(teamData.value);
     playerData.value = '';
     loading.value = false;
   };
 
   return {
-    userData,
     v$,
     updatePlayerData,
     updateTeamData,

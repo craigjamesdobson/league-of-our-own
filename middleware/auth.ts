@@ -1,13 +1,7 @@
-import { useAccountStore } from '../stores/account';
+export default defineNuxtRouteMiddleware((_to, _from) => {
+  const user = useSupabaseUser();
 
-// middleware/auth.ts
-export default defineNuxtRouteMiddleware(() => {
-  const accountStore = useAccountStore();
-  const userData = computed(() => accountStore.getUserData);
-  // redirect the user to the login page
-  if (!userData.value.isSignedIn) {
-    return navigateTo({
-      path: '/account/login',
-    });
+  if (!user.value) {
+    return navigateTo('/account/login');
   }
 });

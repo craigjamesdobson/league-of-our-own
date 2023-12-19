@@ -9,10 +9,11 @@ const playerStore = usePlayersStore();
 <template>
   <div v-if="playerStore.isLoaded && draftedTeamsStore.getDraftedTeams.length">
     <h1 class="main-heading">Teams</h1>
+    <button @click="draftedTeamsStore.upsertTeamData">click</button>
     <div class="grid lg:grid-cols-2 xl:grid-cols-4">
       <div
         v-for="draftedTeam in draftedTeamsStore.getDraftedTeams"
-        :key="draftedTeam.id"
+        :key="draftedTeam.drafted_team_id"
       >
         <DraftedTeam :drafted-team="draftedTeam" />
       </div>

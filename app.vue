@@ -1,5 +1,4 @@
 <script setup>
-import { monitorUserStatus } from './logic/account/auth';
 import { usePlayersStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
@@ -9,8 +8,6 @@ onMounted(async () => {
 
   const draftedTeamsStore = useDraftedTeamsStore();
   await draftedTeamsStore.fetchDraftedTeams();
-
-  // monitorUserStatus();
 });
 </script>
 

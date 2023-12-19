@@ -4,8 +4,6 @@ import type { DraftedTeamData } from '@/logic/drafted-teams/interfaces/DraftedTe
 const props = defineProps({
   draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
 });
-
-const isHovered = ref(false);
 </script>
 
 <template>
@@ -17,45 +15,51 @@ const isHovered = ref(false);
       }"
     >
       <div class="flex flex-col uppercase">
-        <span class="font-black">{{ props.draftedTeam?.teamName }}</span>
+        <span class="font-black">{{ props.draftedTeam?.team_name }}</span>
         <span class="text-xs font-light">{{
           props.draftedTeam?.teamOwner
         }}</span>
       </div>
-      <span v-if="props.draftedTeam?.allowedTransfers">
+      <span v-if="props.draftedTeam?.allowed_transfers">
         <Icon size="24" name="ic:round-swap-horiz" />
       </span>
     </div>
     <div
-      v-for="player in props.draftedTeam?.teamPlayers"
-      :key="player.id"
+      v-for="player in props.draftedTeam?.players"
+      :key="player.player_id"
       class="relative text-sm"
       :class="{
         'bg-yellow-200':
           player.transfers.length &&
-          !player.transfers.at(-1)?.isCurrentWeekTransfer,
-        'bg-green-200': player.transfers.at(-1)?.isCurrentWeekTransfer,
+          new Date(player.transfers.at(-1)?.active_transfer_expiry) >
+            new Date(),
+        'bg-green-200':
+          new Date(player.transfers.at(-1)?.active_transfer_expiry) <=
+          new Date(),
       }"
     >
       <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
       <div
         v-else-if="player.transfers.at(-1) !== null"
-        class="cursor-pointer"
-        @mouseover="isHovered = true"
-        @mouseleave="isHovered = false"
+        class="cursor-pointer player-container"
       >
         <DraftedPlayer
           :is-transfer="true"
-          :drafted-player="player.transfers.at(-1)"
+          :drafted-player="player.transfers.at(-1).player"
         />
         <div
-          class="absolute left-0 z-10 flex items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
-          :class="{
-            '!visible': isHovered,
-          }"
+          class="prev-transfer absolute left-0 z-10 gap-5 flex flex-col items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
         >
-          {{ player.webName }} was transferred out in gameweek
-          {{ player.transfers.at(-1)?.transferWeek }}
+          <div
+            v-for="(transferredPlayer, index) in player.transfers"
+            :key="transferredPlayer.player.player_id"
+          >
+            {{
+              player.transfers[index - 1]?.player.web_name ?? player.web_name
+            }}
+            was transferred out in gameweek
+            {{ transferredPlayer.transfer_week }}
+          </div>
         </div>
       </div>
     </div>
@@ -67,3 +71,9 @@ const isHovered = ref(false);
     </div>
   </div>
 </template>
+
+<style>
+.player-container:hover .prev-transfer {
+  @apply !visible;
+}
+</style>

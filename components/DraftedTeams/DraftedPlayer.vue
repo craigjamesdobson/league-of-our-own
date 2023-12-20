@@ -39,7 +39,7 @@ const props = defineProps({
         name="ic:round-swap-horiz"
     /></span>
     <span class="w-2/12 p-2 text-center">
-      {{ props.draftedPlayer?.cost }}
+      {{ props.draftedPlayer?.cost.toFixed(1) }}
     </span>
   </div>
 </template>

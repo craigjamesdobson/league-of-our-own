@@ -3,7 +3,8 @@ import { Database } from '@/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const draftedTeamsWithPlayersQuery = supabase.from('drafted_teams').select(`
+  const draftedTeamsWithPlayersQuery = supabase.from('drafted_teams_summary')
+    .select(`
   *,
   players:drafted_players(
     drafted_player_id,

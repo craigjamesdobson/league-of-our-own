@@ -1,9 +1,18 @@
 <script setup lang="ts">
+import type { DraftedTeams } from '#build/components';
 import DraftedPlayer from './DraftedPlayer.vue';
-import type { DraftedTeamData } from '@/logic/drafted-teams/interfaces/DraftedTeamData';
+import type { Tables } from '~/types/database.types';
+
 const props = defineProps({
-  draftedTeam: { type: Object as PropType<DraftedTeamData>, default: null },
+  draftedTeam: {
+    type: Object as PropType<Tables<'drafted_teams_summary'>>,
+    default: null,
+  },
 });
+
+const getTotalTeamCost = (players: Tables<'players_view'>[]) => {
+  return players.reduce((sum, player) => sum + (player.cost || 0), 0);
+};
 </script>
 
 <template>
@@ -11,13 +20,13 @@ const props = defineProps({
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800"
       :class="{
-        'bg-red-200': props.draftedTeam?.isInvalidTeam,
+        'bg-red-200': !props.draftedTeam?.valid_team,
       }"
     >
       <div class="flex flex-col uppercase">
         <span class="font-black">{{ props.draftedTeam?.team_name }}</span>
         <span class="text-xs font-light">{{
-          props.draftedTeam?.teamOwner
+          props.draftedTeam?.team_owner
         }}</span>
       </div>
       <span v-if="props.draftedTeam?.allowed_transfers">
@@ -66,7 +75,7 @@ const props = defineProps({
     <div class="flex justify-between pt-2">
       <span>Total</span>
       <strong class="w-2/12 text-center">
-        {{ props.draftedTeam?.totalTeamValue }}
+        {{ props.draftedTeam.total_cost }}
       </strong>
     </div>
   </div>

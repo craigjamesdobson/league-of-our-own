@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { Database } from '@/types/database.types';
+import { initDraftedTeamData } from '~/logic/drafted-teams';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const draftedTeamsWithPlayersQuery = supabase.from('drafted_teams_summary')
-    .select(`
+  const draftedTeamsWithPlayersQuery = supabase.from('drafted_teams').select(`
   *,
   players:drafted_players(
     drafted_player_id,
@@ -27,11 +27,29 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     )
   );
 
+  const getDraftedTeamByID = computed(
+    () => (id: number) =>
+      draftedTeams.value.find((x) => x.drafted_team_id === id)
+  );
+
   const fetchDraftedTeams = async () => {
     const { data, error } = await draftedTeamsWithPlayersQuery;
     if (error) throw error;
-    console.log(data);
-    draftedTeams.value = data;
+    draftedTeams.value = initDraftedTeamData(data);
+  };
+
+  const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
+    const { data, error } = await supabase
+      .from('drafted_players')
+      .select(
+        `*,
+          transfers:drafted_transfers(*)
+        )`
+      )
+      .eq('drafted_player_id', draftedPlayerID)
+      .single();
+    if (error) throw new Error(error.message);
+    return data;
   };
 
   const upsertTeamData = (teamData: string) => {
@@ -47,38 +65,12 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     });
   };
 
-  return { draftedTeams, getDraftedTeams, fetchDraftedTeams, upsertTeamData };
+  return {
+    draftedTeams,
+    getDraftedTeams,
+    getDraftedTeamByID,
+    fetchDraftedTeams,
+    fetchDraftedPlayerByID,
+    upsertTeamData,
+  };
 });
-
-// export const useDraftedTeamsStore = defineStore({
-//   id: 'drafted-teams-store',
-//   state: () => {
-//     return {
-//       draftedTeams: null,
-//     };
-//   },
-
-//   actions: {
-//     async fetchDraftedTeams() {
-//       const { data, error } = await draftedTeamsWithPlayers;
-//       if (error) throw error;
-//       console.log(data);
-//       this.draftedTeams = data;
-//     },
-//   },
-
-//   getters: {
-//     getDraftedTeams: (state) =>
-//       state.draftedTeams.sort((a, b) =>
-//         a.teamName.toLowerCase().localeCompare(b.teamName.toLowerCase())
-//       ),
-//     getDraftedTeamsWithTransfers: (state) =>
-//       state.draftedTeams.filter((x) => x.allowedTransfers),
-//     getDraftedTeamByID: (state) => {
-//       return (draftedTeamID: number) =>
-//         state.draftedTeams.filter(
-//           (draftedTeam) => draftedTeam.teamID === +draftedTeamID
-//         )[0];
-//     },
-//   },
-// });

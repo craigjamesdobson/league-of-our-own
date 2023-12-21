@@ -1,5 +1,9 @@
 <script setup>
 import { useAccount } from '@/logic/account/';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import DraftedTeam from '@/components/DraftedTeams/DraftedTeam';
+
+const draftedTeamStore = useDraftedTeamsStore();
 
 definePageMeta({
   middleware: ['auth'],
@@ -28,6 +32,9 @@ const {
       <p class="m-4 text-center underline">
         Hello {{ accountStore.user.email }}
       </p>
+      <div v-if="draftedTeamStore.draftedTeams">
+        <DraftedTeam :drafted-team="draftedTeamStore.getDraftedTeamByID(1)" />
+      </div>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
           <textarea

@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { DraftedTeams } from '#build/components';
 import DraftedPlayer from './DraftedPlayer.vue';
 import type { Tables } from '~/types/database.types';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+
+const draftedTeamsStore = useDraftedTeamsStore();
 
 const props = defineProps({
   draftedTeam: {
@@ -10,8 +12,21 @@ const props = defineProps({
   },
 });
 
-const getTotalTeamCost = (players: Tables<'players_view'>[]) => {
-  return players.reduce((sum, player) => sum + (player.cost || 0), 0);
+const modal = ref();
+const selectedDraftedPlayer = ref(null);
+
+const handleEditPlayer = async (playerID: string) => {
+  await fetchDraftedPlayer(playerID);
+  modal.value.toggleModal(true);
+};
+
+const fetchDraftedPlayer = async (playerID: string) => {
+  try {
+    const player = await draftedTeamsStore.fetchDraftedPlayerByID(playerID);
+    selectedDraftedPlayer.value = player;
+  } catch (error) {
+    console.error('Error fetching drafted player:', error);
+  }
 };
 </script>
 
@@ -20,7 +35,7 @@ const getTotalTeamCost = (players: Tables<'players_view'>[]) => {
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800"
       :class="{
-        'bg-red-200': !props.draftedTeam?.valid_team,
+        'bg-red-200': props.draftedTeam?.is_invalid_team,
       }"
     >
       <div class="flex flex-col uppercase">
@@ -46,6 +61,7 @@ const getTotalTeamCost = (players: Tables<'players_view'>[]) => {
           new Date(player.transfers.at(-1)?.active_transfer_expiry) <=
           new Date(),
       }"
+      @click="handleEditPlayer(player.drafted_player_id)"
     >
       <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
       <div
@@ -75,10 +91,25 @@ const getTotalTeamCost = (players: Tables<'players_view'>[]) => {
     <div class="flex justify-between pt-2">
       <span>Total</span>
       <strong class="w-2/12 text-center">
-        {{ props.draftedTeam.total_cost }}
+        {{ props.draftedTeam.total_team_value }}
       </strong>
     </div>
   </div>
+  <GenericModal v-if="selectedDraftedPlayer" ref="modal">
+    <template #default>
+      <div>
+        <input v-model="selectedDraftedPlayer.drafted_player" type="number" />
+      </div>
+      <div
+        v-for="playerTransfer in selectedDraftedPlayer.transfers"
+        :key="playerTransfer.drafted_transfer_id"
+      >
+        <input v-model="playerTransfer.player_id" type="number" />
+        <input v-model="playerTransfer.active_transfer_expiry" type="date" />
+        <input v-model="playerTransfer.transfer_week" type="number" />
+      </div>
+    </template>
+  </GenericModal>
 </template>
 
 <style>

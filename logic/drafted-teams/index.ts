@@ -1,92 +1,39 @@
-import type { Player } from '../players/interfaces/Player';
-import type {
-  DraftedTeamData,
-  CompleteDraftedPlayer,
-} from './interfaces/DraftedTeamData';
-import type {
-  RawDraftedPlayerData,
-  RawDraftedTeamData,
-} from '@/logic/drafted-teams/interfaces/RawDraftedTeamData';
+import type { DraftedTeamData } from './interfaces/DraftedTeamData';
 
-const setDraftedPlayersData = (
-  rawDraftedPlayerData: RawDraftedPlayerData[],
-  playerList: Player[]
-): CompleteDraftedPlayer[] => {
-  return rawDraftedPlayerData.map((rawDraftedPlayer) => {
-    return {
-      ...playerList.filter(
-        (player) => player.id === rawDraftedPlayer.player_id
-      )[0],
-      transfers: rawDraftedPlayer.transfers.map((rawTransferData) => {
-        return {
-          ...playerList.filter((p) => p.id === rawTransferData.transfer_id)[0],
-          isCurrentWeekTransfer:
-            new Date(rawTransferData.current_transfer_date_expiry) >=
-            new Date(),
-          transferWeek: rawTransferData.transfer_week,
-        };
-      }),
-    };
-  });
+const setTotalTeamPrice = (draftedTeamData: any) => {
+  return draftedTeamData.players.reduce((total: number, draftedPlayer: any) => {
+    const playerPrice =
+      draftedPlayer.transfers.length > 0
+        ? parseFloat(
+            draftedPlayer.transfers[draftedPlayer.transfers.length - 1].player
+              .cost
+          )
+        : parseFloat(draftedPlayer.cost);
+
+    return total + playerPrice;
+  }, 0);
 };
 
-const setTotalTeamPrice = (draftedTeamData: DraftedTeamData[]) => {
-  draftedTeamData.forEach((draftedTeam) => {
-    let totalTeamValue = 0;
-    draftedTeam.teamPlayers.forEach((draftedPlayer) => {
-      if (draftedPlayer.transfers.length > 0) {
-        totalTeamValue += parseFloat(
-          draftedPlayer.transfers[draftedPlayer.transfers.length - 1].price
-        );
-      } else {
-        totalTeamValue += parseFloat(draftedPlayer.price);
-      }
-    });
-    draftedTeam.totalTeamValue = totalTeamValue;
-  });
+const setTeamValidity = (draftedTeamData: any) => {
+  if (draftedTeamData.allowedTransfers) {
+    return (draftedTeamData.isInvalidTeam =
+      draftedTeamData.totalTeamValue > 85);
+  } else {
+    return (draftedTeamData.isInvalidTeam =
+      draftedTeamData.totalTeamValue > 95);
+  }
 };
 
-const setTeamValidity = (draftedTeamData: DraftedTeamData[]) => {
-  draftedTeamData.forEach((draftedTeam) => {
-    if (draftedTeam.allowedTransfers) {
-      draftedTeam.isInvalidTeam = draftedTeam.totalTeamValue > 85;
-    } else {
-      draftedTeam.isInvalidTeam = draftedTeam.totalTeamValue > 95;
-    }
-  });
-};
-
-const initDraftedTeamData = (
-  playerList: Player[],
-  rawDraftedTeams: RawDraftedTeamData[]
-) => {
-  const draftedTeamData: DraftedTeamData[] = rawDraftedTeams.map(
-    (rawDraftedTeamData) => {
+const initDraftedTeamData = (draftedTeamsData: any) => {
+  const draftedTeamData: DraftedTeamData[] = draftedTeamsData.map(
+    (draftedTeam: any) => {
       return {
-        teamID: rawDraftedTeamData.team_id,
-        teamName: rawDraftedTeamData.team_name,
-        teamOwner: rawDraftedTeamData.team_owner,
-        allowedTransfers: rawDraftedTeamData.allowed_transfers,
-        teamValueAllowed: rawDraftedTeamData.allowed_transfers ? 85 : 95,
-        teamPlayers: setDraftedPlayersData(
-          rawDraftedTeamData.team_players,
-          playerList
-        ),
-        totalTeamValue: 0,
-        isInvalidTeam: false,
-        invalidErrorMessages: [],
-        gameweekStats: [],
-        totalPoints: undefined,
-        totalGoals: undefined,
-        totalAssists: undefined,
-        totalRedCards: undefined,
-        totalCleanSheets: undefined,
+        ...draftedTeam,
+        total_team_value: setTotalTeamPrice(draftedTeam),
+        is_invalid_team: setTeamValidity(draftedTeam),
       };
     }
   );
-
-  setTotalTeamPrice(draftedTeamData);
-  setTeamValidity(draftedTeamData);
 
   return draftedTeamData.sort((a, b) => (a.teamName > b.teamName ? 1 : -1));
 };

@@ -2,35 +2,36 @@
 import { getImageUrl, loadPlayerFallbackImage } from '@/composables/helpers';
 import { usePlayerModal } from '@/logic/players/modal';
 
-const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
+const { selectedPlayer, modalVisible } = usePlayerModal();
 </script>
 
 <template lang="">
   <div>
-    <div
-      class="flex items-center justify-center modal"
-      :class="{ '-active': modalVisible }"
-      @click.self="toggleModal(false)"
+    <Dialog
+      v-model:visible="modalVisible"
+      :pt="{
+        root: {
+          class: [
+            'rounded-lg relative overflow-hidden w-1/3',
+            {
+              'border-4 border-yellow-300':
+                !selectedPlayer.unavailable_for_season &&
+                selectedPlayer.is_unavailable,
+              'border-4 border-red-500': selectedPlayer.unavailable_for_season,
+            },
+          ],
+        },
+        header: {
+          class: 'flex justify-end rounded-t-none bg-white p-5',
+        },
+      }"
+      modal
+      :dismissable-mask="true"
     >
-      <div v-if="selectedPlayer" class="px-4 modal__content">
-        <div class="absolute top-0 right-0 p-12 opacity-75 cursor-pointer">
-          <Icon
-            name="system-uicons:cross-circle"
-            class="w-12 h-12 text-white"
-            @click="toggleModal(false)"
-          />
-        </div>
-        <div
-          class="modal__inner"
-          :class="{
-            'border-4 border-yellow-300':
-              !selectedPlayer.unavailable_for_season &&
-              selectedPlayer.is_unavailable,
-            'border-4 border-red-500': selectedPlayer.unavailable_for_season,
-          }"
-        >
+      <div v-if="selectedPlayer" class="px-4">
+        <div class="">
           <img
-            class="modal__badge"
+            class="modal__badge z-100"
             :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
           />
           <div class="flex flex-row justify-between gap-4 items-top">
@@ -136,7 +137,7 @@ const { selectedPlayer, toggleModal, modalVisible } = usePlayerModal();
           </div>
         </div>
       </div>
-    </div>
+    </Dialog>
   </div>
 </template>
 

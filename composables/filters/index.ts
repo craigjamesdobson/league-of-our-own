@@ -1,7 +1,8 @@
-import { usePlayersStore } from '@/stores/players';
+import { PRICE_BREAKS } from './constants';
+import { usePlayerStore } from '@/stores/players';
 
 const useFilters = () => {
-  const playerStore = usePlayersStore();
+  const playerStore = usePlayerStore();
 
   interface FilterData {
     filterName: string;
@@ -16,7 +17,7 @@ const useFilters = () => {
   });
 
   const setFilteredPlayers = () => {
-    playerStore.getFilteredPlayers(filterData);
+    playerStore.filterPlayers(filterData);
   };
 
   const selectfilteredTeam = (event: Event) => {
@@ -44,7 +45,7 @@ const useFilters = () => {
       .forEach((e) => e.classList.remove('active'));
 
     filterData.filterTeam = undefined;
-    setFilteredPlayers();
+    return setFilteredPlayers();
   };
 
   return {
@@ -53,6 +54,7 @@ const useFilters = () => {
     selectfilteredTeam,
     resetFilteredTeams,
     setFilteredPlayers,
+    PRICE_BREAKS,
   };
 };
 

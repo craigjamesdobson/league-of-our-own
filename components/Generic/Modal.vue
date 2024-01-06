@@ -1,17 +1,15 @@
 <script setup>
-import { useModal } from '@/composables/useModal';
+const { toggleDialog, dialogVisible } = useDialog();
 
-const { toggleModal, modalVisible } = useModal();
-
-defineExpose({ toggleModal });
+defineExpose({ toggleDialog });
 </script>
 
 <template>
   <div>
     <div
       class="flex items-center justify-center modal"
-      :class="{ '-active': modalVisible }"
-      @click.self="toggleModal(false)"
+      :class="{ '-active': dialogVisible }"
+      @click.self="toggleDialog(false)"
     >
       <div class="bg-white p-5">
         <slot />

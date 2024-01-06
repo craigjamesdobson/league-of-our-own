@@ -1,14 +1,19 @@
-<script setup>
-import { getImageUrl, loadPlayerFallbackImage } from '@/composables/helpers';
-import { usePlayerModal } from '@/logic/players/modal';
+<script setup lang="ts">
+import type { Player } from '~/types/Player';
+import { getImageUrl, loadPlayerFallbackImage } from '@/helpers/images';
 
-const { selectedPlayer, modalVisible } = usePlayerModal();
+const { selectedPlayer } = defineProps<{
+  selectedPlayer: Player | null;
+}>();
+
+const modelValue = defineModel<boolean>();
 </script>
 
-<template lang="">
+<template>
   <div>
     <Dialog
-      v-model:visible="modalVisible"
+      v-if="selectedPlayer"
+      v-model:visible="modelValue"
       :pt="{
         root: {
           class: [
@@ -39,7 +44,7 @@ const { selectedPlayer, modalVisible } = usePlayerModal();
               <img
                 class="rounded-full"
                 :src="selectedPlayer.image_large"
-                :alt="selectedPlayer.name"
+                :alt="selectedPlayer.web_name"
                 @error="loadPlayerFallbackImage"
               />
             </div>

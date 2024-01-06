@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template lang="">
   <div class="mb-36 players-container xl:mb-0">
     <Players />

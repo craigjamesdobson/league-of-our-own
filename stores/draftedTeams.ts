@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
-import { Database } from '@/types/database.types';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
+import type { DraftedPlayer } from '~/types/DraftedPlayer';
+import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -19,7 +21,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     )
   `);
 
-  const draftedTeams: Ref<Array<any> | null> = ref(null);
+  const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
     draftedTeams.value?.sort((a, b) =>
@@ -38,13 +40,15 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     draftedTeams.value = initDraftedTeamData(data);
   };
 
-  const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
+  const fetchDraftedPlayerByID = async (
+    draftedPlayerID: string
+  ): Promise<DraftedPlayer> => {
     const { data, error } = await supabase
       .from('drafted_players')
       .select(
         `*,
           transfers:drafted_transfers(*)
-        )`
+        `
       )
       .eq('drafted_player_id', draftedPlayerID)
       .single();
@@ -53,8 +57,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   };
 
   const upsertTeamData = (teamData: string) => {
-    JSON.parse(teamData).map(async ({ team_players, ...draftedTeamData }) => {
-      const formattedDraftedPlayers = team_players.map((x: any) => {
+    const parsedDraftedTeams: DraftedTeam[] = JSON.parse(teamData);
+    parsedDraftedTeams.map(async ({ players, ...draftedTeamData }) => {
+      const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
           drafted_player: x.player_id,
           drafted_team: draftedTeamData.drafted_team_id,

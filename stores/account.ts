@@ -2,7 +2,7 @@ import { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
 import { Database } from 'types/database.types';
 
-export const useAccountStore = defineStore('account', () => {
+export const useAccountStore = defineStore('account-store', () => {
   const supabase = useSupabaseClient<Database>();
   const userData = useSupabaseUser();
 

@@ -1,7 +1,7 @@
 import { useVuelidate } from '@vuelidate/core';
 import { required, email, minLength, helpers } from '@vuelidate/validators';
 import { useAccountStore } from '@/stores/account';
-import { usePlayersStore } from '@/stores/players';
+import { usePlayerStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const useAccount = () => {
@@ -31,7 +31,7 @@ const useAccount = () => {
 
   const v$ = useVuelidate(rules, formData);
 
-  const playerStore = usePlayersStore();
+  const playerStore = usePlayerStore();
   const playerData = ref('');
   const teamData = ref('');
 

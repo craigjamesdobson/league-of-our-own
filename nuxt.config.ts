@@ -35,8 +35,8 @@ export default defineNuxtConfig({
             '-1': '-1',
           },
           colors: {
-            primary: '#02033c',
-            offWhite: '#F0F3FA',
+            primary: 'rgb(2,3,60)',
+            offWhite: 'rgb(240, 243, 250)',
             'primary-50': 'rgb(var(--primary-50))',
             'primary-100': 'rgb(var(--primary-100))',
             'primary-200': 'rgb(var(--primary-200))',

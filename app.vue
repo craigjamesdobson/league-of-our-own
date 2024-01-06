@@ -1,10 +1,10 @@
 <script setup>
-import { usePlayersStore } from '@/stores/players';
+import { usePlayerStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 onMounted(async () => {
-  const playerStore = usePlayersStore();
-  await playerStore.getPlayerSettings();
+  const playerStore = usePlayerStore();
+  await playerStore.fetchPlayers();
 
   const draftedTeamsStore = useDraftedTeamsStore();
   await draftedTeamsStore.fetchDraftedTeams();

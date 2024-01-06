@@ -1,111 +1,19 @@
 export default {
-    root: ({ props, state }) => ({
+    root: {
         class: [
-            // Display and Position
-            'inline-flex',
-            'relative',
-
-            // Shape
-            'w-full md:w-56',
+            // Sizing and Shape
+            'min-w-[12rem]',
             'rounded-md',
 
-            // Color and Background
-            'bg-surface-0 dark:bg-surface-900',
-            'border border-surface-300 dark:border-surface-700',
-
-            // Transitions
-            'transition-all',
-            'duration-200',
-
-            // States
-            'hover:border-primary-500 dark:hover:border-primary-300',
-            { 'outline-none outline-offset-0 ring ring-primary-400/50 dark:ring-primary-300/50': state.focused },
-
-            // Misc
-            'cursor-pointer',
-            'select-none',
-            { 'opacity-60': props.disabled, 'pointer-events-none': props.disabled, 'cursor-default': props.disabled }
-        ]
-    }),
-    input: ({ props }) => ({
-        class: [
-            //Font
-            'font-sans',
-            'leading-none',
-
-            // Display
-            'block',
-            'flex-auto',
-
-            // Color and Background
-            'bg-transparent',
-            'border-0',
-            { 'text-surface-800 dark:text-white/80': props.modelValue, 'text-surface-400 dark:text-surface-500': !props.modelValue },
-            'placeholder:text-surface-400 dark:placeholder:text-surface-500',
-
-            // Sizing and Spacing
-            'w-[1%]',
-            'p-3',
-            { 'pr-7': props.showClear },
-
-            //Shape
-            'rounded-none',
-
-            // Transitions
-            'transition',
-            'duration-200',
-
-            // States
-            'focus:outline-none focus:shadow-none',
-
-            // Misc
-            'relative',
-            'cursor-pointer',
-            'overflow-hidden overflow-ellipsis',
-            'whitespace-nowrap',
-            'appearance-none'
-        ]
-    }),
-    trigger: {
-        class: [
-            // Flexbox
-            'flex items-center justify-center',
-            'shrink-0',
-
-            // Color and Background
-            'bg-transparent',
-            'text-surface-500',
-
-            // Size
-            'w-12',
-
-            // Shape
-            'rounded-tr-md',
-            'rounded-br-md'
-        ]
-    },
-    panel: {
-        class: [
-            // Position
-            'absolute top-0 left-0',
-
-            // Shape
-            'border-0 dark:border',
-            'rounded-md',
-            'shadow-md',
-
-            // Color
+            // Colors
             'bg-surface-0 dark:bg-surface-800',
-            'text-surface-800 dark:text-white/80',
-            'dark:border-surface-700'
+            'text-surface-700 dark:text-white/80',
+            'border border-surface-200 dark:border-surface-600'
         ]
     },
     wrapper: {
         class: [
-            // Sizing
-            'max-h-[200px]',
-
-            // Misc
+            // Overflow
             'overflow-auto'
         ]
     },
@@ -167,19 +75,6 @@ export default {
             'cursor-auto'
         ]
     },
-    emptymessage: {
-        class: [
-            // Font
-            'leading-none',
-
-            // Spacing
-            'py-3 px-5',
-
-            // Color
-            'text-surface-800 dark:text-white/80',
-            'bg-transparent'
-        ]
-    },
     header: {
         class: [
             // Spacing
@@ -194,7 +89,7 @@ export default {
             // Color
             'text-surface-700 dark:text-white/80',
             'bg-surface-100 dark:bg-surface-800',
-            'border-surface-300 dark:border-surface-700'
+            'border-surface-300 dark:border-surface-600'
         ]
     },
     filtercontainer: {
@@ -237,24 +132,17 @@ export default {
     filtericon: {
         class: ['absolute', 'top-1/2 right-3', '-mt-2']
     },
-    clearicon: {
+    emptymessage: {
         class: [
-            // Color
-            'text-surface-500',
-
-            // Position
-            'absolute',
-            'top-1/2',
-            'right-12',
+            // Font
+            'leading-none',
 
             // Spacing
-            '-mt-2'
+            'py-3 px-5',
+
+            // Color
+            'text-surface-800 dark:text-white/80',
+            'bg-transparent'
         ]
-    },
-    transition: {
-        enterFromClass: 'opacity-0 scale-y-[0.8]',
-        enterActiveClass: 'transition-[transform,opacity] duration-[120ms] ease-[cubic-bezier(0,0,0.2,1)]',
-        leaveActiveClass: 'transition-opacity duration-100 ease-linear',
-        leaveToClass: 'opacity-0'
     }
 };

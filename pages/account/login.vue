@@ -16,13 +16,13 @@ const { v$, formData, accountStore } = useAccount();
       class="flex flex-col justify-center p-10 mb-4 bg-white rounded-md w-96"
     >
       <form class="flex flex-col gap-6" action="">
-        <FormField
+        <GenericFormField
           v-model="formData.email"
           label="Email"
           :validation="v$.email"
           icon="material-symbols:alternate-email"
         />
-        <FormField
+        <GenericFormField
           v-model="formData.password"
           label="Password"
           :validation="v$.password"

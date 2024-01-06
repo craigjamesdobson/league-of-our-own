@@ -1,10 +1,22 @@
-<script setup>
-import { usePlayerModal } from '@/logic/players/modal';
-import { usePlayersStore } from '@/stores/players';
-import { loadPlayerFallbackImage } from '@/composables/helpers';
+<script lang="ts" setup>
+import { usePlayerStore } from '@/stores/players';
+import { loadPlayerFallbackImage } from '@/helpers/images';
+import type { Player } from '~/types/Player';
 
-const { toggleModal } = usePlayerModal();
-const playerStore = usePlayersStore();
+const router = useRouter();
+const playerStore = usePlayerStore();
+const selectedPlayer: Ref<Player | null> = ref(null);
+const showDialog = ref(false);
+const playerData = computed(() => playerStore.formatFilteredPlayersByPosition);
+
+const setSelectedPlayerAndQueryParam = (playerID: number) => {
+  selectedPlayer.value = playerStore.getPlayerByID(playerID) as Player;
+  router.push({
+    path: 'players',
+    query: { id: playerID },
+  });
+  showDialog.value = true;
+};
 </script>
 
 <template>
@@ -21,27 +33,19 @@ const playerStore = usePlayersStore();
     </div>
   </div>
   <div v-else>
-    <PlayerModal />
-    <div
-      v-for="(
-        playerTypes, key, index
-      ) in playerStore.getFilteredPlayersByPosition"
-      :key="index"
-    >
+    <PlayerModal v-model="showDialog" :selected-player="selectedPlayer" />
+    <div v-for="(data, index) in playerData" :key="index">
       <h1 class="main-heading">
-        {{ key }}
+        {{ data.position }}
       </h1>
-      <div
-        v-if="playerTypes.length"
-        class="flex justify-between mb-4 rounded-sm"
-      >
+      <div class="flex justify-between mb-4 rounded-sm">
         <div class="w-full border-r border-gray-100">
           <div class="grid grid-cols-1 gap-1 md:grid-cols-2">
             <div
-              v-for="player in playerTypes"
+              v-for="player in data.players"
               :key="player.player_id"
               class="relative flex flex-col items-center justify-around w-full text-sm bg-white border-b border-gray-100 cursor-pointer"
-              @click="toggleModal(true, player.player_id)"
+              @click="setSelectedPlayerAndQueryParam(player.player_id)"
             >
               <div class="flex items-center w-full">
                 <span class="w-1/12 p-2">{{ player.player_id }}</span>
@@ -57,9 +61,7 @@ const playerStore = usePlayersStore();
                 <span class="w-5/12 p-2 text-center">{{
                   player.web_name
                 }}</span>
-                <span class="w-1/12 p-2 text-center">{{
-                  player.cost.toFixed(1)
-                }}</span>
+                <span class="w-1/12 p-2 text-center">{{ player.cost }}</span>
                 <span
                   v-if="player.unavailable_for_season"
                   class="flex items-center justify-end w-2/12 p-2"

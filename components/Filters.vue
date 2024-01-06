@@ -1,8 +1,7 @@
 <script setup>
 import { TEAM_DATA } from '@/logic/teams/constants';
-import { PRICE_BREAKS } from '@/logic/filters/constants';
-import { useFilters } from '@/logic/filters';
-import { getImageUrl } from '@/composables/helpers';
+import { getImageUrl } from '@/helpers/images';
+import { PRICE_BREAKS } from '~/composables/filters/constants';
 
 const {
   filterData,
@@ -13,6 +12,8 @@ const {
 } = useFilters();
 
 const filtersVisible = ref(false);
+
+const players = defineModel('players');
 </script>
 
 <template>
@@ -54,7 +55,7 @@ const filtersVisible = ref(false);
               type="text"
               name="filter_name"
               placeholder="Search Players..."
-              @keyup="setFilteredPlayers"
+              @keyup="players = setFilteredPlayers($event)"
             />
             <Icon size="22" name="mdi:person-search-outline" />
           </div>
@@ -69,7 +70,7 @@ const filtersVisible = ref(false);
               v-model="filterData.filterPrice"
               name="filter_number"
               class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
-              @change="setFilteredPlayers"
+              @change="players = setFilteredPlayers($event)"
             >
               <option selected="selected" value="">All</option>
               <option v-for="price in PRICE_BREAKS" :key="price" :value="price">
@@ -94,7 +95,7 @@ const filtersVisible = ref(false);
               :key="team.id"
               :data-teamID="team.id"
               class="mb-2 icon-container"
-              @click.prevent="selectfilteredTeam"
+              @click.prevent="players = selectfilteredTeam($event)"
             >
               <img
                 class="w-full h-full px-2"

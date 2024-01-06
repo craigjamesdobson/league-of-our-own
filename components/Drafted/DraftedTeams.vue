@@ -1,15 +1,14 @@
 <script setup>
 import DraftedTeam from './DraftedTeam';
-import { usePlayersStore } from '@/stores/players';
+import { usePlayerStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 const draftedTeamsStore = useDraftedTeamsStore();
-const playerStore = usePlayersStore();
+const playerStore = usePlayerStore();
 </script>
 
 <template>
   <div v-if="playerStore.isLoaded">
     <h1 class="main-heading">Teams</h1>
-    <button @click="draftedTeamsStore.upsertTeamData">click</button>
     <div class="grid lg:grid-cols-2 xl:grid-cols-4">
       <div
         v-for="draftedTeam in draftedTeamsStore.getDraftedTeams"

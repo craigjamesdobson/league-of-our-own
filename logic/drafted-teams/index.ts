@@ -1,4 +1,4 @@
-import type { DraftedTeamData } from './interfaces/DraftedTeamData';
+import type { DraftedTeam } from '~/types/DraftedTeam';
 
 const setTotalTeamPrice = (draftedTeamData: any) => {
   return draftedTeamData.players.reduce((total: number, draftedPlayer: any) => {
@@ -25,7 +25,7 @@ const setTeamValidity = (draftedTeamData: any) => {
 };
 
 const initDraftedTeamData = (draftedTeamsData: any) => {
-  const draftedTeamData: DraftedTeamData[] = draftedTeamsData.map(
+  const draftedTeamData: DraftedTeam[] = draftedTeamsData.map(
     (draftedTeam: any) => {
       return {
         ...draftedTeam,
@@ -35,7 +35,7 @@ const initDraftedTeamData = (draftedTeamsData: any) => {
     }
   );
 
-  return draftedTeamData.sort((a, b) => (a.teamName > b.teamName ? 1 : -1));
+  return draftedTeamData.sort((a, b) => (a.team_name > b.team_name ? 1 : -1));
 };
 
 export { initDraftedTeamData };

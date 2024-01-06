@@ -1,7 +1,6 @@
 <script setup>
 import { useAccount } from '@/logic/account/';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
-import DraftedTeam from '@/components/DraftedTeams/DraftedTeam';
 
 const draftedTeamStore = useDraftedTeamsStore();
 
@@ -20,7 +19,6 @@ const {
 </script>
 
 <template>
-  <!-- <TransferModal /> -->
   <div class="flex flex-col items-center justify-center h-full">
     <h1 class="flex items-center main-heading">
       <span>Admin Login</span>
@@ -33,7 +31,10 @@ const {
         Hello {{ accountStore.user.email }}
       </p>
       <div v-if="draftedTeamStore.draftedTeams">
-        <DraftedTeam :drafted-team="draftedTeamStore.getDraftedTeamByID(1)" />
+        <DraftedTeam
+          :editable="true"
+          :drafted-team="draftedTeamStore.getDraftedTeamByID(1)"
+        />
       </div>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">

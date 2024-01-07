@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import type { Player } from '~/types/Player';
 import { getImageUrl, loadPlayerFallbackImage } from '@/helpers/images';
+const router = useRouter();
 
 const { selectedPlayer } = defineProps<{
   selectedPlayer: Player | null;
 }>();
+
+const clearPlayerQueryParam = () => {
+  router.push({
+    path: 'players',
+    query: null,
+  });
+};
 
 const modelValue = defineModel<boolean>();
 </script>
@@ -32,6 +40,7 @@ const modelValue = defineModel<boolean>();
       }"
       modal
       :dismissable-mask="true"
+      @hide="clearPlayerQueryParam"
     >
       <div v-if="selectedPlayer" class="px-4">
         <div class="">

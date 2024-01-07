@@ -61,7 +61,9 @@ const setSelectedPlayerAndQueryParam = (playerID: number) => {
                 <span class="w-5/12 p-2 text-center">{{
                   player.web_name
                 }}</span>
-                <span class="w-1/12 p-2 text-center">{{ player.cost }}</span>
+                <span class="w-1/12 p-2 text-center">{{
+                  player.cost.toFixed(1)
+                }}</span>
                 <span
                   v-if="player.unavailable_for_season"
                   class="flex items-center justify-end w-2/12 p-2"

@@ -64,8 +64,19 @@ const players = defineModel('players');
           <label class="flex mb-2 text-xs" for="filter_name">
             Filter by price
           </label>
-          <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
-            <select
+
+          <InputNumber
+            v-model="filterData.filterPrice"
+            class="w-full"
+            input-id="minmax-buttons"
+            mode="decimal"
+            show-buttons
+            :min="0"
+            :step="0.5"
+            :max="14.0"
+            :update:model-value="setFilteredPlayers($event)"
+          />
+          <!-- <select
               id="filter_number"
               v-model="filterData.filterPrice"
               name="filter_number"
@@ -76,8 +87,7 @@ const players = defineModel('players');
               <option v-for="price in PRICE_BREAKS" :key="price" :value="price">
                 {{ price }}
               </option>
-            </select>
-          </div>
+            </select> -->
         </div>
         <div class="border-gray-100 max-xl:pb-3 max-xl:border-b">
           <label

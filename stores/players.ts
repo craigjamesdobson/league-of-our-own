@@ -3,7 +3,7 @@ import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, Tables } from '~/types/database.types';
 interface FilterData {
   filterName: string;
-  filterPrice: string;
+  filterPrice: number;
   filterTeam: number | undefined;
 }
 
@@ -38,7 +38,7 @@ export const usePlayerStore = defineStore('player-store', () => {
 
   const filterPlayers = ({
     filterName = '',
-    filterPrice = '',
+    filterPrice = 0,
     filterTeam = 0,
   }: FilterData) => {
     let newFilteredPlayers = [...players.value];
@@ -53,8 +53,8 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
 
     if (filterPrice) {
-      newFilteredPlayers = newFilteredPlayers.filter((player) =>
-        player.cost.includes(filterPrice)
+      newFilteredPlayers = newFilteredPlayers.filter(
+        (player) => player.cost === +filterPrice
       );
     }
 

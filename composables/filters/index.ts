@@ -1,4 +1,3 @@
-import { PRICE_BREAKS } from './constants';
 import { usePlayerStore } from '@/stores/players';
 
 const useFilters = () => {
@@ -54,7 +53,6 @@ const useFilters = () => {
     selectfilteredTeam,
     resetFilteredTeams,
     setFilteredPlayers,
-    PRICE_BREAKS,
   };
 };
 

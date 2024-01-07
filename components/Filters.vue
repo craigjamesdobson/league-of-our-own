@@ -1,7 +1,6 @@
 <script setup>
 import { TEAM_DATA } from '@/logic/teams/constants';
 import { getImageUrl } from '@/helpers/images';
-import { PRICE_BREAKS } from '~/composables/filters/constants';
 
 const {
   filterData,
@@ -76,18 +75,6 @@ const players = defineModel('players');
             :max="14.0"
             :update:model-value="setFilteredPlayers($event)"
           />
-          <!-- <select
-              id="filter_number"
-              v-model="filterData.filterPrice"
-              name="filter_number"
-              class="w-full text-sm placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
-              @change="players = setFilteredPlayers($event)"
-            >
-              <option selected="selected" value="">All</option>
-              <option v-for="price in PRICE_BREAKS" :key="price" :value="price">
-                {{ price }}
-              </option>
-            </select> -->
         </div>
         <div class="border-gray-100 max-xl:pb-3 max-xl:border-b">
           <label

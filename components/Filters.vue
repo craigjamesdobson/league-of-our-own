@@ -54,7 +54,7 @@ const players = defineModel('players');
               type="text"
               name="filter_name"
               placeholder="Search Players..."
-              @keyup="players = setFilteredPlayers($event)"
+              @keyup="players = setFilteredPlayers()"
             />
             <Icon size="22" name="mdi:person-search-outline" />
           </div>
@@ -73,7 +73,7 @@ const players = defineModel('players');
             :min="0"
             :step="0.5"
             :max="14.0"
-            :update:model-value="setFilteredPlayers($event)"
+            :update:model-value="setFilteredPlayers()"
           />
         </div>
         <div class="border-gray-100 max-xl:pb-3 max-xl:border-b">

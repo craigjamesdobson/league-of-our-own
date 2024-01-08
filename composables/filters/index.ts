@@ -5,13 +5,13 @@ const useFilters = () => {
 
   interface FilterData {
     filterName: string;
-    filterPrice: string;
+    filterPrice: number;
     filterTeam: number | undefined;
   }
 
   const filterData: FilterData = reactive({
     filterName: '',
-    filterPrice: '',
+    filterPrice: 0,
     filterTeam: undefined,
   });
 

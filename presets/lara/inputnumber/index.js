@@ -31,7 +31,7 @@ export default {
         'flex flex-auto',
 
         // Font
-        'font-sans leading-none text-xs',
+        'font-sans leading-none',
 
         // Text
         {
@@ -40,7 +40,7 @@ export default {
         },
 
         // Spacing
-        'p-2',
+        'p-3',
         'm-0',
 
         // Shape
@@ -70,7 +70,8 @@ export default {
         // Colorsh
         'text-surface-600 dark:text-surface-200',
         'placeholder:text-surface-400 dark:placeholder:text-surface-500',
-        'bg-gray-100 dark:bg-surface-900',
+        'bg-surface-0 dark:bg-surface-900',
+        'border border-surface-300 dark:border-surface-600',
 
         // States
         'hover:border-primary-500 dark:hover:border-primary-400',
@@ -94,6 +95,7 @@ export default {
       // Flex
       'flex',
       'flex-col',
+      'gap-[1px]',
     ],
   }),
 

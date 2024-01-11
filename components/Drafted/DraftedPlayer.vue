@@ -13,7 +13,7 @@ const { draftedPlayer, isTransfer } = defineProps({
 
 <template>
   <div
-    class="flex items-center w-full border-b border-gray-100"
+    class="flex items-center w-full h-full"
     :class="{
       'opacity-25': draftedPlayer.unavailable_for_season,
     }"

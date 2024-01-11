@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import DraftedPlayer from './DraftedPlayer.vue';
-// import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import type { DraftedTeam } from '~/types/DraftedTeam';
-
-// const draftedTeamsStore = useDraftedTeamsStore();
 
 const props = defineProps({
   draftedTeam: {
@@ -16,34 +13,27 @@ const props = defineProps({
   },
 });
 
-const isActiveTransfer = (transferDate: string) => {
+const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
 };
 
-// const selectedDraftedPlayer = ref(null);
-// const showDialog = ref(false);
+const selectedDraftedPlayer = ref(null);
+const showDialog = ref(false);
 
-// const handleEditPlayer = async (playerID: string) => {
-//   await fetchDraftedPlayer(playerID);
-//   showDialog.value = true;
-// };
-
-// const formatDate = (dateString: string) => {
-//   return new Date(dateString);
-// };
-
-// const fetchDraftedPlayer = async (playerID: string) => {
-//   try {
-//     const player = await draftedTeamsStore.fetchDraftedPlayerByID(playerID);
-//     selectedDraftedPlayer.value = player;
-//   } catch (error) {
-//     console.error('Error fetching drafted player:', error);
-//   }
-// };
+const handleEditPlayer = (playerID: number) => {
+  try {
+    selectedDraftedPlayer.value = props.draftedTeam.players.find(
+      (x) => x.player_id === playerID
+    );
+    showDialog.value = true;
+  } catch (error) {
+    console.error('Error fetching drafted player:', error);
+  }
+};
 </script>
 
 <template v-if="props.draftedTeam">
-  <div class="p-4 m-2 bg-white rounded-sm">
+  <div class="p-4 bg-white rounded-sm">
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800"
       :class="{
@@ -51,12 +41,17 @@ const isActiveTransfer = (transferDate: string) => {
       }"
     >
       <div class="flex flex-col uppercase">
-        <span class="font-black">{{ props.draftedTeam?.team_name }}</span>
+        <span class="font-black text-lg">{{
+          props.draftedTeam?.team_name
+        }}</span>
         <span class="text-xs font-light">{{
           props.draftedTeam?.team_owner
         }}</span>
       </div>
-      <span v-if="props.draftedTeam?.allowed_transfers">
+      <span
+        v-if="props.draftedTeam?.allowed_transfers"
+        title="Transfers allowed"
+      >
         <Icon size="24" name="ic:round-swap-horiz" />
       </span>
     </div>
@@ -73,43 +68,44 @@ const isActiveTransfer = (transferDate: string) => {
           !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
       }"
     >
-      <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
-      <div
-        v-else-if="player.transfers.at(-1) !== null"
-        class="cursor-pointer player-container"
-      >
+      <div class="flex gap-5 w-full border-b border-gray-100 items-center">
         <DraftedPlayer
-          :is-transfer="true"
-          :drafted-player="player.transfers.at(-1)!.player"
+          v-if="!player.transfers.length"
+          :drafted-player="player"
         />
-        <div
-          class="prev-transfer absolute left-0 z-10 gap-5 flex flex-col items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
+        <DraftedTransfer
+          v-else-if="player.transfers.at(-1) !== null"
+          :drafted-player="player"
+          class="w-full"
+        />
+        <Button
+          v-if="editable"
+          icon="pi pi-check"
+          aria-label="Edit Player"
+          title="Edit Player"
+          class="mr-2"
+          :pt="{
+            root: { class: 'w-6 h-6' },
+          }"
+          :pt-options="{ mergeProps: true }"
+          @click="handleEditPlayer(player.player_id)"
         >
-          <div
-            v-for="(transferredPlayer, index) in player.transfers"
-            :key="transferredPlayer.player.player_id"
-          >
-            {{
-              player.transfers[index - 1]?.player.web_name ?? player.web_name
-            }}
-            was transferred out in gameweek
-            {{ transferredPlayer.transfer_week }}
-          </div>
-        </div>
+          <Icon size="20" name="ic:round-swap-horiz" />
+        </Button>
       </div>
     </div>
-    <div class="flex justify-between pt-2">
+    <div class="flex justify-between px-2.5 pt-2.5">
       <span>Total</span>
-      <strong class="w-2/12 text-center">
-        {{ props.draftedTeam.total_team_value }}
+      <strong>
+        {{ props.draftedTeam?.total_team_value }}
       </strong>
     </div>
   </div>
-  <!-- <DraftedPlayerEditDialog
+  <DraftedPlayerEditDialog
     v-if="editable"
     v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog"
-  /> -->
+  />
 </template>
 
 <style>

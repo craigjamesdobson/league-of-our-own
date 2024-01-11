@@ -1,34 +1,145 @@
 <template>
-  <Dialog v-model:visible="visible" modal :dismissable-mask="true">
-    <div>
-      <input v-model="draftedPlayer.player_id" type="number" />
-      <Dropdown
-        v-model="draftedPlayer"
-        :options="playerStore.players"
-        option-label="web_name"
-        placeholder="Select a Player"
-      >
-      </Dropdown>
-    </div>
-    <div
-      v-for="playerTransfer in draftedPlayer.transfers"
-      :key="playerTransfer.drafted_transfer_id"
-    >
-      <input v-model="playerTransfer.player_id" type="number" />
-      <Calendar v-model="playerTransfer.active_transfer_expiry" show-icon />
-      <input v-model="playerTransfer.transfer_week" type="number" />
+  <Toast />
+  <Dialog v-model:visible="visible" header=" " modal :dismissable-mask="true">
+    <div class="grid grid-cols-3 gap-10">
+      <div class="col-span-2">
+        <div class="mb-10">
+          <h2 class="pb-2.5 uppercase font-black text-lg">Original Player</h2>
+          <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
+        </div>
+        <div v-if="draftedPlayer?.transfers.length" class="mb-5">
+          <h2 class="uppercase font-black text-lg mb-2.5">Transfers</h2>
+          <div
+            v-for="playerTransfer in draftedPlayer.transfers"
+            :key="playerTransfer.drafted_transfer_id"
+            class="mb-5 flex flex-col"
+          >
+            <h3 class="text-sm uppercase font-bold flex self-start">
+              gameweek {{ playerTransfer.transfer_week }}
+            </h3>
+            <div class="flex items-center gap-2.5">
+              <Icon
+                class="w-6 h-6"
+                name="material-symbols:subdirectory-arrow-right-rounded"
+              />
+              <DraftedPlayer :drafted-player="playerTransfer.player" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h2 class="uppercase font-black text-lg mb-2.5">Submit new transfer</h2>
+        <form class="flex flex-col gap-5 items-start">
+          <div class="flex flex-col gap-2 w-full">
+            <label for="new-transfer-id">Player</label>
+            <Dropdown
+              v-model="newTransferData.player"
+              class="!w-full"
+              filter
+              :options="
+                playerStore.players.filter(
+                  (x) => x.position === draftedPlayer?.position
+                )
+              "
+              option-label="web_name"
+              placeholder="Select a Player"
+            >
+              <template #option="slotProps">
+                <div class="flex align-items-center">
+                  <div class="w-1/5">
+                    {{ slotProps.option.player_id }}
+                  </div>
+                  <div class="w-4/5">
+                    {{ slotProps.option.web_name }}
+                  </div>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
+          <div class="flex flex-col gap-2 w-full">
+            <label for="new-transfer-week">Transfer Week</label>
+            <InputNumber
+              v-model="newTransferData.transferWeek"
+              :min="0"
+              :max="38"
+              class="!w-full"
+              show-buttons
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="new-transfer-expiry-date">Active expiry date</label>
+            <Calendar
+              v-model="newTransferData.activeExpiryDate"
+              date-format="dd/mm/yy"
+              show-icon
+            />
+          </div>
+          <Button
+            class="flex self-start"
+            label="Submit"
+            @click="addNewTransfer"
+          />
+        </form>
+      </div>
     </div>
   </Dialog>
 </template>
 
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
 import { usePlayerStore } from '~/stores/players';
+import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
+
+const toast = useToast();
+
+interface TransferData {
+  player: null | DraftedPlayer; // Replace 'string' with the actual type of the player property
+  activeExpiryDate: Date;
+  transferWeek: number;
+}
+
+const newTransferData: Ref<TransferData> = ref({
+  player: null,
+  activeExpiryDate: new Date(),
+  transferWeek: 0,
+});
 
 const visible = defineModel<boolean>('visible');
 const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
 
 const playerStore = usePlayerStore();
+const draftedTeamsStore = useDraftedTeamsStore();
+
+const addNewTransfer = async () => {
+  try {
+    await draftedTeamsStore.addNewTransfer([
+      {
+        drafted_player: draftedPlayer.value?.drafted_player_id,
+        active_transfer_expiry: newTransferData.value.activeExpiryDate,
+        player_id: newTransferData.value.player?.player_id,
+        transfer_week: newTransferData.value.transferWeek,
+      },
+    ]);
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Transfer was made',
+      life: 3000,
+    });
+    draftedPlayer.value?.transfers.push({
+      active_transfer_expiry: newTransferData.value.activeExpiryDate,
+      player: newTransferData.value.player,
+      transfer_week: newTransferData.value.transferWeek,
+    });
+  } catch (err) {
+    toast.add({
+      severity: 'error',
+      detail: 'Error submitting transfer',
+      life: 3000,
+    });
+  }
+};
 </script>
 
 <style scoped></style>

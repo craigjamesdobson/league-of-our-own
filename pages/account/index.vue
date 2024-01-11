@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useAccount } from '@/logic/account/';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
@@ -8,14 +8,12 @@ definePageMeta({
   middleware: ['auth'],
 });
 
-const {
-  teamData,
-  updatePlayerData,
-  updateTeamData,
-  loading,
-  accountStore,
-  playerData,
-} = useAccount();
+const selectedDraftedTeamID = ref(0);
+const selectedDraftedTeam = computed(() =>
+  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
+);
+
+const { updatePlayerData, loading, accountStore, playerData } = useAccount();
 </script>
 
 <template>
@@ -30,48 +28,35 @@ const {
       <p class="m-4 text-center underline">
         Hello {{ accountStore.user.email }}
       </p>
-      <div v-if="draftedTeamStore.draftedTeams">
-        <DraftedTeam
-          :editable="true"
-          :drafted-team="draftedTeamStore.getDraftedTeamByID(1)"
-        />
-      </div>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
-          <textarea
-            id=""
+          <Textarea
             v-model="playerData"
-            class="p-2 text-sm rounded-md"
-            name="player-data"
             cols="75"
-            rows="20"
+            rows="40"
             placeholder="Paste player data here..."
           />
-          <button
-            :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex self-start p-2 text-white rounded-md bg-primary"
+          <Button
+            :class="{ 'opacity-25': loading }"
+            label="Update players"
             @click="updatePlayerData"
-          >
-            Update Players
-          </button>
+          />
         </div>
         <div class="flex flex-col gap-4">
-          <textarea
-            id=""
-            v-model="teamData"
-            class="p-2 text-sm rounded-md"
-            name="player-data"
-            cols="75"
-            rows="20"
-            placeholder="Paste team data here..."
+          <Dropdown
+            v-model="selectedDraftedTeamID"
+            class="!w-full"
+            :options="
+              draftedTeamStore.draftedTeams?.filter((x) => x.allowed_transfers)
+            "
+            filter
+            option-label="team_name"
+            option-value="drafted_team_id"
+            placeholder="Select a team"
           />
-          <button
-            :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex self-start p-2 text-white rounded-md bg-primary"
-            @click="updateTeamData"
-          >
-            Update Teams
-          </button>
+          <div v-if="selectedDraftedTeam">
+            <DraftedTeam :editable="true" :drafted-team="selectedDraftedTeam" />
+          </div>
         </div>
       </div>
       <div class="update-log" />

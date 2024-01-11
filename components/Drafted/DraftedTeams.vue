@@ -13,12 +13,13 @@ const playerStore = usePlayerStore();
       <div
         v-for="draftedTeam in draftedTeamsStore.getDraftedTeams"
         :key="draftedTeam.drafted_team_id"
+        class="m-2"
       >
         <DraftedTeam :drafted-team="draftedTeam" />
       </div>
     </div>
   </div>
-  <DraftedTeamLoader v-else />
+  <SkeletonDraftedTeams v-else />
 </template>
 
 <style scoped></style>

@@ -1,15 +1,15 @@
 :root {
-  --primary-50: 228 247 248;
-  --primary-100: 204 238 242;
-  --primary-200: 156 215 229;
-  --primary-300: 108 185 216;
-  --primary-400: 59 148 203;
-  --primary-500: 42 102 159;
-  --primary-600: 35 75 131;
-  --primary-700: 27 51 102;
-  --primary-800: 20 32 74;
-  --primary-900: 12 16 46;
-  --primary-950: 8 10 32;
+  --primary-50: 243 243 248;
+  --primary-100: 231 232 242;
+  --primary-200: 196 197 222;
+  --primary-300: 161 162 202;
+  --primary-400: 90 92 162;
+  --primary-500: 19 22 122;
+  --primary-600: 17 20 110;
+  --primary-700: 11 13 73;
+  --primary-800: 9 10 55;
+  --primary-900: 6 7 37;
+  --primary-950: 1 1 18;
   --surface-0: 255 255 255;
   --surface-50: 248 250 252;
   --surface-100: 241 245 249;
@@ -22,6 +22,10 @@
   --surface-800: 30 41 59;
   --surface-900: 15 23 42;
   --surface-950: 3 6 23;
+}
+
+body {
+  @apply text-sm
 }
 
 .main-heading {

@@ -20,7 +20,7 @@ const setSelectedPlayerAndQueryParam = (playerID: number) => {
 </script>
 
 <template>
-  <PlayerLoader v-if="!playerStore.isLoaded" />
+  <SkeletonPlayers v-if="!playerStore.isLoaded" />
   <div v-else>
     <PlayerModal v-model="showDialog" :selected-player="selectedPlayer" />
     <div v-for="(data, index) in playerData" :key="index">

@@ -31,7 +31,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   const getDraftedTeamByID = computed(
     () => (id: number) =>
-      draftedTeams.value.find((x) => x.drafted_team_id === id)
+      draftedTeams.value?.find((x) => x.drafted_team_id === id)
   );
 
   const fetchDraftedTeams = async () => {
@@ -70,6 +70,13 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     });
   };
 
+  const addNewTransfer = async (newTransferData) => {
+    const { data, error } = await supabase
+      .from('drafted_transfers')
+      .insert(newTransferData)
+      .select();
+  };
+
   return {
     draftedTeams,
     getDraftedTeams,
@@ -77,5 +84,6 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     fetchDraftedTeams,
     fetchDraftedPlayerByID,
     upsertTeamData,
+    addNewTransfer,
   };
 });

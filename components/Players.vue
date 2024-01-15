@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { usePlayerStore } from '@/stores/players';
-import { loadPlayerFallbackImage } from '@/helpers/images';
 import type { Player } from '~/types/Player';
 
 const router = useRouter();

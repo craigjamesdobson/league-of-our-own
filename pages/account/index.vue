@@ -53,7 +53,16 @@ const { updatePlayerData, loading, accountStore, playerData } = useAccount();
             option-label="team_name"
             option-value="drafted_team_id"
             placeholder="Select a team"
-          />
+          >
+            <template #option="slotProps">
+              <div class="flex flex-col gap-1 align-items-center">
+                <div class="font-black">
+                  {{ slotProps.option.team_name.toUpperCase() }}
+                </div>
+                <span class="text-xs">{{ slotProps.option.team_owner }}</span>
+              </div>
+            </template>
+          </Dropdown>
           <div v-if="selectedDraftedTeam">
             <DraftedTeam :editable="true" :drafted-team="selectedDraftedTeam" />
           </div>

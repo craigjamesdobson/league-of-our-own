@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
-import type { Database } from '~/types/database.types';
+import type { Database, Tables } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -40,9 +40,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     draftedTeams.value = initDraftedTeamData(data);
   };
 
-  const fetchDraftedPlayerByID = async (
-    draftedPlayerID: string
-  ): Promise<DraftedPlayer> => {
+  const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
     const { data, error } = await supabase
       .from('drafted_players')
       .select(
@@ -70,11 +68,35 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     });
   };
 
-  const addNewTransfer = async (newTransferData) => {
+  const addNewTransfer = async (
+    newTransferData: Array<{
+      drafted_player: number;
+      player_id: number;
+      transfer_week: number;
+      active_transfer_expiry: string;
+    }>
+  ) => {
     const { data, error } = await supabase
       .from('drafted_transfers')
       .insert(newTransferData)
       .select();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  };
+
+  const deleteTransfer = async (draftedTransferID: number) => {
+    const { error } = await supabase
+      .from('drafted_transfers')
+      .delete()
+      .eq('drafted_transfer_id', draftedTransferID);
+
+    if (error) {
+      throw new Error(error.message);
+    }
   };
 
   return {
@@ -85,5 +107,6 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     fetchDraftedPlayerByID,
     upsertTeamData,
     addNewTransfer,
+    deleteTransfer,
   };
 });

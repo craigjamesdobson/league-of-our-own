@@ -23,6 +23,17 @@
                 name="material-symbols:subdirectory-arrow-right-rounded"
               />
               <DraftedPlayer :drafted-player="playerTransfer.player" />
+              <Button
+                severity="danger"
+                text
+                rounded
+                aria-label="Cancel"
+                @click="
+                  handleDeleteTransfer(playerTransfer.drafted_transfer_id)
+                "
+              >
+                <Icon class="w-8 h-8" name="typcn:delete" />
+              </Button>
             </div>
           </div>
         </div>
@@ -91,13 +102,13 @@ import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 
-const toast = useToast();
-
 interface TransferData {
-  player: null | DraftedPlayer; // Replace 'string' with the actual type of the player property
+  player: DraftedPlayer | null;
   activeExpiryDate: Date;
   transferWeek: number;
 }
+
+const toast = useToast();
 
 const newTransferData: Ref<TransferData> = ref({
   player: null,
@@ -113,33 +124,47 @@ const draftedTeamsStore = useDraftedTeamsStore();
 
 const addNewTransfer = async () => {
   try {
-    await draftedTeamsStore.addNewTransfer([
+    if (!draftedPlayer.value || !newTransferData.value.player) {
+      throw new Error('No player was found');
+    }
+    // Update the DB with the new transfer
+    const newTransfer = await draftedTeamsStore.addNewTransfer([
       {
-        drafted_player: draftedPlayer.value?.drafted_player_id,
-        active_transfer_expiry: newTransferData.value.activeExpiryDate,
-        player_id: newTransferData.value.player?.player_id,
+        drafted_player: draftedPlayer.value.drafted_player_id,
+        active_transfer_expiry:
+          newTransferData.value.activeExpiryDate.toDateString(),
+        player_id: newTransferData.value.player.player_id,
         transfer_week: newTransferData.value.transferWeek,
       },
     ]);
-    toast.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Transfer was made',
-      life: 3000,
-    });
-    draftedPlayer.value?.transfers.push({
+
+    // Build a new transfer obj using the new data returned
+    // from DB and push it to the players transfer array
+    draftedPlayer.value!.transfers.push({
+      drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
-      player: newTransferData.value.player,
       transfer_week: newTransferData.value.transferWeek,
+      player: newTransferData.value.player!,
     });
+
+    handleApiSuccess(`Transfer was successful`, toast);
+  } catch (err: unknown) {
+    handleApiError(err, toast);
+  }
+};
+
+const handleDeleteTransfer = async (draftedTransferID: number) => {
+  try {
+    if (!draftedPlayer.value || !newTransferData.value.player) {
+      throw new Error('No player was found');
+    }
+    await draftedTeamsStore.deleteTransfer(draftedTransferID);
+    draftedPlayer.value.transfers = draftedPlayer.value.transfers.filter(
+      (x) => x.drafted_transfer_id !== draftedTransferID
+    );
+    handleApiSuccess('Transfer was removed', toast);
   } catch (err) {
-    toast.add({
-      severity: 'error',
-      detail: 'Error submitting transfer',
-      life: 3000,
-    });
+    handleApiError(err, toast);
   }
 };
 </script>
-
-<style scoped></style>

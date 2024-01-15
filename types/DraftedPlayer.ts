@@ -9,7 +9,7 @@ interface DraftedTransfer {
 
 interface DraftedPlayer extends Tables<'players_view'> {
   drafted_player_id: number;
-  transfers: DraftedTransfer[] | [];
+  transfers: DraftedTransfer[];
 }
 
 export type { DraftedPlayer, DraftedTransfer };

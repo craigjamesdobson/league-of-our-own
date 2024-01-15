@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DraftedPlayer, DraftedTransfer } from '@/types/DraftedPlayer';
-import { loadPlayerFallbackImage } from '~/helpers/images';
 
 const { draftedPlayer, isTransfer } = defineProps({
   draftedPlayer: {

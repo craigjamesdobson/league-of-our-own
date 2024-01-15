@@ -1,6 +1,5 @@
 <script setup>
 import { TEAM_DATA } from '@/logic/teams/constants';
-import { getImageUrl } from '@/helpers/images';
 
 const {
   filterData,

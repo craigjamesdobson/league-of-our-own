@@ -3,6 +3,7 @@
     "@nuxtjs/eslint-config-typescript",
     "plugin:prettier/recommended"
   ],
+  "ignorePatterns": ["/presets/**"],
   "rules": {
     "no-console": "off",
     "vue/multi-word-component-names": "off",

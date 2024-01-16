@@ -14,7 +14,7 @@ onMounted(async () => {
 <template>
   <div>
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage keepalive />
     </NuxtLayout>
     <div id="modals" />
   </div>

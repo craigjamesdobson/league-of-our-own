@@ -36,6 +36,29 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
   };
 
+  const upsertPlayerData = async (playerData: string) => {
+    const formattedPlayerData = JSON.parse(playerData)?.elements;
+    if (formattedPlayerData === null) {
+      throw new Error('Player data was not correct, please try again.');
+    }
+
+    const { error } = await supabase
+      .from('players')
+      .upsert(
+        formattedPlayerData.map(
+          ({ id, ...rest }: { id: number; [key: string]: any }) => ({
+            player_id: id,
+            ...rest,
+          })
+        )
+      )
+      .select();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
   const filterPlayers = ({
     filterName = '',
     filterPrice = 0,
@@ -105,6 +128,7 @@ export const usePlayerStore = defineStore('player-store', () => {
     filteredPlayers,
     isLoaded,
     fetchPlayers,
+    upsertPlayerData,
     filterPlayers,
     getPlayerByID,
     formatFilteredPlayersByPosition,

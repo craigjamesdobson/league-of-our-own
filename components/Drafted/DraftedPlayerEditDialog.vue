@@ -1,5 +1,4 @@
 <template>
-  <Toast />
   <Dialog v-model:visible="visible" header=" " modal :dismissable-mask="true">
     <div class="grid grid-cols-3 gap-10">
       <div class="col-span-2">

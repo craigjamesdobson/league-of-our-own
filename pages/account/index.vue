@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
 import { useAccount } from '@/logic/account/';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import { usePlayerStore } from '@/stores/players';
 
 const draftedTeamStore = useDraftedTeamsStore();
+const playerStore = usePlayerStore();
 
 definePageMeta({
   middleware: ['auth'],
@@ -13,11 +16,28 @@ const selectedDraftedTeam = computed(() =>
   draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
 );
 
-const { updatePlayerData, loading, accountStore, playerData } = useAccount();
+const toast = useToast();
+const playerData = ref();
+const updating = ref(false);
+
+const handleUpsertPlayerData = async () => {
+  try {
+    updating.value = true;
+    await playerStore.upsertPlayerData(playerData.value);
+    handleApiSuccess('Player data has been updated', toast);
+  } catch (err) {
+    handleApiError(err, toast);
+  } finally {
+    updating.value = false;
+  }
+};
+
+const { loading, accountStore } = useAccount();
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center h-full">
+    <Toast />
     <h1 class="flex items-center main-heading">
       <span>Admin Login</span>
       <button title="Sign out" @click.prevent="accountStore.signOutUser">
@@ -26,7 +46,7 @@ const { updatePlayerData, loading, accountStore, playerData } = useAccount();
     </h1>
     <div v-if="accountStore.userIsLoggedIn">
       <p class="m-4 text-center underline">
-        Hello {{ accountStore.user.email }}
+        Hello {{ accountStore.user?.email }}
       </p>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
@@ -39,7 +59,8 @@ const { updatePlayerData, loading, accountStore, playerData } = useAccount();
           <Button
             :class="{ 'opacity-25': loading }"
             label="Update players"
-            @click="updatePlayerData"
+            :loading="updating"
+            @click="handleUpsertPlayerData"
           />
         </div>
         <div class="flex flex-col gap-4">

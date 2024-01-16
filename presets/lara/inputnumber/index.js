@@ -12,7 +12,7 @@ export default {
           parent.instance.$name == 'InputGroup' && !props.showButtons,
       },
       {
-        'border-0 border-y border-l last:border-r border-surface-300 dark:border-surface-600':
+        'border-0 border-y border-l last:border-r border-surface-300 ':
           parent.instance.$name == 'InputGroup' && !props.showButtons,
       },
       {
@@ -68,14 +68,14 @@ export default {
         },
 
         // Colorsh
-        'text-surface-600 dark:text-surface-200',
-        'placeholder:text-surface-400 dark:placeholder:text-surface-500',
-        'bg-surface-0 dark:bg-surface-900',
-        'border border-surface-300 dark:border-surface-600',
+        'text-surface-600 ',
+        'placeholder:text-surface-400 ',
+        'bg-surface-0 ',
+        'border border-surface-300 ',
 
         // States
-        'hover:border-primary-500 dark:hover:border-primary-400',
-        'focus:outline-none focus:outline-offset-0 focus:ring focus:ring-primary-500/50 dark:focus:ring-primary-400/50',
+        'hover:border-primary-500 ',
+        'focus:outline-none focus:outline-offset-0 focus:ring focus:ring-primary-500/50 ',
         {
           'opacity-60 select-none pointer-events-none cursor-default':
             context.disabled,
@@ -123,9 +123,9 @@ export default {
         },
 
         // Color
-        'text-white dark:text-surface-900',
-        'bg-primary-500 dark:bg-primary-400',
-        'border border-primary-500 dark:border-primary-400',
+        'text-white ',
+        'bg-primary-500 ',
+        'border border-primary-500 ',
 
         // Sizing
         'w-[3rem]',
@@ -160,7 +160,7 @@ export default {
 
         // States
         'focus:outline-none focus:outline-offset-0 focus:ring',
-        'hover:bg-primary-600 dark:hover:bg-primary-300 hover:border-primary-600 dark:hover:border-primary-300',
+        'hover:bg-primary-600 ',
 
         // Misc
         'cursor-pointer overflow-hidden select-none',
@@ -194,9 +194,9 @@ export default {
         },
 
         // Color
-        'text-white dark:text-surface-900',
-        'bg-primary-500 dark:bg-primary-400',
-        'border border-primary-500 dark:border-primary-400',
+        'text-white ',
+        'bg-primary-500 ',
+        'border border-primary-500 ',
 
         // Sizing
         'w-[3rem]',
@@ -231,7 +231,7 @@ export default {
 
         // States
         'focus:outline-none focus:outline-offset-0 focus:ring',
-        'hover:bg-primary-600 dark:hover:bg-primary-300 hover:border-primary-600 dark:hover:border-primary-300',
+        'hover:bg-primary-600 ',
 
         // Misc
         'cursor-pointer overflow-hidden select-none',

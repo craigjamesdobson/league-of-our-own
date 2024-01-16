@@ -27,15 +27,15 @@ export default {
             'rounded-md',
 
             // Color
-            'text-surface-700 dark:text-white/80',
-            'bg-surface-0 dark:bg-surface-900',
-            'border border-surface-300 dark:border-surface-700',
+            'text-surface-700 ',
+            'bg-surface-0 ',
+            'border border-surface-300 ',
 
             // States
-            'hover:border-primary-500 dark:hover:border-primary-400',
+            'hover:border-primary-500 ',
             'focus:outline-none focus:outline-offset-0',
-            { 'ring ring-primary-400/50 dark:ring-primary-300/50': state.focused },
-            { 'ring ring-primary-400/50 dark:ring-primary-300/50': state.hovered },
+            { 'ring ring-primary-400/50 ': state.focused },
+            { 'ring ring-primary-400/50 ': state.hovered },
 
             // Transition
             'transition-colors duration-200',
@@ -66,7 +66,7 @@ export default {
             'shadow-none',
 
             // Color
-            'text-surface-700 dark:text-white/80',
+            'text-surface-700 ',
             'bg-transparent'
         ]
     },
@@ -82,8 +82,8 @@ export default {
             'rounded-[1.14rem]',
 
             // Colors
-            'text-surface-700 dark:text-white/70',
-            'bg-surface-200 dark:bg-surface-700'
+            'text-surface-700 ',
+            'bg-surface-200 '
         ]
     },
     label: {

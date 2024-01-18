@@ -24,7 +24,7 @@ const modelValue = defineModel<boolean>();
       :pt="{
         root: {
           class: [
-            'rounded-lg relative overflow-hidden w-1/3',
+            'rounded-lg relative overflow-hidden w-full md:w-1/3',
             {
               'border-4 border-yellow-300':
                 !selectedPlayer.unavailable_for_season &&

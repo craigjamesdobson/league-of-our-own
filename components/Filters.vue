@@ -9,36 +9,18 @@ const {
   resetFilteredTeams,
 } = useFilters();
 
-const filtersVisible = ref(false);
-
 const players = defineModel('players');
 </script>
 
 <template>
   <div class="filter-container">
     <div
-      class="flex flex-row items-center justify-between p-4 cursor-pointer xl:mb-4 xl:p-0"
-      @click.prevent="filtersVisible = !filtersVisible"
+      class="hidden xl:flex flex-row items-center justify-between p-4 cursor-pointer xl:mb-4 xl:p-0"
     >
       <h2 class="!mb-0 !text-xl main-heading">Filters</h2>
-      <button class="xl:hidden">
-        <Icon
-          v-if="filtersVisible"
-          class="fill-slate-900"
-          size="22"
-          name="octicon:chevron-down-24"
-        />
-        <Icon
-          v-else
-          class="fill-slate-900"
-          size="22"
-          name="octicon:chevron-up-24"
-        />
-      </button>
     </div>
     <div
       class="justify-between mb-4 bg-white rounded-sm lg:bg-transparent xl:block"
-      :class="{ hidden: !filtersVisible }"
     >
       <div class="p-4 bg-white xl:mb-4">
         <div class="pb-3 mb-3 border-b border-gray-100">
@@ -102,27 +84,27 @@ const players = defineModel('players');
         </div>
       </div>
       <div class="mx-4 xl:m-0">
-        <div
-          class="flex items-center grid-cols-4 gap-5 px-4 py-2 mb-4 text-xs text-blue-700 bg-blue-100 border-l-4 border-blue-500 rounded-sm"
-          role="alert"
+        <Message
+          v-if="playerStore.getPlayerLastUpdatedDate"
+          severity="info"
+          :closable="false"
         >
-          <Icon class="flex-none" size="22" name="mdi:information-outline" />
-          <p class="col-span-3">
-            Players last updated on:
-            <strong>{{ playerStore.getPlayersUpdatedDate }}</strong>
-          </p>
-        </div>
-        <div
-          class="flex items-center gap-5 px-4 py-2 text-xs text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500 rounded-sm bg-"
-          role="alert"
+          Players last updated on:
+          <strong>{{
+            new Date(playerStore.getPlayerLastUpdatedDate).toLocaleDateString(
+              'en-GB'
+            )
+          }}</strong>
+        </Message>
+        <Message
+          v-if="playerStore.getPlayerLastUpdatedDate"
+          severity="warn"
+          :closable="false"
         >
-          <Icon class="flex-none" size="22" name="mingcute:warning-line" />
-          <p>
-            Player data is pulled from fantasy football source and may not be
-            the same as official data. It is to be used as a guide when picking
-            players and not for score calculations
-          </p>
-        </div>
+          Player data is pulled from fantasy football source and may not be the
+          same as official data. It is to be used as a guide when picking
+          players and not for score calculations
+        </Message>
       </div>
     </div>
   </div>

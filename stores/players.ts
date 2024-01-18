@@ -14,6 +14,7 @@ export const usePlayerStore = defineStore('player-store', () => {
 
   const players: Ref<Players[] | []> = ref([]);
   const filteredPlayers: Ref<Players[] | []> = ref([]);
+  const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
   const fetchPlayers = async () => {
@@ -26,6 +27,7 @@ export const usePlayerStore = defineStore('player-store', () => {
       }
       players.value = data;
       filteredPlayers.value = players.value;
+      await fetchPlayerUpdatedDate();
       isLoaded.value = true;
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'message' in error) {
@@ -34,6 +36,20 @@ export const usePlayerStore = defineStore('player-store', () => {
         console.error('An unknown error occurred.');
       }
     }
+  };
+
+  const fetchPlayerUpdatedDate = async () => {
+    const { data, error } = await supabase
+      .from('players')
+      .select('updated_at')
+      .limit(1)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    playerUpdatedDate.value = data.updated_at;
   };
 
   const upsertPlayerData = async (playerData: string) => {
@@ -90,6 +106,8 @@ export const usePlayerStore = defineStore('player-store', () => {
     filteredPlayers.value = newFilteredPlayers;
   };
 
+  const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
+
   const getPlayerByID = computed(
     () => (id: number) => players.value.find((x) => x.player_id === id)
   );
@@ -131,6 +149,7 @@ export const usePlayerStore = defineStore('player-store', () => {
     upsertPlayerData,
     filterPlayers,
     getPlayerByID,
+    getPlayerLastUpdatedDate,
     formatFilteredPlayersByPosition,
   };
 });

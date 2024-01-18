@@ -32,7 +32,7 @@ const handleUpsertPlayerData = async () => {
   }
 };
 
-const { loading, accountStore } = useAccount();
+const { accountStore } = useAccount();
 </script>
 
 <template>
@@ -57,7 +57,6 @@ const { loading, accountStore } = useAccount();
             placeholder="Paste player data here..."
           />
           <Button
-            :class="{ 'opacity-25': loading }"
             label="Update players"
             :loading="updating"
             @click="handleUpsertPlayerData"

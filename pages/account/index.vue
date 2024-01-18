@@ -73,6 +73,7 @@ const { accountStore } = useAccount();
             option-label="team_name"
             option-value="drafted_team_id"
             placeholder="Select a team"
+            scroll-height="400"
           >
             <template #option="slotProps">
               <div class="flex flex-col gap-1 align-items-center">

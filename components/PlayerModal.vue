@@ -44,11 +44,11 @@ const modelValue = defineModel<boolean>();
       <div v-if="selectedPlayer" class="px-4">
         <div class="">
           <img
-            class="modal__badge z-100"
+            class="modal__badge"
             :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
           />
           <div class="flex flex-row justify-between gap-4 items-top">
-            <div class="w-24">
+            <div class="w-24 z-10">
               <img
                 class="rounded-full"
                 :src="selectedPlayer.image_large"

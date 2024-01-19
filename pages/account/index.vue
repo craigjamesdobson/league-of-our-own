@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
-import { useAccount } from '@/logic/account/';
+import { useAccountStore } from '~/stores/account';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { usePlayerStore } from '@/stores/players';
 
+const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
 const playerStore = usePlayerStore();
+const router = useRouter();
 
 definePageMeta({
   middleware: ['auth'],
@@ -32,15 +34,22 @@ const handleUpsertPlayerData = async () => {
   }
 };
 
-const { accountStore } = useAccount();
+const handleUserLogout = async () => {
+  try {
+    await accountStore.signUserOut();
+    router.push({ path: '/account/login' });
+  } catch (err) {
+    handleApiError(err, toast);
+  }
+};
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center h-full">
     <Toast />
     <h1 class="flex items-center main-heading">
-      <span>Admin Login</span>
-      <button title="Sign out" @click.prevent="accountStore.signOutUser">
+      <span>Admin Dashboard</span>
+      <button title="Sign out" @click.prevent="handleUserLogout">
         <Icon class="ml-2" name="la:sign-out-alt" />
       </button>
     </h1>

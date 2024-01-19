@@ -51,7 +51,7 @@ const players = defineModel('players');
             input-id="minmax-buttons"
             mode="decimal"
             show-buttons
-            :min="0"
+            :min="4"
             :step="0.5"
             :max="14.0"
             :update:model-value="setFilteredPlayers()"

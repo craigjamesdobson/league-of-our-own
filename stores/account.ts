@@ -10,7 +10,7 @@ export const useAccountStore = defineStore('account-store', () => {
 
   const userIsLoggedIn = computed(() => user.value !== null);
 
-  const setUserData = (userData: User) => {
+  const setUserData = (userData: User | null) => {
     user.value = userData;
   };
 
@@ -29,5 +29,15 @@ export const useAccountStore = defineStore('account-store', () => {
     setUserData(data.user);
   };
 
-  return { user, userIsLoggedIn, setUserData, signUserIn };
+  const signUserOut = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    setUserData(null);
+  };
+
+  return { user, userIsLoggedIn, setUserData, signUserIn, signUserOut };
 });

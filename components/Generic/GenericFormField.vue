@@ -23,15 +23,6 @@
         @change="validation?.$touch"
         @input="$emit('update:modelValue', $event?.target?.value)"
       />
-      <button
-        v-if="label === 'Password'"
-        @click.prevent="label === 'password' ? 'text' : 'password'"
-      >
-        <Icon
-          class="absolute text-primary right-4 top-3"
-          :name="label === 'password' ? 'bx:show' : 'clarity:eye-hide-solid'"
-        />
-      </button>
     </div>
     <div
       v-if="validation.$error"

@@ -47,6 +47,15 @@ const handleUserLogin = async () => {
         />
       </form>
     </div>
+    <Message :closable="false">
+      Please report any bugs or issues by emailing
+      <a
+        class="underline font-bold"
+        href="mailto:craigjamesdobson.dev@gmail.com"
+        >craigjamesdobson.dev@gmail.com</a
+      >
+      with as much information as possible.
+    </Message>
   </div>
 </template>
 

@@ -8,12 +8,7 @@
 
 .icon-container {
   @apply transition-all duration-200 ease-in-out h-8;
-  width: 25%;
   filter: grayscale(1);
-
-  @media (min-width: 620px) { 
-    width: 10%;
-  }
 
   &.active {
     filter: grayscale(0);

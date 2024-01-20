@@ -29,7 +29,7 @@ export default {
 
       // Colors
       'text-surface-600 ',
-      'placeholder:text-surface-400 ',
+      'placeholder:text-surface-600/50',
       'bg-surface-0 ',
       'border border-surface-300 ',
 

@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model:visible="visible" header=" " modal :dismissable-mask="true">
-    <div class="grid grid-cols-3 gap-10">
-      <div class="col-span-2">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+      <div class="lg:col-span-2">
         <div class="mb-10">
           <h2 class="pb-2.5 uppercase font-black text-lg">Original Player</h2>
           <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />

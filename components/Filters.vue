@@ -24,37 +24,35 @@ const players = defineModel('players');
     >
       <div class="p-4 bg-white xl:mb-4">
         <div class="pb-3 mb-3 border-b border-gray-100">
-          <label class="flex mb-2 text-xs" for="filter_name">
-            Filter by name
-          </label>
-          <div class="flex items-center px-2 py-1 bg-gray-100 rounded">
-            <input
-              id="filter_name"
-              v-model="filterData.filterName"
-              class="w-full text-xs placeholder-gray-800 placeholder-opacity-50 bg-gray-100 focus:outline-none"
-              type="text"
-              name="filter_name"
-              placeholder="Search Players..."
-              @keyup="players = setFilteredPlayers()"
-            />
-            <Icon size="22" name="mdi:person-search-outline" />
+          <div class="flex flex-col gap-2">
+            <label class="text-xs" for="filter_name">Filter by name</label>
+            <span class="flex items-center relative w-full">
+              <Icon
+                size="22"
+                class="absolute right-3 text-surface-400"
+                name="mdi:person-search-outline"
+              />
+              <InputText
+                id="filter_name"
+                v-model="filterData.filterName"
+                class="!bg-surface-100 !border-none !w-full"
+                placeholder="Search players..."
+              />
+            </span>
           </div>
         </div>
         <div class="pb-3 mb-3 border-b border-gray-100">
           <label class="flex mb-2 text-xs" for="filter_name">
             Filter by price
           </label>
-
-          <InputNumber
+          <Dropdown
             v-model="filterData.filterPrice"
-            class="w-full"
-            input-id="minmax-buttons"
-            mode="decimal"
-            show-buttons
-            :min="4"
-            :step="0.5"
-            :max="14.0"
+            class="!bg-surface-100 !border-none !w-full"
+            option-label="name"
+            option-value="value"
+            :options="populateFilterPrices(4.0, 14.0, 0.5)"
             :update:model-value="setFilteredPlayers()"
+            placeholder="Select price..."
           />
         </div>
         <div class="border-gray-100 max-xl:pb-3 max-xl:border-b">
@@ -67,16 +65,16 @@ const players = defineModel('players');
               <Icon size="20" name="carbon:reset" />
             </button>
           </label>
-          <div class="flex flex-wrap -mx-2 -mb-1 cursor-pointer">
+          <div class="grid grid-cols-10 gap-2.5 flex-wrap cursor-pointer">
             <button
               v-for="team in TEAM_DATA"
               :key="team.id"
               :data-teamID="team.id"
-              class="mb-2 icon-container"
+              class="icon-container"
               @click.prevent="players = selectfilteredTeam($event)"
             >
               <img
-                class="w-full h-full px-2"
+                class="w-full h-full"
                 :src="getImageUrl(team.short_name.toLowerCase())"
               />
             </button>

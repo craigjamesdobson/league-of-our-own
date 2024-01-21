@@ -32,8 +32,8 @@ const handleEditPlayer = (playerID: number) => {
 };
 </script>
 
-<template v-if="props.draftedTeam">
-  <div class="p-4 bg-white rounded-sm">
+<template>
+  <div v-if="props.draftedTeam" class="p-4 bg-white rounded-sm">
     <div
       class="flex items-center justify-between p-2 pt-0 mb-2 border-b border-gray-800"
       :class="{

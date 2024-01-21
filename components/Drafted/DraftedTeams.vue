@@ -15,7 +15,7 @@ const playerStore = usePlayerStore();
         :key="draftedTeam.drafted_team_id"
         class="m-2"
       >
-        <DraftedTeam :drafted-team="draftedTeam" />
+        <DraftedTeam v-if="draftedTeam" :drafted-team="draftedTeam" />
       </div>
     </div>
   </div>

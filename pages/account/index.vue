@@ -71,12 +71,14 @@ const handleUserLogout = async () => {
             @click="handleUpsertPlayerData"
           />
         </div>
-        <div class="flex flex-col gap-4">
+        <div v-if="draftedTeamStore.draftedTeams" class="flex flex-col gap-4">
           <Dropdown
             v-model="selectedDraftedTeamID"
             class="!w-full"
             :options="
-              draftedTeamStore.draftedTeams?.filter((x) => x.allowed_transfers)
+              draftedTeamStore.getDraftedTeams?.filter(
+                (x) => x.allowed_transfers
+              )
             "
             filter
             option-label="team_name"

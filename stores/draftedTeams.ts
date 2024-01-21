@@ -24,20 +24,22 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
-    draftedTeams.value?.sort((a, b) =>
+    initDraftedTeamData(draftedTeams.value)?.sort((a, b) =>
       a.team_name.toLowerCase().localeCompare(b.team_name.toLowerCase())
     )
   );
 
-  const getDraftedTeamByID = computed(
-    () => (id: number) =>
-      draftedTeams.value?.find((x) => x.drafted_team_id === id)
-  );
+  const getDraftedTeamByID = computed(() => {
+    const draftedTeamsValue = getDraftedTeams.value; // Access the value of getDraftedTeams
+
+    return (id: number) =>
+      draftedTeamsValue?.find((x) => x.drafted_team_id === id);
+  });
 
   const fetchDraftedTeams = async () => {
     const { data, error } = await draftedTeamsWithPlayersQuery;
     if (error) throw error;
-    draftedTeams.value = initDraftedTeamData(data);
+    draftedTeams.value = data;
   };
 
   const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {

@@ -154,7 +154,7 @@ const addNewTransfer = async () => {
 
 const handleDeleteTransfer = async (draftedTransferID: number) => {
   try {
-    if (!draftedPlayer.value || !newTransferData.value.player) {
+    if (!draftedPlayer.value) {
       throw new Error('No player was found');
     }
     await draftedTeamsStore.deleteTransfer(draftedTransferID);

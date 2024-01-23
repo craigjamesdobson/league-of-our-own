@@ -3,6 +3,7 @@ import { useToast } from 'primevue/usetoast';
 import { useAccountStore } from '~/stores/account';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { usePlayerStore } from '@/stores/players';
+import type { DraftedTeam } from '~/types/DraftedTeam';
 
 const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
@@ -41,6 +42,12 @@ const handleUserLogout = async () => {
   } catch (err) {
     handleApiError(err, toast);
   }
+};
+
+const transfersMadeCount = (team: DraftedTeam) => {
+  return team.players
+    .map((x) => x.transfers.length)
+    .reduce((total, transfers) => total + transfers, 0);
 };
 </script>
 
@@ -87,11 +94,19 @@ const handleUserLogout = async () => {
             scroll-height="400"
           >
             <template #option="slotProps">
-              <div class="flex flex-col gap-1 align-items-center">
-                <div class="font-black">
-                  {{ slotProps.option.team_name.toUpperCase() }}
+              <div class="flex justify-between items-center">
+                <div class="flex flex-col gap-1 align-items-center">
+                  <div class="font-black">
+                    {{ slotProps.option.team_name.toUpperCase() }}
+                  </div>
+                  <span class="text-xs">{{ slotProps.option.team_owner }}</span>
                 </div>
-                <span class="text-xs">{{ slotProps.option.team_owner }}</span>
+                <Tag
+                  severity="info"
+                  rounded
+                  title="transfers made"
+                  :value="transfersMadeCount(slotProps.option)"
+                ></Tag>
               </div>
             </template>
           </Dropdown>

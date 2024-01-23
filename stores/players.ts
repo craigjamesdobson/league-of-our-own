@@ -1,227 +1,155 @@
 import { defineStore } from 'pinia';
-import { isEqual } from 'lodash-es';
-import { doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
-import type { Player } from '../logic/players/interfaces/Player';
-import { PlayerPosition } from '../logic/players/interfaces/PlayerPosition';
-import { createPlayerData } from '../logic/players';
-import {
-  localStorageGet,
-  localStorageHas,
-  localStorageSet,
-} from '../composables/localStorage';
-import {
-  draftedTeamsCollection,
-  playersCollection,
-  settingsCollection,
-} from './../firebase/useDB';
-
+import { PlayerPosition } from '~/types/PlayerPosition';
+import type { Database, Tables } from '~/types/database.types';
 interface FilterData {
   filterName: string;
-  filterPrice: string;
+  filterPrice: number;
   filterTeam: number | undefined;
 }
 
-interface State {
-  players: Player[];
-  filteredPlayers: Player[];
-  selectedPlayer: Player;
-  updatedAt: string;
-  isLoaded: boolean;
-}
+type Players = Tables<'players_view'>;
 
-export const usePlayersStore = defineStore({
-  id: 'player-store',
-  state: (): State => {
-    return {
-      players: [],
-      filteredPlayers: [],
-      selectedPlayer: {} as Player,
-      updatedAt: '',
-      isLoaded: false,
-    };
-  },
-  actions: {
-    async getPlayerSettings() {
-      const settingsDocRef = doc(settingsCollection, 'players');
-      const settingsDoc = await getDoc(settingsDocRef);
+export const usePlayerStore = defineStore('player-store', () => {
+  const supabase = useSupabaseClient<Database>();
 
-      if (!settingsDoc.exists()) {
+  const players: Ref<Players[] | []> = ref([]);
+  const filteredPlayers: Ref<Players[] | []> = ref([]);
+  const playerUpdatedDate: Ref<string | null> = ref(null);
+  const isLoaded = ref(false);
+
+  const fetchPlayers = async () => {
+    try {
+      const { data, error } = await supabase.from('players_view').select(`*`);
+
+      if (error) {
+        console.error('Error fetching data:', error.message);
         return;
       }
-
-      if (
-        localStorageHas('updated-at') &&
-        localStorageGet('updated-at') ===
-          settingsDoc.data().updatedAt.toString()
-      ) {
-        this.players = localStorageGet('players') as Player[];
-        this.filteredPlayers = this.players;
-        this.updatedAt = localStorageGet('updated-at') as string;
-        this.isLoaded = true;
+      players.value = data;
+      filteredPlayers.value = players.value;
+      await fetchPlayerUpdatedDate();
+      isLoaded.value = true;
+    } catch (error) {
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        console.error('Error:', (error as Error).message);
       } else {
-        const playerDocs = await getDocs(playersCollection);
-        const players = playerDocs.docs.map((player) => player.data());
-
-        this.players = await createPlayerData(players);
-        this.filteredPlayers = this.players;
-
-        localStorageSet('updated-at', settingsDoc.data().updatedAt);
-        this.updatedAt = settingsDoc.data().updatedAt;
-        localStorageSet('players', this.players);
-
-        this.isLoaded = true;
+        console.error('An unknown error occurred.');
       }
-    },
+    }
+  };
 
-    setSelectedPlayer(playerID: number) {
-      this.selectedPlayer = this.players.filter((x) => x.id === playerID)[0];
-    },
+  const fetchPlayerUpdatedDate = async () => {
+    const { data, error } = await supabase
+      .from('players')
+      .select('updated_at')
+      .limit(1)
+      .single();
 
-    async updatePlayerData(playerData: string) {
-      const parsedData = JSON.parse(playerData);
+    if (error) {
+      throw new Error(error.message);
+    }
 
-      const updateLog = document.querySelector('.update-log');
+    playerUpdatedDate.value = data.updated_at;
+  };
 
-      if (!updateLog) {
-        throw new Error('No log element');
-      }
+  const upsertPlayerData = async (playerData: string) => {
+    const formattedPlayerData = JSON.parse(playerData)?.elements;
+    if (formattedPlayerData === null) {
+      throw new Error('Player data was not correct, please try again.');
+    }
 
-      for (const newPlayerData of parsedData) {
-        const playerDocRef = doc(
-          playersCollection,
-          newPlayerData.id.toString()
-        );
-        const playerDocSnap = await getDoc(playerDocRef);
+    const { error } = await supabase
+      .from('players')
+      .upsert(
+        formattedPlayerData.map(
+          ({ id, ...rest }: { id: number; [key: string]: any }) => ({
+            player_id: id,
+            ...rest,
+          })
+        )
+      )
+      .select();
 
-        if (!playerDocSnap.exists()) {
-          await setDoc(
-            doc(playersCollection, newPlayerData.id.toString()),
-            newPlayerData
-          );
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: green;">${newPlayerData.web_name} added</p>`
-          );
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
 
-          continue;
-        }
+  const filterPlayers = ({
+    filterName = '',
+    filterPrice = 0,
+    filterTeam = 0,
+  }: FilterData) => {
+    let newFilteredPlayers = [...players.value];
+    if (filterName) {
+      newFilteredPlayers = newFilteredPlayers.filter((player) =>
+        (player.web_name ?? '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036F]/g, '')
+          .toLowerCase()
+          .includes(filterName.toLowerCase())
+      );
+    }
 
-        if (
-          playerDocSnap.exists() &&
-          isEqual(playerDocSnap.data(), newPlayerData)
-        ) {
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: gray;">${newPlayerData.web_name} has no changes</p>`
-          );
-        } else {
-          await updateDoc(playerDocRef, newPlayerData);
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: blue;">${newPlayerData.web_name} updated</p>`
-          );
-        }
-      }
-      const settingsDocRef = doc(settingsCollection, 'players');
+    if (filterPrice) {
+      newFilteredPlayers = newFilteredPlayers.filter(
+        (player) => player.cost === +filterPrice
+      );
+    }
 
-      await updateDoc(settingsDocRef, {
-        updatedAt: Date.now(),
-      });
-    },
+    if (filterTeam) {
+      newFilteredPlayers = newFilteredPlayers.filter(
+        (p) => p.team === filterTeam
+      );
+    }
 
-    async updateTeamData(teamData: string) {
-      const parsedData = JSON.parse(teamData);
+    filteredPlayers.value = newFilteredPlayers;
+  };
 
-      const updateLog = document.querySelector('.update-log');
+  const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
 
-      if (!updateLog) {
-        throw new Error('No log element');
-      }
+  const getPlayerByID = computed(
+    () => (id: number) => players.value.find((x) => x.player_id === id)
+  );
 
-      for (const newTeamData of parsedData) {
-        const teamDocRef = doc(
-          draftedTeamsCollection,
-          newTeamData.team_id.toString()
-        );
-        const teamDocSnap = await getDoc(teamDocRef);
-
-        if (!teamDocSnap.exists()) {
-          await setDoc(
-            doc(draftedTeamsCollection, newTeamData.team_id.toString()),
-            newTeamData
-          );
-
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: green;">${newTeamData.team_name} added</p>`
-          );
-        } else {
-          await updateDoc(teamDocRef, newTeamData);
-          updateLog.insertAdjacentHTML(
-            'afterend',
-            `<p style="color: blue;">${newTeamData.team_name} updated</p>`
-          );
-        }
-      }
-    },
-  },
-  getters: {
-    playerList: (state) => state.players,
-
-    getPlayerByID: (state) => {
-      return (playerID: number) =>
-        state.players.filter((player) => player.id === +playerID)[0];
-    },
-
-    getSelectedPlayer: (state) => state.selectedPlayer,
-
-    getPlayersUpdatedDate: (state) => new Date(+state.updatedAt).toDateString(),
-
-    stateIsLoaded: (state) => state.isLoaded,
-
-    getFilteredPlayers:
-      (state) =>
-      ({ filterName, filterPrice, filterTeam }: FilterData) => {
-        let filteredPlayers = state.players;
-        if (filterName) {
-          filteredPlayers = filteredPlayers.filter((p) =>
-            p.webName
-              .normalize('NFD')
-              .replace(/[\u0300-\u036F]/g, '')
-              .toLowerCase()
-              .includes(filterName.toLowerCase())
-          );
-        }
-
-        if (filterPrice) {
-          filteredPlayers = filteredPlayers.filter((player) =>
-            player.price.includes(filterPrice)
-          );
-        }
-
-        if (filterTeam) {
-          filteredPlayers = filteredPlayers.filter(
-            (p) => p.team === filterTeam
-          );
-        }
-        state.filteredPlayers = filteredPlayers;
-      },
-
-    getFilteredPlayersByPosition: (state) => {
-      return {
-        goalkeepers: state.filteredPlayers
+  const formatFilteredPlayersByPosition = computed(() => {
+    return [
+      {
+        position: 'Goalkeepers',
+        players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.GOALKEEPER)
           .sort((a, b) => a.team - b.team),
-        defenders: state.filteredPlayers
+      },
+      {
+        position: 'Defenders',
+        players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.DEFENDER)
           .sort((a, b) => a.team - b.team),
-        midfielders: state.filteredPlayers
+      },
+      {
+        position: 'Midfielders',
+        players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.MIDFIELDER)
           .sort((a, b) => a.team - b.team),
-        forwards: state.filteredPlayers
+      },
+      {
+        position: 'Forwards',
+        players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.FORWARD)
           .sort((a, b) => a.team - b.team),
-      };
-    },
-  },
+      },
+    ];
+  });
+
+  return {
+    players,
+    filteredPlayers,
+    isLoaded,
+    fetchPlayers,
+    upsertPlayerData,
+    filterPlayers,
+    getPlayerByID,
+    getPlayerLastUpdatedDate,
+    formatFilteredPlayersByPosition,
+  };
 });

@@ -1,68 +1,103 @@
-<script setup>
-import { useAccount } from '@/logic/account/';
+<script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+import { useAccountStore } from '~/stores/account';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import { usePlayerStore } from '@/stores/players';
+
+const accountStore = useAccountStore();
+const draftedTeamStore = useDraftedTeamsStore();
+const playerStore = usePlayerStore();
+const router = useRouter();
 
 definePageMeta({
   middleware: ['auth'],
 });
 
-const {
-  userData,
-  teamData,
-  updatePlayerData,
-  updateTeamData,
-  loading,
-  accountStore,
-  playerData,
-} = useAccount();
+const selectedDraftedTeamID = ref(0);
+const selectedDraftedTeam = computed(() =>
+  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
+);
+
+const toast = useToast();
+const playerData = ref();
+const updating = ref(false);
+
+const handleUpsertPlayerData = async () => {
+  try {
+    updating.value = true;
+    await playerStore.upsertPlayerData(playerData.value);
+    handleApiSuccess('Player data has been updated', toast);
+  } catch (err) {
+    handleApiError(err, toast);
+  } finally {
+    updating.value = false;
+  }
+};
+
+const handleUserLogout = async () => {
+  try {
+    await accountStore.signUserOut();
+    router.push({ path: '/account/login' });
+  } catch (err) {
+    handleApiError(err, toast);
+  }
+};
 </script>
 
 <template>
-  <!-- <TransferModal /> -->
   <div class="flex flex-col items-center justify-center h-full">
+    <Toast />
     <h1 class="flex items-center main-heading">
-      <span>Admin Login</span>
-      <button title="Sign out" @click.prevent="accountStore.signOutUser">
+      <span>Admin Dashboard</span>
+      <button title="Sign out" @click.prevent="handleUserLogout">
         <Icon class="ml-2" name="la:sign-out-alt" />
       </button>
     </h1>
-    <div v-if="userData.isSignedIn">
-      <p class="m-4 text-center underline">Hello {{ userData.email }}</p>
+    <div v-if="accountStore.userIsLoggedIn">
+      <p class="m-4 text-center underline">
+        Hello {{ accountStore.user?.email }}
+      </p>
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="flex flex-col gap-4">
-          <textarea
-            id=""
+          <Textarea
             v-model="playerData"
-            class="p-2 text-sm rounded-md"
-            name="player-data"
             cols="75"
-            rows="20"
+            rows="40"
             placeholder="Paste player data here..."
           />
-          <button
-            :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex self-start p-2 text-white rounded-md bg-primary"
-            @click="updatePlayerData"
-          >
-            Update Players
-          </button>
-        </div>
-        <div class="flex flex-col gap-4">
-          <textarea
-            id=""
-            v-model="teamData"
-            class="p-2 text-sm rounded-md"
-            name="player-data"
-            cols="75"
-            rows="20"
-            placeholder="Paste team data here..."
+          <Button
+            label="Update players"
+            :loading="updating"
+            @click="handleUpsertPlayerData"
           />
-          <button
-            :class="{ 'pointer-events-none opacity-25': loading }"
-            class="flex self-start p-2 text-white rounded-md bg-primary"
-            @click="updateTeamData"
+        </div>
+        <div v-if="draftedTeamStore.draftedTeams" class="flex flex-col gap-4">
+          <Dropdown
+            v-model="selectedDraftedTeamID"
+            class="!w-full"
+            :options="
+              draftedTeamStore.getDraftedTeams?.filter(
+                (x) => x.allowed_transfers
+              )
+            "
+            filter
+            option-label="team_name"
+            option-value="drafted_team_id"
+            placeholder="Select a team"
+            scroll-height="400"
           >
-            Update Teams
-          </button>
+            <template #option="slotProps">
+              <div class="flex flex-col gap-1 align-items-center">
+                <div class="font-black">
+                  {{ slotProps.option.team_name.toUpperCase() }}
+                </div>
+                <span class="text-xs">{{ slotProps.option.team_owner }}</span>
+              </div>
+            </template>
+          </Dropdown>
+          <div v-if="selectedDraftedTeam">
+            <DraftedTeam :editable="true" :drafted-team="selectedDraftedTeam" />
+          </div>
         </div>
       </div>
       <div class="update-log" />

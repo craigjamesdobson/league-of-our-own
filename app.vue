@@ -1,23 +1,20 @@
 <script setup>
-import { monitorUserStatus } from './logic/account/auth';
-import { usePlayersStore } from '@/stores/players';
+import { usePlayerStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 onMounted(async () => {
-  const playerStore = usePlayersStore();
-  await playerStore.getPlayerSettings();
+  const playerStore = usePlayerStore();
+  await playerStore.fetchPlayers();
 
   const draftedTeamsStore = useDraftedTeamsStore();
   await draftedTeamsStore.fetchDraftedTeams();
-
-  monitorUserStatus();
 });
 </script>
 
 <template>
   <div>
     <NuxtLayout>
-      <NuxtPage />
+      <NuxtPage keepalive />
     </NuxtLayout>
     <div id="modals" />
   </div>

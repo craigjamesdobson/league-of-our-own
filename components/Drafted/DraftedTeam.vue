@@ -17,7 +17,7 @@ const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
 };
 
-const selectedDraftedPlayer = ref(null);
+const selectedDraftedPlayer = ref();
 const showDialog = ref(false);
 
 const handleEditPlayer = (playerID: number) => {

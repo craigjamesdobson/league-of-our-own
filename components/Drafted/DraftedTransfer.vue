@@ -2,13 +2,13 @@
   <div class="player-container">
     <DraftedPlayer
       :is-transfer="true"
-      :drafted-player="draftedPlayer.transfers.at(-1)!.player"
+      :drafted-player="sortedTransfers.at(-1)!.player"
     />
     <div
       class="prev-transfer absolute left-0 z-10 gap-5 flex flex-col items-center justify-center invisible w-full p-2.5 text-center bg-green-200 top-full"
     >
       <div
-        v-for="(transferredPlayer, index) in draftedPlayer.transfers"
+        v-for="(transferredPlayer, index) in sortedTransfers"
         :key="transferredPlayer.player.player_id"
       >
         {{
@@ -30,6 +30,12 @@ const { draftedPlayer } = defineProps({
     type: Object as PropType<DraftedPlayer>,
     default: null,
   },
+});
+
+const sortedTransfers = computed(() => {
+  return [...draftedPlayer.transfers].sort(
+    (a, b) => a.transfer_week - b.transfer_week
+  );
 });
 </script>
 

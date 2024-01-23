@@ -6,7 +6,10 @@ import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const draftedTeamsWithPlayersQuery = supabase.from('drafted_teams').select(`
+  const draftedTeamsWithPlayersQuery = supabase
+    .from('drafted_teams')
+    .select(
+      `
   *,
   players:drafted_players(
     drafted_player_id,
@@ -19,18 +22,18 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
         player:players_view(*)
       )
     )
-  `);
+  `
+    )
+    .order('team_name', { ascending: true });
 
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
-    initDraftedTeamData(draftedTeams.value)?.sort((a, b) =>
-      a.team_name.toLowerCase().localeCompare(b.team_name.toLowerCase())
-    )
+    initDraftedTeamData(draftedTeams.value)
   );
 
   const getDraftedTeamByID = computed(() => {
-    const draftedTeamsValue = getDraftedTeams.value; // Access the value of getDraftedTeams
+    const draftedTeamsValue = getDraftedTeams.value;
 
     return (id: number) =>
       draftedTeamsValue?.find((x) => x.drafted_team_id === id);

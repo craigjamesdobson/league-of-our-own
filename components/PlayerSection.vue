@@ -61,6 +61,12 @@
           >
             {{ slotProps.option.news }}
           </div>
+          <div
+            v-if="slotProps.option.selected"
+            class="flex text-[10px] whitespace-pre-wrap"
+          >
+            Player has already been selected
+          </div>
         </div>
       </template>
     </Dropdown>
@@ -79,6 +85,10 @@ const player = defineModel<{
   selectedPlayer: Player | null;
 }>('player');
 
+const props = defineProps<{
+  selectedPlayers: number[];
+}>();
+
 const getCorrectColSpanClass = (position: PlayerPosition) => {
   switch (position) {
     case PlayerPosition.GOALKEEPER:
@@ -96,9 +106,14 @@ const dropdownPlayerData = computed(() =>
       return {
         ...player,
         disabled: player.unavailable_for_season === true,
+        selected: props.selectedPlayers.includes(player.player_id),
       };
     })
-    .filter((x) => x.position === player.value!.position)
+    .filter(
+      (x) =>
+        x.position === player.value!.position &&
+        !props.selectedPlayers.includes(x.player_id)
+    )
 );
 </script>
 

@@ -40,7 +40,7 @@
             <div class="flex gap-2.5 items-center">
               Transfer Budget Remaining:
               <span class="font-black text-lg">{{
-                calculateRemainingBudget()
+                calculateRemainingBudget().toFixed(1)
               }}</span>
             </div>
           </div>
@@ -50,13 +50,14 @@
     </div>
     <div class="grid grid-cols-12 justify-center">
       <template v-for="(player, index) in draftedTeamPlayers" :key="index">
-        <PlayerSection :player="player" />
+        <PlayerSection :selected-players="selectedPlayerIds" :player="player" />
       </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
 
 const draftedTeamData = ref({
@@ -70,7 +71,12 @@ const teamBudget = computed(() =>
   draftedTeamData.value.allowed_transfers ? 85 : 95
 );
 
-const draftedTeamPlayers = ref([
+interface DraftedTeamPlayer {
+  position: PlayerPosition;
+  selectedPlayer: Player | null;
+}
+
+const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([
   {
     position: PlayerPosition.GOALKEEPER,
     selectedPlayer: null,
@@ -117,6 +123,12 @@ const draftedTeamPlayers = ref([
   },
 ]);
 
+const selectedPlayerIds = computed(() => {
+  return draftedTeamPlayers.value
+    .filter((player) => player.selectedPlayer !== null)
+    .map((player) => player.selectedPlayer?.player_id);
+});
+
 const calculateRemainingBudget = (): number => {
   const remainingBudget = teamBudget.value;
 
@@ -133,7 +145,7 @@ const calculateRemainingBudget = (): number => {
     0
   );
 
-  return (remainingBudget - totalCost).toFixed(1);
+  return remainingBudget - totalCost;
 };
 </script>
 

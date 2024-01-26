@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     },
   },
   tailwindcss: {
+    exposeConfig: true,
     config: {
       content: ['presets/**/*.{js,vue,ts}'],
       theme: {

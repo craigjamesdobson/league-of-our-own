@@ -45,7 +45,7 @@
             </div>
           </div>
         </Message>
-        <Button class="w-full" label="Submit team" />
+        <Button class="w-full" label="Submit team" @click="sendEmail" />
       </form>
     </div>
     <div class="grid grid-cols-12 justify-center">
@@ -146,6 +146,21 @@ const calculateRemainingBudget = (): number => {
   );
 
   return remainingBudget - totalCost;
+};
+
+const sendEmail = async () => {
+  try {
+    const { data } = await useFetch('/api/send', {
+      method: 'post',
+      body: {
+        email: draftedTeamData.value.team_email,
+        html: `<p>${selectedPlayerIds.value.join(' | ')}</p>`,
+      },
+    });
+    console.log(data.value);
+  } catch (err) {
+    console.log(err);
+  }
 };
 </script>
 

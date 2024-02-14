@@ -40,9 +40,9 @@
       class="!min-w-[300px] mt-auto"
       :options="dropdownPlayerData"
       :virtual-scroller-options="{ itemSize: 60 }"
-      option-label="web_name"
       placeholder="Select a Player"
       option-disabled="disabled"
+      option-label="web_name"
     >
       <template #value="slotProps">
         {{ slotProps.value?.web_name || slotProps.placeholder }}
@@ -86,7 +86,7 @@ const player = defineModel<{
 }>('player');
 
 const props = defineProps<{
-  selectedPlayers: number[];
+  selectedPlayers: (number | undefined)[];
 }>();
 
 const getCorrectColSpanClass = (position: PlayerPosition) => {

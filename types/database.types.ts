@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       drafted_players: {
@@ -49,12 +49,48 @@ export interface Database {
             isOneToOne: false;
             referencedRelation: 'drafted_teams';
             referencedColumns: ['drafted_team_id'];
+          }
+        ];
+      };
+      drafted_players_pending: {
+        Row: {
+          created_at: string;
+          drafted_player: number | null;
+          drafted_player_id: number;
+          drafted_team: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          drafted_player?: number | null;
+          drafted_player_id?: number;
+          drafted_team?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          drafted_player?: number | null;
+          drafted_player_id?: number;
+          drafted_team?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'drafted_players_pending_drafted_player_fkey';
+            columns: ['drafted_player'];
+            isOneToOne: false;
+            referencedRelation: 'players';
+            referencedColumns: ['player_id'];
           },
           {
-            foreignKeyName: 'drafted_players_drafted_team_fkey';
+            foreignKeyName: 'drafted_players_pending_drafted_player_fkey';
+            columns: ['drafted_player'];
+            isOneToOne: false;
+            referencedRelation: 'players_view';
+            referencedColumns: ['player_id'];
+          },
+          {
+            foreignKeyName: 'drafted_players_pending_drafted_team_fkey';
             columns: ['drafted_team'];
             isOneToOne: false;
-            referencedRelation: 'drafted_teams_summary';
+            referencedRelation: 'drafted_teams_pending';
             referencedColumns: ['drafted_team_id'];
           }
         ];
@@ -83,35 +119,65 @@ export interface Database {
         };
         Relationships: [];
       };
+      drafted_teams_pending: {
+        Row: {
+          allowed_transfers: boolean;
+          created_at: string;
+          drafted_team_id: number;
+          key: string;
+          team_email: string;
+          team_name: string;
+          team_owner: string;
+        };
+        Insert: {
+          allowed_transfers: boolean;
+          created_at?: string;
+          drafted_team_id?: number;
+          key?: string;
+          team_email: string;
+          team_name: string;
+          team_owner: string;
+        };
+        Update: {
+          allowed_transfers?: boolean;
+          created_at?: string;
+          drafted_team_id?: number;
+          key?: string;
+          team_email?: string;
+          team_name?: string;
+          team_owner?: string;
+        };
+        Relationships: [];
+      };
       drafted_transfers: {
         Row: {
-          active_transfer_expiry: string;
+          active_transfer_expiry: string | null;
           created_at: string;
-          drafted_player_id: number | null;
+          drafted_player: number;
           drafted_transfer_id: number;
-          player_id: number | null;
+          player_id: number;
           transfer_week: number | null;
         };
         Insert: {
           active_transfer_expiry?: string | null;
           created_at?: string;
-          drafted_player_id?: number | null;
+          drafted_player: number;
           drafted_transfer_id?: number;
-          player_id?: number | null;
+          player_id: number;
           transfer_week?: number | null;
         };
         Update: {
           active_transfer_expiry?: string | null;
           created_at?: string;
-          drafted_player_id?: number | null;
+          drafted_player?: number;
           drafted_transfer_id?: number;
-          player_id?: number | null;
+          player_id?: number;
           transfer_week?: number | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'drafted_transfers_drafted_player_id_fkey';
-            columns: ['drafted_player_id'];
+            foreignKeyName: 'drafted_transfers_drafted_player_fkey';
+            columns: ['drafted_player'];
             isOneToOne: false;
             referencedRelation: 'drafted_players';
             referencedColumns: ['drafted_player_id'];
@@ -528,40 +594,28 @@ export interface Database {
       };
     };
     Views: {
-      drafted_teams_summary: {
-        Row: {
-          allowed_transfers: boolean | null;
-          drafted_team_id: number | null;
-          team_email: string | null;
-          team_name: string | null;
-          team_owner: string | null;
-          total_cost: number | null;
-          valid_team: boolean | null;
-        };
-        Relationships: [];
-      };
       players_view: {
         Row: {
           assists: number | null;
           clean_sheets: number | null;
           code: number | null;
-          cost: number;
+          cost: number | null;
           first_name: string | null;
           goals_scored: number | null;
-          image: string;
-          image_large: string;
+          image: string | null;
+          image_large: string | null;
           is_unavailable: boolean | null;
           news: string | null;
-          player_id: number;
+          player_id: number | null;
           position: number | null;
           red_cards: number | null;
           second_name: string | null;
           status: string | null;
-          team: number;
+          team: number | null;
           team_name: string | null;
           team_short_name: string | null;
           unavailable_for_season: boolean | null;
-          web_name: string;
+          web_name: string | null;
         };
         Relationships: [
           {
@@ -599,7 +653,7 @@ export interface Database {
       [_ in never]: never;
     };
   };
-}
+};
 
 export type Tables<
   PublicTableNameOrOptions extends

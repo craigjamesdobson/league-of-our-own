@@ -19,7 +19,7 @@
           'border !border-green-400 ': !validation?.$invalid,
           'pl-10 ': !!icon,
         }"
-        class="px-4 py-2 bg-white border rounded-md border-primary focus:outline-none"
+        class="px-4 py-2 bg-white border rounded-md border-surface-300 focus:outline-none"
         :type="type"
         autocomplete="chrome-off"
         @change="validation?.$touch"

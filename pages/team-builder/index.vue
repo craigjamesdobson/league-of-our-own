@@ -299,7 +299,7 @@ const handleTeamSubmit = async () => {
     await upsertPlayerData(data.drafted_team_id, isExistingDraftedTeam);
 
     router.push({
-      path: 'team-picker',
+      path: 'team-builder',
       query: { id: data.key },
     });
 
@@ -313,7 +313,7 @@ const handleTeamSubmit = async () => {
             .join(' | ')}</p>
           <p>You can edit your team by clicking this <a href="${
             config.public.siteURL
-          }/team-picker?id=${data.key}">link</a></p>
+          }/team-builder?id=${data.key}">link</a></p>
         `,
       },
     });

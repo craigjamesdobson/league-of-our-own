@@ -1,41 +1,41 @@
 <template>
   <div
     class="flex flex-col items-center gap-5 justify-center p-5"
-    :class="getCorrectColSpanClass(player!.position)"
+    :class="getCorrectColSpanClass(props.position)"
   >
     <div class="flex flex-row items-center justify-center gap-5">
       <Button
-        v-if="player?.selectedPlayer"
+        v-if="player"
         severity="danger"
         aria-label="Clear player"
         rounded
         outlined
         class="!w-6 !h-6"
-        @click="player.selectedPlayer = null"
+        @click="player = undefined"
       >
         <Icon name="akar-icons:cross" />
       </Button>
       <img
         class="w-24 h-24 rounded-full bg-white drop-shadow-lg p-2"
-        :src="player!.selectedPlayer?.image_large ?? loadPlayerFallbackImage"
-        :alt="player!.selectedPlayer?.web_name"
+        :src="player ? player!.image_large : loadPlayerFallbackImage"
+        :alt="player ? player!.web_name : 'pick a player'"
         @error="loadPlayerFallbackImage"
       />
-      <div v-if="player!.selectedPlayer" class="relative flex flex-col gap-2.5">
+      <div v-if="player" class="relative flex flex-col gap-2.5">
         <div class="flex items-start gap-10">
           <img
             class="w-8 h-8"
-            :src="getImageUrl(player!.selectedPlayer.team_short_name.toLowerCase())"
+            :src="getImageUrl(player!.team_short_name.toLowerCase())"
           />
         </div>
         <p class="uppercase font-black">
-          {{ player!.selectedPlayer.web_name }}
+          {{ player!.web_name }}
         </p>
-        <p>{{ player!.selectedPlayer.cost.toFixed(1) }}</p>
+        <p>{{ player!.cost.toFixed(1) }}</p>
       </div>
     </div>
     <Dropdown
-      v-model="player!.selectedPlayer"
+      v-model="player"
       filter
       class="!min-w-[300px] mt-auto"
       :options="dropdownPlayerData"
@@ -74,19 +74,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import { usePlayerStore } from '~/stores/players';
+import type { Player } from '~/types/Player';
 
 const playerStore = usePlayerStore();
 
-const player = defineModel<{
-  position: PlayerPosition;
-  selectedPlayer: Player | null;
-}>('player');
+const player = defineModel<Player>('player');
 
 const props = defineProps<{
   selectedPlayers: (number | undefined)[];
+  position: PlayerPosition;
 }>();
 
 const getCorrectColSpanClass = (position: PlayerPosition) => {
@@ -102,18 +100,16 @@ const getCorrectColSpanClass = (position: PlayerPosition) => {
 
 const dropdownPlayerData = computed(() =>
   playerStore.players
-    .map((player) => {
+    .map((p) => {
       return {
-        ...player,
-        disabled: player.unavailable_for_season === true,
-        selected: props.selectedPlayers.includes(player.player_id),
+        ...p,
+        disabled:
+          p.unavailable_for_season === true ||
+          props.selectedPlayers.includes(p.player_id),
+        selected: props.selectedPlayers.includes(p.player_id),
       };
     })
-    .filter(
-      (x) =>
-        x.position === player.value!.position &&
-        !props.selectedPlayers.includes(x.player_id)
-    )
+    .filter((x) => x.position === props.position)
 );
 </script>
 

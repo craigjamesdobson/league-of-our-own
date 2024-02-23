@@ -63,24 +63,15 @@
           label="Submit team"
           @click="handleTeamSubmit"
         />
-        <Message
-          v-for="(error, index) in errors"
-          :key="index"
-          severity="info"
-          class="w-full !my-1"
-          :closable="false"
-          :life="3000"
-        >
-          <div>{{ error }}</div>
-        </Message>
       </form>
     </div>
     <div class="grid grid-cols-12 justify-center">
       <PlayerSection
-        v-for="player in draftedTeamPlayers"
-        :key="player.id"
+        v-for="(player, index) in draftedTeamPlayers"
+        :key="index"
+        v-model:player="player.selectedPlayer"
         :selected-players="selectedPlayerIds"
-        :player="player"
+        :position="player.position"
       />
     </div>
   </div>
@@ -95,6 +86,7 @@ import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert } from '~/types/database.types';
+import type { Player } from '~/types/Player';
 
 const supabase = useSupabaseClient<Database>();
 const route = useRoute();
@@ -145,7 +137,7 @@ const draftedTeamPlayers: Ref<
   | {
       draftedPlayerID?: number;
       position: PlayerPosition;
-      selectedPlayer: DraftedPlayer;
+      selectedPlayer: Player;
     }[]
   | []
 > = ref([]);

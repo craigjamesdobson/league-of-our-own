@@ -1,8 +1,9 @@
 <template>
   <div class="relative flex flex-col mb-2">
-    <label class="mb-2 text-xs" :for="label">{{ label }}</label>
+    <label v-if="label" class="mb-2 text-xs" :for="label">{{ label }}</label>
     <div class="relative flex flex-col">
       <Icon
+        v-if="icon"
         class="absolute text-primary left-4 top-3"
         :class="{
           'text-red-500': validation?.$error,
@@ -12,16 +13,16 @@
       />
       <input
         :id="label"
-        :v-model="modelValue"
+        v-model="modelValue"
         :class="{
           'border !border-red-500 rounded-b-none': validation?.$error,
           'border !border-green-400 ': !validation?.$invalid,
+          'pl-10 ': !!icon,
         }"
-        class="p-2 pl-10 bg-white border rounded-md border-primary focus:outline-none"
-        :type="label"
+        class="px-4 py-2 bg-white border rounded-md border-surface-300 focus:outline-none"
+        :type="type"
         autocomplete="chrome-off"
         @change="validation?.$touch"
-        @input="$emit('update:modelValue', $event?.target?.value)"
       />
     </div>
     <div
@@ -44,7 +45,7 @@ defineProps({
     type: String,
     default: '',
   },
-  modelValue: {
+  type: {
     type: String,
     default: '',
   },
@@ -58,7 +59,7 @@ defineProps({
   },
 });
 
-defineEmits(['update:modelValue']);
+const modelValue = defineModel('modelValue');
 </script>
 
 <style scoped></style>

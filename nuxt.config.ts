@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     },
   },
   tailwindcss: {
+    exposeConfig: true,
     config: {
       content: ['presets/**/*.{js,vue,ts}'],
       theme: {
@@ -93,6 +94,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       gtagId: 'G-YL6X3M2488',
+      siteURL: process.env.SITE_URL,
     },
   },
   ssr: false,

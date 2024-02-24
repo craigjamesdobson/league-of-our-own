@@ -139,6 +139,10 @@ export default {
       'm-0',
       'py-3 px-5',
 
+      {
+        'pointer-events-none opacity-50': context.disabled
+      },
+
       // Color
       {
         'text-surface-700 ': !context.focused && !context.selected,

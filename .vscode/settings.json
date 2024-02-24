@@ -14,5 +14,6 @@
         "unplugin",
         "vuelidate",
         "vueuse"
-    ]
+    ],
+    "tailwindCSS.experimental.configFile": ".nuxt/tailwind.config.d.ts"
 }

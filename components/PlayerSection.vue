@@ -11,7 +11,7 @@
         rounded
         outlined
         class="!w-6 !h-6"
-        @click="player = undefined"
+        @click="player = null"
       >
         <Icon name="akar-icons:cross" />
       </Button>
@@ -80,7 +80,7 @@ import type { Player } from '~/types/Player';
 
 const playerStore = usePlayerStore();
 
-const player = defineModel<Player>('player');
+const player = defineModel<Player | null>('player');
 
 const props = defineProps<{
   selectedPlayers: (number | undefined)[];
@@ -92,9 +92,9 @@ const getCorrectColSpanClass = (position: PlayerPosition) => {
     case PlayerPosition.GOALKEEPER:
       return 'col-span-12';
     case PlayerPosition.DEFENDER:
-      return 'col-span-3';
+      return 'col-span-12 xl:col-span-3';
     default:
-      return 'col-span-4';
+      return 'col-span-12 xl:col-span-4';
   }
 };
 

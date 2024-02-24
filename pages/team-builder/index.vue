@@ -1,7 +1,7 @@
 <template>
-  <div class="flex gap-5">
+  <div class="flex flex-col 2xl:flex-row gap-5">
     <Toast />
-    <div class="p-5 w-96">
+    <div class="p-5 2xl:w-96">
       <h1 class="text-xl font-black uppercase mb-5">Team Details</h1>
       <form class="flex flex-col gap-5 items-start">
         <div class="flex flex-col gap-1 w-full">
@@ -59,7 +59,7 @@
         </Message>
         <Button
           :loading="loading"
-          class="w-full"
+          class="w-full hidden xl:flex"
           label="Submit team"
           @click="handleTeamSubmit"
         />
@@ -74,6 +74,12 @@
         :position="player.position"
       />
     </div>
+    <Button
+      class="w-full xl:hidden"
+      :loading="loading"
+      label="Submit team"
+      @click="handleTeamSubmit"
+    />
   </div>
 </template>
 

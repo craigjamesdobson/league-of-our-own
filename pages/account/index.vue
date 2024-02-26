@@ -94,7 +94,12 @@ const transfersMadeCount = (team: DraftedTeam) => {
             scroll-height="400"
           >
             <template #option="slotProps">
-              <div class="flex justify-between items-center">
+              <div
+                class="flex justify-between items-center"
+                :class="{
+                  'opacity-25': transfersMadeCount(slotProps.option) === 4,
+                }"
+              >
                 <div class="flex flex-col gap-1 align-items-center">
                   <div class="font-black">
                     {{ slotProps.option.team_name.toUpperCase() }}

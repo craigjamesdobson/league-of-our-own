@@ -1,7 +1,7 @@
 <template>
-  <Dialog v-model:visible="visible" header=" " modal :dismissable-mask="true">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-      <div class="lg:col-span-2">
+  <Dialog v-model:visible="visible" header="" modal :dismissable-mask="true">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:min-w-[30rem]">
+      <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
           <h2 class="pb-2.5 uppercase font-black text-lg">Original Player</h2>
           <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
@@ -23,6 +23,7 @@
               />
               <DraftedPlayer :drafted-player="playerTransfer.player" />
               <Button
+                v-if="props.editable"
                 severity="danger"
                 text
                 rounded
@@ -37,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="props.editable">
         <h2 class="uppercase font-black text-lg mb-2.5">Submit new transfer</h2>
         <form class="flex flex-col gap-5 items-start">
           <div class="flex flex-col gap-2 w-full">
@@ -117,6 +118,13 @@ const newTransferData: Ref<TransferData> = ref({
 
 const visible = defineModel<boolean>('visible');
 const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
+
+const props = defineProps({
+  editable: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const playerStore = usePlayerStore();
 const draftedTeamsStore = useDraftedTeamsStore();

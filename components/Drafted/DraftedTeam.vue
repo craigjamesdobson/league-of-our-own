@@ -56,14 +56,14 @@ const handleEditPlayer = (playerID: number) => {
       </span>
     </div>
     <div
-      v-for="player in props.draftedTeam?.players"
+      v-for="player in props.draftedTeam.players"
       :key="player.player_id"
       class="relative text-sm"
       :class="{
-        'bg-yellow-200':
+        'bg-yellow-200 hover:bg-yellow-300':
           !!player.transfers.length &&
           isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-        'bg-green-200':
+        'bg-green-200 transition-all hover:bg-green-300':
           !!player.transfers.length &&
           !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
       }"
@@ -76,10 +76,11 @@ const handleEditPlayer = (playerID: number) => {
         <DraftedTransfer
           v-else-if="player.transfers.at(-1) !== null"
           :drafted-player="player"
-          class="w-full"
+          class="w-full cursor-pointer"
+          @click="handleEditPlayer(player.player_id)"
         />
         <Button
-          v-if="editable"
+          v-if="props.editable"
           icon="pi pi-check"
           aria-label="Edit Player"
           title="Edit Player"
@@ -102,9 +103,9 @@ const handleEditPlayer = (playerID: number) => {
     </div>
   </div>
   <DraftedPlayerEditDialog
-    v-if="editable"
     v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog"
+    :editable="props.editable"
   />
 </template>
 

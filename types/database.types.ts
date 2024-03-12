@@ -198,6 +198,45 @@ export type Database = {
           }
         ];
       };
+      fixtures: {
+        Row: {
+          away_team: number | null;
+          created_at: string;
+          game_week: number | null;
+          home_team: number | null;
+          id: number;
+        };
+        Insert: {
+          away_team?: number | null;
+          created_at?: string;
+          game_week?: number | null;
+          home_team?: number | null;
+          id?: number;
+        };
+        Update: {
+          away_team?: number | null;
+          created_at?: string;
+          game_week?: number | null;
+          home_team?: number | null;
+          id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_fixtures_away_team_fkey';
+            columns: ['away_team'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_fixtures_home_team_fkey';
+            columns: ['home_team'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
       players: {
         Row: {
           assists: number | null;
@@ -644,6 +683,13 @@ export type Database = {
           team_name: string;
           team_id: number;
         }[];
+      };
+      insert_or_update_data: {
+        Args: {
+          id_field: number;
+          other_field: string;
+        };
+        Returns: undefined;
       };
     };
     Enums: {

@@ -1,3 +1,5 @@
+import type { Tables } from './database.types';
+
 interface Player {
   player_id: number;
   code: number;
@@ -7,7 +9,6 @@ interface Player {
   first_name: string;
   second_name: string;
   goals_scored: number;
-  assists: number;
   clean_sheets: number;
   red_cards: number;
   cost: number;
@@ -22,4 +23,11 @@ interface Player {
   created_at?: string;
 }
 
-export type { Player };
+interface PlayerWithStats extends Tables<'players_view'> {
+  week_goals?: number;
+  week_assists?: number;
+  week_redcard?: boolean;
+  week_cleansheet?: boolean;
+}
+
+export type { Player, PlayerWithStats };

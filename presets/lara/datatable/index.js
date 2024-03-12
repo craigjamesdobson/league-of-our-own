@@ -46,8 +46,6 @@ export default {
   }),
   header: ({ props }) => ({
     class: [
-      'font-bold',
-
       // Shape
       props.showGridlines
         ? 'border-x border-t border-b-0'

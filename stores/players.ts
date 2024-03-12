@@ -19,7 +19,10 @@ export const usePlayerStore = defineStore('player-store', () => {
 
   const fetchPlayers = async () => {
     try {
-      const { data, error } = await supabase.from('players_view').select(`*`);
+      const { data, error } = await supabase
+        .from('players_view')
+        .select(`*`)
+        .order('minutes', { ascending: false });
 
       if (error) {
         console.error('Error fetching data:', error.message);

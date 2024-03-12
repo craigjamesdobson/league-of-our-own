@@ -73,6 +73,9 @@ export default {
     ],
   },
   tabpanel: {
+    root: {
+      class: 'bg-red-800',
+    },
     header: ({ props }) => ({
       class: [
         // Spacing

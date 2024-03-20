@@ -1,4 +1,4 @@
-import type { Tables } from './database.types';
+import type { Tables } from './database-generated.types';
 
 interface Player {
   player_id: number;

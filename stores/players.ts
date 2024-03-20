@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, Tables } from '~/types/database.types';
+import type { Database, Views } from '~/types/database.types';
 interface FilterData {
   filterName: string;
   filterPrice: number;
   filterTeam: number | undefined;
 }
 
-type Players = Tables<'players_view'>;
+type Players = Views<'players_view'>;
 
 export const usePlayerStore = defineStore('player-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -115,6 +115,8 @@ export const usePlayerStore = defineStore('player-store', () => {
     () => (id: number) => players.value.find((x) => x.player_id === id)
   );
 
+  const getPlayers = computed(() => players.value);
+
   const formatFilteredPlayersByPosition = computed(() => {
     return [
       {
@@ -151,6 +153,7 @@ export const usePlayerStore = defineStore('player-store', () => {
     fetchPlayers,
     upsertPlayerData,
     filterPlayers,
+    getPlayers,
     getPlayerByID,
     getPlayerLastUpdatedDate,
     formatFilteredPlayersByPosition,

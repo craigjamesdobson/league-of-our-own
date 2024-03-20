@@ -1,39 +1,46 @@
 <script setup lang="ts">
-import type { Database } from '~/types/database.types';
+import { useFixtureStore } from '~/stores/fixtures';
 
-interface Team {
-  id: number;
-  name: string;
-  short_name: string;
-}
+const fixtureStore = useFixtureStore();
+const selectedWeek = ref(1);
 
-interface Fixture {
-  id: number;
-  home_team: Team;
-  away_team: Team;
-}
+watch(
+  selectedWeek,
+  async (newWeek) => {
+    await useAsyncData('fixtures', () => fixtureStore.fetchFixtures(newWeek));
 
-const fixtures: Ref<Fixture[] | undefined> = ref();
-const supabase = useSupabaseClient<Database>();
-
-const fetchFixtures = async () => {
-  const { data } = await supabase.from('fixtures').select(`
-  id,
-  home_team (id, name, short_name),
-  away_team (id, name, short_name)
-`);
-  // @ts-ignore - typings coming back from supabase is wrong
-  fixtures.value = data;
-};
-
-await fetchFixtures();
+    await useAsyncData('players-with-stats', () =>
+      fixtureStore.formatFixturesAndPlayers(newWeek)
+    );
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
-  <div>
-    <h1>Fixtures</h1>
+  <div v-if="fixtureStore.playersWithStats">
+    <div class="flex justify-between">
+      <h1 class="font-black text-2xl uppercase my-2">Fixtures</h1>
+      <div class="flex flex-col gap-2.5">
+        <label for="gameweeks">Select a game week</label>
+        <Dropdown
+          id="gameweeks"
+          v-model="selectedWeek"
+          :options="
+            Array.from({ length: 38 }, (_, i) => ({
+              label: `Week ${i + 1}`,
+              value: i + 1,
+            }))
+          "
+          option-label="label"
+          option-value="value"
+          placeholder="Select a game week"
+          class="w-full md:w-[14rem]"
+        />
+      </div>
+    </div>
     <div
-      v-for="fixture in fixtures"
+      v-for="fixture in fixtureStore.playersWithStats"
       :key="fixture.id"
       class="grid grid-cols-2 gap-5 mb-5"
     >

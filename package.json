@@ -7,7 +7,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint --ext .ts,.js,.vue .",
-    "lint:fix": "eslint --ext .ts,.js,.vue . --fix"
+    "lint:fix": "eslint --ext .ts,.js,.vue . --fix",
+    "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts"
   },
   "dependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
@@ -22,6 +23,7 @@
     "prettier": "^2.8.8",
     "primevue": "^3.45.0",
     "resend": "^3.1.0",
+    "type-fest": "^4.12.0",
     "typescript": "^4.9.5",
     "vue": "^3.4.3"
   },

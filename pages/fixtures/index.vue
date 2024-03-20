@@ -18,7 +18,7 @@ watch(
 </script>
 
 <template>
-  <div v-if="fixtureStore.playersWithStats">
+  <div>
     <div class="flex justify-between">
       <h1 class="font-black text-2xl uppercase my-2">Fixtures</h1>
       <div class="flex flex-col gap-2.5">
@@ -39,12 +39,45 @@ watch(
         />
       </div>
     </div>
-    <div
-      v-for="fixture in fixtureStore.playersWithStats"
-      :key="fixture.id"
-      class="grid grid-cols-2 gap-5 mb-5"
-    >
-      <Fixture :fixture="fixture" />
+    <div v-if="fixtureStore.playersWithStats">
+      <div
+        v-for="fixture in fixtureStore.playersWithStats"
+        :key="fixture.id"
+        class="grid grid-cols-2 gap-5 mb-5"
+      >
+        <Fixture :fixture="fixture" />
+      </div>
+    </div>
+    <div class="my-5">
+      <div class="grid grid-cols-2 gap-5 mb-5">
+        <DataTable v-for="x in 4" :key="x" :value="new Array(5)">
+          <Column field="Player" header="Player">
+            <template #body>
+              <Skeleton></Skeleton>
+            </template>
+          </Column>
+          <Column field="Goals" header="Goals">
+            <template #body>
+              <Skeleton></Skeleton>
+            </template>
+          </Column>
+          <Column field="Assists" header="Assists">
+            <template #body>
+              <Skeleton></Skeleton>
+            </template>
+          </Column>
+          <Column field="Clean sheet" header="Clean sheet">
+            <template #body>
+              <Skeleton></Skeleton>
+            </template>
+          </Column>
+          <Column field="Red card" header="Red card">
+            <template #body>
+              <Skeleton></Skeleton>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
     </div>
   </div>
 </template>

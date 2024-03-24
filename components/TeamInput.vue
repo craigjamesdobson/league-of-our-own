@@ -1,9 +1,5 @@
 <template>
-  <h2 class="font-black text-lg uppercase my-2">
-    {{ team.name }}
-  </h2>
-  <button @click="console.log(players)">click</button>
-  <TabView class="flex flex-col h-full">
+  <TabView>
     <TabPanel
       v-for="(position, index) in playerPositions"
       :key="index"
@@ -57,15 +53,12 @@
         </Column>
         <Column class="w-2/12" field="quantity" header="Clean sheet">
           <template #body="slotProps">
-            <Checkbox
-              v-model="slotProps.data.week_clean_sheet"
-              :binary="true"
-            />
+            <Checkbox v-model="slotProps.data.week_cleansheet" :binary="true" />
           </template>
         </Column>
         <Column class="w-2/12" field="quantity" header="Red card">
           <template #body="slotProps">
-            <Checkbox v-model="slotProps.data.week_red_card" :binary="true" />
+            <Checkbox v-model="slotProps.data.week_redcard" :binary="true" />
           </template>
         </Column>
       </DataTable>
@@ -77,14 +70,7 @@
 import { FilterMatchMode } from 'primevue/api';
 import type { PlayerWithStats } from '~/types/Player';
 
-interface Team {
-  id: number;
-  name: string;
-  short_name: string;
-}
-
-const { team, players } = defineProps<{
-  team: Team;
+const { players } = defineProps<{
   players: PlayerWithStats[];
 }>();
 

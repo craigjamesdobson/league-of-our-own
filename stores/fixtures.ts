@@ -63,6 +63,10 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     playersWithStats.value = data;
   };
 
+  const getFixtureByID = computed(() => {
+    return (id: number) => fixtures.value?.find((x) => x.id === id);
+  });
+
   // const getFixturesWithPlayers = computed(() => {
   //   return fixtures.value?.map((x) => {
   //     return {
@@ -83,6 +87,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fixtures,
     fetchFixtures,
     playersWithStats,
+    getFixtureByID,
     formatFixturesAndPlayers,
   };
 });

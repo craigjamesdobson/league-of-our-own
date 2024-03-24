@@ -35,49 +35,40 @@ watch(
           option-label="label"
           option-value="value"
           placeholder="Select a game week"
-          class="w-full md:w-[14rem]"
         />
       </div>
     </div>
-    <div v-if="fixtureStore.playersWithStats">
-      <div
-        v-for="fixture in fixtureStore.playersWithStats"
+    <div
+      v-if="fixtureStore.playersWithStats"
+      class="grid grid-cols-2 gap-10 m-20"
+    >
+      <Card
+        v-for="(fixture, index) in fixtureStore.playersWithStats"
         :key="fixture.id"
-        class="grid grid-cols-2 gap-5 mb-5"
       >
-        <Fixture :fixture="fixture" />
-      </div>
-    </div>
-    <div class="my-5">
-      <div class="grid grid-cols-2 gap-5 mb-5">
-        <DataTable v-for="x in 4" :key="x" :value="new Array(5)">
-          <Column field="Player" header="Player">
-            <template #body>
-              <Skeleton></Skeleton>
-            </template>
-          </Column>
-          <Column field="Goals" header="Goals">
-            <template #body>
-              <Skeleton></Skeleton>
-            </template>
-          </Column>
-          <Column field="Assists" header="Assists">
-            <template #body>
-              <Skeleton></Skeleton>
-            </template>
-          </Column>
-          <Column field="Clean sheet" header="Clean sheet">
-            <template #body>
-              <Skeleton></Skeleton>
-            </template>
-          </Column>
-          <Column field="Red card" header="Red card">
-            <template #body>
-              <Skeleton></Skeleton>
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+        <template #title>
+          <div class="flex justify-between">
+            <span
+              class="text-xs bg-primary-500 w-8 h-8 flex items-center justify-center text-white rounded-full"
+            >
+              {{ index + 1 }}
+            </span>
+            <Button
+              aria-label="Clear player"
+              outlined
+              rounded
+              class="!w-8 !h-8"
+            >
+              <NuxtLink :to="`/fixtures/${fixture.id}`">
+                <Icon size="22" name="mage:edit-fill"
+              /></NuxtLink>
+            </Button>
+          </div>
+        </template>
+        <template #content>
+          <FixtureBase :fixture="fixture" />
+        </template>
+      </Card>
     </div>
   </div>
 </template>

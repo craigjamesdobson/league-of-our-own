@@ -6,6 +6,7 @@
         :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
       />
       <p class="uppercase font-black">{{ fixture.home_team.name }}</p>
+      <span>{{ fixture.home_team_score ?? '-' }}</span>
     </div>
     <div>VS</div>
     <div class="flex flex-col gap-5 items-center">
@@ -14,6 +15,7 @@
         :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
       />
       <p class="uppercase font-black">{{ fixture.away_team.name }}</p>
+      <span>{{ fixture.away_team_score ?? '-' }}</span>
     </div>
   </div>
 </template>
@@ -31,8 +33,10 @@ interface Fixture {
   id: number;
   home_team: Team;
   home_players: PlayerWithStats[];
+  home_team_score: number;
   away_team: Team;
   away_players: PlayerWithStats[];
+  away_team_score: number;
 }
 
 const { fixture } = defineProps<{

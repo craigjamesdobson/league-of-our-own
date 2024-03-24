@@ -38,37 +38,15 @@ watch(
         />
       </div>
     </div>
-    <div
-      v-if="fixtureStore.playersWithStats"
-      class="grid grid-cols-2 gap-10 m-20"
-    >
-      <Card
-        v-for="(fixture, index) in fixtureStore.playersWithStats"
+    <div v-if="fixtureStore.fixtures" class="grid grid-cols-2 gap-10 m-20">
+      <NuxtLink
+        v-for="(fixture, index) in fixtureStore.fixtures"
         :key="fixture.id"
+        :to="`/fixtures/${fixture.id}`"
+        class="p-5 bg-surface-50 border hover:border-primary *:transition-all ease-in-out duration-300"
       >
-        <template #title>
-          <div class="flex justify-between">
-            <span
-              class="text-xs bg-primary-500 w-8 h-8 flex items-center justify-center text-white rounded-full"
-            >
-              {{ index + 1 }}
-            </span>
-            <Button
-              aria-label="Clear player"
-              outlined
-              rounded
-              class="!w-8 !h-8"
-            >
-              <NuxtLink :to="`/fixtures/${fixture.id}`">
-                <Icon size="22" name="mage:edit-fill"
-              /></NuxtLink>
-            </Button>
-          </div>
-        </template>
-        <template #content>
-          <FixtureBase :fixture="fixture" />
-        </template>
-      </Card>
+        <FixtureBase :fixture="fixture" />
+      </NuxtLink>
     </div>
   </div>
 </template>

@@ -1,20 +1,9 @@
 import { defineStore } from 'pinia';
+import type { Fixture } from '~/types/Fixture';
 import { type Database } from '~/types/database.types';
 
 export const useFixtureStore = defineStore('fixture-store', () => {
   const supabase = useSupabaseClient<Database>();
-
-  interface Team {
-    id: number;
-    name: string;
-    short_name: string;
-  }
-
-  interface Fixture {
-    id: number;
-    home_team: Team;
-    away_team: Team;
-  }
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
 
@@ -37,6 +26,24 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fixtures.value = data;
   };
 
+  const fetchFixtureByID = async (id: number) => {
+    const { data } = await supabase
+      .from('fixtures')
+      .select(
+        `
+          id,
+          home_team_score,
+          away_team_score,
+          home_team (id, name, short_name),
+          away_team (id, name, short_name)
+        `
+      )
+      .eq('id', id)
+      .returns<Fixture>()
+      .single();
+    return data;
+  };
+
   const getFixtureByID = computed(() => {
     return (id: number) => fixtures.value?.find((x) => x.id === id);
   });
@@ -44,6 +51,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
   return {
     fixtures,
     fetchFixtures,
+    fetchFixtureByID,
     getFixtureByID,
   };
 });

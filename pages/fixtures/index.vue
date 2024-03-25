@@ -7,11 +7,7 @@ const selectedWeek = ref(1);
 watch(
   selectedWeek,
   async (newWeek) => {
-    await useAsyncData('fixtures', () => fixtureStore.fetchFixtures(newWeek));
-
-    await useAsyncData('players-with-stats', () =>
-      fixtureStore.formatFixturesAndPlayers(newWeek)
-    );
+    await fixtureStore.fetchFixtures(newWeek);
   },
   { immediate: true }
 );
@@ -40,7 +36,7 @@ watch(
     </div>
     <div v-if="fixtureStore.fixtures" class="grid grid-cols-2 gap-10 m-20">
       <NuxtLink
-        v-for="(fixture, index) in fixtureStore.fixtures"
+        v-for="fixture in fixtureStore.fixtures"
         :key="fixture.id"
         :to="`/fixtures/${fixture.id}`"
         class="p-5 bg-surface-50 border hover:border-primary *:transition-all ease-in-out duration-300"

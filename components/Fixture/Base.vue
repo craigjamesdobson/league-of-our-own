@@ -5,8 +5,8 @@
         class="w-16 h-w-16 aspect-square"
         :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
       />
-      <p class="uppercase font-black">{{ fixture.home_team.name }}</p>
-      <span>{{ fixture.home_team_score ?? '-' }}</span>
+      <p class="uppercase font-black text-lg">{{ fixture.home_team.name }}</p>
+      <span class="font-bold">{{ fixture.home_team_score ?? '-' }}</span>
     </div>
     <div>VS</div>
     <div class="flex flex-col gap-5 items-center">
@@ -14,8 +14,8 @@
         class="w-16 h-w-16 aspect-square"
         :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
       />
-      <p class="uppercase font-black">{{ fixture.away_team.name }}</p>
-      <span>{{ fixture.away_team_score ?? '-' }}</span>
+      <p class="uppercase font-black text-lg">{{ fixture.away_team.name }}</p>
+      <span class="font-bold">{{ fixture.away_team_score ?? '-' }}</span>
     </div>
   </div>
 </template>

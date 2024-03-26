@@ -9,7 +9,7 @@
         v-model:filters="filters"
         scrollable
         scroll-height="275px"
-        :value="players.filter((x) => x.position === position.value)"
+        :value="players!.filter((x) => x.position === position.value)"
         size="small"
         :global-filter-fields="['web_name']"
         data-key="id"
@@ -78,7 +78,7 @@
 import { FilterMatchMode } from 'primevue/api';
 import type { PlayerWithStats } from '~/types/Player';
 
-const players = defineModel<PlayerWithStats>('players');
+const players = defineModel<PlayerWithStats[]>('players');
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },

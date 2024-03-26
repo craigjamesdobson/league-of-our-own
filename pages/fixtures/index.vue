@@ -36,12 +36,12 @@ watch(
     </div>
     <div v-if="fixtureStore.fixtures" class="grid grid-cols-2 gap-10 m-20">
       <NuxtLink
-        v-for="fixture in fixtureStore.fixtures"
+        v-for="(fixture, index) in fixtureStore.fixtures"
         :key="fixture.id"
         :to="`/fixtures/${fixture.id}`"
         class="p-5 bg-surface-50 border hover:border-primary *:transition-all ease-in-out duration-300"
       >
-        <FixtureBase :fixture="fixture" />
+        <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
       </NuxtLink>
     </div>
   </div>

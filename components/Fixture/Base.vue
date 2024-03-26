@@ -39,9 +39,7 @@ interface Fixture {
   away_team_score: number;
 }
 
-const { fixture } = defineProps<{
-  fixture: Fixture;
-}>();
+const fixture = defineModel<Fixture>('fixture');
 </script>
 
 <style scoped></style>

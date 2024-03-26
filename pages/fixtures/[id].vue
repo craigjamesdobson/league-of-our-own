@@ -14,7 +14,7 @@
           min="0"
         />
       </div>
-      <TeamInput :players="homePlayers" />
+      <TeamInput v-model:players="homePlayers" />
     </div>
     <div>
       <div class="flex justify-center gap-5 items-center m-10">
@@ -30,9 +30,9 @@
           :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
         />
       </div>
-      <TeamInput :players="awayPlayers" />
+      <TeamInput v-model:players="awayPlayers" />
     </div>
-    <Button @click="filterPopulatedPlayers">Click</Button>
+    <Button @click="updateFixture">Click</Button>
   </div>
 </template>
 
@@ -63,8 +63,12 @@ const { data: awayPlayers } = await supabase
   })
   .returns<PlayerWithStats[]>();
 
-const filterPopulatedPlayers = () => {
-  const populatedHomePlayers = homePlayers.filter((player) => {
+const updateFixture = () => {
+  if (!fixture.value) throw new Error('No fixture');
+
+  fixtureStore.upsertFixtureScore(fixture.value);
+
+  const populatedHomePlayers = homePlayers!.filter((player) => {
     return (
       player.week_assists > 0 ||
       player.week_goals > 0 ||
@@ -73,7 +77,7 @@ const filterPopulatedPlayers = () => {
     );
   });
 
-  const populatedAwayPlayers = awayPlayers.filter((player) => {
+  const populatedAwayPlayers = awayPlayers!.filter((player) => {
     return (
       player.week_assists > 0 ||
       player.week_goals > 0 ||

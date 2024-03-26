@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type { Fixture } from '~/types/Fixture';
-import { type Database } from '~/types/database.types';
+import { type Database, type TablesInsert } from '~/types/database.types';
 
 export const useFixtureStore = defineStore('fixture-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -39,9 +39,35 @@ export const useFixtureStore = defineStore('fixture-store', () => {
         `
       )
       .eq('id', id)
-      .returns<Fixture>()
+      .returns<Fixture[]>()
       .single();
     return data;
+  };
+
+  const upsertFixtureScore = async (fixtureData: Fixture) => {
+    const formattedFixture: TablesInsert<'fixtures'> = {
+      id: fixtureData.id,
+      home_team_score: fixtureData.home_team_score,
+      away_team_score: fixtureData.away_team_score,
+    };
+
+    const selectedFixtureIndex = fixtures.value?.findIndex(
+      (x) => x.id === fixtureData.id
+    );
+
+    if (!selectedFixtureIndex || !fixtures.value)
+      throw new Error('No fixture found');
+
+    fixtures.value[selectedFixtureIndex] = fixtureData;
+
+    const { data, error } = await supabase
+      .from('fixtures')
+      .upsert(formattedFixture)
+      .select();
+
+    if (error) throw new Error(error.message);
+
+    console.log(data);
   };
 
   const getFixtureByID = computed(() => {
@@ -52,6 +78,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fixtures,
     fetchFixtures,
     fetchFixtureByID,
+    upsertFixtureScore,
     getFixtureByID,
   };
 });

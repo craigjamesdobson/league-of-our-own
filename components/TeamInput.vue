@@ -1,5 +1,5 @@
 <template>
-  <TabView>
+  <TabView class="min-h-[450px] bg-surface-0">
     <TabPanel
       v-for="(position, index) in playerPositions"
       :key="index"
@@ -7,8 +7,8 @@
     >
       <DataTable
         v-model:filters="filters"
-        paginator
-        :rows="5"
+        scrollable
+        scroll-height="275px"
         :value="players.filter((x) => x.position === position.value)"
         size="small"
         :global-filter-fields="['web_name']"
@@ -53,12 +53,20 @@
         </Column>
         <Column class="w-2/12" field="quantity" header="Clean sheet">
           <template #body="slotProps">
-            <Checkbox v-model="slotProps.data.week_cleansheet" :binary="true" />
+            <input
+              v-model="slotProps.data.week_cleansheet"
+              class="w-5 h-5"
+              type="checkbox"
+            />
           </template>
         </Column>
         <Column class="w-2/12" field="quantity" header="Red card">
           <template #body="slotProps">
-            <Checkbox v-model="slotProps.data.week_redcard" :binary="true" />
+            <input
+              v-model="slotProps.data.week_redcard"
+              class="w-5 h-5"
+              type="checkbox"
+            />
           </template>
         </Column>
       </DataTable>
@@ -70,9 +78,7 @@
 import { FilterMatchMode } from 'primevue/api';
 import type { PlayerWithStats } from '~/types/Player';
 
-const { players } = defineProps<{
-  players: PlayerWithStats[];
-}>();
+const players = defineModel<PlayerWithStats>('players');
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },

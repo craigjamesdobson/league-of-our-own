@@ -24,10 +24,10 @@ interface Player {
 }
 
 interface PlayerWithStats extends Tables<'players_view'> {
-  week_goals?: number;
-  week_assists?: number;
-  week_redcard?: boolean;
-  week_cleansheet?: boolean;
+  week_goals: number;
+  week_assists: number;
+  week_redcard: boolean;
+  week_cleansheet: boolean;
 }
 
 export type { Player, PlayerWithStats };

@@ -34,7 +34,7 @@ watch(
         />
       </div>
     </div>
-    <div v-if="fixtureStore.fixtures" class="grid grid-cols-2 gap-10 m-20">
+    <div v-if="fixtureStore.fixtures" class="grid xl:grid-cols-2 gap-10 m-20">
       <NuxtLink
         v-for="(fixture, index) in fixtureStore.fixtures"
         :key="fixture.id"

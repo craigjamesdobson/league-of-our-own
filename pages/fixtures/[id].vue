@@ -57,14 +57,16 @@ const fixture: Ref<Fixture | null> = ref(null);
 fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
 
 const { data: homePlayers } = await supabase
-  .rpc('get_player_stats_by_team_id', {
+  .rpc('get_player_stats_by_team_id_for_fixture', {
     team_id_param: fixture.value!.home_team.id,
+    fixture_id_param: fixture.value!.id,
   })
   .returns<PlayerWithStats[]>();
 
 const { data: awayPlayers } = await supabase
-  .rpc('get_player_stats_by_team_id', {
+  .rpc('get_player_stats_by_team_id_for_fixture', {
     team_id_param: fixture.value!.away_team.id,
+    fixture_id_param: fixture.value!.id,
   })
   .returns<PlayerWithStats[]>();
 

@@ -6,9 +6,9 @@ import Sidebar from '@/components/Sidebar.vue';
   <div class="flex flex-col-reverse md:flex-row">
     <Sidebar />
     <main
-      class="flex flex-row w-full min-h-screen transition duration-500 ease-in-out bg-offWhite pb-20 xl:pb-0"
+      class="bg-offWhite flex min-h-screen w-full flex-row pb-20 transition duration-500 ease-in-out xl:pb-0"
     >
-      <div class="flex flex-col w-full m-5">
+      <div class="m-5 flex w-full flex-col">
         <slot />
       </div>
     </main>

@@ -67,7 +67,7 @@ export const usePlayerStore = defineStore('player-store', () => {
         formattedPlayerData.map(
           ({ id, ...rest }: { id: number; [key: string]: any }) => ({
             player_id: id,
-            ...rest,
+            ...rest
           })
         )
       )
@@ -81,7 +81,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   const filterPlayers = ({
     filterName = '',
     filterPrice = 0,
-    filterTeam = 0,
+    filterTeam = 0
   }: FilterData) => {
     let newFilteredPlayers = [...players.value];
     if (filterName) {
@@ -123,26 +123,26 @@ export const usePlayerStore = defineStore('player-store', () => {
         position: 'Goalkeepers',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.GOALKEEPER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Defenders',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.DEFENDER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Midfielders',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.MIDFIELDER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Forwards',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.FORWARD)
-          .sort((a, b) => a.team - b.team),
-      },
+          .sort((a, b) => a.team - b.team)
+      }
     ];
   });
 
@@ -156,6 +156,6 @@ export const usePlayerStore = defineStore('player-store', () => {
     getPlayers,
     getPlayerByID,
     getPlayerLastUpdatedDate,
-    formatFilteredPlayersByPosition,
+    formatFilteredPlayersByPosition
   };
 });

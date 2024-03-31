@@ -1,5 +1,5 @@
 <template>
-  <TabView class="min-h-[450px] bg-surface-0">
+  <TabView class="bg-surface-0 min-h-[450px]">
     <TabPanel
       v-for="(position, index) in playerPositions"
       :key="index"
@@ -19,7 +19,7 @@
             <span class="relative flex items-center">
               <Icon
                 size="20"
-                class="absolute left-3 text-surface-400"
+                class="text-surface-400 absolute left-3"
                 name="mdi:person-search-outline"
               />
               <InputText
@@ -35,7 +35,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_goals"
-              class="p-1 border rounded w-16"
+              class="w-16 rounded border p-1"
               type="number"
               min="0"
             />
@@ -45,7 +45,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_assists"
-              class="p-1 border rounded w-16"
+              class="w-16 rounded border p-1"
               type="number"
               min="0"
             />
@@ -55,7 +55,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_cleansheet"
-              class="w-5 h-5"
+              class="h-5 w-5"
               type="checkbox"
             />
           </template>
@@ -64,7 +64,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_redcard"
-              class="w-5 h-5"
+              class="h-5 w-5"
               type="checkbox"
             />
           </template>
@@ -81,13 +81,13 @@ import type { PlayerWithStats } from '~/types/Player';
 const players = defineModel<PlayerWithStats[]>('players');
 
 const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
 const playerPositions = [
   { key: 'GOALKEEPER', value: 1 },
   { key: 'DEFENDER', value: 2 },
   { key: 'MIDFIELDER', value: 3 },
-  { key: 'FORWARD', value: 4 },
+  { key: 'FORWARD', value: 4 }
 ];
 </script>

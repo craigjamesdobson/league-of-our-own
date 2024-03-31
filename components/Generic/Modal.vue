@@ -7,7 +7,7 @@ defineExpose({ toggleDialog });
 <template>
   <div>
     <div
-      class="flex items-center justify-center modal"
+      class="modal flex items-center justify-center"
       :class="{ '-active': dialogVisible }"
       @click.self="toggleDialog(false)"
     >

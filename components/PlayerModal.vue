@@ -9,7 +9,7 @@ const { selectedPlayer } = defineProps<{
 const clearPlayerQueryParam = () => {
   router.push({
     path: 'players',
-    query: null,
+    query: null
   });
 };
 
@@ -29,13 +29,13 @@ const modelValue = defineModel<boolean>();
               'border-4 border-yellow-300':
                 !selectedPlayer.unavailable_for_season &&
                 selectedPlayer.is_unavailable,
-              'border-4 border-red-500': selectedPlayer.unavailable_for_season,
-            },
-          ],
+              'border-4 border-red-500': selectedPlayer.unavailable_for_season
+            }
+          ]
         },
         header: {
-          class: 'flex justify-end rounded-t-none bg-white p-5',
-        },
+          class: 'flex justify-end rounded-t-none bg-white p-5'
+        }
       }"
       modal
       :dismissable-mask="true"
@@ -47,8 +47,8 @@ const modelValue = defineModel<boolean>();
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
           />
-          <div class="flex flex-row justify-between gap-4 items-top">
-            <div class="w-24 z-10">
+          <div class="items-top flex flex-row justify-between gap-4">
+            <div class="z-10 w-24">
               <img
                 class="rounded-full"
                 :src="selectedPlayer.image_large"
@@ -57,7 +57,7 @@ const modelValue = defineModel<boolean>();
               />
             </div>
             <h4
-              class="flex flex-col items-end text-2xl leading-none text-right uppercase md:text-4xl"
+              class="flex flex-col items-end text-right text-2xl uppercase leading-none md:text-4xl"
             >
               <span class="mb-2 text-base">
                 {{ selectedPlayer.first_name }}
@@ -65,23 +65,23 @@ const modelValue = defineModel<boolean>();
               {{ selectedPlayer.second_name }}
             </h4>
           </div>
-          <div class="mt-6 rounded-lg inner">
+          <div class="inner mt-6 rounded-lg">
             <div
-              class="flex flex-col items-start justify-between gap-4 xl:items-end xl:flex-row"
+              class="flex flex-col items-start justify-between gap-4 xl:flex-row xl:items-end"
             >
               <div
                 v-if="selectedPlayer.news"
-                class="flex items-center flex-grow w-3/4 mr-4"
+                class="mr-4 flex w-3/4 flex-grow items-center"
               >
-                <span class="flex items-center justify-center w-5 h-5 mr-2">
+                <span class="mr-2 flex h-5 w-5 items-center justify-center">
                   <Icon
                     name="mdi:alert-circle-outline"
-                    class="text-white bg-green-500 rounded-full"
+                    class="rounded-full bg-green-500 text-white"
                     :class="{
                       'bg-yellow-500':
                         !selectedPlayer.unavailable_for_season &&
                         selectedPlayer.is_unavailable,
-                      'bg-red-500': selectedPlayer.unavailable_for_season,
+                      'bg-red-500': selectedPlayer.unavailable_for_season
                     }"
                   />
                 </span>
@@ -90,30 +90,30 @@ const modelValue = defineModel<boolean>();
                 </p>
               </div>
               <div
-                class="flex flex-col items-end w-full text-sm xl:w-1/4 xl:ml-auto"
+                class="flex w-full flex-col items-end text-sm xl:ml-auto xl:w-1/4"
               >
                 <h4
-                  class="flex justify-end w-full pb-1 mb-1 uppercase border-b border-black"
+                  class="mb-1 flex w-full justify-end border-b border-black pb-1 uppercase"
                 >
                   Statistics
                 </h4>
-                <ul class="flex flex-col w-full text-xs">
-                  <li class="flex justify-between w-full">
-                    <span class="w-3/4 py-1 border-b border-r border-gray-100">
+                <ul class="flex w-full flex-col text-xs">
+                  <li class="flex w-full justify-between">
+                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
                       Goals:
                     </span>
                     <strong
-                      class="w-1/4 py-1 text-center border-b border-gray-100"
+                      class="w-1/4 border-b border-gray-100 py-1 text-center"
                     >
                       {{ selectedPlayer.goals_scored }}
                     </strong>
                   </li>
-                  <li class="flex justify-between w-full">
-                    <span class="w-3/4 py-1 border-b border-r border-gray-100">
+                  <li class="flex w-full justify-between">
+                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
                       Assists:
                     </span>
                     <strong
-                      class="w-1/4 py-1 text-center border-b border-gray-100"
+                      class="w-1/4 border-b border-gray-100 py-1 text-center"
                     >
                       {{ selectedPlayer.assists }}
                     </strong>
@@ -123,23 +123,23 @@ const modelValue = defineModel<boolean>();
                       selectedPlayer.position === 1 ||
                       selectedPlayer.position === 2
                     "
-                    class="flex justify-between w-full"
+                    class="flex w-full justify-between"
                   >
-                    <span class="w-3/4 py-1 border-b border-r border-gray-100">
+                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
                       Clean Sheets:
                     </span>
                     <strong
-                      class="w-1/4 py-1 text-center border-b border-gray-100"
+                      class="w-1/4 border-b border-gray-100 py-1 text-center"
                     >
                       {{ selectedPlayer.clean_sheets }}
                     </strong>
                   </li>
-                  <li class="flex justify-between w-full">
-                    <span class="w-3/4 py-1 border-b border-r border-gray-100">
+                  <li class="flex w-full justify-between">
+                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
                       Red Cards:
                     </span>
                     <strong
-                      class="w-1/4 py-1 text-center border-b border-gray-100"
+                      class="w-1/4 border-b border-gray-100 py-1 text-center"
                     >
                       {{ selectedPlayer.red_cards }}
                     </strong>

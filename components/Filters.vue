@@ -6,7 +6,7 @@ const {
   playerStore,
   selectfilteredTeam,
   setFilteredPlayers,
-  resetFilteredTeams,
+  resetFilteredTeams
 } = useFilters();
 
 const players = defineModel('players');
@@ -15,39 +15,39 @@ const players = defineModel('players');
 <template>
   <div class="filter-container">
     <div
-      class="hidden xl:flex flex-row items-center justify-between p-4 cursor-pointer xl:mb-4 xl:p-0"
+      class="hidden cursor-pointer flex-row items-center justify-between p-4 xl:mb-4 xl:flex xl:p-0"
     >
-      <h2 class="!mb-0 !text-xl main-heading">Filters</h2>
+      <h2 class="main-heading !mb-0 !text-xl">Filters</h2>
     </div>
     <div
-      class="justify-between mb-4 bg-white rounded-sm lg:bg-transparent xl:block"
+      class="mb-4 justify-between rounded-sm bg-white lg:bg-transparent xl:block"
     >
-      <div class="p-4 bg-white xl:mb-4">
-        <div class="pb-3 mb-3 border-b border-gray-100">
+      <div class="bg-white p-4 xl:mb-4">
+        <div class="mb-3 border-b border-gray-100 pb-3">
           <div class="flex flex-col gap-2">
             <label class="text-xs" for="filter_name">Filter by name</label>
-            <span class="flex items-center relative w-full">
+            <span class="relative flex w-full items-center">
               <Icon
                 size="22"
-                class="absolute right-3 text-surface-400"
+                class="text-surface-400 absolute right-3"
                 name="mdi:person-search-outline"
               />
               <InputText
                 id="filter_name"
                 v-model="filterData.filterName"
-                class="!bg-surface-100 !border-none !w-full"
+                class="!bg-surface-100 !w-full !border-none"
                 placeholder="Search players..."
               />
             </span>
           </div>
         </div>
-        <div class="pb-3 mb-3 border-b border-gray-100">
-          <label class="flex mb-2 text-xs" for="filter_name">
+        <div class="mb-3 border-b border-gray-100 pb-3">
+          <label class="mb-2 flex text-xs" for="filter_name">
             Filter by price
           </label>
           <Dropdown
             v-model="filterData.filterPrice"
-            class="!bg-surface-100 !border-none !w-full"
+            class="!bg-surface-100 !w-full !border-none"
             option-label="name"
             option-value="value"
             :options="populateFilterPrices(4.0, 14.0, 0.5)"
@@ -55,9 +55,9 @@ const players = defineModel('players');
             placeholder="Select price..."
           />
         </div>
-        <div class="border-gray-100 max-xl:pb-3 max-xl:border-b">
+        <div class="border-gray-100 max-xl:border-b max-xl:pb-3">
           <label
-            class="flex justify-between w-full mb-4 text-xs"
+            class="mb-4 flex w-full justify-between text-xs"
             for="filter_name"
           >
             Filter by team
@@ -65,7 +65,7 @@ const players = defineModel('players');
               <Icon size="20" name="carbon:reset" />
             </button>
           </label>
-          <div class="grid grid-cols-10 gap-2.5 flex-wrap cursor-pointer">
+          <div class="grid cursor-pointer grid-cols-10 flex-wrap gap-2.5">
             <button
               v-for="team in TEAM_DATA"
               :key="team.id"
@@ -74,7 +74,7 @@ const players = defineModel('players');
               @click.prevent="players = selectfilteredTeam($event)"
             >
               <img
-                class="w-full h-full"
+                class="h-full w-full"
                 :src="getImageUrl(team.short_name.toLowerCase())"
               />
             </button>

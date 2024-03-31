@@ -3,18 +3,15 @@ import { usePlayerStore } from '@/stores/players';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const playerStore = usePlayerStore();
-
-await useAsyncData('players', () => playerStore.fetchPlayers());
+await playerStore.fetchPlayers();
 
 const draftedTeamsStore = useDraftedTeamsStore();
-await useAsyncData('drafted_teams', () =>
-  draftedTeamsStore.fetchDraftedTeams()
-);
+await draftedTeamsStore.fetchDraftedTeams();
 </script>
 
 <template>
   <div>
-    <NuxtLoadingIndicator />
+    <NuxtLoadingIndicator :height="10" />
     <NuxtLayout>
       <NuxtPage keepalive />
     </NuxtLayout>

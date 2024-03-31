@@ -1,4 +1,3 @@
-import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
 
 const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
@@ -34,7 +33,7 @@ const initDraftedTeamData = (draftedTeamsData: any) => {
       return {
         ...draftedTeam,
         total_team_value: setTotalTeamPrice(draftedTeam),
-        is_invalid_team: setTeamValidity(draftedTeam),
+        is_invalid_team: setTeamValidity(draftedTeam)
       };
     }
   );

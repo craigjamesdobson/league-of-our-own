@@ -12,7 +12,7 @@ const useFilters = () => {
   const filterData: FilterData = reactive({
     filterName: '',
     filterPrice: 0,
-    filterTeam: undefined,
+    filterTeam: undefined
   });
 
   const setFilteredPlayers = () => {
@@ -52,7 +52,7 @@ const useFilters = () => {
     playerStore,
     selectfilteredTeam,
     resetFilteredTeams,
-    setFilteredPlayers,
+    setFilteredPlayers
   };
 };
 

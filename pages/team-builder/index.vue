@@ -1,41 +1,41 @@
 <template>
-  <div class="flex flex-col 2xl:flex-row gap-5">
+  <div class="flex flex-col gap-5 2xl:flex-row">
     <Toast />
     <div class="p-5 2xl:w-96">
-      <h1 class="text-xl font-black uppercase mb-5">Team Details</h1>
-      <form class="flex flex-col gap-5 items-start">
-        <div class="flex flex-col gap-1 w-full">
-          <label class="uppercase font-bold" for="team_name">Team name</label>
+      <h1 class="mb-5 text-xl font-black uppercase">Team Details</h1>
+      <form class="flex flex-col items-start gap-5">
+        <div class="flex w-full flex-col gap-1">
+          <label class="font-bold uppercase" for="team_name">Team name</label>
           <GenericFormField
             v-model="draftedTeamData.team_name"
             :validation="v$.team_name"
             type="text"
           />
         </div>
-        <div class="flex flex-col gap-1 w-full">
-          <label class="uppercase font-bold" for="team_owner">Team owner</label>
+        <div class="flex w-full flex-col gap-1">
+          <label class="font-bold uppercase" for="team_owner">Team owner</label>
           <GenericFormField
             v-model="draftedTeamData.team_owner"
             :validation="v$.team_owner"
             type="text"
           />
         </div>
-        <div class="flex flex-col gap-1 w-full">
-          <label class="uppercase font-bold" for="team_email">Team email</label>
+        <div class="flex w-full flex-col gap-1">
+          <label class="font-bold uppercase" for="team_email">Team email</label>
           <GenericFormField
             v-model="draftedTeamData.team_email"
             :validation="v$.team_email"
             type="email"
           />
         </div>
-        <div class="flex flex-col gap-1 w-full">
+        <div class="flex w-full flex-col gap-1">
           <div class="flex items-center">
             <Checkbox
               v-model="draftedTeamData.allowed_transfers"
               input-id="allowed_transfers"
               :binary="true"
             />
-            <label for="allowed_transfers" class="uppercase font-bold ml-2.5"
+            <label for="allowed_transfers" class="ml-2.5 font-bold uppercase"
               >Transfers Allowed</label
             >
           </div>
@@ -48,10 +48,10 @@
           <template #messageicon>
             <Icon class="mr-2.5 self-start" size="22" name="tabler:pig-money" />
           </template>
-          <div class="flex flex-col gap-2.5 items-center">
-            <div class="flex gap-2.5 items-center">
+          <div class="flex flex-col items-center gap-2.5">
+            <div class="flex items-center gap-2.5">
               Transfer Budget Remaining:
-              <span class="font-black text-lg">{{
+              <span class="text-lg font-black">{{
                 calculateRemainingBudget().toFixed(1)
               }}</span>
             </div>
@@ -59,7 +59,7 @@
         </Message>
         <Button
           :loading="loading"
-          class="w-full hidden xl:flex"
+          class="hidden w-full xl:flex"
           label="Submit team"
           @click="handleTeamSubmit"
         />
@@ -105,21 +105,18 @@ const loading = ref(false);
 const rules = computed(() => {
   return {
     team_name: {
-      required: helpers.withMessage(
-        'The team name field is required',
-        required
-      ),
+      required: helpers.withMessage('The team name field is required', required)
     },
     team_owner: {
       required: helpers.withMessage(
         'The team owner field is required',
         required
-      ),
+      )
     },
     team_email: {
       required: helpers.withMessage('The email field is required', required),
-      email: helpers.withMessage('Invalid email format', email),
-    },
+      email: helpers.withMessage('Invalid email format', email)
+    }
   };
 });
 
@@ -127,7 +124,7 @@ const draftedTeamData: Ref<TablesInsert<'drafted_teams_pending'>> = ref({
   team_name: '',
   team_owner: '',
   team_email: '',
-  allowed_transfers: false,
+  allowed_transfers: false
 });
 
 const v$ = useVuelidate(rules, draftedTeamData);
@@ -136,7 +133,7 @@ const teamStructure = [
   { position: PlayerPosition.GOALKEEPER, count: 1 },
   { position: PlayerPosition.DEFENDER, count: 4 },
   { position: PlayerPosition.MIDFIELDER, count: 3 },
-  { position: PlayerPosition.FORWARD, count: 3 },
+  { position: PlayerPosition.FORWARD, count: 3 }
 ];
 
 const draftedTeamPlayers: Ref<
@@ -169,7 +166,7 @@ const fetchDraftedTeamData = async () => {
       severity: 'error',
       summary: 'No team found',
       detail: 'No team was found using that id',
-      life: 3000,
+      life: 3000
     });
     setTeamPlayers(teamStructure);
     return;
@@ -196,7 +193,7 @@ const setTeamPlayers = (
       ...playersToAdd.map((selectedPlayer) => ({
         draftedPlayerID: selectedPlayer?.drafted_player_id ?? 0,
         position,
-        selectedPlayer,
+        selectedPlayer
       }))
     );
   });
@@ -242,7 +239,7 @@ const upsertTeamData = async (isEditing: boolean) => {
     team_name: draftedTeamData.value.team_name,
     team_owner: draftedTeamData.value.team_owner,
     team_email: draftedTeamData.value.team_email,
-    allowed_transfers: draftedTeamData.value.allowed_transfers,
+    allowed_transfers: draftedTeamData.value.allowed_transfers
   };
 
   if (isEditing) {
@@ -265,7 +262,7 @@ const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean) => {
   const draftedPlayersUpsertData = draftedTeamPlayers.value.map((x) => {
     const data: TablesInsert<'drafted_players'> = {
       drafted_player: x.selectedPlayer?.player_id,
-      drafted_team: draftedTeamID,
+      drafted_team: draftedTeamID
     };
 
     if (isEditing) {
@@ -298,7 +295,7 @@ const handleTeamSubmit = async () => {
 
     router.push({
       path: 'team-builder',
-      query: { id: data.key },
+      query: { id: data.key }
     });
 
     await useFetch('/api/send', {
@@ -312,15 +309,15 @@ const handleTeamSubmit = async () => {
           <p>You can edit your team by clicking this <a href="${
             config.public.siteURL
           }/team-builder?id=${data.key}">link</a></p>
-        `,
-      },
+        `
+      }
     });
 
     toast.add({
       severity: 'success',
       summary: 'Success',
       detail: 'Your team has been submitted, thank you!',
-      life: 3000,
+      life: 3000
     });
   } catch (err) {
     console.log(err);
@@ -335,7 +332,7 @@ const formIsValid = () => {
       severity: 'error',
       summary: 'Form errors',
       detail: 'Team details are incorrect, please review validation errors',
-      life: 3000,
+      life: 3000
     });
     return false;
   }
@@ -349,7 +346,7 @@ const formIsValid = () => {
       severity: 'error',
       summary: 'Form errors',
       detail: 'Please select all players before submitting team',
-      life: 3000,
+      life: 3000
     });
     return false;
   }
@@ -359,7 +356,7 @@ const formIsValid = () => {
       severity: 'error',
       summary: 'Form errors',
       detail: 'Your team is overbudget, please adjust your players',
-      life: 3000,
+      life: 3000
     });
     return false;
   }

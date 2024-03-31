@@ -1,24 +1,24 @@
 <template>
   <Dialog v-model:visible="visible" header="" modal :dismissable-mask="true">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:min-w-[30rem]">
+    <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
       <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
-          <h2 class="pb-2.5 uppercase font-black text-lg">Original Player</h2>
+          <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
           <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">
-          <h2 class="uppercase font-black text-lg mb-2.5">Transfers</h2>
+          <h2 class="mb-2.5 text-lg font-black uppercase">Transfers</h2>
           <div
             v-for="playerTransfer in draftedPlayer.transfers"
             :key="playerTransfer.drafted_transfer_id"
             class="mb-5 flex flex-col"
           >
-            <h3 class="text-sm uppercase font-bold flex self-start">
+            <h3 class="flex self-start text-sm font-bold uppercase">
               gameweek {{ playerTransfer.transfer_week }}
             </h3>
             <div class="flex items-center gap-2.5">
               <Icon
-                class="w-6 h-6"
+                class="h-6 w-6"
                 name="material-symbols:subdirectory-arrow-right-rounded"
               />
               <DraftedPlayer :drafted-player="playerTransfer.player" />
@@ -32,16 +32,16 @@
                   handleDeleteTransfer(playerTransfer.drafted_transfer_id)
                 "
               >
-                <Icon class="w-8 h-8" name="typcn:delete" />
+                <Icon class="h-8 w-8" name="typcn:delete" />
               </Button>
             </div>
           </div>
         </div>
       </div>
       <div v-if="props.editable">
-        <h2 class="uppercase font-black text-lg mb-2.5">Submit new transfer</h2>
-        <form class="flex flex-col gap-5 items-start">
-          <div class="flex flex-col gap-2 w-full">
+        <h2 class="mb-2.5 text-lg font-black uppercase">Submit new transfer</h2>
+        <form class="flex flex-col items-start gap-5">
+          <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-id">Player</label>
             <Dropdown
               v-model="newTransferData.player"
@@ -56,7 +56,7 @@
               placeholder="Select a Player"
             >
               <template #option="slotProps">
-                <div class="flex align-items-center">
+                <div class="align-items-center flex">
                   <div class="w-1/5">
                     {{ slotProps.option.player_id }}
                   </div>
@@ -67,7 +67,7 @@
               </template>
             </Dropdown>
           </div>
-          <div class="flex flex-col gap-2 w-full">
+          <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-week">Transfer Week</label>
             <InputNumber
               v-model="newTransferData.transferWeek"
@@ -113,7 +113,7 @@ const toast = useToast();
 const newTransferData: Ref<TransferData> = ref({
   player: null,
   activeExpiryDate: new Date(),
-  transferWeek: 0,
+  transferWeek: 0
 });
 
 const visible = defineModel<boolean>('visible');
@@ -122,8 +122,8 @@ const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
 const props = defineProps({
   editable: {
     type: Boolean,
-    default: false,
-  },
+    default: false
+  }
 });
 
 const playerStore = usePlayerStore();
@@ -141,8 +141,8 @@ const addNewTransfer = async () => {
         active_transfer_expiry:
           newTransferData.value.activeExpiryDate.toDateString(),
         player_id: newTransferData.value.player.player_id,
-        transfer_week: newTransferData.value.transferWeek,
-      },
+        transfer_week: newTransferData.value.transferWeek
+      }
     ]);
 
     // Build a new transfer obj using the new data returned
@@ -151,7 +151,7 @@ const addNewTransfer = async () => {
       drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
-      player: newTransferData.value.player!,
+      player: newTransferData.value.player!
     });
 
     handleApiSuccess(`Transfer was successful`, toast);

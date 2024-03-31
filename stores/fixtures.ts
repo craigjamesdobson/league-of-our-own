@@ -61,7 +61,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     const formattedFixture: TablesInsert<'fixtures'> = {
       id: fixtureData.id,
       home_team_score: fixtureData.home_team_score,
-      away_team_score: fixtureData.away_team_score,
+      away_team_score: fixtureData.away_team_score
     };
 
     const selectedFixtureIndex = fixtures.value?.findIndex(
@@ -103,13 +103,13 @@ export const useFixtureStore = defineStore('fixture-store', () => {
         goals: x.week_goals,
         assists: x.week_assists,
         clean_sheet: x.week_cleansheet,
-        red_card: x.week_redcard,
+        red_card: x.week_redcard
       };
     });
 
     const { data, error } = await supabase
       .from('player_statistics')
-      .upsert(formattedPlayers, { onConflict: 'fixture_id, player_id' })
+      .insert(formattedPlayers)
       .select();
 
     if (error) throw new Error(error.message);
@@ -117,16 +117,11 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     console.log(data);
   };
 
-  const getFixtureByID = computed(() => {
-    return (id: number) => fixtures.value?.find((x) => x.id === id);
-  });
-
   return {
     fixtures,
     fetchFixtures,
     fetchFixtureByID,
     updateFixtureScore,
-    updatePlayerStatistics,
-    getFixtureByID,
+    updatePlayerStatistics
   };
 });

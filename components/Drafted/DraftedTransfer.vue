@@ -13,8 +13,8 @@ import type { DraftedPlayer } from '~/types/DraftedPlayer';
 const { draftedPlayer } = defineProps({
   draftedPlayer: {
     type: Object as PropType<DraftedPlayer>,
-    default: null,
-  },
+    default: null
+  }
 });
 
 const sortedTransfers = computed(() => {

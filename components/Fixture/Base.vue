@@ -1,43 +1,31 @@
 <template>
-  <div class="flex gap-40 my-5 justify-center items-center">
-    <div class="flex flex-col gap-5 items-center">
+  <div v-if="fixture" class="my-5 flex items-center justify-center gap-40">
+    <div class="flex flex-col items-center gap-5">
       <img
-        class="w-16 h-w-16 aspect-square"
+        class="h-w-16 aspect-square w-16"
         :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
       />
-      <p class="uppercase font-black text-lg">{{ fixture.home_team.name }}</p>
-      <span class="font-bold">{{ fixture.home_team_score ?? '-' }}</span>
+      <p class="text-lg font-black uppercase">{{ fixture.home_team.name }}</p>
+      <span class="text-lg font-bold">{{
+        fixture.home_team_score ?? '-'
+      }}</span>
     </div>
     <div>VS</div>
-    <div class="flex flex-col gap-5 items-center">
+    <div class="flex flex-col items-center gap-5">
       <img
-        class="w-16 h-w-16 aspect-square"
+        class="h-w-16 aspect-square w-16"
         :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
       />
-      <p class="uppercase font-black text-lg">{{ fixture.away_team.name }}</p>
-      <span class="font-bold">{{ fixture.away_team_score ?? '-' }}</span>
+      <p class="text-lg font-black uppercase">{{ fixture.away_team.name }}</p>
+      <span class="text-lg font-bold">{{
+        fixture.away_team_score ?? '-'
+      }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PlayerWithStats } from '~/types/Player';
-
-interface Team {
-  id: number;
-  name: string;
-  short_name: string;
-}
-
-interface Fixture {
-  id: number;
-  home_team: Team;
-  home_players: PlayerWithStats[];
-  home_team_score: number;
-  away_team: Team;
-  away_players: PlayerWithStats[];
-  away_team_score: number;
-}
+import type { Fixture } from '~/types/Fixture';
 
 const fixture = defineModel<Fixture>('fixture');
 </script>

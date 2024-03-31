@@ -1,41 +1,48 @@
 <template>
-  <div class="flex flex-col">
+  <div>
     <Toast />
-    <div v-if="!!fixture" class="grid grid-cols-2 gap-5">
-      <div>
-        <div class="flex justify-center gap-5 items-center m-10">
-          <img
-            class="w-16 h-w-16 aspect-square"
-            :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
-          />
-          <p class="uppercase font-black">{{ fixture?.home_team.name }}</p>
-          <input
-            v-model="fixture.home_team_score"
-            class="p-1 border rounded w-16"
-            type="number"
-            min="0"
-          />
+    <div v-if="!!fixture" class="flex flex-col">
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <div class="m-10 flex items-center justify-center gap-5">
+            <img
+              class="h-w-16 aspect-square w-16"
+              :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
+            />
+            <p class="font-black uppercase">{{ fixture?.home_team.name }}</p>
+            <input
+              v-model="fixture.home_team_score"
+              class="w-16 rounded border p-1"
+              type="number"
+              min="0"
+            />
+          </div>
+          <FixtureStatsInput v-if="homePlayers" v-model:players="homePlayers" />
         </div>
-        <FixtureStatsInput v-model:players="homePlayers" />
-      </div>
-      <div>
-        <div class="flex justify-center gap-5 items-center m-10">
-          <input
-            v-model="fixture.away_team_score"
-            class="p-1 border rounded w-16"
-            type="number"
-            min="0"
-          />
-          <p class="uppercase font-black">{{ fixture?.away_team.name }}</p>
-          <img
-            class="w-16 h-w-16 aspect-square"
-            :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
-          />
+        <div>
+          <div class="m-10 flex items-center justify-center gap-5">
+            <input
+              v-model="fixture.away_team_score"
+              class="w-16 rounded border p-1"
+              type="number"
+              min="0"
+            />
+            <p class="font-black uppercase">{{ fixture?.away_team.name }}</p>
+            <img
+              class="h-w-16 aspect-square w-16"
+              :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
+            />
+          </div>
+          <FixtureStatsInput v-if="awayPlayers" v-model:players="awayPlayers" />
         </div>
-        <FixtureStatsInput v-model:players="awayPlayers" />
       </div>
+      <Button
+        class="mx-auto my-10"
+        label="Save Fixture"
+        @click="updateFixture"
+      />
     </div>
-    <Button class="mx-auto my-10" label="Save Fixture" @click="updateFixture" />
+    <div v-else>Loading...</div>
   </div>
 </template>
 
@@ -59,14 +66,14 @@ fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
 const { data: homePlayers } = await supabase
   .rpc('get_player_stats_by_team_id_for_fixture', {
     team_id_param: fixture.value!.home_team.id,
-    fixture_id_param: fixture.value!.id,
+    fixture_id_param: fixture.value!.id
   })
   .returns<PlayerWithStats[]>();
 
 const { data: awayPlayers } = await supabase
   .rpc('get_player_stats_by_team_id_for_fixture', {
     team_id_param: fixture.value!.away_team.id,
-    fixture_id_param: fixture.value!.id,
+    fixture_id_param: fixture.value!.id
   })
   .returns<PlayerWithStats[]>();
 

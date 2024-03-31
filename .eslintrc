@@ -8,7 +8,7 @@
     "no-console": "off",
     "vue/multi-word-component-names": "off",
     "semi-style": 1,
-    "prettier/prettier": ["error", { "semi": true, "endOfLine": "auto" }],
+    "prettier/prettier": ["error", { "semi": true, "endOfLine": "auto", "trailingComma": "none" }],
     "no-unexpected-multiline": "off"
   }
 }

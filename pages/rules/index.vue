@@ -3,13 +3,13 @@
     <p class="m-5">
       Unable to display PDF file?
       <a
-        class="block px-6 py-2 mt-5 ml-5 text-white rounded-md lg:inline-flex bg-primary"
+        class="bg-primary ml-5 mt-5 block rounded-md px-6 py-2 text-white lg:inline-flex"
         href="/2023-2024-rules.pdf"
         >Download here</a
       >
     </p>
     <object
-      class="w-full mx-auto lg:w-3/4"
+      class="mx-auto w-full lg:w-3/4"
       data="/2023-2024-rules.pdf"
     ></object>
   </div>

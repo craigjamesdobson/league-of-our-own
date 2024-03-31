@@ -65,7 +65,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
           drafted_player: x.player_id,
-          drafted_team: draftedTeamData.drafted_team_id,
+          drafted_team: draftedTeamData.drafted_team_id
         };
       });
       await supabase.from('drafted_teams').upsert(draftedTeamData);
@@ -112,6 +112,6 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     fetchDraftedPlayerByID,
     upsertTeamData,
     addNewTransfer,
-    deleteTransfer,
+    deleteTransfer
   };
 });

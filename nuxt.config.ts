@@ -7,17 +7,17 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@nuxtjs/supabase',
     '@nuxt/devtools',
-    'nuxt-primevue',
+    'nuxt-primevue'
   ],
   primevue: {
     options: { unstyled: true },
     importPT: {
       as: 'Lara',
-      from: path.resolve(__dirname, '/presets/lara'),
+      from: path.resolve(__dirname, '/presets/lara')
     },
     components: {
-      exclude: ['Editor', 'Chart'],
-    },
+      exclude: ['Editor', 'Chart']
+    }
   },
   tailwindcss: {
     exposeConfig: true,
@@ -27,13 +27,13 @@ export default defineNuxtConfig({
         extend: {
           fontFamily: {
             display: '"Rubik", sans-serif',
-            sans: '"Inter", "sans-serif"',
+            sans: '"Inter", "sans-serif"'
           },
           spacing: {
-            sidebar: '18rem',
+            sidebar: '18rem'
           },
           zIndex: {
-            '-1': '-1',
+            '-1': '-1'
           },
           colors: {
             primary: 'rgb(2,3,60)',
@@ -60,11 +60,11 @@ export default defineNuxtConfig({
             'surface-700': 'rgb(var(--surface-700))',
             'surface-800': 'rgb(var(--surface-800))',
             'surface-900': 'rgb(var(--surface-900))',
-            'surface-950': 'rgb(var(--surface-950))',
-          },
-        },
-      },
-    },
+            'surface-950': 'rgb(var(--surface-950))'
+          }
+        }
+      }
+    }
   },
   app: {
     head: {
@@ -72,33 +72,33 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: '' },
+        { hid: 'description', name: 'description', content: '' }
       ],
       link: [
         {
           rel: 'icon',
           type: 'image/png',
-          href: '/favicon.png',
+          href: '/favicon.png'
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap',
+          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap'
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap',
-        },
-      ],
-    },
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap'
+        }
+      ]
+    }
   },
   runtimeConfig: {
     public: {
       gtagId: 'G-YL6X3M2488',
-      siteURL: process.env.SITE_URL,
-    },
+      siteURL: process.env.SITE_URL
+    }
   },
   ssr: false,
   supabase: {
-    redirect: false,
-  },
+    redirect: false
+  }
 });

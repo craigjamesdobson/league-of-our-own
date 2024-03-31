@@ -16,16 +16,18 @@ watch(
 <template>
   <div>
     <div class="flex justify-between">
-      <h1 class="font-black text-2xl uppercase my-2">Fixtures</h1>
+      <h1 class="text-2xl font-black uppercase">Fixtures</h1>
       <div class="flex flex-col gap-2.5">
-        <label for="gameweeks">Select a game week</label>
+        <label class="font-bold uppercase" for="gameweeks"
+          >Select a game week</label
+        >
         <Dropdown
           id="gameweeks"
           v-model="selectedWeek"
           :options="
             Array.from({ length: 38 }, (_, i) => ({
               label: `Week ${i + 1}`,
-              value: i + 1,
+              value: i + 1
             }))
           "
           option-label="label"
@@ -34,15 +36,23 @@ watch(
         />
       </div>
     </div>
-    <div v-if="fixtureStore.fixtures" class="grid xl:grid-cols-2 gap-10 m-20">
+    <div
+      v-if="fixtureStore.fixtures"
+      class="mx-20 my-10 grid gap-10 xl:grid-cols-2"
+    >
       <NuxtLink
         v-for="(fixture, index) in fixtureStore.fixtures"
         :key="fixture.id"
         :to="`/fixtures/${fixture.id}`"
-        class="p-5 bg-surface-50 border hover:border-primary *:transition-all ease-in-out duration-300"
+        class="bg-surface-50 hover:border-primary border p-5 duration-300 ease-in-out *:transition-all"
       >
         <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
       </NuxtLink>
+    </div>
+    <div v-else class="mx-20 my-10 grid gap-10 xl:grid-cols-2">
+      <div v-for="i in 6" :key="i" class="bg-surface-50 border p-5">
+        <SkeletonFixture />
+      </div>
     </div>
   </div>
 </template>

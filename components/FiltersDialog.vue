@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  keepalive: true,
+  keepalive: true
 });
 
 const modelValue = defineModel<boolean>();

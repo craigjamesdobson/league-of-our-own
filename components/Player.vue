@@ -1,9 +1,9 @@
 <template>
-  <div class="flex items-center w-full">
+  <div class="flex w-full items-center">
     <span class="w-1/12 p-2">{{ player.player_id }}</span>
     <span class="w-2/12 p-2">
       <img
-        class="w-6 h-6 rounded-full shadow-md"
+        class="h-6 w-6 rounded-full shadow-md"
         :src="player.image"
         :alt="player.web_name"
         @error="loadPlayerFallbackImage"
@@ -14,29 +14,29 @@
     <span class="w-1/12 p-2 text-center">{{ player.cost.toFixed(1) }}</span>
     <span
       v-if="player.unavailable_for_season"
-      class="flex items-center justify-end w-2/12 p-2"
+      class="flex w-2/12 items-center justify-end p-2"
       :class="player.status"
     >
       <span
-        class="flex justify-center w-3 h-3 mr-2 leading-tight bg-red-500 rounded-full"
+        class="mr-2 flex h-3 w-3 justify-center rounded-full bg-red-500 leading-tight"
       />
     </span>
     <span
       v-if="player.is_unavailable && !player.unavailable_for_season"
-      class="flex items-center justify-end w-2/12 p-2"
+      class="flex w-2/12 items-center justify-end p-2"
       :class="player.status"
     >
       <span
-        class="flex justify-center w-3 h-3 mr-2 leading-tight bg-yellow-400 rounded-full"
+        class="mr-2 flex h-3 w-3 justify-center rounded-full bg-yellow-400 leading-tight"
       />
     </span>
     <span
       v-else-if="!player.is_unavailable"
-      class="flex items-center justify-end w-2/12 p-2"
+      class="flex w-2/12 items-center justify-end p-2"
       :class="player.status"
     >
       <span
-        class="flex justify-center w-3 h-3 mr-2 leading-tight bg-green-400 rounded-full"
+        class="mr-2 flex h-3 w-3 justify-center rounded-full bg-green-400 leading-tight"
       />
     </span>
   </div>

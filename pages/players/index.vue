@@ -1,6 +1,6 @@
 <template>
   <div class="players-container xl:mb-0">
-    <div v-if="isSmallDevice" class="fixed top-5 right-5 z-10 opacity-75">
+    <div v-if="isSmallDevice" class="fixed right-5 top-5 z-10 opacity-75">
       <Button rounded aria-label="Player Filters" @click="visible = true">
         <Icon size="22" name="fluent:filter-32-filled" />
       </Button>
@@ -18,7 +18,7 @@ const visible = ref(false);
 
 <style lang="scss">
 .players-container {
-  @apply grid gap-4 grid-cols-1;
+  @apply grid grid-cols-1 gap-4;
 
   @media (min-width: 1280px) {
     grid-template-columns: 0.7fr 0.3fr;

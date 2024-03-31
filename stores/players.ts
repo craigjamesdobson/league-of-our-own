@@ -1,19 +1,18 @@
 import { defineStore } from 'pinia';
+import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, Views } from '~/types/database.types';
+import type { Database } from '~/types/database.types';
 interface FilterData {
   filterName: string;
   filterPrice: number;
   filterTeam: number | undefined;
 }
 
-type Players = Views<'players_view'>;
-
 export const usePlayerStore = defineStore('player-store', () => {
   const supabase = useSupabaseClient<Database>();
 
-  const players: Ref<Players[] | []> = ref([]);
-  const filteredPlayers: Ref<Players[] | []> = ref([]);
+  const players: Ref<Player[] | []> = ref([]);
+  const filteredPlayers: Ref<Player[] | []> = ref([]);
   const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 

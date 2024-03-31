@@ -7,7 +7,7 @@ export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
-      Views: {
+      Tables: {
         players_view: {
           Row: {
             assists: number;

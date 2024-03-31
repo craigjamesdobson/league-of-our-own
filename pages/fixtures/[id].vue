@@ -6,34 +6,56 @@
         <div>
           <div class="m-10 flex items-center justify-center gap-5">
             <img
-              class="h-w-16 aspect-square w-16"
+              class="aspect-square h-32 w-32"
               :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
             />
-            <p class="font-black uppercase">{{ fixture?.home_team.name }}</p>
-            <input
-              v-model="fixture.home_team_score"
-              class="w-16 rounded border p-1"
-              type="number"
-              min="0"
-            />
+            <div class="flex flex-col items-center gap-2.5">
+              <p class="text-xl font-black uppercase">
+                {{ fixture?.home_team.name }}
+              </p>
+              <input
+                v-model="fixture.home_team_score"
+                class="h-10 w-20 rounded border p-2 text-lg"
+                type="number"
+                min="0"
+              />
+            </div>
           </div>
-          <FixtureStatsInput v-if="homePlayers" v-model:players="homePlayers" />
+          <FixtureStatsInput
+            v-if="homePlayers"
+            v-model:players="homePlayers"
+            :disable-cleansheet="fixture.away_team_score > 0"
+          />
+          <div v-else>
+            <SkeletonStatsInput />
+          </div>
         </div>
         <div>
           <div class="m-10 flex items-center justify-center gap-5">
-            <input
-              v-model="fixture.away_team_score"
-              class="w-16 rounded border p-1"
-              type="number"
-              min="0"
-            />
-            <p class="font-black uppercase">{{ fixture?.away_team.name }}</p>
+            <div class="flex flex-col items-center gap-2.5">
+              <p class="text-xl font-black uppercase">
+                {{ fixture?.away_team.name }}
+              </p>
+              <input
+                v-model="fixture.away_team_score"
+                class="h-10 w-20 rounded border p-2 text-lg"
+                type="number"
+                min="0"
+              />
+            </div>
             <img
-              class="h-w-16 aspect-square w-16"
+              class="aspect-square h-32 w-32"
               :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
             />
           </div>
-          <FixtureStatsInput v-if="awayPlayers" v-model:players="awayPlayers" />
+          <FixtureStatsInput
+            v-if="awayPlayers"
+            v-model:players="awayPlayers"
+            :disable-cleansheet="fixture.home_team_score > 0"
+          />
+          <div v-else>
+            <SkeletonStatsInput />
+          </div>
         </div>
       </div>
       <Button
@@ -49,11 +71,8 @@
 <script setup lang="ts">
 import { useToast } from 'primevue/usetoast';
 import { useFixtureStore } from '~/stores/fixtures';
-import type { Database } from '~/types/database.types';
 import type { Fixture } from '~/types/Fixture';
 import type { PlayerWithStats } from '~/types/Player';
-
-const supabase = useSupabaseClient<Database>();
 
 const route = useRoute();
 const fixtureStore = useFixtureStore();
@@ -63,29 +82,32 @@ const fixture: Ref<Fixture | null> = ref(null);
 
 fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
 
-const { data: homePlayers } = await supabase
-  .rpc('get_player_stats_by_team_id_for_fixture', {
-    team_id_param: fixture.value!.home_team.id,
-    fixture_id_param: fixture.value!.id
-  })
-  .returns<PlayerWithStats[]>();
+const homePlayers: Ref<PlayerWithStats[] | undefined> = ref();
+const awayPlayers: Ref<PlayerWithStats[] | undefined> = ref();
 
-const { data: awayPlayers } = await supabase
-  .rpc('get_player_stats_by_team_id_for_fixture', {
-    team_id_param: fixture.value!.away_team.id,
-    fixture_id_param: fixture.value!.id
-  })
-  .returns<PlayerWithStats[]>();
+const populatePlayers = async () => {
+  homePlayers.value = await fixtureStore.fetchPlayersWithStatistics(
+    fixture.value!.id,
+    fixture.value!.home_team.id
+  );
+
+  awayPlayers.value = await fixtureStore.fetchPlayersWithStatistics(
+    fixture.value!.id,
+    fixture.value!.away_team.id
+  );
+};
+
+populatePlayers();
 
 const updateFixture = async () => {
   if (!fixture.value) throw new Error('No fixture');
 
-  if (!homePlayers || !awayPlayers) throw new Error('No players');
+  if (!homePlayers.value || !awayPlayers.value) throw new Error('No players');
 
   try {
     const a = fixtureStore.updateFixtureScore(fixture.value);
     const b = fixtureStore.updatePlayerStatistics(
-      [...homePlayers, ...awayPlayers],
+      [...homePlayers.value, ...awayPlayers.value],
       fixture.value.id
     );
 

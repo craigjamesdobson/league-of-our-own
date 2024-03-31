@@ -1,5 +1,14 @@
 <template>
-  <TabView class="bg-surface-0 min-h-[450px]">
+  <TabView
+    class="bg-surface-0 min-h-[480px]"
+    :pt="{
+      tabpanel: {
+        headerTitle: {
+          class: 'font-black'
+        }
+      }
+    }"
+  >
     <TabPanel
       v-for="(position, index) in playerPositions"
       :key="index"
@@ -8,11 +17,18 @@
       <DataTable
         v-model:filters="filters"
         scrollable
-        scroll-height="275px"
+        scroll-height="290px"
         :value="players!.filter((x) => x.position === position.value)"
         size="small"
         :global-filter-fields="['web_name']"
         data-key="id"
+        :pt="{
+          column: {
+            headercontent: {
+              class: 'font-bold uppercase text-xs py-2.5'
+            }
+          }
+        }"
       >
         <template #header>
           <div class="flex justify-end">
@@ -55,6 +71,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_cleansheet"
+              :disabled="disableCleansheet"
               class="h-5 w-5"
               type="checkbox"
             />
@@ -79,6 +96,10 @@ import { FilterMatchMode } from 'primevue/api';
 import type { PlayerWithStats } from '~/types/Player';
 
 const players = defineModel<PlayerWithStats[]>('players');
+
+const { disableCleansheet } = defineProps<{
+  disableCleansheet: boolean;
+}>();
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }

@@ -1,4 +1,4 @@
-import type { Tables } from './database-generated.types';
+import type { Tables } from './database.types';
 
 interface DraftedTransfer {
   drafted_transfer_id: number;

@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia';
+import { usePlayerStore } from './players';
 import type { Fixture } from '~/types/Fixture';
-import type { PlayerWithStats } from '~/types/Player';
-import { type Database, type TablesInsert } from '~/types/database.types';
+import type { Player, PlayerWithStats } from '~/types/Player';
+import {
+  type Database,
+  type Tables,
+  type TablesInsert
+} from '~/types/database.types';
 
 const getPlayersWithStats = (players: PlayerWithStats[]) => {
   return players!.filter((player) => {
@@ -14,8 +19,45 @@ const getPlayersWithStats = (players: PlayerWithStats[]) => {
   });
 };
 
+const populatePlayersWithStats = (
+  players: Player[],
+  PlayerStats: Tables<'player_statistics'>[],
+  teamID: number
+): PlayerWithStats[] => {
+  const filteredPlayers = players.filter((x) => x.team === teamID);
+
+  const weekDataMap = new Map<number, (typeof PlayerStats)[number]>();
+  PlayerStats.forEach((data: Tables<'player_statistics'>) =>
+    weekDataMap.set(data.player_id!, data)
+  );
+
+  return filteredPlayers.map((player) => {
+    const weekPlayerData = weekDataMap.get(player.player_id);
+    if (weekPlayerData) {
+      // Merge week data into player
+      return {
+        ...player,
+        week_goals: weekPlayerData.goals || 0,
+        week_assists: weekPlayerData.assists || 0,
+        week_redcard: weekPlayerData.red_card || false,
+        week_cleansheet: weekPlayerData.clean_sheet || false
+      };
+    } else {
+      // Set default values for players without week data
+      return {
+        ...player,
+        week_goals: 0,
+        week_assists: 0,
+        week_redcard: false,
+        week_cleansheet: false
+      };
+    }
+  });
+};
+
 export const useFixtureStore = defineStore('fixture-store', () => {
   const supabase = useSupabaseClient<Database>();
+  const playerStore = usePlayerStore();
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
 
@@ -73,14 +115,26 @@ export const useFixtureStore = defineStore('fixture-store', () => {
 
     fixtures.value[selectedFixtureIndex] = fixtureData;
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('fixtures')
       .upsert(formattedFixture)
       .select();
 
     if (error) throw new Error(error.message);
+  };
 
-    console.log(data);
+  const fetchPlayersWithStatistics = async (
+    fixtureID: number,
+    teamID: number
+  ) => {
+    const { data, error } = await supabase
+      .from('player_statistics')
+      .select()
+      .eq('fixture_id', fixtureID);
+
+    if (error) throw new Error(error.message);
+
+    return populatePlayersWithStats([...playerStore.players], data, teamID);
   };
 
   const updatePlayerStatistics = async (
@@ -107,20 +161,19 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       };
     });
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('player_statistics')
       .insert(formattedPlayers)
       .select();
 
     if (error) throw new Error(error.message);
-
-    console.log(data);
   };
 
   return {
     fixtures,
     fetchFixtures,
     fetchFixtureByID,
+    fetchPlayersWithStatistics,
     updateFixtureScore,
     updatePlayerStatistics
   };

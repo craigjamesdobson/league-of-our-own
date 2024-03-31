@@ -30,8 +30,8 @@ dependencies:
     specifier: ^2.0.32
     version: 2.1.7(typescript@4.9.5)(vue@3.4.3)
   primevue:
-    specifier: ^3.45.0
-    version: 3.45.0(vue@3.4.3)
+    specifier: ^3.50.0
+    version: 3.50.0(vue@3.4.3)
   resend:
     specifier: ^3.1.0
     version: 3.1.0
@@ -6765,7 +6765,7 @@ packages:
     resolution: {integrity: sha512-OfXDe5V0WovXt9b2GOjYV1kyVXmcFfj+6DqVs1pbeP4EyF2H0SbIMoUTT8Ax+sXT/tQ+mXr3qTFD9Y6IL+Y9og==}
     dependencies:
       '@nuxt/kit': 3.9.0
-      primevue: 3.45.0(vue@3.4.3)
+      primevue: 3.50.0(vue@3.4.3)
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -7735,8 +7735,8 @@ packages:
     engines: {node: ^14.13.1 || >=16.0.0}
     dev: true
 
-  /primevue@3.45.0(vue@3.4.3):
-    resolution: {integrity: sha512-qtA2YDi6SSBkGRb33lUXL2WnzMd7VZd4IC/YLXiUZLnxCGxqtB4iYj+jGqINNDcIFVqIYYMrc1UhiX+C68GQEQ==}
+  /primevue@3.50.0(vue@3.4.3):
+    resolution: {integrity: sha512-vYpQzvIXSmF0hWUkviHEGnwbFY/G8jI2RSxoa75noJloI2rWhzOX+JarJ8iaesVOr7b2se31N/p7zOx6uh3ddQ==}
     peerDependencies:
       vue: ^3.0.0
     dependencies:

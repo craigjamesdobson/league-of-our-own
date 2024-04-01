@@ -4,6 +4,10 @@ import { useFixtureStore } from '~/stores/fixtures';
 const fixtureStore = useFixtureStore();
 const selectedWeek = ref(1);
 
+definePageMeta({
+  middleware: ['auth']
+});
+
 watch(
   selectedWeek,
   async (newWeek) => {

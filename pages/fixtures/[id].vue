@@ -4,7 +4,9 @@
     <div v-if="!!fixture" class="flex flex-col">
       <div class="grid grid-cols-2 gap-5">
         <div>
-          <div class="m-10 flex items-center justify-center gap-5">
+          <div
+            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border bg-white p-5"
+          >
             <img
               class="aspect-square h-32 w-32"
               :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
@@ -31,7 +33,9 @@
           </div>
         </div>
         <div>
-          <div class="m-10 flex items-center justify-center gap-5">
+          <div
+            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border bg-white p-5"
+          >
             <div class="flex flex-col items-center gap-2.5">
               <p class="text-xl font-black uppercase">
                 {{ fixture?.away_team.name }}
@@ -59,7 +63,7 @@
         </div>
       </div>
       <Button
-        class="mx-auto my-10"
+        class="mx-auto my-5"
         label="Save Fixture"
         @click="updateFixture"
       />
@@ -81,6 +85,10 @@ const toast = useToast();
 const fixture: Ref<Fixture | null> = ref(null);
 
 fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
+
+if (!fixtureStore.fixtures && fixture.value?.game_week) {
+  fixtureStore.fetchFixtures(fixture.value.game_week);
+}
 
 const homePlayers: Ref<PlayerWithStats[] | undefined> = ref();
 const awayPlayers: Ref<PlayerWithStats[] | undefined> = ref();
@@ -112,6 +120,13 @@ const updateFixture = async () => {
     );
 
     await Promise.all([a, b]);
+
+    await navigateTo({
+      path: '/fixtures',
+      query: {
+        week: fixture.value.game_week
+      }
+    });
 
     handleApiSuccess('Fixture has been updated', toast);
   } catch (error) {

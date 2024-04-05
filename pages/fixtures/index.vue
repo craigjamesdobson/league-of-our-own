@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useFixtureStore } from '~/stores/fixtures';
 
+const route = useRoute();
+const router = useRouter();
 const fixtureStore = useFixtureStore();
-const selectedWeek = ref(1);
+const selectedWeek = ref(route.query.week ?? 1);
 
 definePageMeta({
   middleware: ['auth']
@@ -12,6 +14,10 @@ watch(
   selectedWeek,
   async (newWeek) => {
     await fixtureStore.fetchFixtures(newWeek);
+    await router.push({
+      path: 'fixtures',
+      query: { week: newWeek }
+    });
   },
   { immediate: true }
 );
@@ -21,22 +27,18 @@ watch(
   <div>
     <div class="flex justify-between">
       <h1 class="text-2xl font-black uppercase">Fixtures</h1>
-      <div class="flex flex-col gap-2.5">
-        <label class="font-bold uppercase" for="gameweeks"
-          >Select a game week</label
-        >
-        <Dropdown
-          id="gameweeks"
-          v-model="selectedWeek"
-          :options="
-            Array.from({ length: 38 }, (_, i) => ({
-              label: `Week ${i + 1}`,
-              value: i + 1
-            }))
-          "
-          option-label="label"
-          option-value="value"
-          placeholder="Select a game week"
+    </div>
+    <div class="mx-20 my-10 flex flex-col gap-2.5">
+      <label class="font-bold uppercase" for="gameweeks"
+        >Select a game week</label
+      >
+      <div class="grid-cols-19 grid gap-2">
+        <Button
+          v-for="(week, i) in 38"
+          :key="week"
+          :outlined="week != selectedWeek"
+          :label="(i + 1).toString()"
+          @click="selectedWeek = week"
         />
       </div>
     </div>
@@ -48,7 +50,11 @@ watch(
         v-for="(fixture, index) in fixtureStore.fixtures"
         :key="fixture.id"
         :to="`/fixtures/${fixture.id}`"
-        class="bg-surface-50 hover:border-primary border p-5 duration-300 ease-in-out *:transition-all"
+        class="bg-surface-50 hover:border-primary rounded-md border p-5 duration-300 ease-in-out *:transition-all"
+        :class="{
+          'border-green-500':
+            fixture.home_team_score !== null && fixture.away_team_score !== null
+        }"
       >
         <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
       </NuxtLink>

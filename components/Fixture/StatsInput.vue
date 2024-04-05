@@ -1,19 +1,11 @@
 <template>
-  <TabView
-    class="bg-surface-0 min-h-[480px]"
-    :pt="{
-      tabpanel: {
-        headerTitle: {
-          class: 'font-black'
-        }
-      }
-    }"
-  >
-    <TabPanel
-      v-for="(position, index) in playerPositions"
-      :key="index"
-      :header="position.key"
-    >
+  <TabView class="bg-surface-0 min-h-[480px]">
+    <TabPanel v-for="(position, index) in playerPositions" :key="index">
+      <template #header>
+        <div class="align-items-center flex gap-2">
+          <span class="white-space-nowrap font-black">{{ position.key }}</span>
+        </div>
+      </template>
       <DataTable
         v-model:filters="filters"
         scrollable
@@ -54,6 +46,9 @@
               class="w-16 rounded border p-1"
               type="number"
               min="0"
+              :class="{
+                'bg-green-500 text-white': slotProps.data.week_goals > 0
+              }"
             />
           </template>
         </Column>
@@ -64,6 +59,10 @@
               class="w-16 rounded border p-1"
               type="number"
               min="0"
+              :class="{
+                'border-green-700 bg-green-500 text-white':
+                  slotProps.data.week_assists > 0
+              }"
             />
           </template>
         </Column>
@@ -81,7 +80,7 @@
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_redcard"
-              class="h-5 w-5"
+              class="h-5 w-5 accent-red-600"
               type="checkbox"
             />
           </template>

@@ -11,7 +11,6 @@ await draftedTeamsStore.fetchDraftedTeams();
 
 <template>
   <div>
-    <NuxtLoadingIndicator :height="10" />
     <NuxtLayout>
       <NuxtPage keepalive />
     </NuxtLayout>

@@ -6,6 +6,7 @@ interface Team {
 
 interface Fixture {
   id: number;
+  game_week?: number;
   home_team: Team;
   home_team_score: number;
   away_team: Team;

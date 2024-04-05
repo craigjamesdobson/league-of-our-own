@@ -110,7 +110,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       (x) => x.id === fixtureData.id
     );
 
-    if (!selectedFixtureIndex || !fixtures.value)
+    if (selectedFixtureIndex === undefined || !fixtures.value)
       throw new Error('No fixture found');
 
     fixtures.value[selectedFixtureIndex] = fixtureData;

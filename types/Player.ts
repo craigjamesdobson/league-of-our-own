@@ -7,6 +7,7 @@ interface PlayerWithStats extends Player {
   week_assists: number;
   week_redcard: boolean;
   week_cleansheet: boolean;
+  week_points: number;
 }
 
 export type { Player, PlayerWithStats };

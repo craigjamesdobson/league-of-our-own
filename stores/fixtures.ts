@@ -34,22 +34,22 @@ const populatePlayersWithStats = (
   return filteredPlayers.map((player) => {
     const weekPlayerData = weekDataMap.get(player.player_id);
     if (weekPlayerData) {
-      // Merge week data into player
       return {
         ...player,
         week_goals: weekPlayerData.goals || 0,
         week_assists: weekPlayerData.assists || 0,
         week_redcard: weekPlayerData.red_card || false,
-        week_cleansheet: weekPlayerData.clean_sheet || false
+        week_cleansheet: weekPlayerData.clean_sheet || false,
+        week_points: weekPlayerData.points || 0
       };
     } else {
-      // Set default values for players without week data
       return {
         ...player,
         week_goals: 0,
         week_assists: 0,
         week_redcard: false,
-        week_cleansheet: false
+        week_cleansheet: false,
+        week_points: 0
       };
     }
   });
@@ -157,7 +157,8 @@ export const useFixtureStore = defineStore('fixture-store', () => {
         goals: x.week_goals,
         assists: x.week_assists,
         clean_sheet: x.week_cleansheet,
-        red_card: x.week_redcard
+        red_card: x.week_redcard,
+        points: x.week_points
       };
     });
 

@@ -38,8 +38,8 @@
             </span>
           </div>
         </template>
-        <Column class="w-4/12" field="web_name" header="Player"></Column>
-        <Column class="w-2/12" header="Goals">
+        <Column class="w-[20%]" field="web_name" header="Player"></Column>
+        <Column class="w-[10%]" header="Goals">
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_goals"
@@ -49,10 +49,11 @@
               :class="{
                 'bg-green-500 text-white': slotProps.data.week_goals > 0
               }"
+              @click="calculatePlayerPoints(slotProps.data)"
             />
           </template>
         </Column>
-        <Column class="w-2/12" header="Assists">
+        <Column class="w-[10%]" header="Assists">
           <template #body="slotProps">
             <input
               v-model="slotProps.data.week_assists"
@@ -60,31 +61,37 @@
               type="number"
               min="0"
               :class="{
-                'border-green-700 bg-green-500 text-white':
-                  slotProps.data.week_assists > 0
+                'bg-green-500 text-white': slotProps.data.week_assists > 0
               }"
+              @click="calculatePlayerPoints(slotProps.data)"
             />
           </template>
         </Column>
-        <Column class="w-2/12" field="quantity" header="Clean sheet">
+        <Column class="w-[10%]" header="Clean sheet">
           <template #body="slotProps">
-            <input
+            <Checkbox
               v-model="slotProps.data.week_cleansheet"
               :disabled="disableCleansheet"
-              class="h-5 w-5"
-              type="checkbox"
+              :binary="true"
+              @change="calculatePlayerPoints(slotProps.data)"
             />
           </template>
         </Column>
-        <Column class="w-2/12" field="quantity" header="Red card">
+        <Column class="w-[10%]" header="Red card">
           <template #body="slotProps">
-            <input
+            <Checkbox
               v-model="slotProps.data.week_redcard"
-              class="h-5 w-5 accent-red-600"
-              type="checkbox"
+              :pt-options="{ mergeProps: true }"
+              :pt:box:class="{
+                '!bg-red-600 border-red-600': slotProps.data.week_redcard,
+                'peer-hover:!border-red-600': true
+              }"
+              :binary="true"
+              @change="calculatePlayerPoints(slotProps.data)"
             />
           </template>
         </Column>
+        <Column class="w-[10%]" field="week_points" header="Points" />
       </DataTable>
     </TabPanel>
   </TabView>
@@ -93,6 +100,7 @@
 <script setup lang="ts">
 import { FilterMatchMode } from 'primevue/api';
 import type { PlayerWithStats } from '~/types/Player';
+import { PlayerPosition } from '~/types/PlayerPosition';
 
 const players = defineModel<PlayerWithStats[]>('players');
 
@@ -103,6 +111,57 @@ const { disableCleansheet } = defineProps<{
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
+
+const calculatePlayerPoints = (player: PlayerWithStats) => {
+  const POINTS_RED_CARD = -10;
+  const POINTS_GOALKEEPER_CLEAN_SHEET = 5;
+  const POINTS_DEFENDER_CLEAN_SHEET = 2;
+  const POINTS_PER_GOAL: { [key: string]: number } = {
+    [PlayerPosition.GOALKEEPER]: 10,
+    [PlayerPosition.DEFENDER]: 7,
+    [PlayerPosition.MIDFIELDER]: 5,
+    [PlayerPosition.FORWARD]: 3
+  };
+  const POINTS_TWO_GOALS_BONUS = 5;
+  const POINTS_THREE_OR_MORE_GOALS_BONUS = 10;
+  const POINTS_PER_ASSIST = 3;
+
+  if (!player || !player.position) {
+    throw new Error('Invalid player data');
+  }
+
+  let totalPoints = 0;
+
+  // Red Card
+  if (player.week_redcard) {
+    totalPoints += POINTS_RED_CARD;
+  }
+
+  // Clean Sheet
+  if (player.week_cleansheet) {
+    if (player.position === PlayerPosition.GOALKEEPER) {
+      totalPoints += POINTS_GOALKEEPER_CLEAN_SHEET;
+    } else if (player.position === PlayerPosition.DEFENDER) {
+      totalPoints += POINTS_DEFENDER_CLEAN_SHEET;
+    }
+  }
+
+  // Goals
+  const pointsPerGoal = POINTS_PER_GOAL[player.position] || 0;
+  totalPoints += player.week_goals * pointsPerGoal;
+
+  // Goal Bonuses
+  if (player.week_goals === 2) {
+    totalPoints += POINTS_TWO_GOALS_BONUS;
+  } else if (player.week_goals >= 3) {
+    totalPoints += POINTS_THREE_OR_MORE_GOALS_BONUS;
+  }
+
+  // Assists
+  totalPoints += player.week_assists * POINTS_PER_ASSIST;
+
+  player.week_points = totalPoints;
+};
 
 const playerPositions = [
   { key: 'GOALKEEPER', value: 1 },

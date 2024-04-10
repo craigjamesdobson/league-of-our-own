@@ -22,9 +22,13 @@ const getPlayersWithStats = (players: PlayerWithStats[]) => {
 const populatePlayersWithStats = (
   players: Player[],
   PlayerStats: Tables<'player_statistics'>[],
-  teamID: number
+  teamID?: number
 ): PlayerWithStats[] => {
-  const filteredPlayers = players.filter((x) => x.team === teamID);
+  const filteredPlayers = players;
+
+  if (teamID) {
+    filteredPlayers.filter((x) => x.team === teamID);
+  }
 
   const weekDataMap = new Map<number, (typeof PlayerStats)[number]>();
   PlayerStats.forEach((data: Tables<'player_statistics'>) =>
@@ -123,6 +127,17 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     if (error) throw new Error(error.message);
   };
 
+  const fetchPlayersWithStatisticsByGameweek = async (gameweek: number) => {
+    const { data, error } = await supabase
+      .from('player_statistics')
+      .select()
+      .eq('fixture_id(game_week)', gameweek);
+
+    if (error) throw new Error(error.message);
+
+    return populatePlayersWithStats([...playerStore.players], data);
+  };
+
   const fetchPlayersWithStatistics = async (
     fixtureID: number,
     teamID: number
@@ -175,6 +190,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fetchFixtures,
     fetchFixtureByID,
     fetchPlayersWithStatistics,
+    fetchPlayersWithStatisticsByGameweek,
     updateFixtureScore,
     updatePlayerStatistics
   };

@@ -21,6 +21,8 @@ watch(
   },
   { immediate: true }
 );
+
+const a = ref(await fixtureStore.fetchPlayersWithStatisticsByGameweek(1));
 </script>
 
 <template>

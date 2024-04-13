@@ -6,30 +6,11 @@ import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const draftedTeamsWithPlayersQuery = supabase
-    .from('drafted_teams')
-    .select(
-      `
-  *,
-  players:drafted_players(
-    drafted_player_id,
-    drafted_team,
-    ...players_view(*),
-    transfers:drafted_transfers(
-        drafted_transfer_id,
-        transfer_week, 
-        active_transfer_expiry,
-        player:players_view(*)
-      )
-    )
-  `
-    )
-    .order('team_name', { ascending: true });
 
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
-    initDraftedTeamData(draftedTeams.value)
+    initDraftedTeamData(draftedTeams.value),
   );
 
   const getDraftedTeamByID = computed(() => {
@@ -40,7 +21,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   });
 
   const fetchDraftedTeams = async () => {
-    const { data, error } = await draftedTeamsWithPlayersQuery;
+    const { data, error } = await supabase
+      .rpc('get_drafted_teams_and_players')
+      .returns<DraftedTeam[]>();
     if (error) throw error;
     draftedTeams.value = data;
   };
@@ -51,7 +34,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       .select(
         `*,
           transfers:drafted_transfers(*)
-        `
+        `,
       )
       .eq('drafted_player_id', draftedPlayerID)
       .single();
@@ -64,7 +47,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     parsedDraftedTeams.map(async ({ players, ...draftedTeamData }) => {
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
-          drafted_player: x.player_id,
+          drafted_player: x.data.player_id,
           drafted_team: draftedTeamData.drafted_team_id,
         };
       });
@@ -79,7 +62,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       player_id: number;
       transfer_week: number;
       active_transfer_expiry: string;
-    }>
+    }>,
   ) => {
     const { data, error } = await supabase
       .from('drafted_transfers')

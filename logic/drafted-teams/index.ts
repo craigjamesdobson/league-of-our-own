@@ -1,4 +1,3 @@
-import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
 
 const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
@@ -6,10 +5,10 @@ const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
     const playerPrice =
       draftedPlayer.transfers.length > 0
         ? parseFloat(
-            draftedPlayer.transfers[draftedPlayer.transfers.length - 1].player
-              .cost
+            draftedPlayer.transfers[draftedPlayer.transfers.length - 1].data
+              .cost,
           )
-        : parseFloat(draftedPlayer.cost);
+        : parseFloat(draftedPlayer.data.cost);
 
     return total + playerPrice;
   }, 0);
@@ -36,7 +35,7 @@ const initDraftedTeamData = (draftedTeamsData: any) => {
         total_team_value: setTotalTeamPrice(draftedTeam),
         is_invalid_team: setTeamValidity(draftedTeam),
       };
-    }
+    },
   );
 
   return draftedTeamData;

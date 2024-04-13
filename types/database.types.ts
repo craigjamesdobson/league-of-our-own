@@ -49,7 +49,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'drafted_teams';
             referencedColumns: ['drafted_team_id'];
-          }
+          },
         ];
       };
       drafted_players_pending: {
@@ -92,7 +92,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'drafted_teams_pending';
             referencedColumns: ['drafted_team_id'];
-          }
+          },
         ];
       };
       drafted_teams: {
@@ -195,7 +195,120 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'players_view';
             referencedColumns: ['player_id'];
-          }
+          },
+        ];
+      };
+      fixtures: {
+        Row: {
+          away_team: number | null;
+          away_team_score: number | null;
+          created_at: string;
+          game_week: number | null;
+          home_team: number | null;
+          home_team_score: number | null;
+          id: number;
+        };
+        Insert: {
+          away_team?: number | null;
+          away_team_score?: number | null;
+          created_at?: string;
+          game_week?: number | null;
+          home_team?: number | null;
+          home_team_score?: number | null;
+          id?: number;
+        };
+        Update: {
+          away_team?: number | null;
+          away_team_score?: number | null;
+          created_at?: string;
+          game_week?: number | null;
+          home_team?: number | null;
+          home_team_score?: number | null;
+          id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_fixtures_away_team_fkey';
+            columns: ['away_team'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_fixtures_home_team_fkey';
+            columns: ['home_team'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      player_statistics: {
+        Row: {
+          assists: number | null;
+          author: string | null;
+          clean_sheet: boolean | null;
+          created_at: string;
+          fixture_id: number | null;
+          goals: number | null;
+          id: number;
+          player_id: number | null;
+          points: number;
+          red_card: boolean | null;
+        };
+        Insert: {
+          assists?: number | null;
+          author?: string | null;
+          clean_sheet?: boolean | null;
+          created_at?: string;
+          fixture_id?: number | null;
+          goals?: number | null;
+          id?: number;
+          player_id?: number | null;
+          points?: number;
+          red_card?: boolean | null;
+        };
+        Update: {
+          assists?: number | null;
+          author?: string | null;
+          clean_sheet?: boolean | null;
+          created_at?: string;
+          fixture_id?: number | null;
+          goals?: number | null;
+          id?: number;
+          player_id?: number | null;
+          points?: number;
+          red_card?: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_player_statistics_author_fkey';
+            columns: ['author'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_player_statistics_fixture_id_fkey';
+            columns: ['fixture_id'];
+            isOneToOne: false;
+            referencedRelation: 'fixtures';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_player_statistics_player_id_fkey';
+            columns: ['player_id'];
+            isOneToOne: false;
+            referencedRelation: 'players';
+            referencedColumns: ['player_id'];
+          },
+          {
+            foreignKeyName: 'public_player_statistics_player_id_fkey';
+            columns: ['player_id'];
+            isOneToOne: false;
+            referencedRelation: 'players_view';
+            referencedColumns: ['player_id'];
+          },
         ];
       };
       players: {
@@ -482,7 +595,7 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'teams';
             referencedColumns: ['id'];
-          }
+          },
         ];
       };
       profiles: {
@@ -517,7 +630,7 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'users';
             referencedColumns: ['id'];
-          }
+          },
         ];
       };
       teams: {
@@ -605,6 +718,7 @@ export type Database = {
           image: string | null;
           image_large: string | null;
           is_unavailable: boolean | null;
+          minutes: number | null;
           news: string | null;
           player_id: number | null;
           position: number | null;
@@ -624,17 +738,78 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'teams';
             referencedColumns: ['id'];
-          }
+          },
         ];
       };
     };
     Functions: {
-      get_player_data: {
+      get_drafted_teams_and_players: {
         Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
+      get_player_stats_by_team_id: {
+        Args: {
+          team_id_param: number;
+        };
         Returns: {
+          player_id: number;
+          number_code: number;
+          image: string;
+          image_large: string;
           web_name: string;
+          first_name: string;
+          second_name: string;
+          goals_scored: number;
+          assists: number;
+          clean_sheets: number;
+          red_cards: number;
+          cost: number;
+          status: string;
+          is_unavailable: boolean;
+          unavailable_for_season: boolean;
+          news: string;
+          position: number;
+          team: number;
           team_name: string;
-          team_id: number;
+          team_short_name: string;
+          minutes: number;
+          week_goals: number;
+          week_assists: number;
+          week_cleansheet: boolean;
+          week_redcard: boolean;
+        }[];
+      };
+      get_player_stats_by_team_id_for_fixture: {
+        Args: {
+          team_id_param: number;
+          fixture_id_param: number;
+        };
+        Returns: {
+          player_id: number;
+          code: number;
+          image: string;
+          image_large: string;
+          web_name: string;
+          first_name: string;
+          second_name: string;
+          goals_scored: number;
+          assists: number;
+          clean_sheets: number;
+          red_cards: number;
+          cost: number;
+          status: string;
+          is_unavailable: boolean;
+          unavailable_for_season: boolean;
+          news: string;
+          position: number;
+          team: number;
+          team_name: string;
+          team_short_name: string;
+          minutes: number;
+          week_goals: number;
+          week_assists: number;
+          week_cleansheet: boolean;
+          week_redcard: boolean;
         }[];
       };
       get_player_team: {
@@ -644,6 +819,13 @@ export type Database = {
           team_name: string;
           team_id: number;
         }[];
+      };
+      insert_or_update_data: {
+        Args: {
+          id_field: number;
+          other_field: string;
+        };
+        Returns: undefined;
       };
     };
     Enums: {
@@ -655,14 +837,16 @@ export type Database = {
   };
 };
 
+type PublicSchema = Database[Extract<keyof Database, 'public'>];
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database['public']['Tables'] & Database['public']['Views'])
+    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
         Database[PublicTableNameOrOptions['schema']]['Views'])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
       Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
@@ -670,67 +854,67 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database['public']['Tables'] &
-      Database['public']['Views'])
-  ? (Database['public']['Tables'] &
-      Database['public']['Views'])[PublicTableNameOrOptions] extends {
-      Row: infer R;
-    }
-    ? R
-    : never
-  : never;
+  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
+        PublicSchema['Views'])
+    ? (PublicSchema['Tables'] &
+        PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database['public']['Tables']
+    | keyof PublicSchema['Tables']
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I;
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database['public']['Tables']
-  ? Database['public']['Tables'][PublicTableNameOrOptions] extends {
-      Insert: infer I;
-    }
-    ? I
-    : never
-  : never;
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database['public']['Tables']
+    | keyof PublicSchema['Tables']
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U;
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database['public']['Tables']
-  ? Database['public']['Tables'][PublicTableNameOrOptions] extends {
-      Update: infer U;
-    }
-    ? U
-    : never
-  : never;
+  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database['public']['Enums']
+    | keyof PublicSchema['Enums']
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database['public']['Enums']
-  ? Database['public']['Enums'][PublicEnumNameOrOptions]
-  : never;
+  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
+    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never;

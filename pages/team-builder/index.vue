@@ -107,13 +107,13 @@ const rules = computed(() => {
     team_name: {
       required: helpers.withMessage(
         'The team name field is required',
-        required
+        required,
       ),
     },
     team_owner: {
       required: helpers.withMessage(
         'The team owner field is required',
-        required
+        required,
       ),
     },
     team_email: {
@@ -158,7 +158,7 @@ const fetchDraftedTeamData = async () => {
           drafted_team,
           ...players_view(*)
         )
-      `
+      `,
     )
     .eq('key', route.query.id)
     .returns<DraftedTeam[]>()
@@ -181,7 +181,7 @@ const fetchDraftedTeamData = async () => {
 
 const setTeamPlayers = (
   teamStructure: { position: number; count: number }[],
-  players: DraftedPlayer[] | null = null
+  players: DraftedPlayer[] | null = null,
 ) => {
   teamStructure.forEach(({ position, count }) => {
     const playersForPosition = players
@@ -197,7 +197,7 @@ const setTeamPlayers = (
         draftedPlayerID: selectedPlayer?.drafted_player_id ?? 0,
         position,
         selectedPlayer,
-      }))
+      })),
     );
   });
 };
@@ -209,7 +209,7 @@ if (route.query.id) {
 }
 
 const teamBudget = computed(() =>
-  draftedTeamData.value.allowed_transfers ? 85 : 95
+  draftedTeamData.value.allowed_transfers ? 85 : 95,
 );
 
 const selectedPlayerIds = computed(() => {
@@ -231,7 +231,7 @@ const calculateRemainingBudget = (): number => {
       }
       return accumulator;
     },
-    0
+    0,
   );
 
   return remainingBudget - totalCost;
@@ -342,7 +342,7 @@ const formIsValid = () => {
 
   if (
     draftedTeamPlayers.value.some(
-      (draftedTeamPlayer) => draftedTeamPlayer.selectedPlayer === null
+      (draftedTeamPlayer) => draftedTeamPlayer.selectedPlayer === null,
     )
   ) {
     toast.add({

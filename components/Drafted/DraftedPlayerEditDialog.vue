@@ -4,7 +4,10 @@
       <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
           <h2 class="pb-2.5 uppercase font-black text-lg">Original Player</h2>
-          <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
+          <DraftedPlayer
+            v-if="draftedPlayer"
+            :drafted-player="draftedPlayer.data"
+          />
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">
           <h2 class="uppercase font-black text-lg mb-2.5">Transfers</h2>
@@ -21,7 +24,7 @@
                 class="w-6 h-6"
                 name="material-symbols:subdirectory-arrow-right-rounded"
               />
-              <DraftedPlayer :drafted-player="playerTransfer.player" />
+              <DraftedPlayer :drafted-player="playerTransfer.data" />
               <Button
                 v-if="props.editable"
                 severity="danger"
@@ -49,7 +52,7 @@
               filter
               :options="
                 playerStore.players.filter(
-                  (x) => x.position === draftedPlayer?.position
+                  (x) => x.position === draftedPlayer?.data.position,
                 )
               "
               option-label="web_name"
@@ -151,7 +154,7 @@ const addNewTransfer = async () => {
       drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
-      player: newTransferData.value.player!,
+      data: newTransferData.value.player!,
     });
 
     handleApiSuccess(`Transfer was successful`, toast);
@@ -167,7 +170,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     }
     await draftedTeamsStore.deleteTransfer(draftedTransferID);
     draftedPlayer.value.transfers = draftedPlayer.value.transfers.filter(
-      (x) => x.drafted_transfer_id !== draftedTransferID
+      (x) => x.drafted_transfer_id !== draftedTransferID,
     );
     handleApiSuccess('Transfer was removed', toast);
   } catch (err) {

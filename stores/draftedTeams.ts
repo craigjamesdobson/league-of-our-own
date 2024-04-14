@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
-import type { Database } from '~/types/database.generated.types';
+import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, Tables } from '~/types/database.generated.types';
+import type { Database, Tables } from '~/types/database.types';
 interface FilterData {
   filterName: string;
   filterPrice: number;

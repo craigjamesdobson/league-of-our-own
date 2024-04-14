@@ -104,9 +104,10 @@ import { useToast } from 'primevue/usetoast';
 import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
+import type { Player } from '~/types/Player';
 
 interface TransferData {
-  player: DraftedPlayer | null;
+  player: Player | null;
   activeExpiryDate: Date;
   transferWeek: number;
 }
@@ -143,7 +144,7 @@ const addNewTransfer = async () => {
         drafted_player: draftedPlayer.value.drafted_player_id,
         active_transfer_expiry:
           newTransferData.value.activeExpiryDate.toDateString(),
-        player_id: newTransferData.value.player.player_id,
+        player_id: newTransferData.value.player.player_id!,
         transfer_week: newTransferData.value.transferWeek,
       },
     ]);
@@ -154,7 +155,7 @@ const addNewTransfer = async () => {
       drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
-      data: newTransferData.value.player!,
+      data: newTransferData.value.player,
     });
 
     handleApiSuccess(`Transfer was successful`, toast);

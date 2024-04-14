@@ -21,7 +21,7 @@ const handleApiError = (error: unknown, toast: ToastServiceMethods) => {
 
 const handleApiSuccess = (
   successMesage: string,
-  toast: ToastServiceMethods
+  toast: ToastServiceMethods,
 ) => {
   toast.add({
     severity: 'success',

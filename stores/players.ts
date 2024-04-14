@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, Tables } from '~/types/database.types';
+import type { Database, Tables } from '~/types/database.generated.types';
 interface FilterData {
   filterName: string;
   filterPrice: number;
@@ -65,8 +65,8 @@ export const usePlayerStore = defineStore('player-store', () => {
           ({ id, ...rest }: { id: number; [key: string]: any }) => ({
             player_id: id,
             ...rest,
-          })
-        )
+          }),
+        ),
       )
       .select();
 
@@ -87,19 +87,19 @@ export const usePlayerStore = defineStore('player-store', () => {
           .normalize('NFD')
           .replace(/[\u0300-\u036F]/g, '')
           .toLowerCase()
-          .includes(filterName.toLowerCase())
+          .includes(filterName.toLowerCase()),
       );
     }
 
     if (filterPrice) {
       newFilteredPlayers = newFilteredPlayers.filter(
-        (player) => player.cost === +filterPrice
+        (player) => player.cost === +filterPrice,
       );
     }
 
     if (filterTeam) {
       newFilteredPlayers = newFilteredPlayers.filter(
-        (p) => p.team === filterTeam
+        (p) => p.team === filterTeam,
       );
     }
 
@@ -109,7 +109,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
 
   const getPlayerByID = computed(
-    () => (id: number) => players.value.find((x) => x.player_id === id)
+    () => (id: number) => players.value.find((x) => x.player_id === id),
   );
 
   const formatFilteredPlayersByPosition = computed(() => {

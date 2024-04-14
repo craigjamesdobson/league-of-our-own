@@ -19,7 +19,7 @@ const useAccount = () => {
       password: {
         required: helpers.withMessage(
           'The password field is required',
-          required
+          required,
         ),
         minLength: minLength(6),
       },

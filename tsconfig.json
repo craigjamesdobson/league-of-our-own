@@ -4,6 +4,7 @@
   "compilerOptions": {
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "skipLibCheck": true
   },
   "rules": {
     "camelcase": ["error", { "ignoreDestructuring": true }]

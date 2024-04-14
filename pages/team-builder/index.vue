@@ -91,7 +91,7 @@ import { delay } from '@/utils/utility';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert } from '~/types/database.types';
+import type { Database, TablesInsert } from '~/types/database-generated.types';
 import type { Player } from '~/types/Player';
 
 const supabase = useSupabaseClient<Database>();
@@ -181,7 +181,7 @@ const fetchDraftedTeamData = async () => {
 
 const setTeamPlayers = (
   teamStructure: { position: number; count: number }[],
-  players: DraftedPlayer[] | null = null,
+  players: Player[] | null = null,
 ) => {
   teamStructure.forEach(({ position, count }) => {
     const playersForPosition = players
@@ -193,7 +193,8 @@ const setTeamPlayers = (
       : Array.from({ length: count }, () => null);
 
     draftedTeamPlayers.value.push(
-      ...playersToAdd.map((selectedPlayer) => ({
+      // @ts-ignore -  This shouldnt be inherting the type never...
+      ...playersToAdd.map((selectedPlayer: DraftedPlayer | null) => ({
         draftedPlayerID: selectedPlayer?.drafted_player_id ?? 0,
         position,
         selectedPlayer,

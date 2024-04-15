@@ -90,7 +90,7 @@ const players = defineModel('players');
           Players last updated on:
           <strong>{{
             new Date(playerStore.getPlayerLastUpdatedDate).toLocaleDateString(
-              'en-GB',
+              'en-GB'
             )
           }}</strong>
         </Message>

@@ -10,7 +10,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
-    initDraftedTeamData(draftedTeams.value),
+    initDraftedTeamData(draftedTeams.value)
   );
 
   const getDraftedTeamByID = computed(() => {
@@ -34,7 +34,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       .select(
         `*,
           transfers:drafted_transfers(*)
-        `,
+        `
       )
       .eq('drafted_player_id', draftedPlayerID)
       .single();
@@ -62,7 +62,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       player_id: number;
       transfer_week: number;
       active_transfer_expiry: string;
-    }>,
+    }>
   ) => {
     const { data, error } = await supabase
       .from('drafted_transfers')

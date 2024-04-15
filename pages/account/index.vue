@@ -16,7 +16,7 @@ definePageMeta({
 
 const selectedDraftedTeamID = ref(0);
 const selectedDraftedTeam = computed(() =>
-  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value),
+  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
 );
 
 const toast = useToast();
@@ -84,7 +84,7 @@ const transfersMadeCount = (team: DraftedTeam) => {
             class="!w-full"
             :options="
               draftedTeamStore.getDraftedTeams?.filter(
-                (x) => x.allowed_transfers,
+                (x) => x.allowed_transfers
               )
             "
             filter

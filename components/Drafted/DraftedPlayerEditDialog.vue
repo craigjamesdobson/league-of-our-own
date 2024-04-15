@@ -52,7 +52,7 @@
               filter
               :options="
                 playerStore.players.filter(
-                  (x) => x.position === draftedPlayer?.data.position,
+                  (x) => x.position === draftedPlayer?.data.position
                 )
               "
               option-label="web_name"
@@ -171,7 +171,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     }
     await draftedTeamsStore.deleteTransfer(draftedTransferID);
     draftedPlayer.value.transfers = draftedPlayer.value.transfers.filter(
-      (x) => x.drafted_transfer_id !== draftedTransferID,
+      (x) => x.drafted_transfer_id !== draftedTransferID
     );
     handleApiSuccess('Transfer was removed', toast);
   } catch (err) {

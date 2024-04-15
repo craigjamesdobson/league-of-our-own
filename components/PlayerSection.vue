@@ -110,7 +110,7 @@ const dropdownPlayerData = computed(() =>
         selected: props.selectedPlayers.includes(p.player_id),
       };
     })
-    .filter((x) => x.position === props.position),
+    .filter((x) => x.position === props.position)
 );
 </script>
 

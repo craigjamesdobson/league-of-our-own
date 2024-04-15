@@ -107,13 +107,13 @@ const rules = computed(() => {
     team_name: {
       required: helpers.withMessage(
         'The team name field is required',
-        required,
+        required
       ),
     },
     team_owner: {
       required: helpers.withMessage(
         'The team owner field is required',
-        required,
+        required
       ),
     },
     team_email: {
@@ -139,14 +139,13 @@ const teamStructure = [
   { position: PlayerPosition.FORWARD, count: 3 },
 ];
 
-const draftedTeamPlayers: Ref<
-  | {
-      draftedPlayerID?: number;
-      position: PlayerPosition;
-      selectedPlayer: Player;
-    }[]
-  | []
-> = ref([]);
+interface DraftedTeamPlayer {
+  draftedPlayerID?: number;
+  position: PlayerPosition;
+  selectedPlayer: Player;
+}
+
+const draftedTeamPlayers: Ref<DraftedTeamPlayer[]> = ref([]);
 
 const fetchDraftedTeamData = async () => {
   const { data, error } = await supabase
@@ -158,7 +157,7 @@ const fetchDraftedTeamData = async () => {
           drafted_team,
           ...players_view(*)
         )
-      `,
+      `
     )
     .eq('key', route.query.id)
     .returns<DraftedTeam[]>()
@@ -176,12 +175,13 @@ const fetchDraftedTeamData = async () => {
   }
 
   draftedTeamData.value = data;
+  // @ts-ignore - TODO: fix the typing for this...
   setTeamPlayers(teamStructure, data.players);
 };
 
 const setTeamPlayers = (
   teamStructure: { position: number; count: number }[],
-  players: Player[] | null = null,
+  players: Player[] | null = null
 ) => {
   teamStructure.forEach(({ position, count }) => {
     const playersForPosition = players
@@ -198,7 +198,7 @@ const setTeamPlayers = (
         draftedPlayerID: selectedPlayer?.drafted_player_id ?? 0,
         position,
         selectedPlayer,
-      })),
+      }))
     );
   });
 };
@@ -210,7 +210,7 @@ if (route.query.id) {
 }
 
 const teamBudget = computed(() =>
-  draftedTeamData.value.allowed_transfers ? 85 : 95,
+  draftedTeamData.value.allowed_transfers ? 85 : 95
 );
 
 const selectedPlayerIds = computed(() => {
@@ -222,19 +222,10 @@ const selectedPlayerIds = computed(() => {
 const calculateRemainingBudget = (): number => {
   const remainingBudget = teamBudget.value;
 
-  const totalCost = draftedTeamPlayers.value.reduce(
-    (accumulator: number, teamPlayerData) => {
-      if (
-        teamPlayerData.selectedPlayer &&
-        teamPlayerData.selectedPlayer.cost !== null
-      ) {
-        return accumulator + teamPlayerData.selectedPlayer.cost;
-      }
-      return accumulator;
-    },
-    0,
+  const totalCost: number = draftedTeamPlayers.value.reduce(
+    (prev: number, curr: DraftedTeamPlayer) => prev + curr.selectedPlayer.cost,
+    0
   );
-
   return remainingBudget - totalCost;
 };
 
@@ -343,7 +334,7 @@ const formIsValid = () => {
 
   if (
     draftedTeamPlayers.value.some(
-      (draftedTeamPlayer) => draftedTeamPlayer.selectedPlayer === null,
+      (draftedTeamPlayer) => draftedTeamPlayer.selectedPlayer === null
     )
   ) {
     toast.add({

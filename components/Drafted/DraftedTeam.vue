@@ -23,7 +23,7 @@ const showDialog = ref(false);
 const handleEditPlayer = (playerID: number) => {
   try {
     selectedDraftedPlayer.value = props.draftedTeam.players.find(
-      (x) => x.data.player_id === playerID,
+      (x) => x.data.player_id === playerID
     );
     showDialog.value = true;
   } catch (error) {

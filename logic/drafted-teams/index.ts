@@ -6,7 +6,7 @@ const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
       draftedPlayer.transfers.length > 0
         ? parseFloat(
             draftedPlayer.transfers[draftedPlayer.transfers.length - 1].data
-              .cost,
+              .cost
           )
         : parseFloat(draftedPlayer.data.cost);
 
@@ -35,7 +35,7 @@ const initDraftedTeamData = (draftedTeamsData: any) => {
         total_team_value: setTotalTeamPrice(draftedTeam),
         is_invalid_team: setTeamValidity(draftedTeam),
       };
-    },
+    }
   );
 
   return draftedTeamData;

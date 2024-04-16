@@ -24,10 +24,10 @@ const populatePlayersWithStats = (
   PlayerStats: Tables<'player_statistics'>[],
   teamID?: number
 ): PlayerWithStats[] => {
-  const filteredPlayers = players;
+  let filteredPlayers = players;
 
   if (teamID) {
-    filteredPlayers.filter((x) => x.team === teamID);
+    filteredPlayers = filteredPlayers.filter((x) => x.team === teamID);
   }
 
   const weekDataMap = new Map<number, (typeof PlayerStats)[number]>();

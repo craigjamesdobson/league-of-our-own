@@ -223,7 +223,8 @@ const calculateRemainingBudget = (): number => {
   const remainingBudget = teamBudget.value;
 
   const totalCost: number = draftedTeamPlayers.value.reduce(
-    (prev: number, curr: DraftedTeamPlayer) => prev + curr.selectedPlayer.cost,
+    (prev: number, curr: DraftedTeamPlayer) =>
+      prev + (curr.selectedPlayer?.cost ?? 0),
     0
   );
   return remainingBudget - totalCost;

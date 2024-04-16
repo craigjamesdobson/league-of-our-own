@@ -23,7 +23,7 @@ const showDialog = ref(false);
 const handleEditPlayer = (playerID: number) => {
   try {
     selectedDraftedPlayer.value = props.draftedTeam.players.find(
-      (x) => x.player_id === playerID
+      (x) => x.data.player_id === playerID
     );
     showDialog.value = true;
   } catch (error) {
@@ -57,7 +57,7 @@ const handleEditPlayer = (playerID: number) => {
     </div>
     <div
       v-for="player in props.draftedTeam.players"
-      :key="player.player_id"
+      :key="player.drafted_player_id"
       class="relative text-sm"
       :class="{
         'bg-yellow-200 hover:bg-yellow-300':
@@ -71,13 +71,13 @@ const handleEditPlayer = (playerID: number) => {
       <div class="flex gap-5 w-full border-b border-gray-100 items-center">
         <DraftedPlayer
           v-if="!player.transfers.length"
-          :drafted-player="player"
+          :drafted-player="player.data"
         />
         <DraftedTransfer
           v-else-if="player.transfers.at(-1) !== null"
           :drafted-player="player"
           class="w-full cursor-pointer"
-          @click="handleEditPlayer(player.player_id)"
+          @click="handleEditPlayer(player.data.player_id)"
         />
         <Button
           v-if="props.editable"
@@ -89,7 +89,7 @@ const handleEditPlayer = (playerID: number) => {
             root: { class: 'w-6 h-6' },
           }"
           :pt-options="{ mergeProps: true }"
-          @click="handleEditPlayer(player.player_id)"
+          @click="handleEditPlayer(player.data.player_id)"
         >
           <Icon size="20" name="ic:round-swap-horiz" />
         </Button>
@@ -103,6 +103,7 @@ const handleEditPlayer = (playerID: number) => {
     </div>
   </div>
   <DraftedPlayerEditDialog
+    v-if="selectedDraftedPlayer"
     v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog"
     :editable="props.editable"

@@ -17,7 +17,7 @@
       </Button>
       <img
         class="w-24 h-24 rounded-full bg-white drop-shadow-lg p-2"
-        :src="player ? player!.image_large : loadPlayerFallbackImage"
+        :src="player ? player!.image_large : PLACEHOLDER_PLAYER_IMAGE"
         :alt="player ? player!.web_name : 'pick a player'"
         @error="loadPlayerFallbackImage"
       />
@@ -77,6 +77,7 @@
 import { PlayerPosition } from '~/types/PlayerPosition';
 import { usePlayerStore } from '~/stores/players';
 import type { Player } from '~/types/Player';
+import { PLACEHOLDER_PLAYER_IMAGE } from '~/utils/images';
 
 const playerStore = usePlayerStore();
 

@@ -2,7 +2,7 @@
   <div class="player-container">
     <DraftedPlayer
       :is-transfer="true"
-      :drafted-player="sortedTransfers.at(-1)!.player"
+      :drafted-player="draftedPlayer.transfers.at(-1)!.data"
     />
   </div>
 </template>
@@ -15,12 +15,6 @@ const { draftedPlayer } = defineProps({
     type: Object as PropType<DraftedPlayer>,
     default: null
   }
-});
-
-const sortedTransfers = computed(() => {
-  return [...draftedPlayer.transfers].sort(
-    (a, b) => a.transfer_week - b.transfer_week
-  );
 });
 </script>
 

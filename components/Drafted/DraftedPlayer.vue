@@ -3,7 +3,7 @@ import type { DraftedPlayer, DraftedTransfer } from '@/types/DraftedPlayer';
 
 const { draftedPlayer, isTransfer } = defineProps({
   draftedPlayer: {
-    type: Object as PropType<DraftedPlayer | DraftedTransfer['player']>,
+    type: Object as PropType<DraftedPlayer['data'] | DraftedTransfer['data']>,
     default: null
   },
   isTransfer: { type: Boolean, default: false }
@@ -21,8 +21,8 @@ const { draftedPlayer, isTransfer } = defineProps({
     <span class="w-2/12 p-2">
       <img
         class="m-auto h-6 w-6 rounded-full shadow-md"
-        :src="draftedPlayer.image"
-        :alt="draftedPlayer.web_name"
+        :src="draftedPlayer.image!"
+        :alt="draftedPlayer.web_name!"
         @error="loadPlayerFallbackImage"
       />
     </span>
@@ -32,7 +32,7 @@ const { draftedPlayer, isTransfer } = defineProps({
       <Icon v-if="isTransfer" class="ml-2" size="18" name="ic:round-swap-horiz"
     /></span>
     <span class="w-2/12 p-2 text-center">
-      {{ draftedPlayer.cost.toFixed(1) }}
+      {{ draftedPlayer.cost!.toFixed(1) }}
     </span>
   </div>
 </template>

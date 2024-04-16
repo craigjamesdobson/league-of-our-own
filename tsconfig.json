@@ -3,7 +3,7 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": true
   },
   "rules": {
     "camelcase": ["error", { "ignoreDestructuring": true }]

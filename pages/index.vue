@@ -6,7 +6,7 @@
       <div
         class="bg-primary flex justify-items-center self-center rounded-full p-4"
       >
-        <Icon class="text-offWhite" size="64" name="carbon:soccer" />
+        <Icon class="text-slate-100" size="64" name="carbon:soccer" />
       </div>
       <h1
         class="border-primary mb-6 border-b text-4xl font-black uppercase tracking-wider md:text-[72px] md:leading-[72px]"

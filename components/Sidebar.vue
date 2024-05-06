@@ -31,7 +31,7 @@ const routes = reactive([
 
     <div class="flex items-center rounded-full">
       <!-- Header -->
-      <Icon class="text-offWhite" size="48" name="carbon:soccer" />
+      <Icon class="text-slate-100" size="48" name="carbon:soccer" />
     </div>
 
     <div>
@@ -40,7 +40,7 @@ const routes = reactive([
         <li v-for="route in routes" :key="route.title">
           <nuxt-link
             :to="route.path"
-            class="text-offWhite border-offWhite hover:bg-offWhite hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border text-base transition duration-300 ease-in-out xl:mb-8"
+            class="text-slate-100 border-slate-100 hover:bg-slate-100 hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border text-base transition duration-300 ease-in-out xl:mb-8"
           >
             <Icon size="24" :name="route.icon" />
             <span class="ml-4 hidden capitalize">{{ route.name }}</span>
@@ -51,7 +51,7 @@ const routes = reactive([
 
     <nuxt-link
       to="/account"
-      class="text-offWhite border-offWhite hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-full border text-base transition duration-300 ease-in-out hover:bg-white"
+      class="text-slate-100 border-slate-100 hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-full border text-base transition duration-300 ease-in-out hover:bg-white"
     >
       <Icon name="uil:setting" />
     </nuxt-link>
@@ -60,6 +60,6 @@ const routes = reactive([
 
 <style scoped>
 .router-link-exact-active {
-  @apply bg-offWhite text-primary;
+  @apply bg-slate-100 text-primary;
 }
 </style>

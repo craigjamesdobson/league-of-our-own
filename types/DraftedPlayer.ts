@@ -5,12 +5,14 @@ interface DraftedTransfer {
   active_transfer_expiry: Date;
   transfer_week: number;
   data: Tables<'players_view'>;
+  points?: number;
 }
 
 interface DraftedPlayer {
-  data: Tables<'players_view'>;
   drafted_player_id: number;
   transfers: DraftedTransfer[];
+  data: Tables<'players_view'>;
+  points?: number;
 }
 
 export type { DraftedPlayer, DraftedTransfer };

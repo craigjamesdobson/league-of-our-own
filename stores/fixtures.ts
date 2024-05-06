@@ -8,6 +8,8 @@ import {
   type TablesInsert
 } from '~/types/database.types';
 
+const route = useRoute();
+
 const getPlayersWithStats = (players: PlayerWithStats[]) => {
   return players!.filter((player) => {
     return (
@@ -64,6 +66,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
   const playerStore = usePlayerStore();
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
+  const selectedGameweek = ref(+route.query.week || 1);
 
   const fetchFixtures = async (gameweekID: number) => {
     fixtures.value = null;
@@ -187,6 +190,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
 
   return {
     fixtures,
+    selectedGameweek,
     fetchFixtures,
     fetchFixtureByID,
     fetchPlayersWithStatistics,

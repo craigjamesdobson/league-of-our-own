@@ -1,3 +1,66 @@
+<script setup lang="ts">
+import { useToast } from 'primevue/usetoast';
+import { useFixtureStore } from '~/stores/fixtures';
+import type { Fixture } from '~/types/Fixture';
+import type { PlayerWithStats } from '~/types/Player';
+
+const route = useRoute();
+const fixtureStore = useFixtureStore();
+const toast = useToast();
+
+const fixture: Ref<Fixture | null> = ref(null);
+
+fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
+
+if (!fixtureStore.fixtures && fixture.value?.game_week) {
+  fixtureStore.fetchFixtures(fixture.value.game_week);
+}
+
+const homePlayers: Ref<PlayerWithStats[] | undefined> = ref();
+const awayPlayers: Ref<PlayerWithStats[] | undefined> = ref();
+
+const populatePlayers = async () => {
+  homePlayers.value = await fixtureStore.fetchPlayersWithStatistics(
+    fixture.value!.id,
+    fixture.value!.home_team.id
+  );
+
+  awayPlayers.value = await fixtureStore.fetchPlayersWithStatistics(
+    fixture.value!.id,
+    fixture.value!.away_team.id
+  );
+};
+
+populatePlayers();
+
+const updateFixture = async () => {
+  if (!fixture.value) throw new Error('No fixture');
+
+  if (!homePlayers.value || !awayPlayers.value) throw new Error('No players');
+
+  try {
+    const a = fixtureStore.updateFixtureScore(fixture.value);
+    const b = fixtureStore.updatePlayerStatistics(
+      [...homePlayers.value, ...awayPlayers.value],
+      fixture.value.id
+    );
+
+    await Promise.all([a, b]);
+
+    await navigateTo({
+      path: '/fixtures',
+      query: {
+        week: fixture.value.game_week
+      }
+    });
+
+    handleApiSuccess('Fixture has been updated', toast);
+  } catch (error) {
+    handleApiError(error, toast);
+  }
+};
+</script>
+
 <template>
   <div>
     <Toast />
@@ -71,68 +134,3 @@
     <div v-else>Loading...</div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
-import { useFixtureStore } from '~/stores/fixtures';
-import type { Fixture } from '~/types/Fixture';
-import type { PlayerWithStats } from '~/types/Player';
-
-const route = useRoute();
-const fixtureStore = useFixtureStore();
-const toast = useToast();
-
-const fixture: Ref<Fixture | null> = ref(null);
-
-fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
-
-if (!fixtureStore.fixtures && fixture.value?.game_week) {
-  fixtureStore.fetchFixtures(fixture.value.game_week);
-}
-
-const homePlayers: Ref<PlayerWithStats[] | undefined> = ref();
-const awayPlayers: Ref<PlayerWithStats[] | undefined> = ref();
-
-const populatePlayers = async () => {
-  homePlayers.value = await fixtureStore.fetchPlayersWithStatistics(
-    fixture.value!.id,
-    fixture.value!.home_team.id
-  );
-
-  awayPlayers.value = await fixtureStore.fetchPlayersWithStatistics(
-    fixture.value!.id,
-    fixture.value!.away_team.id
-  );
-};
-
-populatePlayers();
-
-const updateFixture = async () => {
-  if (!fixture.value) throw new Error('No fixture');
-
-  if (!homePlayers.value || !awayPlayers.value) throw new Error('No players');
-
-  try {
-    const a = fixtureStore.updateFixtureScore(fixture.value);
-    const b = fixtureStore.updatePlayerStatistics(
-      [...homePlayers.value, ...awayPlayers.value],
-      fixture.value.id
-    );
-
-    await Promise.all([a, b]);
-
-    await navigateTo({
-      path: '/fixtures',
-      query: {
-        week: fixture.value.game_week
-      }
-    });
-
-    handleApiSuccess('Fixture has been updated', toast);
-  } catch (error) {
-    handleApiError(error, toast);
-  }
-};
-</script>
-
-<style scoped></style>

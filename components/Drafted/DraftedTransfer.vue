@@ -2,7 +2,7 @@
   <div class="player-container">
     <DraftedPlayer
       :is-transfer="true"
-      :drafted-player="draftedPlayer.transfers.at(-1)!.data"
+      :drafted-player="draftedPlayer.transfers.at(-1)"
     />
   </div>
 </template>

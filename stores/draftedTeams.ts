@@ -28,6 +28,16 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     draftedTeams.value = data;
   };
 
+  const fetchDraftedTeamsWithPlayerPointsByGameweek = async (selectedGameWeek: number) => {
+    const { data, error } = await supabase
+      .rpc(
+        'get_drafted_teams_with_player_points_by_gameweek',
+        { game_week_param: selectedGameWeek }
+      ).returns<DraftedTeam[]>()
+    if (error) throw error;
+    return data;
+  };
+
   const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
     const { data, error } = await supabase
       .from('drafted_players')
@@ -93,6 +103,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     getDraftedTeamByID,
     fetchDraftedTeams,
     fetchDraftedPlayerByID,
+    fetchDraftedTeamsWithPlayerPointsByGameweek,
     upsertTeamData,
     addNewTransfer,
     deleteTransfer

@@ -1,19 +1,28 @@
 <script setup lang="ts">
+import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
-const selectedWeek = ref(route.query.week ?? 1);
+const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
+const selectedWeek = ref(+route.query.week || 1);
+
+const draftedTeamsStore = useDraftedTeamsStore();
+
+const draftedTeamsWithPoints = ref(await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(selectedWeek.value));
 
 definePageMeta({
   middleware: ['auth']
 });
 
+
 watch(
   selectedWeek,
   async (newWeek) => {
     await fixtureStore.fetchFixtures(newWeek);
+    draftedTeamsWithPoints.value = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(newWeek)
+    fixtureStore.selectedGameweek = newWeek;
     await router.push({
       path: 'fixtures',
       query: { week: newWeek }
@@ -21,41 +30,35 @@ watch(
   },
   { immediate: true }
 );
-
-const a = ref(await fixtureStore.fetchPlayersWithStatisticsByGameweek(1));
 </script>
 
 <template>
   <div>
     <div class="flex justify-between">
       <h1 class="text-2xl font-black uppercase">Fixtures</h1>
-    </div>
-    <div class="my-10 flex flex-col gap-2.5">
-      <label class="font-bold uppercase" for="gameweeks"
-        >Select a game week</label
-      >
-      <div class="grid-cols-19 grid gap-2">
-        <Button
-          v-for="(week, i) in 38"
-          :key="week"
-          rounded
-          :outlined="week != selectedWeek"
-          :label="(i + 1).toString()"
-          @click="selectedWeek = week"
-        />
+      <div class="flex flex-col gap-2.5">
+        <label class="font-bold uppercase" for="gameweeks">Select a game week</label>
+        <Dropdown v-model="selectedWeek" :options="weeks" placeholder="Select a gameweek" scroll-height="400">
+          <template #value="slotProps">
+            <div class="flex items-center">
+              <div>WEEK {{ slotProps.value }}</div>
+            </div>
+          </template>
+          <template #option="slotProps">
+            <div class="flex items-center">
+              <div>WEEK {{ slotProps.option }}</div>
+            </div>
+          </template>
+        </Dropdown>
       </div>
     </div>
     <div v-if="fixtureStore.fixtures" class="my-10 grid gap-10 xl:grid-cols-2">
-      <NuxtLink
-        v-for="(fixture, index) in fixtureStore.fixtures"
-        :key="fixture.id"
-        :to="`/fixtures/${fixture.id}`"
+      <NuxtLink v-for="(fixture, index) in fixtureStore.fixtures" :key="fixture.id" :to="`/fixtures/${fixture.id}`"
         class="bg-surface-50 hover:border-primary rounded-sm border p-5 duration-300 ease-in-out *:transition-all"
         :class="{
           'border-green-500':
             fixture.home_team_score !== null && fixture.away_team_score !== null
-        }"
-      >
+        }">
         <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
       </NuxtLink>
     </div>
@@ -64,7 +67,7 @@ const a = ref(await fixtureStore.fetchPlayersWithStatisticsByGameweek(1));
         <SkeletonFixture />
       </div>
     </div>
-    <DraftedTeams />
+    <DraftedTeams :drafted-teams="draftedTeamsWithPoints" :show-gameweek-points="true" />
   </div>
 </template>
 

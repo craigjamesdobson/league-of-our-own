@@ -6,7 +6,7 @@
           <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
           <DraftedPlayer
             v-if="draftedPlayer"
-            :drafted-player="draftedPlayer.data"
+            :drafted-player="draftedPlayer"
           />
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">
@@ -24,7 +24,7 @@
                 class="h-6 w-6"
                 name="material-symbols:subdirectory-arrow-right-rounded"
               />
-              <DraftedPlayer :drafted-player="playerTransfer.data" />
+              <DraftedPlayer :drafted-player="playerTransfer" />
               <Button
                 v-if="props.editable"
                 severity="danger"

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import DraftedPlayer from './DraftedPlayer.vue';
 import type { DraftedTeam } from '~/types/DraftedTeam';
+import { useFixtureStore } from '~/stores/fixtures';
+
+const fixtureStore = useFixtureStore();
 
 const props = defineProps({
   draftedTeam: {
@@ -30,6 +33,18 @@ const handleEditPlayer = (playerID: number) => {
     console.error('Error fetching drafted player:', error);
   }
 };
+
+const totalPoints = computed(() => {
+      return props.draftedTeam.players.reduce((total, player) => {
+        let currentPlayerPoints = player.points!;
+        player.transfers.forEach(transfer => {
+          if (transfer.transfer_week >= fixtureStore.selectedGameweek) {
+            currentPlayerPoints = transfer.points!;
+          }
+        });
+        return total + currentPlayerPoints;
+      }, 0);
+    });
 </script>
 
 <template>
@@ -72,6 +87,9 @@ const handleEditPlayer = (playerID: number) => {
       <span>Total</span>
       <strong>
         {{ props.draftedTeam?.total_team_value }}
+      </strong>
+      <strong v-if="totalPoints">
+        {{ totalPoints }}
       </strong>
     </div>
   </div>

@@ -67,7 +67,11 @@ watch(
         <SkeletonFixture />
       </div>
     </div>
-    <DraftedTeams :drafted-teams="draftedTeamsWithPoints" :show-gameweek-points="true" />
+    <div class="grid grid-cols-4 gap-5">
+      <template v-for="draftedTeam in draftedTeamsWithPoints">
+        <DraftedTeamWithPoints :drafted-team="draftedTeam" />
+      </template>
+    </div>
   </div>
 </template>
 

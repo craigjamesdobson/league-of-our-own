@@ -12,7 +12,7 @@ await draftedTeamsStore.fetchDraftedTeams();
 <template>
   <div>
     <NuxtLayout>
-      <NuxtPage keepalive />
+      <NuxtPage />
     </NuxtLayout>
     <div id="modals" />
   </div>

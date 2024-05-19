@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeam, DraftedTeamWithWeeklyStats } from '~/types/DraftedTeam';
 import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
@@ -33,7 +33,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       .rpc(
         'get_drafted_teams_with_player_points_by_gameweek',
         { game_week_param: selectedGameWeek }
-      ).returns<DraftedTeam[]>()
+      ).returns<DraftedTeamWithWeeklyStats[]>()
     if (error) throw error;
     return data;
   };

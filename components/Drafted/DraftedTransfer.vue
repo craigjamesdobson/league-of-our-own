@@ -1,12 +1,3 @@
-<template>
-  <div class="player-container">
-    <DraftedPlayer
-      :is-transfer="true"
-      :drafted-player="draftedPlayer.transfers.at(-1)"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 
@@ -17,5 +8,8 @@ const { draftedPlayer } = defineProps({
   }
 });
 </script>
-
-<style scoped></style>
+<template>
+  <div class="player-container">
+    <DraftedPlayer :is-transfer="true" :drafted-player="draftedPlayer.transfers.at(-1)" />
+  </div>
+</template>

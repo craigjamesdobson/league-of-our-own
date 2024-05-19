@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import DraftedPlayer from './DraftedPlayer.vue';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeam, WeeklyStats } from '~/types/DraftedTeam';
 import { useFixtureStore } from '~/stores/fixtures';
+import type { DraftedPlayerWithWeeklyStats } from '~/types/DraftedPlayer';
 
 const fixtureStore = useFixtureStore();
 
@@ -10,11 +10,13 @@ const props = defineProps({
     type: Object as PropType<DraftedTeam>,
     default: null
   },
-  editable: {
-    type: Boolean,
-    default: false
-  }
+  activeWeek: {
+    type: Number,
+    required: true,
+  },
 });
+
+const weeklyStats = defineModel<WeeklyStats>('weeklyStats')
 
 const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
@@ -34,17 +36,34 @@ const handleEditPlayer = (playerID: number) => {
   }
 };
 
-const totalPoints = computed(() => {
-      return props.draftedTeam.players.reduce((total, player) => {
-        let currentPlayerPoints = player.points!;
-        player.transfers.forEach(transfer => {
-          if (transfer.transfer_week >= fixtureStore.selectedGameweek) {
-            currentPlayerPoints = transfer.points!;
-          }
-        });
-        return total + currentPlayerPoints;
-      }, 0);
-    });
+const calculatedWeeklyStats = computed(() => {
+  return props.draftedTeam.players.reduce((accumulatedStats, player: DraftedPlayerWithWeeklyStats) => {
+    const currentPlayerPoints = player.transfers.reduce((points, transfer) => {
+      return transfer.transfer_week <= fixtureStore.selectedGameweek ? transfer.points || points : points;
+    }, player.points || 0);
+
+    return {
+      drafted_team_id: props.draftedTeam.drafted_team_id,
+      points: accumulatedStats.points + currentPlayerPoints,
+      goals: accumulatedStats.goals + (player.week_goals || 0),
+      assists: accumulatedStats.assists + (player.week_assists || 0),
+      red_cards: accumulatedStats.red_cards + (player.week_redcards ? 1 : 0),
+      clean_sheets: accumulatedStats.clean_sheets + (player.week_cleansheets ? 1 : 0)
+    };
+  }, {
+    points: 0,
+    goals: 0,
+    assists: 0,
+    red_cards: 0,
+    clean_sheets: 0
+  });
+});
+
+const emit = defineEmits(['calculated-weekly-stats']);
+watch(calculatedWeeklyStats, (newValue) => {
+  emit('calculated-weekly-stats', newValue);
+});
+
 </script>
 
 <template>
@@ -73,26 +92,18 @@ const totalPoints = computed(() => {
         !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry)
     }">
       <div class="flex w-full items-center border-b border-gray-100">
-        <DraftedPlayer v-if="!player.transfers.length" :drafted-player="player" />
-        <DraftedTransfer v-else-if="player.transfers.at(-1) !== null" :drafted-player="player"
-          class="w-full cursor-pointer" @click="handleEditPlayer(player.data.player_id!)" />
-        <Button v-if="props.editable" icon="pi pi-check" aria-label="Edit Player" title="Edit Player" class="mr-2" :pt="{
-          root: { class: 'w-6 h-6' }
-        }" :pt-options="{ mergeProps: true }" @click="handleEditPlayer(player.data.player_id!)">
-          <Icon size="20" name="ic:round-swap-horiz" />
-        </Button>
+        <DraftedPlayerWithPoints v-if="!player.transfers.length" :drafted-player="player" />
+        <DraftedActivePlayer :active-gameweek="activeWeek" v-else-if="player.transfers.at(-1) !== null"
+          :drafted-player="player" class="w-full cursor-pointer" @click="handleEditPlayer(player.data.player_id!)" />
       </div>
     </div>
     <div class="flex justify-between px-2.5 pt-2.5">
       <span>Total</span>
       <strong>
-        {{ props.draftedTeam?.total_team_value }}
-      </strong>
-      <strong v-if="totalPoints">
-        {{ totalPoints }}
+        {{ calculatedWeeklyStats.week_points }}
       </strong>
     </div>
   </div>
   <DraftedPlayerEditDialog v-if="selectedDraftedPlayer" v-model:drafted-player="selectedDraftedPlayer"
-    v-model:visible="showDialog" :editable="props.editable" />
+    v-model:visible="showDialog" />
 </template>

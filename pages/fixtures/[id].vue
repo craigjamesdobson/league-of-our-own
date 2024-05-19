@@ -1,4 +1,9 @@
 <script setup lang="ts">
+
+definePageMeta({
+  keepalive: true
+});
+
 import { useToast } from 'primevue/usetoast';
 import { useFixtureStore } from '~/stores/fixtures';
 import type { Fixture } from '~/types/Fixture';

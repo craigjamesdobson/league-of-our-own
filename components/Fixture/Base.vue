@@ -1,5 +1,5 @@
 <template>
-  <div v-if="fixture" class="my-5 flex items-center justify-center gap-40">
+  <div v-if="fixture" class="my-5 flex items-center justify-evenly">
     <div class="flex flex-col items-center gap-5">
       <img
         class="h-w-16 aspect-square w-16"
@@ -29,5 +29,3 @@ import type { Fixture } from '~/types/Fixture';
 
 const fixture = defineModel<Fixture>('fixture');
 </script>
-
-<style scoped></style>

@@ -43,8 +43,6 @@ export default {
     }),
     header: ({ props }) => ({
         class: [
-            'font-bold',
-
             // Shape
             props.showGridlines ? 'border-x border-t border-b-0' : 'border-y border-x-0',
 
@@ -101,7 +99,7 @@ export default {
     column: {
         headercell: ({ context, props }) => ({
             class: [
-                'font-semibold',
+                'font-black uppercase',
                 'leading-[normal]',
 
                 // Position

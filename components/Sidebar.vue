@@ -19,6 +19,11 @@ const routes = reactive([
     title: 'Rules',
     icon: 'ic:outline-rule',
     path: '/rules'
+  },
+  {
+    title: 'Table',
+    icon: 'gg:list',
+    path: '/table'
   }
 ]);
 </script>

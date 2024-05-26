@@ -94,7 +94,7 @@ const updateWeeklyStats = async () => {
         </div>
       </div>
     </div>
-    <div class="flex gap-5">
+    <div class="flex gap-5 items-start">
       <div v-if="fixtureStore.fixtures" class="flex flex-col gap-2.5 w-1/3">
         <NuxtLink v-for="(fixture, index) in fixtureStore.fixtures" :key="fixture.id" :to="`/fixtures/${fixture.id}`"
           class="bg-surface-50 hover:border-primary rounded-sm border p-5 duration-300 ease-in-out *:transition-all"
@@ -105,15 +105,20 @@ const updateWeeklyStats = async () => {
           <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
         </NuxtLink>
       </div>
-      <div v-else class="my-10 grid gap-10 xl:grid-cols-2">
+      <div v-else class="flex flex-col gap-2.5 w-1/3">
         <div v-for="i in 6" :key="i" class="bg-surface-50 border p-5">
           <SkeletonFixture />
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-5 w-2/3">
+      <div v-if="draftedTeamsWithPoints" class="grid grid-cols-3 gap-5 w-2/3">
         <template v-for="draftedTeam in draftedTeamsWithPoints">
           <DraftedTeamWithPoints :drafted-team="draftedTeam" :active-week="selectedWeek"
             @calculated-weekly-stats="populateWeeklyStats" />
+        </template>
+      </div>
+      <div v-else class="grid grid-cols-3 gap-5 w-2/3">
+        <template v-for="i in 6">
+          <SkeletonDraftedTeam />
         </template>
       </div>
     </div>

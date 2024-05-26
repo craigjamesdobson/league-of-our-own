@@ -14,7 +14,14 @@ await draftedTeamsStore.fetchDraftedTeams();
         </div>
       </div>
     </div>
-    <SkeletonDraftedTeams v-else />
+    <div v-else>
+      <h1 class="main-heading">Loading...</h1>
+      <div class="grid lg:grid-cols-2 xl:grid-cols-4">
+        <div v-for="i in 12" class="m-2">
+          <SkeletonDraftedTeam />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

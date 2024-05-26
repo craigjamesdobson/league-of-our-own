@@ -10,7 +10,11 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
+
 CREATE EXTENSION IF NOT EXISTS "pgsodium" WITH SCHEMA "pgsodium";
+
+COMMENT ON SCHEMA "public" IS 'standard public schema';
 
 CREATE EXTENSION IF NOT EXISTS "moddatetime" WITH SCHEMA "extensions";
 
@@ -79,7 +83,7 @@ BEGIN
                         ),
                         '[]'::json
                     )
-                )
+                ) order by pv.position, pv.player_id
             ) AS players
         FROM
             drafted_teams dt
@@ -99,6 +103,112 @@ BEGIN
 END;$$;
 
 ALTER FUNCTION "public"."get_drafted_teams_and_players"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_drafted_teams_with_player_points_by_gameweek"("game_week_param" integer) RETURNS TABLE("drafted_team_id" integer, "team_name" "text", "team_email" character varying, "team_owner" "text", "allowed_transfers" boolean, "weekly_stats" "json", "players" "json")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  RETURN QUERY
+  WITH filtered_player_statistics AS (
+    SELECT
+      ps.player_id,
+      ps.fixture_id,
+      ps.points,
+      SUM(ps.goals) AS week_goals,
+      SUM(ps.assists) AS week_assists,
+      SUM(CASE WHEN ps.red_card THEN 1 ELSE 0 END) AS week_redcards,
+      SUM(CASE WHEN ps.clean_sheet THEN 1 ELSE 0 END) AS week_cleansheets
+    FROM
+      player_statistics ps
+      JOIN fixtures f ON ps.fixture_id = f.id AND f.game_week = game_week_param
+    GROUP BY
+      ps.player_id, ps.fixture_id, ps.points
+  )
+  SELECT
+    dt.drafted_team_id,
+    dt.team_name,
+    dt.team_email,
+    dt.team_owner,
+    dt.allowed_transfers,
+    json_build_object(
+      'points', 0,
+      'goals', 0,
+      'assists', 0,
+      'red_cards', 0,
+      'clean_sheets', 0
+    ) AS weekly_stats,
+    json_agg(
+      json_build_object(
+        'drafted_player_id',
+        dp.drafted_player_id,
+        'drafted_team',
+        dp.drafted_team,
+        'data',
+        pv.*,
+        'points',
+        COALESCE(fps.points, 0),
+        'week_goals',
+        COALESCE(fps.week_goals, 0),
+        'week_assists',
+        COALESCE(fps.week_assists, 0),
+        'week_redcards',
+        COALESCE(fps.week_redcards, 0),
+        'week_cleansheets',
+        COALESCE(fps.week_cleansheets, 0),
+        'transfers',
+        COALESCE(
+          (
+            SELECT
+              json_agg(
+                json_build_object(
+                  'drafted_transfer_id',
+                  dtf.drafted_transfer_id,
+                  'transfer_week',
+                  dtf.transfer_week,
+                  'active_transfer_expiry',
+                  dtf.active_transfer_expiry,
+                  'points',
+                  COALESCE(tps.points, 0),
+                  'week_goals',
+                  COALESCE(tps.week_goals, 0),
+                  'week_assists',
+                  COALESCE(tps.week_assists, 0),
+                  'week_redcards',
+                  COALESCE(tps.week_redcards, 0),
+                  'week_cleansheets',
+                  COALESCE(tps.week_cleansheets, 0),
+                  'data',
+                  tpv.*
+                )
+              )
+            FROM
+              drafted_transfers dtf
+              JOIN players_view tpv ON dtf.player_id = tpv.player_id
+              LEFT JOIN filtered_player_statistics tps ON tpv.player_id = tps.player_id
+            WHERE
+              dp.drafted_player_id = dtf.drafted_player
+          ),
+          '[]'::json
+        )
+      ) ORDER BY pv.position, pv.player_id
+    ) AS players
+  FROM
+    drafted_teams dt
+    JOIN drafted_players dp ON dt.drafted_team_id = dp.drafted_team
+    JOIN players_view pv ON dp.drafted_player = pv.player_id
+    LEFT JOIN filtered_player_statistics fps ON pv.player_id = fps.player_id
+  GROUP BY
+    dt.drafted_team_id,
+    dt.team_name,
+    dt.team_email,
+    dt.team_owner,
+    dt.allowed_transfers
+  ORDER BY
+    dt.team_name;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_drafted_teams_with_player_points_by_gameweek"("game_week_param" integer) OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "public"."get_player_stats_by_team_id"("team_id_param" integer) RETURNS TABLE("player_id" integer, "number_code" integer, "image" "text", "image_large" "text", "web_name" "text", "first_name" "text", "second_name" "text", "goals_scored" integer, "assists" integer, "clean_sheets" integer, "red_cards" integer, "cost" numeric, "status" "text", "is_unavailable" boolean, "unavailable_for_season" boolean, "news" "text", "position" integer, "team" integer, "team_name" "text", "team_short_name" "text", "minutes" integer, "week_goals" integer, "week_assists" integer, "week_cleansheet" boolean, "week_redcard" boolean)
     LANGUAGE "plpgsql"
@@ -206,6 +316,131 @@ $$;
 
 ALTER FUNCTION "public"."get_player_team"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."get_weekly_stats_for_gameweek"("target_week" integer) RETURNS TABLE("drafted_team_id" integer, "team_name" "text", "team_owner" "text", "goals" integer, "assists" integer, "clean_sheets" integer, "red_cards" integer, "total_points" integer, "week_points" integer, "weekly_winner" boolean, "prev_week_position" bigint)
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+    RETURN QUERY
+    WITH max_points_cte AS (
+        SELECT MAX(total_points_for_week) AS max_points
+        FROM (
+            SELECT SUM(t.points) AS total_points_for_week
+            FROM weekly_statistics t
+            WHERE t.week = target_week
+            GROUP BY t.team
+        ) AS sub_query
+    ), team_points_cte AS (
+        SELECT 
+            dt.drafted_team_id,
+            dt.team_name,
+            dt.team_owner,
+            SUM(t.goals)::INT AS goals, 
+            SUM(t.assists)::INT AS assists, 
+            SUM(t.clean_sheets)::INT AS clean_sheets, 
+            SUM(t.red_cards)::INT AS red_cards, 
+            SUM(t.points)::INT AS total_points_up_to_target_week,
+            SUM(CASE WHEN t.week = target_week THEN t.points ELSE 0 END)::INT AS week_points
+        FROM 
+            weekly_statistics t
+        JOIN 
+            drafted_teams dt ON t.team = dt.drafted_team_id
+        WHERE 
+            t.week <= target_week
+        GROUP BY 
+            dt.drafted_team_id
+    ), prev_week_ranking AS (
+        SELECT 
+            dt.drafted_team_id,
+            ROW_NUMBER() OVER (ORDER BY SUM(t.points) DESC, SUM(t.goals) DESC) AS prev_week_position
+        FROM 
+            weekly_statistics t
+        JOIN 
+            drafted_teams dt ON t.team = dt.drafted_team_id
+        WHERE 
+            t.week <= (target_week - 1)
+        GROUP BY 
+            dt.drafted_team_id
+    )
+    SELECT 
+        tp.drafted_team_id,
+        tp.team_name,
+        tp.team_owner,
+        tp.goals, 
+        tp.assists, 
+        tp.clean_sheets, 
+        tp.red_cards, 
+        tp.total_points_up_to_target_week AS total_points,
+        tp.week_points,
+        CASE 
+            WHEN tp.week_points = mp.max_points THEN true 
+            ELSE false 
+        END AS weekly_winner,
+        COALESCE(pwr.prev_week_position, 0) AS prev_week_position
+    FROM 
+        team_points_cte tp
+    CROSS JOIN 
+        max_points_cte mp
+    LEFT JOIN 
+        prev_week_ranking pwr ON tp.drafted_team_id = pwr.drafted_team_id
+    ORDER BY 
+        tp.total_points_up_to_target_week DESC, tp.goals DESC;
+END;
+$$;
+
+ALTER FUNCTION "public"."get_weekly_stats_for_gameweek"("target_week" integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."get_weekly_winners"() RETURNS TABLE("week" integer, "top_teams" "json"[], "points" integer)
+    LANGUAGE "plpgsql"
+    AS $$BEGIN
+    RETURN QUERY
+    WITH all_weeks AS (
+        SELECT generate_series(1, 38) AS week
+    ),
+    max_points AS (
+        SELECT
+            ws.week,
+            MAX(ws.points) AS max_points
+        FROM
+            weekly_statistics ws
+        GROUP BY
+            ws.week
+    ),
+    top_teams AS (
+        SELECT
+            ws.week,
+            dt.team_name,
+            dt.team_owner,
+            ws.points
+        FROM
+            weekly_statistics ws
+        JOIN drafted_teams dt ON ws.team = dt.drafted_team_id
+        JOIN max_points mp ON ws.week = mp.week AND ws.points = mp.max_points
+    )
+    SELECT
+        aw.week,
+        array_agg(
+            json_build_object(
+                'team_name',
+                tt.team_name,
+                'team_owner',
+                tt.team_owner
+            )
+        ) AS top_teams,
+        mp.max_points AS points
+    FROM
+        all_weeks aw
+    LEFT JOIN top_teams tt ON aw.week = tt.week
+    LEFT JOIN max_points mp ON aw.week = mp.week
+    GROUP BY
+        aw.week,
+        mp.max_points
+    ORDER BY
+        aw.week;
+
+END;$$;
+
+ALTER FUNCTION "public"."get_weekly_winners"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -246,6 +481,112 @@ CREATE OR REPLACE FUNCTION "public"."set_author"() RETURNS "trigger"
 END;$$;
 
 ALTER FUNCTION "public"."set_author"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "public"."your_function_name"("game_week_param" integer) RETURNS TABLE("drafted_team_id" integer, "team_name" "text", "team_email" "text", "team_owner" "text", "allowed_transfers" boolean, "weekly_stats" "json", "players" "json")
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+  RETURN QUERY
+  WITH filtered_player_statistics AS (
+    SELECT
+      ps.player_id,
+      ps.fixture_id,
+      ps.points,
+      SUM(ps.goals) AS week_goals,
+      SUM(ps.assists) AS week_assists,
+      SUM(CASE WHEN ps.red_card THEN 1 ELSE 0 END) AS week_redcards,
+      SUM(CASE WHEN ps.clean_sheet THEN 1 ELSE 0 END) AS week_cleansheets
+    FROM
+      player_statistics ps
+      JOIN fixtures f ON ps.fixture_id = f.id AND f.game_week = game_week_param
+    GROUP BY
+      ps.player_id, ps.fixture_id, ps.points
+  )
+  SELECT
+    dt.drafted_team_id,
+    dt.team_name,
+    dt.team_email,
+    dt.team_owner,
+    dt.allowed_transfers,
+    json_build_object(
+      'points', 0,
+      'goals', 0,
+      'assists', 0,
+      'red_cards', 0,
+      'clean_sheets', 0
+    ) AS weekly_stats,
+    json_agg(
+      json_build_object(
+        'drafted_player_id',
+        dp.drafted_player_id,
+        'drafted_team',
+        dp.drafted_team,
+        'data',
+        pv.*,
+        'points',
+        COALESCE(fps.points, 0),
+        'week_goals',
+        COALESCE(fps.week_goals, 0),
+        'week_assists',
+        COALESCE(fps.week_assists, 0),
+        'week_redcards',
+        COALESCE(fps.week_redcards, 0),
+        'week_cleansheets',
+        COALESCE(fps.week_cleansheets, 0),
+        'transfers',
+        COALESCE(
+          (
+            SELECT
+              json_agg(
+                json_build_object(
+                  'drafted_transfer_id',
+                  dtf.drafted_transfer_id,
+                  'transfer_week',
+                  dtf.transfer_week,
+                  'active_transfer_expiry',
+                  dtf.active_transfer_expiry,
+                  'points',
+                  COALESCE(tps.points, 0),
+                  'week_goals',
+                  COALESCE(tps.week_goals, 0),
+                  'week_assists',
+                  COALESCE(tps.week_assists, 0),
+                  'week_redcards',
+                  COALESCE(tps.week_redcards, 0),
+                  'week_cleansheets',
+                  COALESCE(tps.week_cleansheets, 0),
+                  'data',
+                  tpv.*
+                )
+              )
+            FROM
+              drafted_transfers dtf
+              JOIN players_view tpv ON dtf.player_id = tpv.player_id
+              LEFT JOIN filtered_player_statistics tps ON tpv.player_id = tps.player_id
+            WHERE
+              dp.drafted_player_id = dtf.drafted_player
+          ),
+          '[]'::json
+        )
+      ) ORDER BY pv.position, pv.player_id
+    ) AS players
+  FROM
+    drafted_teams dt
+    JOIN drafted_players dp ON dt.drafted_team_id = dp.drafted_team
+    JOIN players_view pv ON dp.drafted_player = pv.player_id
+    LEFT JOIN filtered_player_statistics fps ON pv.player_id = fps.player_id
+  GROUP BY
+    dt.drafted_team_id,
+    dt.team_name,
+    dt.team_email,
+    dt.team_owner,
+    dt.allowed_transfers
+  ORDER BY
+    dt.team_name;
+END;
+$$;
+
+ALTER FUNCTION "public"."your_function_name"("game_week_param" integer) OWNER TO "postgres";
 
 SET default_tablespace = '';
 
@@ -334,6 +675,51 @@ ALTER TABLE "public"."drafted_transfers" OWNER TO "postgres";
 
 ALTER TABLE "public"."drafted_transfers" ALTER COLUMN "drafted_transfer_id" ADD GENERATED BY DEFAULT AS IDENTITY (
     SEQUENCE NAME "public"."drafted_transfers_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE IF NOT EXISTS "public"."fixtures" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "game_week" integer,
+    "home_team" integer,
+    "away_team" integer,
+    "home_team_score" integer NOT NULL,
+    "away_team_score" integer NOT NULL
+);
+
+ALTER TABLE "public"."fixtures" OWNER TO "postgres";
+
+ALTER TABLE "public"."fixtures" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."fixtures_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+CREATE TABLE IF NOT EXISTS "public"."player_statistics" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "player_id" integer NOT NULL,
+    "fixture_id" bigint NOT NULL,
+    "goals" integer,
+    "assists" integer,
+    "red_card" boolean,
+    "clean_sheet" boolean,
+    "author" "uuid" DEFAULT "auth"."uid"(),
+    "points" integer NOT NULL
+);
+
+ALTER TABLE "public"."player_statistics" OWNER TO "postgres";
+
+ALTER TABLE "public"."player_statistics" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."player_statistics_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -511,6 +897,29 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
+CREATE TABLE IF NOT EXISTS "public"."weekly_statistics" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "team" integer,
+    "goals" integer,
+    "assists" integer,
+    "clean_sheets" integer,
+    "red_cards" integer,
+    "week" integer NOT NULL,
+    "points" integer NOT NULL
+);
+
+ALTER TABLE "public"."weekly_statistics" OWNER TO "postgres";
+
+ALTER TABLE "public"."weekly_statistics" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."weekly_statistics_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 ALTER TABLE ONLY "public"."drafted_teams" ALTER COLUMN "drafted_team_id" SET DEFAULT "nextval"('"public"."drafted_teams_team_id_seq"'::"regclass");
 
 ALTER TABLE ONLY "public"."drafted_players_pending"
@@ -534,6 +943,12 @@ ALTER TABLE ONLY "public"."drafted_teams"
 ALTER TABLE ONLY "public"."drafted_transfers"
     ADD CONSTRAINT "drafted_transfers_pkey" PRIMARY KEY ("drafted_transfer_id");
 
+ALTER TABLE ONLY "public"."fixtures"
+    ADD CONSTRAINT "fixtures_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."player_statistics"
+    ADD CONSTRAINT "player_statistics_pkey" PRIMARY KEY ("id");
+
 ALTER TABLE ONLY "public"."players"
     ADD CONSTRAINT "players_pkey" PRIMARY KEY ("player_id");
 
@@ -545,6 +960,9 @@ ALTER TABLE ONLY "public"."profiles"
 
 ALTER TABLE ONLY "public"."teams"
     ADD CONSTRAINT "teams_pkey" PRIMARY KEY ("id");
+
+ALTER TABLE ONLY "public"."weekly_statistics"
+    ADD CONSTRAINT "weekly_statistics_pkey" PRIMARY KEY ("id");
 
 CREATE OR REPLACE TRIGGER "handle_updated_at" BEFORE UPDATE ON "public"."players" FOR EACH ROW EXECUTE FUNCTION "extensions"."moddatetime"('updated_at');
 
@@ -572,6 +990,24 @@ ALTER TABLE ONLY "public"."players"
 ALTER TABLE ONLY "public"."profiles"
     ADD CONSTRAINT "profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
+ALTER TABLE ONLY "public"."fixtures"
+    ADD CONSTRAINT "public_fixtures_away_team_fkey" FOREIGN KEY ("away_team") REFERENCES "public"."teams"("id");
+
+ALTER TABLE ONLY "public"."fixtures"
+    ADD CONSTRAINT "public_fixtures_home_team_fkey" FOREIGN KEY ("home_team") REFERENCES "public"."teams"("id");
+
+ALTER TABLE ONLY "public"."player_statistics"
+    ADD CONSTRAINT "public_player_statistics_author_fkey" FOREIGN KEY ("author") REFERENCES "auth"."users"("id");
+
+ALTER TABLE ONLY "public"."player_statistics"
+    ADD CONSTRAINT "public_player_statistics_fixture_id_fkey" FOREIGN KEY ("fixture_id") REFERENCES "public"."fixtures"("id");
+
+ALTER TABLE ONLY "public"."player_statistics"
+    ADD CONSTRAINT "public_player_statistics_player_id_fkey" FOREIGN KEY ("player_id") REFERENCES "public"."players"("player_id");
+
+ALTER TABLE ONLY "public"."weekly_statistics"
+    ADD CONSTRAINT "public_weekly_statistics_team_fkey" FOREIGN KEY ("team") REFERENCES "public"."drafted_teams"("drafted_team_id");
+
 CREATE POLICY "Allow all access to authenticated user" ON "public"."drafted_transfers" TO "authenticated" USING (true);
 
 CREATE POLICY "Allow auth users access to all" ON "public"."players" TO "authenticated" USING (true);
@@ -594,6 +1030,10 @@ CREATE POLICY "Users can insert their own profile." ON "public"."profiles" FOR I
 
 CREATE POLICY "Users can update own profile." ON "public"."profiles" FOR UPDATE USING (("auth"."uid"() = "id"));
 
+CREATE POLICY "all all access for auithenticated" ON "public"."player_statistics" TO "authenticated" USING (true);
+
+CREATE POLICY "allow all access for authenticated" ON "public"."fixtures" TO "authenticated" USING (true);
+
 CREATE POLICY "allow_read_access_to_all" ON "public"."teams" FOR SELECT USING (true);
 
 ALTER TABLE "public"."drafted_players" ENABLE ROW LEVEL SECURITY;
@@ -607,6 +1047,10 @@ ALTER TABLE "public"."drafted_teams_pending" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."drafted_transfers" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "enable read access" ON "public"."drafted_players_pending" FOR SELECT USING (true);
+
+ALTER TABLE "public"."fixtures" ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE "public"."player_statistics" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."players" ENABLE ROW LEVEL SECURITY;
 
@@ -630,6 +1074,10 @@ GRANT ALL ON FUNCTION "public"."get_drafted_teams_and_players"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_drafted_teams_and_players"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_drafted_teams_and_players"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."get_drafted_teams_with_player_points_by_gameweek"("game_week_param" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_drafted_teams_with_player_points_by_gameweek"("game_week_param" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_drafted_teams_with_player_points_by_gameweek"("game_week_param" integer) TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."get_player_stats_by_team_id"("team_id_param" integer) TO "anon";
 GRANT ALL ON FUNCTION "public"."get_player_stats_by_team_id"("team_id_param" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_player_stats_by_team_id"("team_id_param" integer) TO "service_role";
@@ -642,6 +1090,14 @@ GRANT ALL ON FUNCTION "public"."get_player_team"() TO "anon";
 GRANT ALL ON FUNCTION "public"."get_player_team"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_player_team"() TO "service_role";
 
+GRANT ALL ON FUNCTION "public"."get_weekly_stats_for_gameweek"("target_week" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."get_weekly_stats_for_gameweek"("target_week" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_weekly_stats_for_gameweek"("target_week" integer) TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."get_weekly_winners"() TO "anon";
+GRANT ALL ON FUNCTION "public"."get_weekly_winners"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."get_weekly_winners"() TO "service_role";
+
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
@@ -653,6 +1109,10 @@ GRANT ALL ON FUNCTION "public"."insert_or_update_data"("id_field" integer, "othe
 GRANT ALL ON FUNCTION "public"."set_author"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_author"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_author"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."your_function_name"("game_week_param" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."your_function_name"("game_week_param" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."your_function_name"("game_week_param" integer) TO "service_role";
 
 GRANT ALL ON TABLE "public"."drafted_players" TO "anon";
 GRANT ALL ON TABLE "public"."drafted_players" TO "authenticated";
@@ -690,6 +1150,22 @@ GRANT ALL ON SEQUENCE "public"."drafted_transfers_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."drafted_transfers_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."drafted_transfers_id_seq" TO "service_role";
 
+GRANT ALL ON TABLE "public"."fixtures" TO "anon";
+GRANT ALL ON TABLE "public"."fixtures" TO "authenticated";
+GRANT ALL ON TABLE "public"."fixtures" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."fixtures_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."fixtures_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."fixtures_id_seq" TO "service_role";
+
+GRANT ALL ON TABLE "public"."player_statistics" TO "anon";
+GRANT ALL ON TABLE "public"."player_statistics" TO "authenticated";
+GRANT ALL ON TABLE "public"."player_statistics" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."player_statistics_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."player_statistics_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."player_statistics_id_seq" TO "service_role";
+
 GRANT ALL ON TABLE "public"."players" TO "anon";
 GRANT ALL ON TABLE "public"."players" TO "authenticated";
 GRANT ALL ON TABLE "public"."players" TO "service_role";
@@ -705,6 +1181,14 @@ GRANT ALL ON TABLE "public"."players_view" TO "service_role";
 GRANT ALL ON TABLE "public"."profiles" TO "anon";
 GRANT ALL ON TABLE "public"."profiles" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles" TO "service_role";
+
+GRANT ALL ON TABLE "public"."weekly_statistics" TO "anon";
+GRANT ALL ON TABLE "public"."weekly_statistics" TO "authenticated";
+GRANT ALL ON TABLE "public"."weekly_statistics" TO "service_role";
+
+GRANT ALL ON SEQUENCE "public"."weekly_statistics_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."weekly_statistics_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."weekly_statistics_id_seq" TO "service_role";
 
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "anon";
@@ -722,3 +1206,8 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
 
 RESET ALL;
+
+--
+-- Dumped schema changes for auth and storage
+--
+

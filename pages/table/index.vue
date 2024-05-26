@@ -45,7 +45,7 @@ watch(selectedWeek, async (newWeek) => {
                     </div>
                 </div>
             </div>
-            <DataTable stripedRows :value="tableStore.weeklyData">
+            <DataTable v-if="tableStore.weeklyData" stripedRows :value="tableStore.weeklyData">
                 <Column field="index">
                     <template #header="">
                         <div v-tooltip.click.top="'Current Position'">Pos.</div>
@@ -111,6 +111,7 @@ watch(selectedWeek, async (newWeek) => {
                     </template>
                 </Column>
             </DataTable>
+            <SkeletonTable v-else />
         </div>
         <div class="flex flex-col gap-2.5 col-span-2">
             <WeeklyWinners />

@@ -1,7 +1,6 @@
 <template>
-  <h1 class="main-heading">Loading...</h1>
-  <div class="mt-5 grid gap-5 p-5 lg:grid-cols-2 xl:grid-cols-4">
-    <div v-for="i in 8" :key="i" class="mb-5 flex flex-col gap-5 px-5">
+  <div class="rounded-sm bg-white p-4">
+    <div class="flex flex-col gap-5 px-5">
       <SkeletonLoader class="h-5 w-32" />
       <SkeletonLoader class="h-5 w-20" />
       <hr />

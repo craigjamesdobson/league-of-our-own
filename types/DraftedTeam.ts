@@ -12,6 +12,7 @@ interface DraftedTeam {
 }
 
 interface WeeklyStats {
+  drafted_team_id: number;
   points: number;
   goals: number;
   assists: number;

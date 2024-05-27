@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       drafted_players: {
@@ -57,18 +32,21 @@ export type Database = {
           {
             foreignKeyName: "drafted_players_drafted_player_fkey"
             columns: ["drafted_player"]
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "drafted_players_drafted_player_fkey"
             columns: ["drafted_player"]
+            isOneToOne: false
             referencedRelation: "players_view"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "drafted_players_drafted_team_fkey"
             columns: ["drafted_team"]
+            isOneToOne: false
             referencedRelation: "drafted_teams"
             referencedColumns: ["drafted_team_id"]
           },
@@ -97,18 +75,21 @@ export type Database = {
           {
             foreignKeyName: "drafted_players_pending_drafted_player_fkey"
             columns: ["drafted_player"]
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "drafted_players_pending_drafted_player_fkey"
             columns: ["drafted_player"]
+            isOneToOne: false
             referencedRelation: "players_view"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "drafted_players_pending_drafted_team_fkey"
             columns: ["drafted_team"]
+            isOneToOne: false
             referencedRelation: "drafted_teams_pending"
             referencedColumns: ["drafted_team_id"]
           },
@@ -197,18 +178,21 @@ export type Database = {
           {
             foreignKeyName: "drafted_transfers_drafted_player_fkey"
             columns: ["drafted_player"]
+            isOneToOne: false
             referencedRelation: "drafted_players"
             referencedColumns: ["drafted_player_id"]
           },
           {
             foreignKeyName: "drafted_transfers_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "drafted_transfers_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "players_view"
             referencedColumns: ["player_id"]
           },
@@ -217,41 +201,43 @@ export type Database = {
       fixtures: {
         Row: {
           away_team: number | null
-          away_team_score: number
+          away_team_score: number | null
           created_at: string
           game_week: number | null
           home_team: number | null
-          home_team_score: number
+          home_team_score: number | null
           id: number
         }
         Insert: {
           away_team?: number | null
-          away_team_score: number
+          away_team_score?: number | null
           created_at?: string
           game_week?: number | null
           home_team?: number | null
-          home_team_score: number
+          home_team_score?: number | null
           id?: number
         }
         Update: {
           away_team?: number | null
-          away_team_score?: number
+          away_team_score?: number | null
           created_at?: string
           game_week?: number | null
           home_team?: number | null
-          home_team_score?: number
+          home_team_score?: number | null
           id?: number
         }
         Relationships: [
           {
             foreignKeyName: "public_fixtures_away_team_fkey"
             columns: ["away_team"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_fixtures_home_team_fkey"
             columns: ["home_team"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -298,24 +284,28 @@ export type Database = {
           {
             foreignKeyName: "public_player_statistics_author_fkey"
             columns: ["author"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_player_statistics_fixture_id_fkey"
             columns: ["fixture_id"]
+            isOneToOne: false
             referencedRelation: "fixtures"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "public_player_statistics_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "players"
             referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "public_player_statistics_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "players_view"
             referencedColumns: ["player_id"]
           },
@@ -602,6 +592,7 @@ export type Database = {
           {
             foreignKeyName: "players_team_fkey"
             columns: ["team"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -636,6 +627,7 @@ export type Database = {
           {
             foreignKeyName: "profiles_id_fkey"
             columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -713,6 +705,50 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_statistics: {
+        Row: {
+          assists: number | null
+          clean_sheets: number | null
+          created_at: string
+          goals: number | null
+          id: number
+          points: number
+          red_cards: number | null
+          team: number | null
+          week: number
+        }
+        Insert: {
+          assists?: number | null
+          clean_sheets?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: number
+          points: number
+          red_cards?: number | null
+          team?: number | null
+          week: number
+        }
+        Update: {
+          assists?: number | null
+          clean_sheets?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: number
+          points?: number
+          red_cards?: number | null
+          team?: number | null
+          week?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_weekly_statistics_team_fkey"
+            columns: ["team"]
+            isOneToOne: false
+            referencedRelation: "drafted_teams"
+            referencedColumns: ["drafted_team_id"]
+          },
+        ]
+      }
     }
     Views: {
       players_view: {
@@ -743,6 +779,7 @@ export type Database = {
           {
             foreignKeyName: "players_team_fkey"
             columns: ["team"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -764,6 +801,7 @@ export type Database = {
           team_email: string
           team_owner: string
           allowed_transfers: boolean
+          weekly_stats: Json
           players: Json
         }[]
       }
@@ -840,313 +878,38 @@ export type Database = {
           team_id: number
         }[]
       }
+      get_weekly_stats_for_gameweek: {
+        Args: {
+          target_week: number
+        }
+        Returns: {
+          drafted_team_id: number
+          team_name: string
+          team_owner: string
+          goals: number
+          assists: number
+          clean_sheets: number
+          red_cards: number
+          total_points: number
+          week_points: number
+          weekly_winner: boolean
+          prev_week_position: number
+        }[]
+      }
+      get_weekly_winners: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          week: number
+          top_teams: Json[]
+          points: number
+        }[]
+      }
       insert_or_update_data: {
         Args: {
           id_field: number
           other_field: string
         }
         Returns: undefined
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
-            referencedRelation: "s3_multipart_uploads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
-        Returns: undefined
-      }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: string[]
-      }
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
-      }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-        }
-        Returns: {
-          key: string
-          id: string
-          created_at: string
-        }[]
-      }
-      list_objects_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          start_after?: string
-          next_token?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          metadata: Json
-          updated_at: string
-        }[]
-      }
-      search: {
-        Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
       }
     }
     Enums: {

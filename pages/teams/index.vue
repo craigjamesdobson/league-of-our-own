@@ -18,7 +18,7 @@ await draftedTeamsStore.fetchDraftedTeams();
       <h1 class="main-heading">Loading...</h1>
       <div class="grid lg:grid-cols-2 xl:grid-cols-4">
         <div v-for="i in 12" class="m-2">
-          <SkeletonDraftedTeam />
+          <SkeletonDraftedTeam :key="i" />
         </div>
       </div>
     </div>

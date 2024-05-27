@@ -62,9 +62,9 @@ const handleEditPlayer = (playerID: number) => {
         <DraftedTransfer v-else-if="player.transfers.at(-1) !== null" :drafted-player="player"
           class="w-full cursor-pointer" @click="handleEditPlayer(player.data.player_id!)" />
         <Button v-if="props.editable" icon="pi pi-check" aria-label="Edit Player" title="Edit Player" class="mr-2" :pt="{
-          root: { class: 'w-6 h-6' }
+          root: { class: 'w-6 h-6 text-white !p-1' }
         }" :pt-options="{ mergeProps: true }" @click="handleEditPlayer(player.data.player_id!)">
-          <Icon size="20" name="ic:round-swap-horiz" />
+          <Icon class="text-white" size="20" name="tabler:switch-3" />
         </Button>
       </div>
     </div>

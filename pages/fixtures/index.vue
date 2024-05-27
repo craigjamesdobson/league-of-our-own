@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
+import { useToast } from 'primevue/usetoast';
 import { useFixtureStore } from '~/stores/fixtures';
 import type { DraftedTeamWithWeeklyStats, WeeklyStats } from '~/types/DraftedTeam';
-const supabase = useSupabaseClient();
 
+const supabase = useSupabaseClient();
+const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
 const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
 const selectedWeek = ref(+route.query.week || 1);
-
 
 const draftedTeamsStore = useDraftedTeamsStore();
 const draftedTeamsWithPoints: Ref<DraftedTeamWithWeeklyStats[] | undefined> = ref()
@@ -55,9 +56,9 @@ const updateWeeklyStats = async () => {
   }))
 
   const { error: deleteError } = await supabase
-  .from('weekly_statistics')
-  .delete()
-  .eq('week', selectedWeek.value)
+    .from('weekly_statistics')
+    .delete()
+    .eq('week', selectedWeek.value)
 
   if (deleteError) throw new Error('Failed to update this gameweek')
 
@@ -67,12 +68,33 @@ const updateWeeklyStats = async () => {
     .select();
 
 
-  console.log(draftedTeamsWithPoints.value?.map(x => x.weekly_stats))
+  handleApiSuccess(`Week ${selectedWeek.value} has been updated`, toast);
 }
+
+// const gameweekStatus = computed(() => {
+//   switch (true) {
+//     case fixtureStore.fixtures?.some(fixture => fixture.home_team_score !== null || fixture.away_team_score !== null):
+//       return {
+//         status: 'in-progress',
+//         statusText: 'In Progress'
+//       };
+//     case fixtureStore.fixtures?.every(fixture => fixture.home_team_score !== null && fixture.away_team_score !== null):
+//       return {
+//         status: 'complete',
+//         statusText: 'Complete'
+//       };
+//     default:
+//       return {
+//         status: 'not-started',
+//         statusText: 'Not Started'
+//       };
+//   }
+// });
 </script>
 
 <template>
   <div>
+    <Toast />
     <div class="flex justify-between">
       <h1 class="text-2xl font-black uppercase">Fixtures</h1>
       <div class="flex flex-col gap-2.5 mb-5 items-end">

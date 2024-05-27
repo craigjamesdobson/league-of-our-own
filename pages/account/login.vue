@@ -28,6 +28,7 @@ const handleUserLogin = async () => {
         <GenericFormField
           v-model="formData.email"
           label="Email"
+          type="text"
           :validation="v$.email"
           icon="material-symbols:alternate-email"
           @keydown.enter="handleUserLogin"
@@ -35,6 +36,7 @@ const handleUserLogin = async () => {
         <GenericFormField
           v-model="formData.password"
           label="Password"
+          type="password"
           :validation="v$.password"
           icon="mdi:password-outline"
           @keydown.enter="handleUserLogin"

@@ -52,8 +52,7 @@ export default {
     text: {
         class: [
             // Font and Text
-            'text-base leading-[normal]',
-            'font-medium'
+            'text-sm leading-[normal]',
         ]
     },
     button: ({ props }) => ({

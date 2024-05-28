@@ -91,7 +91,7 @@ const transfersMadeCount = (team: DraftedTeam) => {
             option-label="team_name"
             option-value="drafted_team_id"
             placeholder="Select a team"
-            scroll-height="400"
+            scroll-height="400px"
           >
             <template #option="slotProps">
               <div
@@ -108,6 +108,7 @@ const transfersMadeCount = (team: DraftedTeam) => {
                 </div>
                 <Tag
                   severity="info"
+                  class="w-6 h-6"
                   rounded
                   title="transfers made"
                   :value="transfersMadeCount(slotProps.option)"

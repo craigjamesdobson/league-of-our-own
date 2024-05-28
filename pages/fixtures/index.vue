@@ -28,6 +28,7 @@ watch(
   selectedWeek,
   async (newWeek) => {
     await fixtureStore.fetchFixtures(newWeek);
+    draftedTeamsWithPoints.value = undefined;
     draftedTeamsWithPoints.value = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(newWeek)
     fixtureStore.selectedGameweek = newWeek;
     await router.push({

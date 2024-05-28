@@ -185,7 +185,7 @@ export default {
     header: {
         class: [
             // Spacing
-            'pt-2 px-2 pb-0',
+            'py-2 px-2',
             'm-0',
 
             //Shape

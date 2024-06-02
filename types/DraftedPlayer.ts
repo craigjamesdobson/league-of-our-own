@@ -6,12 +6,14 @@ interface DraftedTransfer {
   transfer_week: number;
   data: Tables<'players_view'>;
   points?: number;
+  selected: boolean;
 }
 
 interface DraftedPlayer {
   drafted_player_id: number;
   transfers: DraftedTransfer[];
   data: Tables<'players_view'>;
+  selected: boolean;
 }
 
 interface DraftedPlayerWithWeeklyStats extends DraftedPlayer {

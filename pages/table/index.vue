@@ -59,7 +59,7 @@ watch(selectedWeek, async (newWeek) => {
                         <div v-tooltip.top="'Previous Position'">Prv Pos.</div>
                     </template>
                     <template #body="slotProps">
-                        <div class="grid grid-cols-[35px_auto]">
+                        <div v-if="!!slotProps.data.prev_week_position" class="grid grid-cols-[35px_auto]">
                             <div>{{ slotProps.data.prev_week_position }}</div>
                             <div v-if="slotProps.data.prev_week_position < slotProps.index + 1">
                                 <Icon size="16" class="text-red-500" name="flowbite:caret-down-solid" />
@@ -71,6 +71,7 @@ watch(selectedWeek, async (newWeek) => {
                                 <Icon size="20" class="text-primary" name="radix-icons:dot-filled" />
                             </div>
                         </div>
+                        <div v-else>N/A</div>
                     </template>
                 </Column>
                 <Column field="team_name" header="Team">

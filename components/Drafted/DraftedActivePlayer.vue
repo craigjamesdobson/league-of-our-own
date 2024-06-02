@@ -12,8 +12,6 @@ const props = defineProps({
   }
 });
 
-
-
 const findActiveGameweekPlayer = computed(() => {
   const player = props.draftedPlayer;
 
@@ -23,8 +21,6 @@ const findActiveGameweekPlayer = computed(() => {
     return player
   }
 });
-
-
 </script>
 <template>
   <div class="player-container">

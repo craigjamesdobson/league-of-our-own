@@ -16,8 +16,6 @@ const props = defineProps({
   },
 });
 
-const weeklyStats = defineModel<WeeklyStats>('weeklyStats')
-
 const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
 };
@@ -38,9 +36,17 @@ const handleEditPlayer = (playerID: number) => {
 
 const calculatedWeeklyStats = computed(() => {
   return props.draftedTeam.players.reduce((accumulatedStats, player: DraftedPlayerWithWeeklyStats) => {
-    const currentPlayerPoints = player.transfers.reduce((points, transfer) => {
-      return transfer.transfer_week <= fixtureStore.selectedGameweek ? transfer.points || points : points;
-    }, player.points || 0);
+    // Check if player or any transfer has selected: true
+    const selectedTransfer = player.selected 
+      ? player 
+      : player.transfers.find(transfer => transfer.selected);
+
+    // Calculate points based on the selected transfer or the usual logic
+    const currentPlayerPoints = selectedTransfer 
+      ? selectedTransfer.points || 0
+      : player.transfers.reduce((points, transfer) => {
+          return transfer.transfer_week <= fixtureStore.selectedGameweek ? transfer.points || points : points;
+        }, player.points || 0);
 
     return {
       drafted_team_id: props.draftedTeam.drafted_team_id,
@@ -58,6 +64,7 @@ const calculatedWeeklyStats = computed(() => {
     clean_sheets: 0
   });
 });
+
 
 const emit = defineEmits(['calculated-weekly-stats']);
 watch(calculatedWeeklyStats, (newValue) => {
@@ -104,6 +111,6 @@ watch(calculatedWeeklyStats, (newValue) => {
       </strong>
     </div>
   </div>
-  <DraftedPlayerEditDialog v-if="selectedDraftedPlayer" v-model:drafted-player="selectedDraftedPlayer"
+  <DraftedTransferSelectionDialog v-if="selectedDraftedPlayer" v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog" />
 </template>

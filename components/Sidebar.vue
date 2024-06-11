@@ -5,34 +5,28 @@ const accountStore = useAccountStore();
 
 const routes = reactive([
   {
-    title: 'Dashboard',
-    icon: 'material-symbols:home-outline-rounded',
-    path: '/',
-    admin: false,
-  },
-  {
     title: 'Players',
     icon: 'material-symbols:list-alt-outline-rounded',
     path: '/players',
-    admin: false,
+    admin: false
   },
   {
     title: 'Teams',
     icon: 'fluent:people-team-24-regular',
     path: '/teams',
-    admin: false,
+    admin: false
   },
   {
     title: 'Rules',
     icon: 'ic:outline-rule',
     path: '/rules',
-    admin: false,
+    admin: false
   },
   {
     title: 'Table',
     icon: 'gg:list',
     path: '/table',
-    admin: false,
+    admin: false
   }
 ]);
 </script>
@@ -43,10 +37,10 @@ const routes = reactive([
   >
     <!-- SideNavBar -->
 
-    <div class="flex items-center rounded-full">
+    <nuxt-link to="/" class="flex items-center rounded-full">
       <!-- Header -->
-      <Icon class="text-slate-100" size="48" name="carbon:soccer" />
-    </div>
+      <Icon class="text-slate-100" size="32" name="carbon:soccer" />
+    </nuxt-link>
 
     <div>
       <ul class="flex gap-4 xl:flex-col">
@@ -54,7 +48,7 @@ const routes = reactive([
         <li v-for="route in routes" :key="route.title">
           <nuxt-link
             :to="route.path"
-            class="text-slate-100 border-slate-100 hover:bg-slate-100 hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border text-base transition duration-300 ease-in-out xl:mb-8"
+            class="logo hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-slate-100 lg:border xl:mb-8"
           >
             <Icon size="24" :name="route.icon" />
             <span class="ml-4 hidden capitalize">{{ route.name }}</span>
@@ -63,9 +57,12 @@ const routes = reactive([
         <li v-if="accountStore.userIsLoggedIn">
           <nuxt-link
             to="/fixtures"
-            class="text-slate-100 border-slate-100 hover:bg-slate-100 hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border text-base transition duration-300 ease-in-out xl:mb-8"
+            class="hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl text-base text-slate-100 transition duration-300 ease-in-out hover:bg-slate-100 lg:border lg:border-slate-100 xl:mb-8"
           >
-            <Icon size="24" name="fluent:text-bullet-list-square-edit-20-regular" />
+            <Icon
+              size="24"
+              name="fluent:text-bullet-list-square-edit-20-regular"
+            />
             <span class="ml-4 hidden capitalize">Fixtures</span>
           </nuxt-link>
         </li>
@@ -74,7 +71,7 @@ const routes = reactive([
 
     <nuxt-link
       to="/account"
-      class="text-slate-100 border-slate-100 hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-full border text-base transition duration-300 ease-in-out hover:bg-white"
+      class="hover:text-primary flex h-8 w-8 flex-col items-center justify-center rounded-full border border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-white lg:h-10 lg:w-10"
     >
       <Icon name="uil:setting" />
     </nuxt-link>
@@ -82,7 +79,7 @@ const routes = reactive([
 </template>
 
 <style scoped>
-.router-link-exact-active {
-  @apply bg-slate-100 text-primary;
+.router-link-exact-active:not('.logo') {
+  @apply text-primary bg-slate-100;
 }
 </style>

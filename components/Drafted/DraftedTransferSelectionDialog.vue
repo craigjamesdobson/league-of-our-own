@@ -6,9 +6,11 @@ const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
 
 const activeTransferPlayer = ref();
 
-const changeActivePlayer = (playerTransfer: DraftedPlayer | DraftedTransfer) => {
+const changeActivePlayer = (
+  playerTransfer: DraftedPlayer | DraftedTransfer
+) => {
   playerTransfer.selected = true;
-}
+};
 </script>
 
 <template>
@@ -18,25 +20,44 @@ const changeActivePlayer = (playerTransfer: DraftedPlayer | DraftedTransfer) => 
         <div class="mb-10">
           <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
           <div class="flex items-center">
-            <RadioButton @change="changeActivePlayer(draftedPlayer!)" v-model="activeTransferPlayer" :inputId="draftedPlayer!.drafted_player_id.toString()"
-              name="dynamic" :value="draftedPlayer" />
-            <label :for="draftedPlayer!.drafted_player_id.toString()" class="ml-2 w-full">
+            <RadioButton
+              v-model="activeTransferPlayer"
+              :input-id="draftedPlayer!.drafted_player_id.toString()"
+              name="dynamic"
+              :value="draftedPlayer"
+              @change="changeActivePlayer(draftedPlayer!)"
+            />
+            <label
+              :for="draftedPlayer!.drafted_player_id.toString()"
+              class="ml-2 w-full"
+            >
               <DraftedPlayerWithPoints :drafted-player="draftedPlayer" />
             </label>
           </div>
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">
           <h2 class="mb-2.5 text-lg font-black uppercase">Transfers</h2>
-          <div v-for="playerTransfer in draftedPlayer.transfers" :key="playerTransfer.drafted_transfer_id"
-            class="mb-5 flex flex-col">
+          <div
+            v-for="playerTransfer in draftedPlayer.transfers"
+            :key="playerTransfer.drafted_transfer_id"
+            class="mb-5 flex flex-col"
+          >
             <h3 class="flex self-start text-sm font-bold uppercase">
               gameweek {{ playerTransfer.transfer_week }}
             </h3>
             <div class="flex items-center gap-2.5">
-              <div class="flex items-center w-full">
-                <RadioButton @change="changeActivePlayer(playerTransfer)" v-model="activeTransferPlayer" :inputId="playerTransfer.drafted_transfer_id.toString()"
-                  name="dynamic" :value="playerTransfer" />
-                <label :for="playerTransfer!.drafted_transfer_id.toString()" class="ml-2 w-full">
+              <div class="flex w-full items-center">
+                <RadioButton
+                  v-model="activeTransferPlayer"
+                  :input-id="playerTransfer.drafted_transfer_id.toString()"
+                  name="dynamic"
+                  :value="playerTransfer"
+                  @change="changeActivePlayer(playerTransfer)"
+                />
+                <label
+                  :for="playerTransfer!.drafted_transfer_id.toString()"
+                  class="ml-2 w-full"
+                >
                   <DraftedPlayerWithPoints :drafted-player="playerTransfer" />
                 </label>
               </div>
@@ -45,6 +66,9 @@ const changeActivePlayer = (playerTransfer: DraftedPlayer | DraftedTransfer) => 
         </div>
       </div>
     </div>
-    <Message class="!mt-0" :closable="false" severity="warn">Changing the selected player will override the points calculation</Message>
+    <Message class="!mt-0" :closable="false" severity="warn"
+      >Changing the selected player will override the points
+      calculation</Message
+    >
   </Dialog>
 </template>

@@ -8,8 +8,10 @@ export const useTableStore = defineStore('table-store', () => {
   const weeklyWinners = ref();
 
   const fetchWeeklyStats = async (week: number) => {
-    let { data, error } = await supabase
-      .rpc('get_weekly_stats_for_gameweek', { target_week: week })
+    const { data, error } = await supabase.rpc(
+      'get_weekly_stats_for_gameweek',
+      { target_week: week }
+    );
 
     if (error) {
       throw new Error(error.message);
@@ -19,8 +21,7 @@ export const useTableStore = defineStore('table-store', () => {
   };
 
   const fetchWeeklyWinners = async () => {
-    let { data, error } = await supabase
-      .rpc('get_weekly_winners')
+    const { data, error } = await supabase.rpc('get_weekly_winners');
 
     if (error) {
       throw new Error(error.message);

@@ -108,7 +108,7 @@ const transfersMadeCount = (team: DraftedTeam) => {
                 </div>
                 <Tag
                   severity="info"
-                  class="w-6 h-6"
+                  class="h-6 w-6"
                   rounded
                   title="transfers made"
                   :value="transfersMadeCount(slotProps.option)"

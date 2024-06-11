@@ -32,8 +32,6 @@ const props = defineProps({
 const playerStore = usePlayerStore();
 const draftedTeamsStore = useDraftedTeamsStore();
 
-const activeTransferPlayer = ref();
-
 const addNewTransfer = async () => {
   try {
     if (!draftedPlayer.value || !newTransferData.value.player) {
@@ -87,22 +85,40 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
       <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
           <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
-          <RadioButton v-model="draftedPlayer" :inputId="draftedPlayer!.drafted_player_id.toString()" name="dynamic" :value="draftedPlayer?.data.web_name" />
+          <RadioButton
+            v-model="draftedPlayer"
+            :input-id="draftedPlayer!.drafted_player_id.toString()"
+            name="dynamic"
+            :value="draftedPlayer?.data.web_name"
+          />
           <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">
           <h2 class="mb-2.5 text-lg font-black uppercase">Transfers</h2>
-          <div v-for="playerTransfer in draftedPlayer.transfers" :key="playerTransfer.drafted_transfer_id"
-            class="mb-5 flex flex-col">
+          <div
+            v-for="playerTransfer in draftedPlayer.transfers"
+            :key="playerTransfer.drafted_transfer_id"
+            class="mb-5 flex flex-col"
+          >
             <h3 class="flex self-start text-sm font-bold uppercase">
               gameweek {{ playerTransfer.transfer_week }}
             </h3>
             <div class="flex items-center gap-2.5">
-              <Icon class="h-6 w-6" name="material-symbols:subdirectory-arrow-right-rounded" />
+              <Icon
+                class="h-6 w-6"
+                name="material-symbols:subdirectory-arrow-right-rounded"
+              />
               <DraftedPlayer :drafted-player="playerTransfer" />
-              <Button v-if="props.editable" severity="danger" text rounded aria-label="Cancel" @click="
-                handleDeleteTransfer(playerTransfer.drafted_transfer_id)
-                ">
+              <Button
+                v-if="props.editable"
+                severity="danger"
+                text
+                rounded
+                aria-label="Cancel"
+                @click="
+                  handleDeleteTransfer(playerTransfer.drafted_transfer_id)
+                "
+              >
                 <Icon class="h-8 w-8" name="typcn:delete" />
               </Button>
             </div>
@@ -114,10 +130,18 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
         <form class="flex flex-col items-start gap-5">
           <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-id">Player</label>
-            <Dropdown v-model="newTransferData.player" class="!w-full" filter :options="playerStore.players.filter(
-              (x) => x.position === draftedPlayer?.data.position
-            )
-              " option-label="web_name" placeholder="Select a Player">
+            <Dropdown
+              v-model="newTransferData.player"
+              class="!w-full"
+              filter
+              :options="
+                playerStore.players.filter(
+                  (x) => x.position === draftedPlayer?.data.position
+                )
+              "
+              option-label="web_name"
+              placeholder="Select a Player"
+            >
               <template #option="slotProps">
                 <div class="align-items-center flex">
                   <div class="w-1/5">
@@ -132,13 +156,27 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
           </div>
           <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-week">Transfer Week</label>
-            <InputNumber v-model="newTransferData.transferWeek" :min="0" :max="38" class="!w-full" show-buttons />
+            <InputNumber
+              v-model="newTransferData.transferWeek"
+              :min="0"
+              :max="38"
+              class="!w-full"
+              show-buttons
+            />
           </div>
           <div class="flex flex-col gap-2">
             <label for="new-transfer-expiry-date">Active expiry date</label>
-            <Calendar v-model="newTransferData.activeExpiryDate" date-format="dd/mm/yy" show-icon />
+            <Calendar
+              v-model="newTransferData.activeExpiryDate"
+              date-format="dd/mm/yy"
+              show-icon
+            />
           </div>
-          <Button class="flex self-start" label="Submit" @click="addNewTransfer" />
+          <Button
+            class="flex self-start"
+            label="Submit"
+            @click="addNewTransfer"
+          />
         </form>
       </div>
     </div>

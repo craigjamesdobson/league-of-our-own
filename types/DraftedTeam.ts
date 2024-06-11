@@ -21,7 +21,7 @@ interface WeeklyStats {
 }
 
 interface DraftedTeamWithWeeklyStats extends DraftedTeam {
-  weekly_stats: WeeklyStats
+  weekly_stats: WeeklyStats;
 }
 
 export type { DraftedTeam, DraftedTeamWithWeeklyStats, WeeklyStats };

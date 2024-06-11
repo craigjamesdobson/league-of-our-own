@@ -8,17 +8,27 @@ const props = defineProps({
   },
   isTransfer: { type: Boolean, default: false }
 });
-
 </script>
 
 <template>
   <div class="flex h-full w-full items-center gap-2">
     <span class="w-1/12 p-2">{{ props.draftedPlayer?.data.player_id }}</span>
-    <span class="w-2/12 p-2">{{ props.draftedPlayer.data.team_short_name }}</span>
-    <span class="w-7/12 p-2 text-center text-sm">{{ props.draftedPlayer.data.web_name }}
-      <Icon v-if="props.isTransfer" class="ml-2" size="18" name="ic:round-swap-horiz" />
+    <span class="w-2/12 p-2">{{
+      props.draftedPlayer.data.team_short_name
+    }}</span>
+    <span class="w-7/12 p-2 text-center text-sm"
+      >{{ props.draftedPlayer.data.web_name }}
+      <Icon
+        v-if="props.isTransfer"
+        class="ml-2"
+        size="18"
+        name="ic:round-swap-horiz"
+      />
     </span>
-    <span v-if="props.draftedPlayer.points !== undefined" class="w-2/12 p-2 text-center">
+    <span
+      v-if="props.draftedPlayer.points !== undefined"
+      class="w-2/12 p-2 text-center"
+    >
       {{ props.draftedPlayer.points }}
     </span>
     <span v-else class="w-2/12 p-2 text-center">

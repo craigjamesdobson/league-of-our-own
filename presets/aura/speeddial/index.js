@@ -277,7 +277,7 @@ export default {
             'rounded-full relative overflow-hidden',
 
             // Appearance
-            'bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-0/80',
+            'bg-primary border border-slate-100 dark:bg-surface-800 text-surface-700 dark:text-surface-0/80',
 
             // Hover Effects
             'hover:bg-surface-200 dark:hover:bg-surface-800 dark:hover:text-surface-0',

@@ -8,22 +8,27 @@ const props = defineProps({
   },
   activeGameweek: {
     type: Number,
-    required: true,
+    required: true
   }
 });
 
 const findActiveGameweekPlayer = computed(() => {
   const player = props.draftedPlayer;
 
-  if (player.transfers.some(x => x.transfer_week <= props.activeGameweek)) {
-    return player.transfers.findLast(x => x.transfer_week <= props.activeGameweek)
+  if (player.transfers.some((x) => x.transfer_week <= props.activeGameweek)) {
+    return player.transfers.findLast(
+      (x) => x.transfer_week <= props.activeGameweek
+    );
   } else {
-    return player
+    return player;
   }
 });
 </script>
 <template>
   <div class="player-container">
-    <DraftedPlayerWithPoints :is-transfer="true" :drafted-player="findActiveGameweekPlayer" />
+    <DraftedPlayerWithPoints
+      :is-transfer="true"
+      :drafted-player="findActiveGameweekPlayer"
+    />
   </div>
 </template>

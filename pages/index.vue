@@ -1,15 +1,15 @@
 <template lang="">
   <div
-    class="flex items-center justify-center h-full text-primary font-display"
+    class="text-primary font-display flex h-full items-center justify-center"
   >
-    <div class="flex flex-col p-10 text-center bg-white rounded-sm">
+    <div class="flex flex-col rounded-sm bg-white p-10 text-center">
       <div
-        class="flex self-center p-4 rounded-full justify-items-center bg-primary"
+        class="bg-primary flex justify-items-center self-center rounded-full p-4"
       >
-        <Icon class="text-offWhite" size="64" name="carbon:soccer" />
+        <Icon class="text-slate-100" size="64" name="carbon:soccer" />
       </div>
       <h1
-        class="text-4xl md:text-[72px] md:leading-[72px] uppercase tracking-wider font-black border-b mb-6 border-primary"
+        class="border-primary mb-6 border-b text-4xl font-black uppercase tracking-wider md:text-[72px] md:leading-[72px]"
       >
         League of our own
       </h1>

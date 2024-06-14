@@ -1,25 +1,27 @@
 import { defineStore } from 'pinia';
+import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, Tables } from '~/types/database.types';
+import type { Database } from '~/types/database.types';
 interface FilterData {
   filterName: string;
   filterPrice: number;
   filterTeam: number | undefined;
 }
 
-type Players = Tables<'players_view'>;
-
 export const usePlayerStore = defineStore('player-store', () => {
   const supabase = useSupabaseClient<Database>();
 
-  const players: Ref<Players[] | []> = ref([]);
-  const filteredPlayers: Ref<Players[] | []> = ref([]);
+  const players: Ref<Player[] | []> = ref([]);
+  const filteredPlayers: Ref<Player[] | []> = ref([]);
   const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
   const fetchPlayers = async () => {
     try {
-      const { data, error } = await supabase.from('players_view').select(`*`);
+      const { data, error } = await supabase
+        .from('players_view')
+        .select(`*`)
+        .order('minutes', { ascending: false });
 
       if (error) {
         console.error('Error fetching data:', error.message);
@@ -64,7 +66,7 @@ export const usePlayerStore = defineStore('player-store', () => {
         formattedPlayerData.map(
           ({ id, ...rest }: { id: number; [key: string]: any }) => ({
             player_id: id,
-            ...rest,
+            ...rest
           })
         )
       )
@@ -78,7 +80,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   const filterPlayers = ({
     filterName = '',
     filterPrice = 0,
-    filterTeam = 0,
+    filterTeam = 0
   }: FilterData) => {
     let newFilteredPlayers = [...players.value];
     if (filterName) {
@@ -112,32 +114,34 @@ export const usePlayerStore = defineStore('player-store', () => {
     () => (id: number) => players.value.find((x) => x.player_id === id)
   );
 
+  const getPlayers = computed(() => players.value);
+
   const formatFilteredPlayersByPosition = computed(() => {
     return [
       {
         position: 'Goalkeepers',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.GOALKEEPER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Defenders',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.DEFENDER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Midfielders',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.MIDFIELDER)
-          .sort((a, b) => a.team - b.team),
+          .sort((a, b) => a.team - b.team)
       },
       {
         position: 'Forwards',
         players: filteredPlayers.value
           .filter((x) => x.position === PlayerPosition.FORWARD)
-          .sort((a, b) => a.team - b.team),
-      },
+          .sort((a, b) => a.team - b.team)
+      }
     ];
   });
 
@@ -148,8 +152,9 @@ export const usePlayerStore = defineStore('player-store', () => {
     fetchPlayers,
     upsertPlayerData,
     filterPlayers,
+    getPlayers,
     getPlayerByID,
     getPlayerLastUpdatedDate,
-    formatFilteredPlayersByPosition,
+    formatFilteredPlayersByPosition
   };
 });

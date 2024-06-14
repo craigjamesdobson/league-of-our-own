@@ -20,7 +20,7 @@ export const useAccountStore = defineStore('account-store', () => {
   }) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email,
-      password: credentials.password,
+      password: credentials.password
     });
 
     if (error) {

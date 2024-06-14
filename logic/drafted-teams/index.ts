@@ -33,7 +33,7 @@ const initDraftedTeamData = (draftedTeamsData: any) => {
       return {
         ...draftedTeam,
         total_team_value: setTotalTeamPrice(draftedTeam),
-        is_invalid_team: setTeamValidity(draftedTeam),
+        is_invalid_team: setTeamValidity(draftedTeam)
       };
     }
   );

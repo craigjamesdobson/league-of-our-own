@@ -14,8 +14,8 @@ export default defineNuxtPlugin(() => {
     script: [
       {
         src: `https://www.googletagmanager.com/gtag/js?id=${gtagId}`,
-        async: true,
-      },
-    ],
+        async: true
+      }
+    ]
   });
 });

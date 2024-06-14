@@ -249,10 +249,10 @@ export type Database = {
           author: string | null;
           clean_sheet: boolean | null;
           created_at: string;
-          fixture_id: number | null;
+          fixture_id: number;
           goals: number | null;
           id: number;
-          player_id: number | null;
+          player_id: number;
           points: number;
           red_card: boolean | null;
         };
@@ -261,11 +261,11 @@ export type Database = {
           author?: string | null;
           clean_sheet?: boolean | null;
           created_at?: string;
-          fixture_id?: number | null;
+          fixture_id: number;
           goals?: number | null;
           id?: number;
-          player_id?: number | null;
-          points?: number;
+          player_id: number;
+          points: number;
           red_card?: boolean | null;
         };
         Update: {
@@ -273,10 +273,10 @@ export type Database = {
           author?: string | null;
           clean_sheet?: boolean | null;
           created_at?: string;
-          fixture_id?: number | null;
+          fixture_id?: number;
           goals?: number | null;
           id?: number;
-          player_id?: number | null;
+          player_id?: number;
           points?: number;
           red_card?: boolean | null;
         };
@@ -705,31 +705,75 @@ export type Database = {
         };
         Relationships: [];
       };
+      weekly_statistics: {
+        Row: {
+          assists: number | null;
+          clean_sheets: number | null;
+          created_at: string;
+          goals: number | null;
+          id: number;
+          points: number;
+          red_cards: number | null;
+          team: number | null;
+          week: number;
+        };
+        Insert: {
+          assists?: number | null;
+          clean_sheets?: number | null;
+          created_at?: string;
+          goals?: number | null;
+          id?: number;
+          points: number;
+          red_cards?: number | null;
+          team?: number | null;
+          week: number;
+        };
+        Update: {
+          assists?: number | null;
+          clean_sheets?: number | null;
+          created_at?: string;
+          goals?: number | null;
+          id?: number;
+          points?: number;
+          red_cards?: number | null;
+          team?: number | null;
+          week?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_weekly_statistics_team_fkey';
+            columns: ['team'];
+            isOneToOne: false;
+            referencedRelation: 'drafted_teams';
+            referencedColumns: ['drafted_team_id'];
+          }
+        ];
+      };
     };
     Views: {
       players_view: {
         Row: {
-          assists: number;
-          clean_sheets: number;
-          code: number;
-          cost: number;
-          first_name: string;
-          goals_scored: number;
-          image: string;
-          image_large: string;
-          is_unavailable: boolean;
-          minutes: number;
-          news: string;
-          player_id: number;
-          position: number;
-          red_cards: number;
-          second_name: string;
-          status: string;
-          team: number;
-          team_name: string;
-          team_short_name: string;
-          unavailable_for_season: boolean;
-          web_name: string;
+          assists: number | null;
+          clean_sheets: number | null;
+          code: number | null;
+          cost: number | null;
+          first_name: string | null;
+          goals_scored: number | null;
+          image: string | null;
+          image_large: string | null;
+          is_unavailable: boolean | null;
+          minutes: number | null;
+          news: string | null;
+          player_id: number | null;
+          position: number | null;
+          red_cards: number | null;
+          second_name: string | null;
+          status: string | null;
+          team: number | null;
+          team_name: string | null;
+          team_short_name: string | null;
+          unavailable_for_season: boolean | null;
+          web_name: string | null;
         };
         Relationships: [
           {
@@ -746,6 +790,20 @@ export type Database = {
       get_drafted_teams_and_players: {
         Args: Record<PropertyKey, never>;
         Returns: Json;
+      };
+      get_drafted_teams_with_player_points_by_gameweek: {
+        Args: {
+          game_week_param: number;
+        };
+        Returns: {
+          drafted_team_id: number;
+          team_name: string;
+          team_email: string;
+          team_owner: string;
+          allowed_transfers: boolean;
+          weekly_stats: Json;
+          players: Json;
+        }[];
       };
       get_player_stats_by_team_id: {
         Args: {
@@ -820,6 +878,32 @@ export type Database = {
           team_id: number;
         }[];
       };
+      get_weekly_stats_for_gameweek: {
+        Args: {
+          target_week: number;
+        };
+        Returns: {
+          drafted_team_id: number;
+          team_name: string;
+          team_owner: string;
+          goals: number;
+          assists: number;
+          clean_sheets: number;
+          red_cards: number;
+          total_points: number;
+          week_points: number;
+          weekly_winner: boolean;
+          prev_week_position: number;
+        }[];
+      };
+      get_weekly_winners: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          week: number;
+          top_teams: Json[];
+          points: number;
+        }[];
+      };
       insert_or_update_data: {
         Args: {
           id_field: number;
@@ -855,14 +939,14 @@ export type Tables<
     ? R
     : never
   : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
-      PublicSchema['Views'])
-  ? (PublicSchema['Tables'] &
-      PublicSchema['Views'])[PublicTableNameOrOptions] extends {
-      Row: infer R;
-    }
-    ? R
-    : never
-  : never;
+        PublicSchema['Views'])
+    ? (PublicSchema['Tables'] &
+        PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
@@ -878,12 +962,12 @@ export type TablesInsert<
     ? I
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-  ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-      Insert: infer I;
-    }
-    ? I
-    : never
-  : never;
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
@@ -899,12 +983,12 @@ export type TablesUpdate<
     ? U
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-  ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-      Update: infer U;
-    }
-    ? U
-    : never
-  : never;
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
 
 export type Enums<
   PublicEnumNameOrOptions extends
@@ -916,5 +1000,5 @@ export type Enums<
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-  ? PublicSchema['Enums'][PublicEnumNameOrOptions]
-  : never;
+    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never;

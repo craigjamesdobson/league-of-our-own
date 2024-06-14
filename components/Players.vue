@@ -12,7 +12,7 @@ const setSelectedPlayerAndQueryParam = (playerID: number) => {
   selectedPlayer.value = playerStore.getPlayerByID(playerID) as Player;
   router.push({
     path: 'players',
-    query: { id: playerID },
+    query: { id: playerID }
   });
   showDialog.value = true;
 };
@@ -26,13 +26,13 @@ const setSelectedPlayerAndQueryParam = (playerID: number) => {
       <h1 class="main-heading">
         {{ data.position }}
       </h1>
-      <div class="flex justify-between mb-4 rounded-sm">
+      <div class="mb-4 flex justify-between rounded-sm">
         <div class="w-full border-r border-gray-100">
           <div class="grid grid-cols-1 gap-1 md:grid-cols-2">
             <div
               v-for="player in data.players"
               :key="player.player_id"
-              class="relative flex flex-col items-center justify-around w-full text-sm bg-white border-b border-gray-100 cursor-pointer"
+              class="relative flex w-full cursor-pointer flex-col items-center justify-around border-b border-gray-100 bg-white text-sm"
               @click="setSelectedPlayerAndQueryParam(player.player_id)"
             >
               <Player :player="player" />

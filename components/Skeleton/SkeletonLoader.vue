@@ -1,7 +1,7 @@
 <template>
   <div :class="[bgClass, loaderClass, 'relative overflow-hidden']">
     <div
-      class="absolute top-0 bottom-0 left-0 right-0 shimmer"
+      class="shimmer absolute bottom-0 left-0 right-0 top-0"
       :style="shimmerStyle"
     ></div>
     <slot />
@@ -16,7 +16,7 @@ const LOADER_TYPES = { rectangle: 'rectangle', circle: 'circle' };
 
 const LOADER_CSS_CLASSES = {
   [LOADER_TYPES.rectangle]: 'rounded',
-  [LOADER_TYPES.circle]: 'rounded-full',
+  [LOADER_TYPES.circle]: 'rounded-full'
 };
 
 const SHIMMER_COLOR = '#ffffff';
@@ -38,20 +38,20 @@ const hexToRgb = (hex: string) =>
 const props = defineProps({
   type: {
     type: String,
-    default: 'rectangle',
+    default: 'rectangle'
   },
   bgClass: {
     type: String,
-    default: 'bg-gray-300',
+    default: 'bg-gray-300'
   },
   cssClass: {
     type: String,
-    default: '',
+    default: ''
   },
   shimmerColor: {
     type: String,
-    default: '#eeeeee',
-  },
+    default: '#eeeeee'
+  }
 });
 
 const { type, bgClass, cssClass, shimmerColor } = toRefs(props);
@@ -62,7 +62,7 @@ const shimmerStyle = computed(() => {
     : SHIMMER_COLOR;
 
   return {
-    backgroundImage: `linear-gradient(90deg, rgba(${rgb}, 0) 0%, rgba(${rgb}, 0.2) 20%, rgba(${rgb}, 0.5) 60%, rgba(${rgb}, 0))`,
+    backgroundImage: `linear-gradient(90deg, rgba(${rgb}, 0) 0%, rgba(${rgb}, 0.2) 20%, rgba(${rgb}, 0.5) 60%, rgba(${rgb}, 0))`
   };
 });
 

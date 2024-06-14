@@ -11,7 +11,7 @@ const playerStore = usePlayerStore();
 const router = useRouter();
 
 definePageMeta({
-  middleware: ['auth'],
+  middleware: ['auth']
 });
 
 const selectedDraftedTeamID = ref(0);
@@ -52,9 +52,9 @@ const transfersMadeCount = (team: DraftedTeam) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center h-full">
+  <div class="flex h-full flex-col items-center justify-center">
     <Toast />
-    <h1 class="flex items-center main-heading">
+    <h1 class="main-heading flex items-center">
       <span>Admin Dashboard</span>
       <button title="Sign out" @click.prevent="handleUserLogout">
         <Icon class="ml-2" name="la:sign-out-alt" />
@@ -91,16 +91,16 @@ const transfersMadeCount = (team: DraftedTeam) => {
             option-label="team_name"
             option-value="drafted_team_id"
             placeholder="Select a team"
-            scroll-height="400"
+            scroll-height="400px"
           >
             <template #option="slotProps">
               <div
-                class="flex justify-between items-center"
+                class="flex items-center justify-between"
                 :class="{
-                  'opacity-25': transfersMadeCount(slotProps.option) === 4,
+                  'opacity-25': transfersMadeCount(slotProps.option) === 4
                 }"
               >
-                <div class="flex flex-col gap-1 align-items-center">
+                <div class="align-items-center flex flex-col gap-1">
                   <div class="font-black">
                     {{ slotProps.option.team_name.toUpperCase() }}
                   </div>
@@ -108,6 +108,7 @@ const transfersMadeCount = (team: DraftedTeam) => {
                 </div>
                 <Tag
                   severity="info"
+                  class="h-6 w-6"
                   rounded
                   title="transfers made"
                   :value="transfersMadeCount(slotProps.option)"

@@ -11,4 +11,17 @@ interface DraftedTeam {
   is_invalid_team?: boolean;
 }
 
-export type { DraftedTeam };
+interface WeeklyStats {
+  drafted_team_id: number;
+  points: number;
+  goals: number;
+  assists: number;
+  clean_sheets: number;
+  red_cards: number;
+}
+
+interface DraftedTeamWithWeeklyStats extends DraftedTeam {
+  weekly_stats: WeeklyStats;
+}
+
+export type { DraftedTeam, DraftedTeamWithWeeklyStats, WeeklyStats };

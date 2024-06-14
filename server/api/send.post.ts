@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
       from: 'Jim & Craig <leagueofourown@craigjamesdobson.dev>',
       to: [body.email],
       subject: 'Thank you for submitting your team',
-      html: body.html,
+      html: body.html
     });
 
     return data;

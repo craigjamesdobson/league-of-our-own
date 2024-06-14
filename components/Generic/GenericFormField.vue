@@ -1,13 +1,13 @@
 <template>
-  <div class="relative flex flex-col mb-2">
+  <div class="relative mb-2 flex flex-col">
     <label v-if="label" class="mb-2 text-xs" :for="label">{{ label }}</label>
     <div class="relative flex flex-col">
       <Icon
         v-if="icon"
-        class="absolute text-primary left-4 top-3"
+        class="text-primary absolute left-4 top-3"
         :class="{
           'text-red-500': validation?.$error,
-          'border-green-400 text-green-500': !validation?.$invalid,
+          'border-green-400 text-green-500': !validation?.$invalid
         }"
         :name="icon"
       />
@@ -15,11 +15,11 @@
         :id="label"
         v-model="modelValue"
         :class="{
-          'border !border-red-500 rounded-b-none': validation?.$error,
+          'rounded-b-none border !border-red-500': validation?.$error,
           'border !border-green-400 ': !validation?.$invalid,
-          'pl-10 ': !!icon,
+          'pl-10 ': !!icon
         }"
-        class="px-4 py-2 bg-white border rounded-md border-surface-300 focus:outline-none"
+        class="border-surface-300 rounded-md border bg-white px-4 py-2 focus:outline-none"
         :type="type"
         autocomplete="chrome-off"
         @change="validation?.$touch"
@@ -27,7 +27,7 @@
     </div>
     <div
       v-if="validation.$error"
-      class="flex px-2 py-1 bg-red-600 rounded-b-md"
+      class="flex rounded-b-md bg-red-600 px-2 py-1"
     >
       <span
         v-for="error in validation.$errors"
@@ -43,20 +43,20 @@
 defineProps({
   label: {
     type: String,
-    default: '',
+    default: ''
   },
   type: {
     type: String,
-    default: '',
+    default: ''
   },
   validation: {
     type: Object,
-    default: () => {},
+    default: () => {}
   },
   icon: {
     type: String,
-    default: '',
-  },
+    default: ''
+  }
 });
 
 const modelValue = defineModel('modelValue');

@@ -16,18 +16,19 @@ const handleUserLogin = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center h-full">
+  <div class="flex h-full flex-col items-center justify-center">
     <Toast />
-    <h1 class="flex items-center main-heading">
+    <h1 class="main-heading flex items-center">
       <span>Admin Dashboard</span>
     </h1>
     <div
-      class="flex flex-col justify-center p-10 mb-4 bg-white rounded-md w-96"
+      class="mb-4 flex w-96 flex-col justify-center rounded-md bg-white p-10"
     >
       <form class="flex flex-col gap-6" @submit.prevent="handleUserLogin">
         <GenericFormField
           v-model="formData.email"
           label="Email"
+          type="text"
           :validation="v$.email"
           icon="material-symbols:alternate-email"
           @keydown.enter="handleUserLogin"
@@ -35,6 +36,7 @@ const handleUserLogin = async () => {
         <GenericFormField
           v-model="formData.password"
           label="Password"
+          type="password"
           :validation="v$.password"
           icon="mdi:password-outline"
           @keydown.enter="handleUserLogin"
@@ -50,7 +52,7 @@ const handleUserLogin = async () => {
     <Message :closable="false">
       Please report any bugs or issues by emailing
       <a
-        class="underline font-bold"
+        class="font-bold underline"
         href="mailto:craigjamesdobson.dev@gmail.com"
         >craigjamesdobson.dev@gmail.com</a
       >

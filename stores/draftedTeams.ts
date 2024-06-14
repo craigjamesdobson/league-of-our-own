@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type {
+  DraftedTeam,
+  DraftedTeamWithWeeklyStats
+} from '~/types/DraftedTeam';
 import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
@@ -28,6 +31,18 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     draftedTeams.value = data;
   };
 
+  const fetchDraftedTeamsWithPlayerPointsByGameweek = async (
+    selectedGameWeek: number
+  ) => {
+    const { data, error } = await supabase
+      .rpc('get_drafted_teams_with_player_points_by_gameweek', {
+        game_week_param: selectedGameWeek
+      })
+      .returns<DraftedTeamWithWeeklyStats[]>();
+    if (error) throw error;
+    return data;
+  };
+
   const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
     const { data, error } = await supabase
       .from('drafted_players')
@@ -48,7 +63,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
           drafted_player: x.data.player_id,
-          drafted_team: draftedTeamData.drafted_team_id,
+          drafted_team: draftedTeamData.drafted_team_id
         };
       });
       await supabase.from('drafted_teams').upsert(draftedTeamData);
@@ -93,8 +108,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     getDraftedTeamByID,
     fetchDraftedTeams,
     fetchDraftedPlayerByID,
+    fetchDraftedTeamsWithPlayerPointsByGameweek,
     upsertTeamData,
     addNewTransfer,
-    deleteTransfer,
+    deleteTransfer
   };
 });

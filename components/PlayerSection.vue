@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col items-center gap-5 justify-center p-5"
+    class="flex flex-col items-center justify-center gap-5 p-5"
     :class="getCorrectColSpanClass(props.position)"
   >
     <div class="flex flex-row items-center justify-center gap-5">
@@ -10,13 +10,13 @@
         aria-label="Clear player"
         rounded
         outlined
-        class="!w-6 !h-6"
+        class="!h-6 !w-6"
         @click="player = null"
       >
         <Icon name="akar-icons:cross" />
       </Button>
       <img
-        class="w-24 h-24 rounded-full bg-white drop-shadow-lg p-2"
+        class="h-24 w-24 rounded-full bg-white p-2 drop-shadow-lg"
         :src="player ? player!.image_large : PLACEHOLDER_PLAYER_IMAGE"
         :alt="player ? player!.web_name : 'pick a player'"
         @error="loadPlayerFallbackImage"
@@ -24,11 +24,11 @@
       <div v-if="player" class="relative flex flex-col gap-2.5">
         <div class="flex items-start gap-10">
           <img
-            class="w-8 h-8"
+            class="h-8 w-8"
             :src="getImageUrl(player!.team_short_name.toLowerCase())"
           />
         </div>
-        <p class="uppercase font-black">
+        <p class="font-black uppercase">
           {{ player!.web_name }}
         </p>
         <p>{{ player!.cost.toFixed(1) }}</p>
@@ -37,7 +37,7 @@
     <Dropdown
       v-model="player"
       filter
-      class="!min-w-[300px] mt-auto"
+      class="mt-auto !min-w-[300px]"
       :options="dropdownPlayerData"
       :virtual-scroller-options="{ itemSize: 60 }"
       placeholder="Select a Player"
@@ -48,7 +48,7 @@
         {{ slotProps.value?.web_name || slotProps.placeholder }}
       </template>
       <template #option="slotProps">
-        <div class="flex flex-col gap-2.5 h-full justify-center">
+        <div class="flex h-full flex-col justify-center gap-2.5">
           <div class="flex gap-2.5">
             <span class="w-1/6">{{ slotProps.option.player_id }}</span>
             <span class="w-1/6">{{ slotProps.option.team_short_name }}</span>
@@ -57,13 +57,13 @@
           </div>
           <div
             v-if="slotProps.option?.unavailable_for_season"
-            class="flex text-[10px] whitespace-pre-wrap"
+            class="flex whitespace-pre-wrap text-[10px]"
           >
             {{ slotProps.option.news }}
           </div>
           <div
             v-if="slotProps.option.selected"
-            class="flex text-[10px] whitespace-pre-wrap"
+            class="flex whitespace-pre-wrap text-[10px]"
           >
             Player has already been selected
           </div>
@@ -107,7 +107,7 @@ const dropdownPlayerData = computed(() =>
         disabled:
           p.unavailable_for_season === true ||
           props.selectedPlayers.includes(p.player_id),
-        selected: props.selectedPlayers.includes(p.player_id),
+        selected: props.selectedPlayers.includes(p.player_id)
       };
     })
     .filter((x) => x.position === props.position)

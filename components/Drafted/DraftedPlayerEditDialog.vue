@@ -85,12 +85,6 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
       <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
           <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
-          <RadioButton
-            v-model="draftedPlayer"
-            :input-id="draftedPlayer!.drafted_player_id.toString()"
-            name="dynamic"
-            :value="draftedPlayer?.data.web_name"
-          />
           <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
         </div>
         <div v-if="draftedPlayer?.transfers.length" class="mb-5">

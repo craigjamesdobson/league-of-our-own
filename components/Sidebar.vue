@@ -22,12 +22,12 @@ const routes = reactive([
     path: '/rules',
     admin: false
   },
-  {
-    title: 'Table',
-    icon: 'gg:list',
-    path: '/table',
-    admin: false
-  }
+  // {
+  //   title: 'Table',
+  //   icon: 'gg:list',
+  //   path: '/table',
+  //   admin: false
+  // }
 ]);
 </script>
 

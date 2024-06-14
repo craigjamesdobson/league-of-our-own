@@ -16,7 +16,7 @@ const changeActivePlayer = (
 <template>
   <Dialog v-model:visible="visible" header="" modal :dismissable-mask="true">
     <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-3">
         <div class="mb-10">
           <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
           <div class="flex items-center">

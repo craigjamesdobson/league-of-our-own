@@ -152,7 +152,8 @@ export default {
             'transition-shadow duration-200',
 
             // Misc
-            'cursor-pointer overflow-hidden whitespace-nowrap'
+            'cursor-pointer overflow-hidden whitespace-nowrap',
+            { 'pointer-events-none opacity-50': context.disabled }
         ]
     }),
     itemgroup: {

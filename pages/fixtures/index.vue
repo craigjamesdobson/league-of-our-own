@@ -48,6 +48,12 @@ watch(
   { immediate: true }
 );
 
+const weekIsInComplete = computed(() => {
+  return fixtureStore.fixtures?.some(fixture => 
+    fixture.home_team_score === null || fixture.away_team_score === null
+  );
+});
+
 const populateWeeklyStats = (data: WeeklyStats) => {
   const currentDraftedTeam = draftedTeamsWithPoints.value?.find(
     (x) => x.drafted_team_id === data.drafted_team_id
@@ -82,8 +88,11 @@ const updateWeeklyStats = async () => {
 <template>
   <div>
     <Toast />
-    <div class="flex justify-between">
-      <h1 class="text-2xl font-black uppercase">Fixtures</h1>
+    <div class="flex justify-between mb-2.5">
+      <div class="flex flex-col gap-2.5">
+        <h1 class="text-2xl font-black uppercase">Fixtures</h1>
+        <Message v-if="weekIsInComplete" class="!m-0" :closable="false">This week is currently incomplete</Message>
+      </div>
       <div class="mb-5 flex flex-col items-end gap-2.5">
         <label class="font-bold uppercase" for="gameweeks"
           >Select a game week</label
@@ -106,7 +115,7 @@ const updateWeeklyStats = async () => {
               </div>
             </template>
           </Dropdown>
-          <Button label="Save week" @click="updateWeeklyStats" />
+          <Button label="Save week" :disabled="weekIsInComplete" @click="updateWeeklyStats" />
         </div>
       </div>
     </div>

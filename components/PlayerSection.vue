@@ -36,6 +36,7 @@ const dropdownPlayerData = computed(() =>
       };
     })
     .filter((x) => x.position === props.position)
+    .sort((a, b) => a.team - b.team)
 );
 </script>
 

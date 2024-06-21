@@ -6,6 +6,7 @@ import { delay } from '@/utils/utility';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert } from '~/types/database-generated.types';
 import type { Player } from '~/types/Player';
+import { generateTeamEmail } from '@/pages/team-builder/email'
 
 const supabase = useSupabaseClient<Database>();
 const router = useRouter();
@@ -126,15 +127,18 @@ const handleTeamSubmit = async () => {
       method: 'post',
       body: {
         email: draftedTeamData.value.team_email,
-        html: `
-          <p>Submitted team: ${draftedTeamPlayers.value
-            .map((x) => x.selectedPlayer.web_name)
-            .join(' | ')}</p>
-          <p>You can edit your team by clicking this <a href="${config.public.siteURL
-          }/team-builder?id=${data.key}">link</a></p>
-        `
+        html: generateTeamEmail(draftedTeamPlayers.value)
+        // html: `
+        //   <p>Submitted team: ${draftedTeamPlayers.value
+        //     .map((x) => x.selectedPlayer.web_name)
+        //     .join(' | ')}</p>
+        //   <p>You can edit your team by clicking this <a href="${config.public.siteURL
+        //   }/team-builder?id=${data.key}">link</a></p>
+        // `
       }
     });
+
+    draftedTeamData.value = data;
 
     toast.add({
       severity: 'success',
@@ -190,7 +194,8 @@ const formIsValid = () => {
 <template>
   <Toast />
   <Message severity="warn" :closable="false" v-if="isExistingDraftedTeam">
-    You are editing your existing team
+    You are editing your existing team. <br /> It was last edited on <strong>{{ new
+      Date(draftedTeamData?.updated_at).toLocaleDateString('en-GB') }}</strong>
   </Message>
   <div class="flex flex-col text-xs" v-else>
     <Divider />
@@ -227,7 +232,7 @@ const formIsValid = () => {
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
             calculateRemainingBudget().toFixed(1)
-            }}</span>
+          }}</span>
         </div>
       </div>
     </Message>

@@ -127,7 +127,7 @@ const handleTeamSubmit = async () => {
       method: 'post',
       body: {
         email: draftedTeamData.value.team_email,
-        html: generateTeamEmail(draftedTeamPlayers.value)
+        html: generateTeamEmail(draftedTeamPlayers.value, data.key)
         // html: `
         //   <p>Submitted team: ${draftedTeamPlayers.value
         //     .map((x) => x.selectedPlayer.web_name)

@@ -7,7 +7,7 @@ interface DraftedTeamPlayer {
     selectedPlayer: Player;
 }
 
-const generateTeamEmail = (players: DraftedTeamPlayer[]) => {
+const generateTeamEmail = (players: DraftedTeamPlayer[], key: string) => {
     return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -752,7 +752,7 @@ const generateTeamEmail = (players: DraftedTeamPlayer[]) => {
         </table>
         <![endif]-->
                                <!--[if !mso]><!-- -->
-                               <a class="pc-w620-fontSize-16px" style="display: inline-block; box-sizing: border-box; border-radius: 38px 38px 38px 38px; background-color: #0b0c3d; padding: 10px 20px 10px 20px; width: 50%; font-family: 'Inter', Arial, Helvetica, sans-serif; font-weight: 600; font-size: 18px; line-height: 150%; letter-spacing: -0.2px; color: #ffffff; vertical-align: top; text-align: center; text-align-last: center; text-decoration: none; -webkit-text-size-adjust: none;" href="https://designmodo.com/postcards/" target="_blank"><span style="display: block;"><span>Edit team</span></span></a>
+                               <a class="pc-w620-fontSize-16px" style="display: inline-block; box-sizing: border-box; border-radius: 38px 38px 38px 38px; background-color: #0b0c3d; padding: 10px 20px 10px 20px; width: 50%; font-family: 'Inter', Arial, Helvetica, sans-serif; font-weight: 600; font-size: 18px; line-height: 150%; letter-spacing: -0.2px; color: #ffffff; vertical-align: top; text-align: center; text-align-last: center; text-decoration: none; -webkit-text-size-adjust: none;" href="https://leagueofourown.co.uk/team-builder?id=${key}" target="_blank"><span style="display: block;"><span>Edit team</span></span></a>
                                <!--<![endif]-->
                               </th>
                              </tr>

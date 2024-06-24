@@ -195,7 +195,7 @@ const formIsValid = () => {
   <Toast />
   <Message severity="warn" :closable="false" v-if="isExistingDraftedTeam">
     You are editing your existing team. <br /> It was last edited on <strong>{{ new
-      Date(draftedTeamData?.updated_at).toLocaleDateString('en-GB') }}</strong>
+      Date(draftedTeamData.updated_at ?? draftedTeamData.created_at).toLocaleDateString('en-GB') }}</strong>
   </Message>
   <div class="flex flex-col text-xs" v-else>
     <Divider />

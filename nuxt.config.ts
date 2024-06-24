@@ -109,7 +109,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       gtagId: 'G-YL6X3M2488',
-      siteURL: process.env.SITE_URL
+      SITE_URL: process.env.SITE_URL,
+      ACTIVE_SEASON: process.env.ACTIVE_SEASON
     }
   },
   ssr: false,

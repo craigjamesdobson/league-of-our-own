@@ -1,6 +1,8 @@
 import type { Player } from "~/types/Player";
 import type { PlayerPosition } from "~/types/PlayerPosition";
 
+const config = useRuntimeConfig();
+
 interface DraftedTeamPlayer {
     draftedPlayerID?: number;
     position: PlayerPosition;
@@ -752,7 +754,7 @@ const generateTeamEmail = (players: DraftedTeamPlayer[], key: string) => {
         </table>
         <![endif]-->
                                <!--[if !mso]><!-- -->
-                               <a class="pc-w620-fontSize-16px" style="display: inline-block; box-sizing: border-box; border-radius: 38px 38px 38px 38px; background-color: #0b0c3d; padding: 10px 20px 10px 20px; width: 50%; font-family: 'Inter', Arial, Helvetica, sans-serif; font-weight: 600; font-size: 18px; line-height: 150%; letter-spacing: -0.2px; color: #ffffff; vertical-align: top; text-align: center; text-align-last: center; text-decoration: none; -webkit-text-size-adjust: none;" href="https://leagueofourown.co.uk/team-builder?id=${key}" target="_blank"><span style="display: block;"><span>Edit team</span></span></a>
+                               <a class="pc-w620-fontSize-16px" style="display: inline-block; box-sizing: border-box; border-radius: 38px 38px 38px 38px; background-color: #0b0c3d; padding: 10px 20px 10px 20px; width: 50%; font-family: 'Inter', Arial, Helvetica, sans-serif; font-weight: 600; font-size: 18px; line-height: 150%; letter-spacing: -0.2px; color: #ffffff; vertical-align: top; text-align: center; text-align-last: center; text-decoration: none; -webkit-text-size-adjust: none;" href="${config.public.SITE_URL}/team-builder?id=${key}" target="_blank"><span style="display: block;"><span>Edit team</span></span></a>
                                <!--<![endif]-->
                               </th>
                              </tr>

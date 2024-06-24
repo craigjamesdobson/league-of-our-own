@@ -52,49 +52,6 @@ export type Database = {
           },
         ]
       }
-      drafted_players_24_25: {
-        Row: {
-          created_at: string
-          drafted_player: number | null
-          drafted_player_id: number
-          drafted_team: number | null
-        }
-        Insert: {
-          created_at?: string
-          drafted_player?: number | null
-          drafted_player_id?: number
-          drafted_team?: number | null
-        }
-        Update: {
-          created_at?: string
-          drafted_player?: number | null
-          drafted_player_id?: number
-          drafted_team?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "drafted_players_pending_drafted_player_fkey"
-            columns: ["drafted_player"]
-            isOneToOne: false
-            referencedRelation: "players"
-            referencedColumns: ["player_id"]
-          },
-          {
-            foreignKeyName: "drafted_players_pending_drafted_player_fkey"
-            columns: ["drafted_player"]
-            isOneToOne: false
-            referencedRelation: "players_view"
-            referencedColumns: ["player_id"]
-          },
-          {
-            foreignKeyName: "drafted_players_pending_drafted_team_fkey"
-            columns: ["drafted_team"]
-            isOneToOne: false
-            referencedRelation: "drafted_teams_24_25"
-            referencedColumns: ["drafted_team_id"]
-          },
-        ]
-      }
       drafted_teams: {
         Row: {
           active_season: string
@@ -105,6 +62,7 @@ export type Database = {
           team_email: string
           team_name: string
           team_owner: string
+          updated_at: string | null
         }
         Insert: {
           active_season: string
@@ -115,6 +73,7 @@ export type Database = {
           team_email: string
           team_name: string
           team_owner: string
+          updated_at?: string | null
         }
         Update: {
           active_season?: string
@@ -125,39 +84,7 @@ export type Database = {
           team_email?: string
           team_name?: string
           team_owner?: string
-        }
-        Relationships: []
-      }
-      drafted_teams_24_25: {
-        Row: {
-          active_season: string
-          allowed_transfers: boolean
-          created_at: string
-          drafted_team_id: number
-          key: string
-          team_email: string
-          team_name: string
-          team_owner: string
-        }
-        Insert: {
-          active_season?: string
-          allowed_transfers: boolean
-          created_at?: string
-          drafted_team_id?: number
-          key?: string
-          team_email: string
-          team_name: string
-          team_owner: string
-        }
-        Update: {
-          active_season?: string
-          allowed_transfers?: boolean
-          created_at?: string
-          drafted_team_id?: number
-          key?: string
-          team_email?: string
-          team_name?: string
-          team_owner?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -647,73 +574,19 @@ export type Database = {
       }
       teams: {
         Row: {
-          code: number
-          draw: number | null
-          form: string | null
           id: number
-          loss: number | null
           name: string | null
-          played: number | null
-          points: number | null
-          position: number | null
-          pulse_id: number | null
           short_name: string | null
-          strength: number | null
-          strength_attack_away: number | null
-          strength_attack_home: number | null
-          strength_defence_away: number | null
-          strength_defence_home: number | null
-          strength_overall_away: number | null
-          strength_overall_home: number | null
-          team_division: string | null
-          unavailable: boolean | null
-          win: number | null
         }
         Insert: {
-          code: number
-          draw?: number | null
-          form?: string | null
           id: number
-          loss?: number | null
           name?: string | null
-          played?: number | null
-          points?: number | null
-          position?: number | null
-          pulse_id?: number | null
           short_name?: string | null
-          strength?: number | null
-          strength_attack_away?: number | null
-          strength_attack_home?: number | null
-          strength_defence_away?: number | null
-          strength_defence_home?: number | null
-          strength_overall_away?: number | null
-          strength_overall_home?: number | null
-          team_division?: string | null
-          unavailable?: boolean | null
-          win?: number | null
         }
         Update: {
-          code?: number
-          draw?: number | null
-          form?: string | null
           id?: number
-          loss?: number | null
           name?: string | null
-          played?: number | null
-          points?: number | null
-          position?: number | null
-          pulse_id?: number | null
           short_name?: string | null
-          strength?: number | null
-          strength_attack_away?: number | null
-          strength_attack_home?: number | null
-          strength_defence_away?: number | null
-          strength_defence_home?: number | null
-          strength_overall_away?: number | null
-          strength_overall_home?: number | null
-          team_division?: string | null
-          unavailable?: boolean | null
-          win?: number | null
         }
         Relationships: []
       }
@@ -801,6 +674,12 @@ export type Database = {
     Functions: {
       get_drafted_teams_and_players: {
         Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_drafted_teams_by_season: {
+        Args: {
+          active_season_param: string
+        }
         Returns: Json
       }
       get_drafted_teams_with_player_points_by_gameweek: {

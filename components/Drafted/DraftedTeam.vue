@@ -50,7 +50,7 @@ const handleEditPlayer = (playerID: number) => {
       </div>
       <span
         v-if="props.draftedTeam?.allowed_transfers"
-        title="Transfers allowed"
+        v-tooltip.top="'Transfers allowed'"
       >
         <Icon size="24" name="ic:round-swap-horiz" />
       </span>

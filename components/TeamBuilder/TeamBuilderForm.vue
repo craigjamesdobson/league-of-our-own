@@ -6,7 +6,7 @@ import { delay } from '@/utils/utility';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert } from '~/types/database-generated.types';
 import type { Player } from '~/types/Player';
-import { generateTeamEmail } from '@/pages/team-builder/email'
+import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email'
 
 const supabase = useSupabaseClient<Database>();
 const router = useRouter();
@@ -123,20 +123,23 @@ const handleTeamSubmit = async () => {
       query: { id: data.key }
     });
 
-    await useFetch('/api/send', {
+    await useFetch('/api/user-email', {
       method: 'post',
       body: {
         email: draftedTeamData.value.team_email,
         html: generateTeamEmail(draftedTeamPlayers.value, data.key)
-        // html: `
-        //   <p>Submitted team: ${draftedTeamPlayers.value
-        //     .map((x) => x.selectedPlayer.web_name)
-        //     .join(' | ')}</p>
-        //   <p>You can edit your team by clicking this <a href="${config.public.siteURL
-        //   }/team-builder?id=${data.key}">link</a></p>
-        // `
       }
     });
+
+    if (!isExistingDraftedTeam.value) {
+      await useFetch('/api/admin-email', {
+        method: 'post',
+        body: {
+          email: 'leagueofourown.fpl@gmail.com',
+          html: generateAdminEmail(draftedTeamPlayers.value, data)
+        }
+      });
+    }
 
     draftedTeamData.value = data;
 

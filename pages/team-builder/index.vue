@@ -5,7 +5,7 @@
       <h1 class="mb-2.5 text-xl font-black uppercase">Team Details</h1>
       <TeamBuilderForm :drafted-team-data="draftedTeamData" :drafted-team-players="draftedTeamPlayers" />
     </div>
-    <div class="grid grid-cols-12 justify-center">
+    <div class="grid grid-cols-12 justify-center gap-5">
       <PlayerSection
         v-for="(player, index) in draftedTeamPlayers"
         :key="index"
@@ -14,7 +14,7 @@
         :position="player.position"
       />
     </div>
-    <ScrollTop />
+    <ScrollTop class="bottom-24 !bg-primary" />
   </div>
 </template>
 
@@ -34,6 +34,8 @@ const draftedTeamData: Ref<TablesInsert<'drafted_teams'>> = ref({
   team_name: '',
   team_owner: '',
   team_email: '',
+  contact_number: null,
+  allow_communication: false,
   allowed_transfers: false
 });
 

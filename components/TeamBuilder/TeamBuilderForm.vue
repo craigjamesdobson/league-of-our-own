@@ -141,7 +141,7 @@ const handleTeamSubmit = async () => {
       });
     }
 
-    draftedTeamData.value = data;
+    Object.assign(draftedTeamData.value, data);
 
     toast.add({
       severity: 'success',

@@ -11,7 +11,6 @@ import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/emai
 const supabase = useSupabaseClient<Database>();
 const router = useRouter();
 const toast = useToast();
-const config = useRuntimeConfig();
 
 const loading = ref(false);
 
@@ -65,6 +64,8 @@ const upsertTeamData = async (isEditing: boolean) => {
     team_name: draftedTeamData.value.team_name,
     team_owner: draftedTeamData.value.team_owner,
     team_email: draftedTeamData.value.team_email,
+    contact_number: draftedTeamData.value.contact_number,
+    allow_communication: draftedTeamData.value.allow_communication,
     allowed_transfers: draftedTeamData.value.allowed_transfers,
     active_season: '24-25'
   };
@@ -221,12 +222,22 @@ const formIsValid = () => {
       <GenericFormField v-model="draftedTeamData.team_email" :validation="v$.team_email" type="email" />
     </div>
     <div class="flex w-full flex-col gap-1">
+      <label class="font-bold uppercase" for="contact_number">Contact number</label>
+      <InputMask id="contact_number" :unmask="true" v-model="draftedTeamData.contact_number" mask="9999999999?9"
+        placeholder="(07) 999 999 999" fluid />
+      <div v-if="draftedTeamData.contact_number" class="flex items-center mt-2.5">
+        <Checkbox v-model="draftedTeamData.allow_communication" input-id="allow_communication" :binary="true" />
+        <label for="allow_communication" class="ml-2.5 text-xs">If you would like to be added to a whats app group for
+          updates & general chit chat please check this box</label>
+      </div>
+    </div>
+    <div class="flex w-full flex-col gap-1">
       <div class="flex items-center">
         <Checkbox v-model="draftedTeamData.allowed_transfers" input-id="allowed_transfers" :binary="true" />
         <label for="allowed_transfers" class="ml-2.5 font-bold uppercase">Transfers Allowed</label>
       </div>
     </div>
-    <Message :severity="calculateRemainingBudget() < 0 ? 'error' : 'success'" class="w-full" :closable="false">
+    <Message :severity="calculateRemainingBudget() < 0 ? 'error' : 'success'" class="w-full !my-0" :closable="false">
       <template #messageicon>
         <Icon class="mr-2.5 self-start" size="22" name="tabler:pig-money" />
       </template>
@@ -235,7 +246,7 @@ const formIsValid = () => {
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
             calculateRemainingBudget().toFixed(1)
-          }}</span>
+            }}</span>
         </div>
       </div>
     </Message>

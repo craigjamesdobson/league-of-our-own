@@ -55,7 +55,9 @@ export type Database = {
       drafted_teams: {
         Row: {
           active_season: string
+          allow_communication: boolean
           allowed_transfers: boolean
+          contact_number: boolean | null
           created_at: string
           drafted_team_id: number
           key: string
@@ -66,7 +68,9 @@ export type Database = {
         }
         Insert: {
           active_season: string
+          allow_communication?: boolean
           allowed_transfers: boolean
+          contact_number?: boolean | null
           created_at?: string
           drafted_team_id?: number
           key?: string
@@ -77,7 +81,9 @@ export type Database = {
         }
         Update: {
           active_season?: string
+          allow_communication?: boolean
           allowed_transfers?: boolean
+          contact_number?: boolean | null
           created_at?: string
           drafted_team_id?: number
           key?: string

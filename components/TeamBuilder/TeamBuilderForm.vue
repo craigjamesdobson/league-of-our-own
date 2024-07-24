@@ -30,7 +30,7 @@ const rules = computed(() => {
       email: helpers.withMessage('Invalid email format', email)
     },
     contact_number: {
-      number: helpers.withMessage('Invalid phone number', numeric)
+      number: helpers.withMessage('Invalid phone number', helpers.regex(/^(07\d{8,9})$/))
     }
   };
 });

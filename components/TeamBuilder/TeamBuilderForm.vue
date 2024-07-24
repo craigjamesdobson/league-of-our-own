@@ -162,6 +162,9 @@ const handleTeamSubmit = async () => {
 
 const formIsValid = () => {
   if (v$.value.$invalid) {
+
+    v$.value.$touch();
+    
     toast.add({
       severity: 'error',
       summary: 'Form errors',

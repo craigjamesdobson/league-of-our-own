@@ -57,9 +57,10 @@ export type Database = {
           active_season: string
           allow_communication: boolean
           allowed_transfers: boolean
-          contact_number: boolean | null
+          contact_number: string | null
           created_at: string
           drafted_team_id: number
+          edited_count: number | null
           key: string
           team_email: string
           team_name: string
@@ -70,9 +71,10 @@ export type Database = {
           active_season: string
           allow_communication?: boolean
           allowed_transfers: boolean
-          contact_number?: boolean | null
+          contact_number?: string | null
           created_at?: string
           drafted_team_id?: number
+          edited_count?: number | null
           key?: string
           team_email: string
           team_name: string
@@ -83,9 +85,10 @@ export type Database = {
           active_season?: string
           allow_communication?: boolean
           allowed_transfers?: boolean
-          contact_number?: boolean | null
+          contact_number?: string | null
           created_at?: string
           drafted_team_id?: number
+          edited_count?: number | null
           key?: string
           team_email?: string
           team_name?: string

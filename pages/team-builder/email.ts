@@ -24,10 +24,9 @@ const generateTeamEmail = (players: DraftedTeamPlayer[], key: string) => {
             ${defenders.length > 0 ? `<p>Defenders: ${defenders.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
             ${midfielders.length > 0 ? `<p>Midfielders: ${midfielders.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
             ${forwards.length > 0 ? `<p>Forwards: ${forwards.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
-            <p>You can edit your team by clicking  <strong><a href="href="${config.public.SITE_URL}/team-builder?id=${key}"">here</a><strong></p>
-            <p><i>If you have any issues please email us at <a href="mailto:
-                leagueofourown.fpl@gmail.com">leagueofourown.fpl@gmail.com</a></i></p>
-            </body>
+            <p>You can edit your team by clicking <strong><a href="${config.public.SITE_URL}/team-builder?id=${key}">here</a></strong></p>
+            <p><i>If you have any issues please email us at <a href="mailto:leagueofourown.fpl@gmail.com">leagueofourown.fpl@gmail.com</a></i></p>
+        </body>
         </html>
     `;
 }

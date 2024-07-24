@@ -6,8 +6,8 @@
         v-if="icon"
         class="text-primary absolute left-4 top-3"
         :class="{
-          'text-red-500': validation?.$error,
-          'border-green-400 text-green-500': !validation?.$invalid
+          'text-red-500': validation.$dirty && validation?.$error,
+          'border-green-400 text-green-500': validation.$dirty && !validation?.$invalid
         }"
         :name="icon"
       />
@@ -15,8 +15,8 @@
         :id="label"
         v-model="modelValue"
         :class="{
-          'rounded-b-none border !border-red-500': validation?.$error,
-          'border !border-green-400 ': !validation?.$invalid,
+          'rounded-b-none border !border-red-500': validation.$dirty && validation?.$error,
+          'border !border-green-400 ': validation.$dirty && !validation?.$invalid,
           'pl-10 ': !!icon
         }"
         class="border-surface-300 rounded-md border bg-white px-4 py-2 focus:outline-none"

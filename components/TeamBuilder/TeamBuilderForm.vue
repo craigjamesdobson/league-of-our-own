@@ -76,6 +76,7 @@ const upsertTeamData = async (isEditing: boolean) => {
   if (isEditing) {
     draftedTeamUpsertData.drafted_team_id =
       draftedTeamData.value.drafted_team_id;
+      draftedTeamUpsertData.edited_count = draftedTeamData.value.edited_count! += 1
   }
 
   const { data, error } = await supabase
@@ -164,7 +165,7 @@ const formIsValid = () => {
   if (v$.value.$invalid) {
 
     v$.value.$touch();
-    
+
     toast.add({
       severity: 'error',
       summary: 'Form errors',

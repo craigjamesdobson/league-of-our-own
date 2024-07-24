@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useVuelidate from '@vuelidate/core';
-import { email, helpers, required } from '@vuelidate/validators';
+import { email, helpers, required, numeric } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
 import { delay } from '@/utils/utility';
 import { PlayerPosition } from '~/types/PlayerPosition';
@@ -28,6 +28,9 @@ const rules = computed(() => {
     team_email: {
       required: helpers.withMessage('The email field is required', required),
       email: helpers.withMessage('Invalid email format', email)
+    },
+    contact_number: {
+      number: helpers.withMessage('Invalid phone number', numeric)
     }
   };
 });
@@ -223,8 +226,7 @@ const formIsValid = () => {
     </div>
     <div class="flex w-full flex-col gap-1">
       <label class="font-bold uppercase" for="contact_number">Contact number</label>
-      <InputMask id="contact_number" :unmask="true" v-model="draftedTeamData.contact_number" mask="9999999999?9"
-        placeholder="(07) 999 999 999" fluid />
+      <GenericFormField v-model="draftedTeamData.contact_number" :validation="v$.contact_number" type="text" />
       <div v-if="draftedTeamData.contact_number" class="flex items-center mt-2.5">
         <Checkbox v-model="draftedTeamData.allow_communication" input-id="allow_communication" :binary="true" />
         <label for="allow_communication" class="ml-2.5 text-xs">If you would like to be added to a whats app group for

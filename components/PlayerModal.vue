@@ -21,10 +21,11 @@ const modelValue = defineModel<boolean>();
     <Dialog
       v-if="selectedPlayer"
       v-model:visible="modelValue"
+      class="m-5"
       :pt="{
         root: {
           class: [
-            'rounded-lg relative overflow-hidden w-full md:w-1/3 bg-white',
+            'rounded-lg relative overflow-hidden w-full md:w-1/2 lg:w-1/3 bg-white',
             {
               'border-4 border-yellow-300':
                 !selectedPlayer.unavailable_for_season &&

@@ -22,7 +22,7 @@ const players = defineModel('players');
     <div
       class="mb-4 justify-between rounded-sm bg-white lg:bg-transparent xl:block"
     >
-      <div class="bg-white p-4 xl:mb-4">
+      <div class="bg-white md:p-4 xl:mb-4">
         <div class="mb-3 border-b border-gray-100 pb-3">
           <div class="flex flex-col gap-2">
             <label class="text-xs" for="filter_name">Filter by name</label>
@@ -81,7 +81,7 @@ const players = defineModel('players');
           </div>
         </div>
       </div>
-      <div class="mx-4 xl:m-0">
+      <div>
         <Message
           v-if="playerStore.getPlayerLastUpdatedDate"
           severity="info"

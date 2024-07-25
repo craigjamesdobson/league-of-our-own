@@ -7,7 +7,7 @@
     class="m-5"
   >
     <Filters />
-    <Button class="w-full"  label="Apply" />
+    <Button @click="modelValue = false" class="w-full"  label="Apply" />
   </Dialog>
 </template>
 

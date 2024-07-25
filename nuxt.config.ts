@@ -112,7 +112,6 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      gtagId: 'G-YL6X3M2488',
       SITE_URL: process.env.CF_PAGES_URL,
       ACTIVE_SEASON: process.env.ACTIVE_SEASON
     }

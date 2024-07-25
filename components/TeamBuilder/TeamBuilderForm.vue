@@ -132,7 +132,7 @@ const handleTeamSubmit = async () => {
       method: 'post',
       body: {
         email: draftedTeamData.value.team_email,
-        html: generateTeamEmail(draftedTeamPlayers.value, data.key)
+        html: generateTeamEmail(draftedTeamPlayers.value, data)
       }
     });
 
@@ -231,16 +231,16 @@ const formIsValid = () => {
     <div class="flex w-full flex-col gap-1">
       <label class="font-bold uppercase" for="contact_number">Contact number</label>
       <GenericFormField v-model="draftedTeamData.contact_number" :validation="v$.contact_number" type="text" />
-      <div v-if="draftedTeamData.contact_number" class="flex items-center mt-2.5">
+      <div v-if="draftedTeamData.contact_number" class="flex items-center gap-5 mt-2.5">
         <Checkbox v-model="draftedTeamData.allow_communication" input-id="allow_communication" :binary="true" />
-        <label for="allow_communication" class="ml-2.5 text-xs">If you would like to be added to a whats app group for
-          updates & general chit chat please check this box</label>
+        <label for="allow_communication" class="text-xs">If you would like to be added to a WhatsApp group for
+          updates & general chat please check this box</label>
       </div>
     </div>
     <div class="flex w-full flex-col gap-1">
-      <div class="flex items-center">
+      <div class="flex items-center gap-5">
         <Checkbox v-model="draftedTeamData.allowed_transfers" input-id="allowed_transfers" :binary="true" />
-        <label for="allowed_transfers" class="ml-2.5 font-bold uppercase">Transfers Allowed</label>
+        <label for="allowed_transfers" class="font-bold uppercase">Transfers Allowed</label>
       </div>
     </div>
     <Message :severity="calculateRemainingBudget() < 0 ? 'error' : 'success'" class="w-full !my-0" :closable="false">

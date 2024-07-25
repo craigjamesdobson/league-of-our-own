@@ -1,8 +1,8 @@
 <template>
   <div class="players-container xl:mb-0">
     <div v-if="isSmallDevice" class="fixed right-5 top-5 z-10 opacity-75">
-      <Button rounded aria-label="Player Filters" @click="visible = true">
-        <Icon size="22" name="fluent:filter-32-filled" />
+      <Button class="w-12 h-12 !p-2" rounded aria-label="Player Filters" @click="visible = true">
+        <Icon size="24" name="fluent:filter-32-filled" />
       </Button>
     </div>
     <Players />

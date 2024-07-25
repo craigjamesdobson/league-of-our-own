@@ -7,7 +7,8 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@nuxtjs/supabase',
     '@nuxt/devtools',
-    'nuxt-primevue'
+    'nuxt-primevue',
+    'nuxt-gtag'
   ],
   primevue: {
     options: { unstyled: true },
@@ -105,6 +106,9 @@ export default defineNuxtConfig({
         }
       ]
     }
+  },
+  gtag: {
+    id: 'G-FWYYJ66CWG'
   },
   runtimeConfig: {
     public: {

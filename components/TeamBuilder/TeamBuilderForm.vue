@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useVuelidate from '@vuelidate/core';
-import { email, helpers, required, numeric } from '@vuelidate/validators';
+import { email, helpers, required } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
 import { delay } from '@/utils/utility';
 import { PlayerPosition } from '~/types/PlayerPosition';
@@ -211,8 +211,9 @@ const formIsValid = () => {
   <div class="flex flex-col text-xs" v-else>
     <Divider />
     <p class="mb-5">Pick your team, fill in the form below and then submit your team.</p>
-    <p>Once you submit your team you will recieve an email confirming your selection and a link to edit your team if you
+    <p class="mb-5">Once you submit your team you will recieve an email confirming your selection and a link to edit your team if you
       wish.</p>
+      <p>If you have any issues please email us with as much detail as possible at <a class="underline font-bold"href="mailto:leagueofourown.fpl@gmail.com">	leagueofourown.fpl@gmail.com</a>.</p>
     <Divider />
   </div>
   <form v-if="draftedTeamData" class="flex flex-col items-start gap-5">

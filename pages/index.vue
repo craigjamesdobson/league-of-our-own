@@ -13,10 +13,10 @@
       </div>
     </div>
     <div class="flex flex-col items-center gap-2.5">
-      <Message pt:text:class="text-xl" pt:icon:class="w-6 h-6 mr-2.5" :closable="false">Welcome to the 24/25 season!
-        Please use the new team builder to submit your team this year.</Message>
+      <Message pt:text:class="text-lg" pt:icon:class="w-6 h-6 mr-2.5" :closable="false">Welcome to the 24/25 season!
+        Please use the new <strong>team builder</strong> to submit your team this year.</Message>
       <NuxtLink class="gtm-team-builder-cta" to="/team-builder">
-        <Button label="Pick a team..." />
+        <Button label="Pick a team!" />
       </NuxtLink>
     </div>
   </div>

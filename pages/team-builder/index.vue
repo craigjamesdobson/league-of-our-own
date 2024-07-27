@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-5 2xl:flex-row">
     <Toast />
-    <div class="p-5 2xl:w-96">
+    <div class="px-5 2xl:w-96">
       <h1 class="mb-2.5 text-xl font-black uppercase">Team Details</h1>
       <TeamBuilderForm :drafted-team-data="draftedTeamData" :drafted-team-players="draftedTeamPlayers" />
     </div>

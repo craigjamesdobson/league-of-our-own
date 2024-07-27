@@ -76,7 +76,7 @@ const upsertTeamData = async (isEditing: boolean) => {
   if (isEditing) {
     draftedTeamUpsertData.drafted_team_id =
       draftedTeamData.value.drafted_team_id;
-      draftedTeamUpsertData.edited_count = draftedTeamData.value.edited_count! += 1
+    draftedTeamUpsertData.edited_count = draftedTeamData.value.edited_count! += 1
   }
 
   const { data, error } = await supabase
@@ -204,17 +204,23 @@ const formIsValid = () => {
 
 <template>
   <Toast />
-  <Message severity="warn" :closable="false" v-if="isExistingDraftedTeam">
+  <Message severity="info" :closable="false" v-if="isExistingDraftedTeam">
     You are editing your existing team. <br /> It was last edited on <strong>{{ new
       Date(draftedTeamData.updated_at ?? draftedTeamData.created_at).toLocaleDateString('en-GB') }}</strong>
   </Message>
   <div class="flex flex-col text-xs" v-else>
     <Divider />
     <p class="mb-5">Pick your team, fill in the form below and then submit your team.</p>
-    <p class="mb-5">Once you submit your team you will recieve an email confirming your selection and a link to edit your team if you
+    <p class="mb-5">Once you submit your team you will recieve an email confirming your selection and a link to edit
+      your team if you
       wish.</p>
-      <p>If you have any issues please email us with as much detail as possible at <a class="underline font-bold"href="mailto:leagueofourown.fpl@gmail.com">	leagueofourown.fpl@gmail.com</a>.</p>
+    <p>If you have any issues please email us with as much detail as possible at <a class="underline font-bold"
+        href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
     <Divider />
+  </div>
+  <div class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5">
+    <p>Deadline for submissions are</p>
+    <p class="uppercase font-black">11.59pm Wed 14th Aug 2024</p>
   </div>
   <form v-if="draftedTeamData" class="flex flex-col items-start gap-5">
     <div class="flex w-full flex-col gap-1">
@@ -253,7 +259,7 @@ const formIsValid = () => {
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
             calculateRemainingBudget().toFixed(1)
-            }}</span>
+          }}</span>
         </div>
       </div>
     </Message>

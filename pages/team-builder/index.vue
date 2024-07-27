@@ -14,7 +14,7 @@
         :position="player.position"
       />
     </div>
-    <ScrollTop class="bottom-24 !bg-primary" />
+    <ScrollTop class="!bottom-24 !bg-primary" />
   </div>
 </template>
 

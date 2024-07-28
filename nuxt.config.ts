@@ -8,7 +8,8 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxt/devtools',
     'nuxt-primevue',
-    'nuxt-gtag'
+    'nuxt-gtag',
+    '@zadigetvoltaire/nuxt-gtm'
   ],
   primevue: {
     options: { unstyled: true },
@@ -109,6 +110,9 @@ export default defineNuxtConfig({
   },
   gtag: {
     id: 'G-FWYYJ66CWG'
+  },
+  gtm: {
+    id: 'GTM-N3HLZXHC',
   },
   runtimeConfig: {
     public: {

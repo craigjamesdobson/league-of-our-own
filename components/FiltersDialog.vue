@@ -4,8 +4,10 @@
     :dismissable-mask="true"
     modal
     header="FILTERS"
+    class="m-5"
   >
-    <Filters v-once />
+    <Filters />
+    <Button @click="modelValue = false" class="w-full"  label="Apply" />
   </Dialog>
 </template>
 

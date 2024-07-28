@@ -9,6 +9,7 @@ import type { Database } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
+  const config = useRuntimeConfig();
 
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
@@ -25,7 +26,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   const fetchDraftedTeams = async () => {
     const { data, error } = await supabase
-      .rpc('get_drafted_teams_and_players')
+      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON })
       .returns<DraftedTeam[]>();
     if (error) throw error;
     draftedTeams.value = data;

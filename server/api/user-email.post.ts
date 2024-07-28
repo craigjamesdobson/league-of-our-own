@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     const data = await resend.emails.send({
       from: 'Jim & Craig <leagueofourown@craigjamesdobson.dev>',
       to: [body.email],
-      subject: 'Thank you for submitting your team',
+      subject: 'Thank you for team submission',
       html: body.html
     });
 

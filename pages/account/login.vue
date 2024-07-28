@@ -53,8 +53,8 @@ const handleUserLogin = async () => {
       Please report any bugs or issues by emailing
       <a
         class="font-bold underline"
-        href="mailto:craigjamesdobson.dev@gmail.com"
-        >craigjamesdobson.dev@gmail.com</a
+        href="mailto:leagueofourown.fpl@gmail.com"
+        >leagueofourown.fpl@gmail.com</a
       >
       with as much information as possible.
     </Message>

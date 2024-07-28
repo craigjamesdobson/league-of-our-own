@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { useDraftedTeamsStore } from '@/stores/draftedTeams';
-const draftedTeamsStore = useDraftedTeamsStore();
-await draftedTeamsStore.fetchDraftedTeams();
+// import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+// const draftedTeamsStore = useDraftedTeamsStore();
+// await draftedTeamsStore.fetchDraftedTeams();
 </script>
 
 <template>
-  <div>
+  <div class="h-full flex justify-center items-center">
+    <div class="p-10 text-2xl font-black rounded-md bg-blue-100/70 text-primary border border-primary">TEAMS WILL APPEAR HERE ONCE THE SEASON IN LIVE</div>
+  </div>
+  <!-- <div>
     <div v-if="draftedTeamsStore.getDraftedTeams">
       <h1 class="main-heading">Teams</h1>
       <div class="grid lg:grid-cols-2 xl:grid-cols-4">
@@ -26,7 +29,7 @@ await draftedTeamsStore.fetchDraftedTeams();
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped></style>

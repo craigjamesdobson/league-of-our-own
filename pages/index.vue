@@ -2,7 +2,7 @@
   const gtm = useGtm()
 
 function trackTeamBuilderCTA() {
-  gtm.trackEvent({
+  gtm?.trackEvent({
     event: 'Landing page team builder CTA',
     category: 'CTA',
     action: 'click',

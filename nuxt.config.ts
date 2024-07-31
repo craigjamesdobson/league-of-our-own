@@ -116,7 +116,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      SITE_URL: process.env.CF_PAGES_URL,
+      SITE_URL: process.env.SITE_URL,
       ACTIVE_SEASON: process.env.ACTIVE_SEASON
     }
   },

@@ -212,15 +212,17 @@ const formIsValid = () => {
     <div class="flex flex-col text-xs" v-else>
       <Divider />
       <p class="mb-5">Pick your team, fill in the form below and then submit your team.</p>
-      <p class="mb-5">Once you submit your team you will recieve an email confirming your selection and a link to edit
+      <p>Once you submit your team you will recieve an email confirming your selection and a link to edit
         your team if you
         wish.</p>
-      <p>If you have any issues please email us with as much detail as possible at <a class="underline font-bold"
-          href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
       <Divider />
     </div>
+    <p class="font-bold text-xs mb-5">If you do not receive an email when submitting or editing your team submission has
+        failed so please email us with as much detail as possible - <a class="underline font-bold"
+          href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
   </div>
-  <div class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5">
+  <div
+    class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5">
     <p>Deadline for submissions are</p>
     <p class="uppercase font-black">11.59pm Wed 14th Aug 2024</p>
   </div>
@@ -261,7 +263,7 @@ const formIsValid = () => {
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
             calculateRemainingBudget().toFixed(1)
-          }}</span>
+            }}</span>
         </div>
       </div>
     </Message>

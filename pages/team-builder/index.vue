@@ -18,10 +18,11 @@
           <p class="mb-5">Once you submit your team you will recieve an email confirming your selection and a link to edit
             your team if you
             wish.</p>
-          <p>If you have any issues please email us with as much detail as possible at <a class="underline font-bold"
-              href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
           <Divider />
         </div>
+        <p class="font-bold text-xs mb-5">If you do not receive an email when submitting or editing your team submission has
+        failed so please email us with as much detail as possible - <a class="underline font-bold"
+          href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
       </div>
       <div class="grid grid-cols-12 justify-center gap-5">
         <PlayerSection v-for="(player, index) in draftedTeamPlayers" :key="index" v-model:player="player.selectedPlayer"

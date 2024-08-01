@@ -48,7 +48,7 @@ interface DraftedTeamPlayer {
 
 
 const teamBudget = computed(() =>
-  draftedTeamData.value.allowed_transfers ? 85 : 95
+  draftedTeamData.value.allowed_transfers ? 85 : 90
 );
 
 const calculateRemainingBudget = (): number => {

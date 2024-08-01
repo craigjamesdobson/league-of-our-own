@@ -70,7 +70,8 @@ const upsertTeamData = async (isEditing: boolean) => {
     contact_number: draftedTeamData.value.contact_number,
     allow_communication: draftedTeamData.value.allow_communication,
     allowed_transfers: draftedTeamData.value.allowed_transfers,
-    active_season: '24-25'
+    active_season: '24-25',
+    total_team_value: teamBudget.value - calculateRemainingBudget()
   };
 
   if (isEditing) {

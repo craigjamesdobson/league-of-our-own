@@ -50,7 +50,7 @@ const generateAdminEmail = (players: DraftedTeamPlayer[], data: any) => {
             ${defenders.length > 0 ? `<p>Defenders: ${defenders.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
             ${midfielders.length > 0 ? `<p>Midfielders: ${midfielders.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
             ${forwards.length > 0 ? `<p>Forwards: ${forwards.map(player => player.selectedPlayer.web_name).join(' | ')}</p>` : ''}
-            <p>Tranfers allowed - ${data.allowed_transfers}</p>
+            <p>Transfers allowed - ${data.allowed_transfers}</p>
             <p>Total team value is - ${data.total_team_value}</p>
         </body>
         </html>

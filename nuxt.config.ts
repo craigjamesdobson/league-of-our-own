@@ -116,7 +116,7 @@ export default defineNuxtConfig({
     id: 'GTM-N3HLZXHC',
   },
   hotjar: {
-    hotjarId: 5090641,
+    hotjarId: 5090647,
   },
   runtimeConfig: {
     public: {

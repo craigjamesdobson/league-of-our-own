@@ -9,7 +9,8 @@ export default defineNuxtConfig({
     '@nuxt/devtools',
     'nuxt-primevue',
     'nuxt-gtag',
-    '@zadigetvoltaire/nuxt-gtm'
+    '@zadigetvoltaire/nuxt-gtm',
+    "nuxt-module-hotjar"
   ],
   primevue: {
     options: { unstyled: true },
@@ -113,6 +114,13 @@ export default defineNuxtConfig({
   },
   gtm: {
     id: 'GTM-N3HLZXHC',
+  },
+  hotjar: {
+    hotjarId: 5090641,
+    scriptVersion: 6,
+
+    // optionally you can turn on debug mode for development
+    debug: true
   },
   runtimeConfig: {
     public: {

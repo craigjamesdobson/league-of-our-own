@@ -117,10 +117,6 @@ export default defineNuxtConfig({
   },
   hotjar: {
     hotjarId: 5090641,
-    scriptVersion: 6,
-
-    // optionally you can turn on debug mode for development
-    debug: true
   },
   runtimeConfig: {
     public: {

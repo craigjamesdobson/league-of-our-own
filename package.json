@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -42,6 +42,7 @@
     "nuxt": "^3.9.0",
     "nuxt-gtag": "^2.1.0",
     "nuxt-icon": "^0.6.10",
+    "nuxt-module-hotjar": "^1.3.2",
     "nuxt-primevue": "^0.2.2",
     "sass": "^1.69.6",
     "sass-loader": "^13.3.3",

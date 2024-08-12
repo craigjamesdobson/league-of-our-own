@@ -132,6 +132,7 @@ const handleTeamSubmit = async () => {
     await useFetch('/api/user-email', {
       method: 'post',
       body: {
+        title: data.edited_count > 0 ? "Your team has been updated" : "Thank you for your team submission",
         email: draftedTeamData.value.team_email,
         html: generateTeamEmail(draftedTeamPlayers.value, data)
       }
@@ -218,8 +219,8 @@ const formIsValid = () => {
       <Divider />
     </div>
     <p class="font-bold text-xs mb-5">If you do not receive an email when submitting or editing your team submission has
-        failed so please email us with as much detail as possible - <a class="underline font-bold"
-          href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
+      failed so please email us with as much detail as possible - <a class="underline font-bold"
+        href="mailto:leagueofourown.fpl@gmail.com"> leagueofourown.fpl@gmail.com</a>.</p>
   </div>
   <div
     class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5">

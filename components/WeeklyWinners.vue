@@ -15,7 +15,7 @@ onMounted(() => {
       <template #body="slotProps">
         <template v-if="!!slotProps.data.points">
           <div v-for="(winner, index) in slotProps.data.top_teams" :key="index">
-            <div class="flex items-center gap-1 text-sm font-black">
+            <div class="flex items-center gap-1 text-sm font-black uppercase">
               {{ winner.team_name }} -
               <div class="text-xs font-normal">{{ winner.team_owner }}</div>
             </div>

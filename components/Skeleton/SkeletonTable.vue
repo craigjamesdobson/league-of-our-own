@@ -17,7 +17,6 @@ const loadingData = ref(new Array(20));
     <Column field="category" header="Team">
       <template #body>
         <Skeleton class="mb-2.5 h-5 w-11/12" />
-        <Skeleton class="h-5 w-8/12" />
       </template>
     </Column>
     <Column field="quantity" header="Goals">

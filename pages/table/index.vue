@@ -53,7 +53,7 @@ watch(selectedWeek, async (newWeek) => {
         </div>
       </div>
       <DataTable
-        v-if="tableStore.weeklyData"
+        v-if="tableStore.weeklyData?.length"
         scrollable
         striped-rows
         :value="tableStore.weeklyData"
@@ -111,7 +111,7 @@ watch(selectedWeek, async (newWeek) => {
         </Column>
         <Column field="team_name" header="Team">
           <template #body="slotProps">
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 uppercase">
               <div class="font-black lg:text-base">
                 {{ slotProps.data.team_name }}
               </div>

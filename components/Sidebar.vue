@@ -21,12 +21,6 @@ const routes = reactive([
     icon: 'ic:outline-rule',
     path: '/rules',
     admin: false
-  },
-  {
-    title: 'Team Builder',
-    icon: 'fluent:form-new-28-regular',
-    path: '/team-builder',
-    admin: false
   }
 ]);
 </script>

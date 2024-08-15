@@ -21,6 +21,12 @@ const routes = reactive([
     icon: 'ic:outline-rule',
     path: '/rules',
     admin: false
+  },
+  {
+    title: 'Table',
+    icon: 'gravity-ui:list-ol',
+    path: '/table',
+    admin: false
   }
 ]);
 </script>

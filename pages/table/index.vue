@@ -22,22 +22,15 @@ watch(selectedWeek, async (newWeek) => {
 
 <template>
   <div class="flex flex-col lg:grid lg:grid-cols-6 lg:gap-10">
-    <div class="lg:col-span-4">
+    <div class="lg:col-span-4 mb-5">
       <div class="flex justify-between">
         <h1 class="mb-5 text-2xl font-black uppercase">
           Week {{ selectedWeek }}
         </h1>
         <div class="mb-5 flex flex-col items-end gap-2.5">
-          <label class="font-bold uppercase" for="gameweeks"
-            >Select a game week</label
-          >
+          <label class="font-bold uppercase" for="gameweeks">Select a game week</label>
           <div class="flex gap-2.5">
-            <Dropdown
-              v-model="selectedWeek"
-              :options="weeks"
-              placeholder="Select a gameweek"
-              scroll-height="400"
-            >
+            <Dropdown v-model="selectedWeek" :options="weeks" placeholder="Select a gameweek" scroll-height="400">
               <template #value="slotProps">
                 <div class="flex items-center">
                   <div>WEEK {{ slotProps.value }}</div>
@@ -52,12 +45,12 @@ watch(selectedWeek, async (newWeek) => {
           </div>
         </div>
       </div>
-      <DataTable
-        v-if="tableStore.weeklyData?.length"
-        scrollable
-        striped-rows
-        :value="tableStore.weeklyData"
-      >
+      <div
+        class="lg:hidden bg-blue-600/10 border border-blue-600 p-2.5 text-blue-600 flex justify-between rounded mb-5">
+        <span>Swipe table to view full details</span>
+        <Icon class="ml-2.5 w-5 h-5" name="ic:outline-swipe" />
+      </div>
+      <DataTable v-if="tableStore.weeklyData?.length" scrollable striped-rows :value="tableStore.weeklyData">
         <Column field="index">
           <template #header="">
             <div v-tooltip.click.top="'Current Position'">Pos.</div>
@@ -73,37 +66,16 @@ watch(selectedWeek, async (newWeek) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div
-              v-if="!!slotProps.data.prev_week_position"
-              class="grid grid-cols-[35px_auto]"
-            >
+            <div v-if="!!slotProps.data.prev_week_position" class="grid grid-cols-[35px_auto]">
               <div>{{ slotProps.data.prev_week_position }}</div>
-              <div
-                v-if="slotProps.data.prev_week_position < slotProps.index + 1"
-              >
-                <Icon
-                  size="16"
-                  class="text-red-500"
-                  name="flowbite:caret-down-solid"
-                />
+              <div v-if="slotProps.data.prev_week_position < slotProps.index + 1">
+                <Icon size="16" class="text-red-500" name="flowbite:caret-down-solid" />
               </div>
-              <div
-                v-if="slotProps.data.prev_week_position > slotProps.index + 1"
-              >
-                <Icon
-                  size="16"
-                  class="text-green-500"
-                  name="flowbite:caret-up-solid"
-                />
+              <div v-if="slotProps.data.prev_week_position > slotProps.index + 1">
+                <Icon size="16" class="text-green-500" name="flowbite:caret-up-solid" />
               </div>
-              <div
-                v-if="slotProps.data.prev_week_position === slotProps.index + 1"
-              >
-                <Icon
-                  size="20"
-                  class="text-primary"
-                  name="radix-icons:dot-filled"
-                />
+              <div v-if="slotProps.data.prev_week_position === slotProps.index + 1">
+                <Icon size="20" class="text-primary" name="radix-icons:dot-filled" />
               </div>
             </div>
             <div v-else>N/A</div>
@@ -133,22 +105,14 @@ watch(selectedWeek, async (newWeek) => {
         </Column>
         <Column field="week_points">
           <template #header>
-            <div
-              v-tooltip.top="'Weekly points total'"
-              class="whitespace-nowrap"
-            >
+            <div v-tooltip.top="'Weekly points total'" class="whitespace-nowrap">
               Wk Pts.
             </div>
           </template>
           <template #body="slotProps">
             <div class="flex items-center gap-2.5">
               <div>{{ slotProps.data.week_points }}</div>
-              <Icon
-                v-if="slotProps.data.weekly_winner"
-                size="16"
-                class="text-yellow-500"
-                name="tabler:star-filled"
-              />
+              <Icon v-if="slotProps.data.weekly_winner" size="16" class="text-yellow-500" name="tabler:star-filled" />
             </div>
           </template>
         </Column>

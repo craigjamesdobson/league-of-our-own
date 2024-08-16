@@ -8,7 +8,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2 class="mb-12 text-xl font-black uppercase">Weekly Winners</h2>
+  <h2 class="mb-5 lg:mb-12 text-xl font-black uppercase">Weekly Winners</h2>
   <DataTable striped-rows :value="tableStore.weeklyWinners">
     <Column class="w-1/12" field="week" header="Week"></Column>
     <Column class="w-10/12" header="Team">

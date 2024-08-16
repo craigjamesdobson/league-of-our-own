@@ -44,10 +44,12 @@ const handleUserLogout = async () => {
   }
 };
 
-const transfersMadeCount = (team: DraftedTeam) => {
-  return team.players
+const transfersRemainingCount = (team: DraftedTeam) => {
+  const totalTransfersMade = team.players
     .map((x) => x.transfers.length)
     .reduce((total, transfers) => total + transfers, 0);
+
+  return 4 - totalTransfersMade;
 };
 </script>
 
@@ -97,12 +99,12 @@ const transfersMadeCount = (team: DraftedTeam) => {
               <div
                 class="flex items-center justify-between"
                 :class="{
-                  'opacity-25': transfersMadeCount(slotProps.option) === 4
+                  'opacity-25': transfersRemainingCount(slotProps.option) === 0
                 }"
               >
-                <div class="align-items-center flex flex-col gap-1">
+                <div class="align-items-center flex flex-col gap-1 uppercase">
                   <div class="font-black">
-                    {{ slotProps.option.team_name.toUpperCase() }}
+                    {{ slotProps.option.team_name }}
                   </div>
                   <span class="text-xs">{{ slotProps.option.team_owner }}</span>
                 </div>
@@ -110,8 +112,8 @@ const transfersMadeCount = (team: DraftedTeam) => {
                   severity="info"
                   class="h-6 w-6"
                   rounded
-                  title="transfers made"
-                  :value="transfersMadeCount(slotProps.option)"
+                  v-tooltip="`${transfersRemainingCount(slotProps.option)} transfers remaining`"
+                  :value="transfersRemainingCount(slotProps.option)"
                 ></Tag>
               </div>
             </template>

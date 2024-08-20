@@ -7,17 +7,17 @@ const tableStore = useTableStore();
 const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
 const selectedWeek = ref(+route.query.week || 1);
 
-onMounted(() => {
-  tableStore.fetchWeeklyStats(selectedWeek.value);
-});
-
 watch(selectedWeek, async (newWeek) => {
-  await tableStore.fetchWeeklyStats(newWeek);
+  if (tableStore.weeklyWinners.find(x => x.week === newWeek).points !== null) {
+    await tableStore.fetchWeeklyStats(newWeek);
+  } else {
+    tableStore.weeklyData = [];
+  }
   await router.push({
     path: 'table',
     query: { week: newWeek }
   });
-});
+}, { immediate: true });
 </script>
 
 <template>

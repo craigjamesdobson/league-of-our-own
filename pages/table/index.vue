@@ -8,7 +8,7 @@ const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
 const selectedWeek = ref(+route.query.week || 1);
 
 watch(selectedWeek, async (newWeek) => {
-  if (tableStore.weeklyWinners.find(x => x.week === newWeek).points !== null) {
+  if (tableStore.weeklyWinners?.find(x => x.week === newWeek).points !== null) {
     await tableStore.fetchWeeklyStats(newWeek);
   } else {
     tableStore.weeklyData = [];

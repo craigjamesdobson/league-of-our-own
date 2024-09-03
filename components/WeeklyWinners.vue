@@ -14,10 +14,12 @@ onMounted(() => {
     <Column class="w-10/12" header="Team">
       <template #body="slotProps">
         <template v-if="!!slotProps.data.points">
-          <div v-for="(winner, index) in slotProps.data.top_teams" :key="index">
-            <div class="flex items-center gap-1 text-sm font-black uppercase">
-              {{ winner.team_name }} -
-              <div class="text-xs font-normal">{{ winner.team_owner }}</div>
+          <div class="flex flex-col gap-2.5">
+            <div v-for="(winner, index) in slotProps.data.top_teams" :key="index">
+              <div class="flex flex-col gap-1 text-sm font-black uppercase">
+                <div>{{ winner.team_name }}</div>
+                <div class="text-xs font-normal">{{ winner.team_owner }}</div>
+              </div>
             </div>
           </div>
         </template>

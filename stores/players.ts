@@ -64,7 +64,7 @@ export const usePlayerStore = defineStore('player-store', () => {
       .from('players')
       .upsert(
         formattedPlayerData.map(
-          ({ id, ...rest }: { id: number; [key: string]: any }) => ({
+          ({ id, region, ...rest }: { id: number; region?: string; [key: string]: any }) => ({
             player_id: id,
             ...rest
           })

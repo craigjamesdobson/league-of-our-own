@@ -22,7 +22,7 @@
     "pinia": "^2.1.7",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.13",
-    "primevue": "^3.45.0",
+    "primevue": "^3.53.0",
     "resend": "^3.1.0",
     "type-fest": "^4.15.0",
     "vue": "^3.4.3"

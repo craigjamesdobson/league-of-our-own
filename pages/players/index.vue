@@ -12,8 +12,13 @@
 </template>
 
 <script setup lang="ts">
-const isSmallDevice = window.matchMedia('(max-width: 1280px)').matches;
-const visible = ref(false);
+const isSmallDevice = ref(false)
+
+onMounted(() => {
+  isSmallDevice.value = window.matchMedia('(max-width: 1280px)').matches
+})
+
+const visible = ref(false)
 </script>
 
 <style lang="scss">

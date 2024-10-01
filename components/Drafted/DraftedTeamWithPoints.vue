@@ -47,7 +47,7 @@ const calculatedWeeklyStats = computed(() => {
         ? selectedTransfer.points || 0
         : player.transfers.reduce((points, transfer) => {
             return transfer.transfer_week <= fixtureStore.selectedGameweek
-              ? transfer.points || points
+              ? transfer.points
               : points;
           }, player.points || 0);
 

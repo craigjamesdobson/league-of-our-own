@@ -5,7 +5,7 @@ interface DraftedTransfer {
   active_transfer_expiry: Date;
   transfer_week: number;
   data: Tables<'players_view'>;
-  points?: number;
+  points: number;
   selected: boolean;
 }
 

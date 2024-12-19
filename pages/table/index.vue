@@ -30,7 +30,7 @@ watch(selectedWeek, async (newWeek) => {
         <div class="mb-5 flex flex-col items-end gap-2.5">
           <label class="font-bold uppercase" for="gameweeks">Select a game week</label>
           <div class="flex gap-2.5">
-            <Dropdown v-model="selectedWeek" :options="weeks" placeholder="Select a gameweek" scroll-height="400">
+            <Select v-model="selectedWeek" :options="weeks" placeholder="Select a gameweek" scrollHeight="25rem">
               <template #value="slotProps">
                 <div class="flex items-center">
                   <div>WEEK {{ slotProps.value }}</div>
@@ -41,7 +41,7 @@ watch(selectedWeek, async (newWeek) => {
                   <div>WEEK {{ slotProps.option }}</div>
                 </div>
               </template>
-            </Dropdown>
+            </Select>
           </div>
         </div>
       </div>

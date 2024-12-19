@@ -79,4 +79,7 @@ const routes = reactive([
 </template>
 
 <style scoped>
+.router-link-active {
+  @apply bg-neutral-200 text-primary;
+}
 </style>

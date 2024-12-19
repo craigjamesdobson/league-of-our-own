@@ -21,7 +21,7 @@ onMounted(() => {
 const visible = ref(false)
 </script>
 
-<style lang="scss">
+<style>
 .players-container {
   @apply grid grid-cols-1 gap-4;
 

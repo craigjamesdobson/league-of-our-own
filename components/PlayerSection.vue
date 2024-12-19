@@ -66,14 +66,14 @@ const dropdownPlayerData = computed(() =>
         <p>{{ player!.cost.toFixed(1) }}</p>
       </div>
     </div>
-    <Dropdown v-model="player" filter class="mt-auto !min-w-[300px]" :options="dropdownPlayerData"
+    <Select v-model="player" filter class="mt-auto !min-w-[300px]" :options="dropdownPlayerData"
       :virtual-scroller-options="{ itemSize: 60 }" :placeholder="`Select a ${PlayerPosition[props.position].toLowerCase()}`"
       option-disabled="disabled" option-label="web_name">
       <template #value="slotProps">
         {{ slotProps.value?.web_name || slotProps.placeholder }}
       </template>
       <template #option="slotProps">
-        <div class="flex h-full flex-col justify-center gap-2.5">
+        <div class="flex h-full w-full flex-col justify-center gap-2.5">
           <div class="flex gap-2.5">
             <span class="w-1/6">{{ slotProps.option.player_id }}</span>
             <span class="w-1/6">{{ slotProps.option.team_short_name }}</span>
@@ -88,6 +88,6 @@ const dropdownPlayerData = computed(() =>
           </div>
         </div>
       </template>
-    </Dropdown>
+    </Select>
   </div>
 </template>

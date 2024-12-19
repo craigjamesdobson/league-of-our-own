@@ -61,7 +61,7 @@ const handleUserLogin = async () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 input {
   @apply focus:outline-none;
 }

@@ -21,7 +21,3 @@ initialize();
     <div id="modals" />
   </div>
 </template>
-
-<style lang="scss">
-@import '@/assets/components/layout';
-</style>

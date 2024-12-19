@@ -1,0 +1,21 @@
+.filter-container {
+  @apply self-start sticky bg-transparent p-0 border-t-0;
+}
+
+@media (min-width: 1280px) {
+  .filter-container {
+    top: 20px;
+  }
+}
+
+
+.icon-container {
+  @apply transition-all duration-200 ease-in-out h-8;
+  filter: grayscale(1);
+}
+
+.icon-container.active,
+.icon-container:hover {
+  filter: grayscale(0);
+  transform: scale(1.2);
+}

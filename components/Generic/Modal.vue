@@ -18,6 +18,6 @@ defineExpose({ toggleDialog });
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '@/assets/components/modal';
+<style scoped>
+@import '@/assets/styles/modal';
 </style>

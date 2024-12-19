@@ -9,7 +9,6 @@ const { selectedPlayer } = defineProps<{
 const clearPlayerQueryParam = () => {
   router.push({
     path: 'players',
-    query: null
   });
 };
 
@@ -21,23 +20,15 @@ const modelValue = defineModel<boolean>();
     <Dialog
       v-if="selectedPlayer"
       v-model:visible="modelValue"
-      class="m-5"
+      class="m-5 rounded-lg relative overflow-hidden w-[90%] lg:w-1/2 2xl:w-1/3 bg-white"
+      pt:header="!justify-end"
       :pt="{
-        root: {
-          class: [
-            'rounded-lg relative overflow-hidden w-[90%] lg:w-1/2 2xl:w-1/3 bg-white',
-            {
-              'border-4 border-yellow-300':
-                !selectedPlayer.unavailable_for_season &&
-                selectedPlayer.is_unavailable,
-              'border-4 border-red-500': selectedPlayer.unavailable_for_season
-            }
-          ]
-        },
-        header: {
-          class: 'flex justify-end rounded-t-none bg-white p-5'
-        }
-      }"
+      root: selectedPlayer.unavailable_for_season
+        ? '!border-2 !border-red-500'
+        : selectedPlayer.is_unavailable
+        ? '!border-2 !border-yellow-300'
+        : 'default-class',
+    }"
       modal
       :dismissable-mask="true"
       @hide="clearPlayerQueryParam"
@@ -155,6 +146,6 @@ const modelValue = defineModel<boolean>();
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '@/assets/components/modal';
+<style scoped>
+@import '@/assets/styles/modal';
 </style>

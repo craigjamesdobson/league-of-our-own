@@ -81,7 +81,7 @@ const transfersRemainingCount = (team: DraftedTeam) => {
           />
         </div>
         <div v-if="draftedTeamStore.draftedTeams" class="flex flex-col gap-4">
-          <Dropdown
+          <Select
             v-model="selectedDraftedTeamID"
             class="!w-full"
             :options="
@@ -97,7 +97,7 @@ const transfersRemainingCount = (team: DraftedTeam) => {
           >
             <template #option="slotProps">
               <div
-                class="flex items-center justify-between"
+                class="flex items-center justify-between w-full"
                 :class="{
                   'opacity-25': transfersRemainingCount(slotProps.option) === 0
                 }"
@@ -117,7 +117,7 @@ const transfersRemainingCount = (team: DraftedTeam) => {
                 ></Tag>
               </div>
             </template>
-          </Dropdown>
+          </Select>
           <div v-if="selectedDraftedTeam">
             <DraftedTeam :editable="true" :drafted-team="selectedDraftedTeam" />
           </div>
@@ -128,7 +128,7 @@ const transfersRemainingCount = (team: DraftedTeam) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 input {
   @apply focus:outline-none;
 }

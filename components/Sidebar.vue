@@ -79,7 +79,4 @@ const routes = reactive([
 </template>
 
 <style scoped>
-.router-link-exact-active:not(.logo) {
-  @apply text-primary bg-slate-100;
-}
 </style>

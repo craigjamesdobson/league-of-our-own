@@ -1,16 +1,3 @@
-<script lang="ts" setup>
-  const gtm = useGtm()
-
-function trackTeamBuilderCTA() {
-  gtm?.trackEvent({
-    event: 'Landing page team builder CTA',
-    category: 'CTA',
-    action: 'click',
-    label: 'Track if user navigated to team builder via landing page button'
-  })
-}
-</script>
-
 <template>
   <div class="flex flex-col gap-5 items-center justify-center h-full">
     <div class="text-primary font-display flex items-center justify-center">

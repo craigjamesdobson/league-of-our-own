@@ -80,7 +80,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" header="" modal :dismissable-mask="true">
+  <Dialog pt:header="!justify-end" v-model:visible="visible" header="" modal :dismissable-mask="true">
     <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
       <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
         <div class="mb-10">
@@ -124,7 +124,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
         <form class="flex flex-col items-start gap-5">
           <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-id">Player</label>
-            <Dropdown
+            <Select
               v-model="newTransferData.player"
               class="!w-full"
               filter
@@ -137,7 +137,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
               placeholder="Select a Player"
             >
               <template #option="slotProps">
-                <div class="align-items-center flex">
+                <div class="align-items-center flex w-full">
                   <div class="w-1/5">
                     {{ slotProps.option.player_id }}
                   </div>
@@ -146,7 +146,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
                   </div>
                 </div>
               </template>
-            </Dropdown>
+            </Select>
           </div>
           <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-week">Transfer Week</label>

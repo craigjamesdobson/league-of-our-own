@@ -98,11 +98,11 @@ const updateWeeklyStats = async () => {
           >Select a game week</label
         >
         <div class="flex gap-2.5">
-          <Dropdown
+          <Select
             v-model="selectedWeek"
             :options="weeks"
             placeholder="Select a gameweek"
-            scroll-height="400"
+            scrollHeight="25rem"
           >
             <template #value="slotProps">
               <div class="flex items-center">
@@ -114,7 +114,7 @@ const updateWeeklyStats = async () => {
                 <div>WEEK {{ slotProps.option }}</div>
               </div>
             </template>
-          </Dropdown>
+          </Select>
           <Button label="Save week" :disabled="weekIsInComplete" @click="updateWeeklyStats" />
         </div>
       </div>

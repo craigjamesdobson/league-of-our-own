@@ -5,7 +5,7 @@ import type { Fixture } from '~/types/Fixture';
 import type { PlayerWithStats } from '~/types/Player';
 
 definePageMeta({
-  keepalive: true
+  keepalive: true,
 });
 
 const route = useRoute();
@@ -26,12 +26,12 @@ const awayPlayers: Ref<PlayerWithStats[] | undefined> = ref();
 const populatePlayers = async () => {
   homePlayers.value = await fixtureStore.fetchPlayersWithStatistics(
     fixture.value!.id,
-    fixture.value!.home_team.id
+    fixture.value!.home_team.id,
   );
 
   awayPlayers.value = await fixtureStore.fetchPlayersWithStatistics(
     fixture.value!.id,
-    fixture.value!.away_team.id
+    fixture.value!.away_team.id,
   );
 };
 
@@ -46,7 +46,7 @@ const updateFixture = async () => {
     const a = fixtureStore.updateFixtureScore(fixture.value);
     const b = fixtureStore.updatePlayerStatistics(
       [...homePlayers.value, ...awayPlayers.value],
-      fixture.value.id
+      fixture.value.id,
     );
 
     await Promise.all([a, b]);
@@ -54,12 +54,13 @@ const updateFixture = async () => {
     await navigateTo({
       path: '/fixtures',
       query: {
-        week: fixture.value.game_week
-      }
+        week: fixture.value.game_week,
+      },
     });
 
     handleApiSuccess('Fixture has been updated', toast);
-  } catch (error) {
+  }
+  catch (error) {
     handleApiError(error, toast);
   }
 };
@@ -68,7 +69,10 @@ const updateFixture = async () => {
 <template>
   <div>
     <Toast />
-    <div v-if="!!fixture" class="flex flex-col">
+    <div
+      v-if="!!fixture"
+      class="flex flex-col"
+    >
       <div class="grid grid-cols-2 gap-5">
         <div>
           <div
@@ -77,7 +81,7 @@ const updateFixture = async () => {
             <img
               class="aspect-square h-32 w-32"
               :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
-            />
+            >
             <div class="flex flex-col items-center gap-2.5">
               <p class="text-xl font-black uppercase">
                 {{ fixture?.home_team.name }}
@@ -87,7 +91,7 @@ const updateFixture = async () => {
                 class="h-10 w-20 rounded border p-2 text-lg"
                 type="number"
                 min="0"
-              />
+              >
             </div>
           </div>
           <FixtureStatsInput
@@ -112,12 +116,12 @@ const updateFixture = async () => {
                 class="h-10 w-20 rounded border p-2 text-lg"
                 type="number"
                 min="0"
-              />
+              >
             </div>
             <img
               class="aspect-square h-32 w-32"
               :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
-            />
+            >
           </div>
           <FixtureStatsInput
             v-if="awayPlayers"
@@ -135,6 +139,8 @@ const updateFixture = async () => {
         @click="updateFixture"
       />
     </div>
-    <div v-else>Loading...</div>
+    <div v-else>
+      Loading...
+    </div>
   </div>
 </template>

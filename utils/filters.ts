@@ -23,7 +23,7 @@ const populateFilterPrices = () => {
     { name: '13.5', value: 13.5 },
     { name: '14', value: 14.0 },
     { name: '14.5', value: 14.5 },
-    { name: '15', value: 15.0 }
+    { name: '15', value: 15.0 },
   ];
 };
 

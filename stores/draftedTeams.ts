@@ -3,7 +3,7 @@ import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type {
   DraftedTeam,
-  DraftedTeamWithWeeklyStats
+  DraftedTeamWithWeeklyStats,
 } from '~/types/DraftedTeam';
 import type { Database } from '~/types/database.types';
 
@@ -14,14 +14,14 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
-    initDraftedTeamData(draftedTeams.value)
+    initDraftedTeamData(draftedTeams.value),
   );
 
   const getDraftedTeamByID = computed(() => {
     const draftedTeamsValue = getDraftedTeams.value;
 
     return (id: number) =>
-      draftedTeamsValue?.find((x) => x.drafted_team_id === id);
+      draftedTeamsValue?.find(x => x.drafted_team_id === id);
   });
 
   const fetchDraftedTeams = async () => {
@@ -33,11 +33,11 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   };
 
   const fetchDraftedTeamsWithPlayerPointsByGameweek = async (
-    selectedGameWeek: number
+    selectedGameWeek: number,
   ) => {
     const { data, error } = await supabase
       .rpc('get_drafted_teams_with_player_points_by_gameweek', {
-        game_week_param: selectedGameWeek
+        game_week_param: selectedGameWeek,
       })
       .returns<DraftedTeamWithWeeklyStats[]>();
     if (error) throw error;
@@ -50,7 +50,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       .select(
         `*,
           transfers:drafted_transfers(*)
-        `
+        `,
       )
       .eq('drafted_player_id', draftedPlayerID)
       .single();
@@ -64,7 +64,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
           drafted_player: x.data.player_id,
-          drafted_team: draftedTeamData.drafted_team_id
+          drafted_team: draftedTeamData.drafted_team_id,
         };
       });
       await supabase.from('drafted_teams').upsert(draftedTeamData);
@@ -78,7 +78,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       player_id: number;
       transfer_week: number;
       active_transfer_expiry: string;
-    }>
+    }>,
   ) => {
     const { data, error } = await supabase
       .from('drafted_transfers')
@@ -112,6 +112,6 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     fetchDraftedTeamsWithPlayerPointsByGameweek,
     upsertTeamData,
     addNewTransfer,
-    deleteTransfer
+    deleteTransfer,
   };
 });

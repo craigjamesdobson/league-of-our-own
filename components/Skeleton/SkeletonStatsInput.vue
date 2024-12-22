@@ -1,28 +1,43 @@
 <template>
   <DataTable :value="new Array(8)">
-    <Column field="code" header="Player">
+    <Column
+      field="code"
+      header="Player"
+    >
       <template #body>
-        <Skeleton></Skeleton>
+        <Skeleton />
       </template>
     </Column>
-    <Column field="name" header="Goals">
+    <Column
+      field="name"
+      header="Goals"
+    >
       <template #body>
-        <Skeleton></Skeleton>
+        <Skeleton />
       </template>
     </Column>
-    <Column field="category" header="Assists">
+    <Column
+      field="category"
+      header="Assists"
+    >
       <template #body>
-        <Skeleton></Skeleton>
+        <Skeleton />
       </template>
     </Column>
-    <Column field="quantity" header="Clean sheet">
+    <Column
+      field="quantity"
+      header="Clean sheet"
+    >
       <template #body>
-        <Skeleton></Skeleton>
+        <Skeleton />
       </template>
     </Column>
-    <Column field="quantity" header="Red Card">
+    <Column
+      field="quantity"
+      header="Red Card"
+    >
       <template #body>
-        <Skeleton></Skeleton>
+        <Skeleton />
       </template>
     </Column>
   </DataTable>

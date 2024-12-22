@@ -8,16 +8,11 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     'nuxt-gtag',
     '@zadigetvoltaire/nuxt-gtm',
-    "nuxt-module-hotjar"
+    'nuxt-module-hotjar',
+    '@nuxt/eslint',
   ],
 
-  css: ['@/assets/styles/base.css'],
-
-  primevue: {
-    options: {
-      theme: 'none'
-    }
-  },
+  ssr: false,
 
   app: {
     head: {
@@ -25,28 +20,39 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: '' }
+        { hid: 'description', name: 'description', content: '' },
       ],
       link: [
         {
           rel: 'icon',
           type: 'image/png',
-          href: '/favicon.png'
+          href: '/favicon.png',
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400;1,500;1,700;1,900&display=swap',
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap'
-        }
-      ]
-    }
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap',
+        },
+      ],
+    },
   },
 
+  css: ['@/assets/styles/base.css'],
+
+  runtimeConfig: {
+    public: {
+      SITE_URL: process.env.SITE_URL,
+      ACTIVE_SEASON: process.env.ACTIVE_SEASON,
+    },
+  },
+
+  compatibilityDate: '2024-12-17',
+
   gtag: {
-    id: 'G-FWYYJ66CWG'
+    id: 'G-FWYYJ66CWG',
   },
 
   gtm: {
@@ -57,18 +63,13 @@ export default defineNuxtConfig({
     hotjarId: 5090647,
   },
 
-  runtimeConfig: {
-    public: {
-      SITE_URL: process.env.SITE_URL,
-      ACTIVE_SEASON: process.env.ACTIVE_SEASON
-    }
+  primevue: {
+    options: {
+      theme: 'none',
+    },
   },
-
-  ssr: false,
 
   supabase: {
-    redirect: false
+    redirect: false,
   },
-
-  compatibilityDate: '2024-12-17'
 });

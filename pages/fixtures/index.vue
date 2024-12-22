@@ -4,7 +4,7 @@ import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 import type {
   DraftedTeamWithWeeklyStats,
-  WeeklyStats
+  WeeklyStats,
 } from '~/types/DraftedTeam';
 
 const supabase = useSupabaseClient();
@@ -16,18 +16,18 @@ const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
 const selectedWeek = ref(+route.query.week || 1);
 
 const draftedTeamsStore = useDraftedTeamsStore();
-const draftedTeamsWithPoints: Ref<DraftedTeamWithWeeklyStats[] | undefined> =
-  ref();
+const draftedTeamsWithPoints: Ref<DraftedTeamWithWeeklyStats[] | undefined>
+  = ref();
 
 onMounted(async () => {
-  draftedTeamsWithPoints.value =
-    await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-      selectedWeek.value
+  draftedTeamsWithPoints.value
+    = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
+      selectedWeek.value,
     );
 });
 
 definePageMeta({
-  middleware: ['auth']
+  middleware: ['auth'],
 });
 
 watch(
@@ -35,41 +35,41 @@ watch(
   async (newWeek) => {
     await fixtureStore.fetchFixtures(newWeek);
     draftedTeamsWithPoints.value = undefined;
-    draftedTeamsWithPoints.value =
-      await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-        newWeek
+    draftedTeamsWithPoints.value
+      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
+        newWeek,
       );
     fixtureStore.selectedGameweek = newWeek;
     await router.push({
       path: 'fixtures',
-      query: { week: newWeek }
+      query: { week: newWeek },
     });
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const weekIsInComplete = computed(() => {
-  return fixtureStore.fixtures?.some(fixture => 
-    fixture.home_team_score === null || fixture.away_team_score === null
+  return fixtureStore.fixtures?.some(fixture =>
+    fixture.home_team_score === null || fixture.away_team_score === null,
   );
 });
 
 const populateWeeklyStats = (data: WeeklyStats) => {
   const currentDraftedTeam = draftedTeamsWithPoints.value?.find(
-    (x) => x.drafted_team_id === data.drafted_team_id
+    x => x.drafted_team_id === data.drafted_team_id,
   );
   currentDraftedTeam!.weekly_stats = data;
 };
 
 const updateWeeklyStats = async () => {
-  const formattedWeeklyData = draftedTeamsWithPoints.value!.map((x) => ({
+  const formattedWeeklyData = draftedTeamsWithPoints.value!.map(x => ({
     team: x.drafted_team_id,
     week: selectedWeek.value,
     points: x.weekly_stats.points,
     goals: x.weekly_stats.goals,
     assists: x.weekly_stats.assists,
     clean_sheets: x.weekly_stats.clean_sheets,
-    red_cards: x.weekly_stats.red_cards
+    red_cards: x.weekly_stats.red_cards,
   }));
 
   const { error: deleteError } = await supabase
@@ -90,19 +90,28 @@ const updateWeeklyStats = async () => {
     <Toast />
     <div class="flex justify-between mb-2.5">
       <div class="flex flex-col gap-2.5">
-        <h1 class="text-2xl font-black uppercase">Fixtures</h1>
-        <Message v-if="weekIsInComplete" class="!m-0" :closable="false">This week is currently incomplete</Message>
+        <h1 class="text-2xl font-black uppercase">
+          Fixtures
+        </h1>
+        <Message
+          v-if="weekIsInComplete"
+          class="!m-0"
+          :closable="false"
+        >
+          This week is currently incomplete
+        </Message>
       </div>
       <div class="mb-5 flex flex-col items-end gap-2.5">
-        <label class="font-bold uppercase" for="gameweeks"
-          >Select a game week</label
-        >
+        <label
+          class="font-bold uppercase"
+          for="gameweeks"
+        >Select a game week</label>
         <div class="flex gap-2.5">
           <Select
             v-model="selectedWeek"
             :options="weeks"
             placeholder="Select a gameweek"
-            scrollHeight="25rem"
+            scroll-height="25rem"
           >
             <template #value="slotProps">
               <div class="flex items-center">
@@ -115,7 +124,11 @@ const updateWeeklyStats = async () => {
               </div>
             </template>
           </Select>
-          <Button label="Save week" :disabled="weekIsInComplete" @click="updateWeeklyStats" />
+          <Button
+            label="Save week"
+            :disabled="weekIsInComplete"
+            @click="updateWeeklyStats"
+          />
         </div>
       </div>
     </div>
@@ -131,15 +144,22 @@ const updateWeeklyStats = async () => {
           class="bg-surface-50 hover:border-primary rounded-sm border p-5 duration-300 ease-in-out *:transition-all"
           :class="{
             'border-green-500':
-              fixture.home_team_score !== null &&
-              fixture.away_team_score !== null
+              fixture.home_team_score !== null
+              && fixture.away_team_score !== null,
           }"
         >
           <FixtureBase v-model:fixture="fixtureStore.fixtures[index]" />
         </NuxtLink>
       </div>
-      <div v-else class="flex w-full flex-col gap-2.5 lg:w-1/3">
-        <div v-for="i in 6" :key="i" class="bg-surface-50 border p-5">
+      <div
+        v-else
+        class="flex w-full flex-col gap-2.5 lg:w-1/3"
+      >
+        <div
+          v-for="i in 6"
+          :key="i"
+          class="bg-surface-50 border p-5"
+        >
           <SkeletonFixture />
         </div>
       </div>
@@ -158,8 +178,14 @@ const updateWeeklyStats = async () => {
           />
         </template>
       </div>
-      <div v-else class="grid w-2/3 grid-cols-3 gap-5">
-        <template v-for="(_, index) in 6" :key="index">
+      <div
+        v-else
+        class="grid w-2/3 grid-cols-3 gap-5"
+      >
+        <template
+          v-for="(_, index) in 6"
+          :key="index"
+        >
           <SkeletonDraftedTeam />
         </template>
       </div>

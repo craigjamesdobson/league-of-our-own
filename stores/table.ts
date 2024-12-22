@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type Database } from '~/types/database.types';
+import type { Database } from '~/types/database.types';
 
 export const useTableStore = defineStore('table-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -10,7 +10,7 @@ export const useTableStore = defineStore('table-store', () => {
   const fetchWeeklyStats = async (week: number) => {
     const { data, error } = await supabase.rpc(
       'get_weekly_stats_for_gameweek',
-      { target_week: week }
+      { target_week: week },
     );
 
     if (error) {

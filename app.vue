@@ -8,7 +8,7 @@ await playerStore.fetchPlayers();
 const draftedTeamsStore = useDraftedTeamsStore();
 await draftedTeamsStore.fetchDraftedTeams();
 
-const { initialize } = useHotjar()
+const { initialize } = useHotjar();
 
 initialize();
 </script>

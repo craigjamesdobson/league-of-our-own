@@ -5,13 +5,12 @@
       <a
         class="bg-primary ml-5 mt-5 block rounded-md px-6 py-2 text-white lg:inline-flex"
         href="/rules.pdf"
-        >Download here</a
-      >
+      >Download here</a>
     </p>
     <object
       class="mx-auto w-full lg:w-3/4"
       data="/rules.pdf"
-    ></object>
+    />
   </div>
 </template>
 

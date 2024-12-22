@@ -9,7 +9,8 @@ const handleUserLogin = async () => {
   try {
     await accountStore.signUserIn(formData);
     router.push({ path: '/account' });
-  } catch (err) {
+  }
+  catch (err) {
     handleApiError(err, toast);
   }
 };
@@ -24,7 +25,10 @@ const handleUserLogin = async () => {
     <div
       class="mb-4 flex w-96 flex-col justify-center rounded-md bg-white p-10"
     >
-      <form class="flex flex-col gap-6" @submit.prevent="handleUserLogin">
+      <form
+        class="flex flex-col gap-6"
+        @submit.prevent="handleUserLogin"
+      >
         <GenericFormField
           v-model="formData.email"
           label="Email"
@@ -54,8 +58,7 @@ const handleUserLogin = async () => {
       <a
         class="font-bold underline"
         href="mailto:leagueofourown.fpl@gmail.com"
-        >leagueofourown.fpl@gmail.com</a
-      >
+      >leagueofourown.fpl@gmail.com</a>
       with as much information as possible.
     </Message>
   </div>

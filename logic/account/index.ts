@@ -1,5 +1,5 @@
 import { useVuelidate } from '@vuelidate/core';
-import { required, email, minLength, helpers } from '@vuelidate/validators';
+import { email, helpers, minLength, required } from '@vuelidate/validators';
 import { useAccountStore } from '@/stores/account';
 
 const useAccount = () => {
@@ -7,22 +7,22 @@ const useAccount = () => {
 
   const formData = reactive({
     email: '',
-    password: ''
+    password: '',
   });
 
   const rules = computed(() => {
     return {
       email: {
         required: helpers.withMessage('The email field is required', required),
-        email: helpers.withMessage('Invalid email format', email)
+        email: helpers.withMessage('Invalid email format', email),
       },
       password: {
         required: helpers.withMessage(
           'The password field is required',
-          required
+          required,
         ),
-        minLength: minLength(6)
-      }
+        minLength: minLength(6),
+      },
     };
   });
 
@@ -31,7 +31,7 @@ const useAccount = () => {
   return {
     v$,
     formData,
-    accountStore
+    accountStore,
   };
 };
 

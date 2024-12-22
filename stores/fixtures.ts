@@ -2,10 +2,10 @@ import { defineStore } from 'pinia';
 import { usePlayerStore } from './players';
 import type { Fixture } from '~/types/Fixture';
 import type { Player, PlayerWithStats } from '~/types/Player';
-import {
-  type Database,
-  type Tables,
-  type TablesInsert
+import type {
+  Database,
+  Tables,
+  TablesInsert,
 } from '~/types/database.types';
 
 const route = useRoute();
@@ -13,10 +13,10 @@ const route = useRoute();
 const getPlayersWithStats = (players: PlayerWithStats[]) => {
   return players!.filter((player) => {
     return (
-      player.week_assists > 0 ||
-      player.week_goals > 0 ||
-      player.week_redcard ||
-      player.week_cleansheet
+      player.week_assists > 0
+      || player.week_goals > 0
+      || player.week_redcard
+      || player.week_cleansheet
     );
   });
 };
@@ -24,17 +24,17 @@ const getPlayersWithStats = (players: PlayerWithStats[]) => {
 const populatePlayersWithStats = (
   players: Player[],
   PlayerStats: Tables<'player_statistics'>[],
-  teamID?: number
+  teamID?: number,
 ): PlayerWithStats[] => {
   let filteredPlayers = players;
 
   if (teamID) {
-    filteredPlayers = filteredPlayers.filter((x) => x.team === teamID);
+    filteredPlayers = filteredPlayers.filter(x => x.team === teamID);
   }
 
   const weekDataMap = new Map<number, (typeof PlayerStats)[number]>();
   PlayerStats.forEach((data: Tables<'player_statistics'>) =>
-    weekDataMap.set(data.player_id!, data)
+    weekDataMap.set(data.player_id!, data),
   );
 
   return filteredPlayers.map((player) => {
@@ -46,16 +46,17 @@ const populatePlayersWithStats = (
         week_assists: weekPlayerData.assists || 0,
         week_redcard: weekPlayerData.red_card || false,
         week_cleansheet: weekPlayerData.clean_sheet || false,
-        week_points: weekPlayerData.points || 0
+        week_points: weekPlayerData.points || 0,
       };
-    } else {
+    }
+    else {
       return {
         ...player,
         week_goals: 0,
         week_assists: 0,
         week_redcard: false,
         week_cleansheet: false,
-        week_points: 0
+        week_points: 0,
       };
     }
   });
@@ -79,7 +80,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
           away_team_score,
           home_team (id, name, short_name),
           away_team (id, name, short_name)
-        `
+        `,
       )
       .eq('game_week', gameweekID)
       .order('id')
@@ -98,7 +99,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
           away_team_score,
           home_team (id, name, short_name),
           away_team (id, name, short_name)
-        `
+        `,
       )
       .eq('id', id)
       .returns<Fixture[]>()
@@ -110,15 +111,14 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     const formattedFixture: TablesInsert<'fixtures'> = {
       id: fixtureData.id,
       home_team_score: fixtureData.home_team_score,
-      away_team_score: fixtureData.away_team_score
+      away_team_score: fixtureData.away_team_score,
     };
 
     const selectedFixtureIndex = fixtures.value?.findIndex(
-      (x) => x.id === fixtureData.id
+      x => x.id === fixtureData.id,
     );
 
-    if (selectedFixtureIndex === undefined || !fixtures.value)
-      throw new Error('No fixture found');
+    if (selectedFixtureIndex === undefined || !fixtures.value) throw new Error('No fixture found');
 
     fixtures.value[selectedFixtureIndex] = fixtureData;
 
@@ -143,7 +143,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
 
   const fetchPlayersWithStatistics = async (
     fixtureID: number,
-    teamID: number
+    teamID: number,
   ) => {
     const { data, error } = await supabase
       .from('player_statistics')
@@ -157,7 +157,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
 
   const updatePlayerStatistics = async (
     PlayersWithStats: PlayerWithStats[],
-    fixtureID: number
+    fixtureID: number,
   ) => {
     const { error: deleteError } = await supabase
       .from('player_statistics')
@@ -176,7 +176,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
         assists: x.week_assists,
         clean_sheet: x.week_cleansheet,
         red_card: x.week_redcard,
-        points: x.week_points
+        points: x.week_points,
       };
     });
 
@@ -196,6 +196,6 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fetchPlayersWithStatistics,
     fetchPlayersWithStatisticsByGameweek,
     updateFixtureScore,
-    updatePlayerStatistics
+    updatePlayerStatistics,
   };
 });

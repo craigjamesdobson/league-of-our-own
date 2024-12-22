@@ -4,9 +4,9 @@ import type { DraftedPlayer, DraftedTransfer } from '@/types/DraftedPlayer';
 const props = defineProps({
   draftedPlayer: {
     type: Object as PropType<DraftedPlayer | DraftedTransfer>,
-    default: null
+    default: null,
   },
-  isTransfer: { type: Boolean, default: false }
+  isTransfer: { type: Boolean, default: false },
 });
 </script>
 
@@ -16,8 +16,7 @@ const props = defineProps({
     <span class="w-2/12 p-2">{{
       props.draftedPlayer.data.team_short_name
     }}</span>
-    <span class="w-7/12 p-2 text-center text-sm"
-      >{{ props.draftedPlayer.data.web_name }}
+    <span class="w-7/12 p-2 text-center text-sm">{{ props.draftedPlayer.data.web_name }}
       <Icon
         v-if="props.isTransfer"
         class="ml-2"
@@ -31,7 +30,10 @@ const props = defineProps({
     >
       {{ props.draftedPlayer.points }}
     </span>
-    <span v-else class="w-2/12 p-2 text-center">
+    <span
+      v-else
+      class="w-2/12 p-2 text-center"
+    >
       {{ props.draftedPlayer.data.cost!.toFixed(1) }}
     </span>
   </div>

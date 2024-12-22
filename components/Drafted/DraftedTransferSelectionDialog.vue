@@ -7,18 +7,25 @@ const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
 const activeTransferPlayer = ref();
 
 const changeActivePlayer = (
-  playerTransfer: DraftedPlayer | DraftedTransfer
+  playerTransfer: DraftedPlayer | DraftedTransfer,
 ) => {
   playerTransfer.selected = true;
 };
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" header="" modal :dismissable-mask="true">
+  <Dialog
+    v-model:visible="visible"
+    header=""
+    modal
+    :dismissable-mask="true"
+  >
     <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
       <div class="lg:col-span-3">
         <div class="mb-10">
-          <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
+          <h2 class="pb-2.5 text-lg font-black uppercase">
+            Original Player
+          </h2>
           <div class="flex items-center">
             <RadioButton
               v-model="activeTransferPlayer"
@@ -35,8 +42,13 @@ const changeActivePlayer = (
             </label>
           </div>
         </div>
-        <div v-if="draftedPlayer?.transfers.length" class="mb-5">
-          <h2 class="mb-2.5 text-lg font-black uppercase">Transfers</h2>
+        <div
+          v-if="draftedPlayer?.transfers.length"
+          class="mb-5"
+        >
+          <h2 class="mb-2.5 text-lg font-black uppercase">
+            Transfers
+          </h2>
           <div
             v-for="playerTransfer in draftedPlayer.transfers"
             :key="playerTransfer.drafted_transfer_id"
@@ -66,9 +78,13 @@ const changeActivePlayer = (
         </div>
       </div>
     </div>
-    <Message class="!mt-0" :closable="false" severity="warn"
-      >Changing the selected player will override the points
-      calculation</Message
+    <Message
+      class="!mt-0"
+      :closable="false"
+      severity="warn"
     >
+      Changing the selected player will override the points
+      calculation
+    </Message>
   </Dialog>
 </template>

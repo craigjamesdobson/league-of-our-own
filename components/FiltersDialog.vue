@@ -7,13 +7,17 @@
     class="m-5"
   >
     <Filters />
-    <Button @click="modelValue = false" class="w-full"  label="Apply" />
+    <Button
+      class="w-full"
+      label="Apply"
+      @click="modelValue = false"
+    />
   </Dialog>
 </template>
 
 <script setup lang="ts">
 definePageMeta({
-  keepalive: true
+  keepalive: true,
 });
 
 const modelValue = defineModel<boolean>();

@@ -4,7 +4,8 @@ const useDialog = () => {
   const toggleDialog = (showDialog: boolean) => {
     if (showDialog) {
       dialogVisible.value = true;
-    } else {
+    }
+    else {
       dialogVisible.value = false;
     }
   };

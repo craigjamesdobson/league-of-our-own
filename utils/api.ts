@@ -6,14 +6,15 @@ const handleApiError = (error: unknown, toast: ToastServiceMethods) => {
       severity: 'error',
       summary: 'An error occurred',
       detail: error.message,
-      life: 3000
+      life: 3000,
     });
-  } else {
+  }
+  else {
     toast.add({
       severity: 'error',
       detail: 'An unknown error occurred',
       summary: 'Please review error logs for more information',
-      life: 3000
+      life: 3000,
     });
     console.error('API Error:', error);
   }
@@ -21,13 +22,13 @@ const handleApiError = (error: unknown, toast: ToastServiceMethods) => {
 
 const handleApiSuccess = (
   successMesage: string,
-  toast: ToastServiceMethods
+  toast: ToastServiceMethods,
 ) => {
   toast.add({
     severity: 'success',
     summary: 'Success',
     detail: successMesage,
-    life: 3000
+    life: 3000,
   });
 };
 

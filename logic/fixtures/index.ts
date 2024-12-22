@@ -9,7 +9,7 @@ const calculatePlayerPoints = (player: PlayerWithStats) => {
     [PlayerPosition.GOALKEEPER]: 10,
     [PlayerPosition.DEFENDER]: 7,
     [PlayerPosition.MIDFIELDER]: 5,
-    [PlayerPosition.FORWARD]: 3
+    [PlayerPosition.FORWARD]: 3,
   };
   const POINTS_TWO_GOALS_BONUS = 5;
   const POINTS_THREE_OR_MORE_GOALS_BONUS = 10;
@@ -30,7 +30,8 @@ const calculatePlayerPoints = (player: PlayerWithStats) => {
   if (player.week_cleansheet) {
     if (player.position === PlayerPosition.GOALKEEPER) {
       totalPoints += POINTS_GOALKEEPER_CLEAN_SHEET;
-    } else if (player.position === PlayerPosition.DEFENDER) {
+    }
+    else if (player.position === PlayerPosition.DEFENDER) {
       totalPoints += POINTS_DEFENDER_CLEAN_SHEET;
     }
   }
@@ -42,7 +43,8 @@ const calculatePlayerPoints = (player: PlayerWithStats) => {
   // Goal Bonuses
   if (player.week_goals === 2) {
     totalPoints += POINTS_TWO_GOALS_BONUS;
-  } else if (player.week_goals >= 3) {
+  }
+  else if (player.week_goals >= 3) {
     totalPoints += POINTS_THREE_OR_MORE_GOALS_BONUS;
   }
 

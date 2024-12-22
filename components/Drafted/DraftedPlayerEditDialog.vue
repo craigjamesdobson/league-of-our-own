@@ -16,7 +16,7 @@ const toast = useToast();
 const newTransferData: Ref<TransferData> = ref({
   player: null,
   activeExpiryDate: new Date(),
-  transferWeek: 0
+  transferWeek: 0,
 });
 
 const visible = defineModel<boolean>('visible');
@@ -25,8 +25,8 @@ const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
 const props = defineProps({
   editable: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const playerStore = usePlayerStore();
@@ -44,8 +44,8 @@ const addNewTransfer = async () => {
         active_transfer_expiry:
           newTransferData.value.activeExpiryDate.toDateString(),
         player_id: newTransferData.value.player.player_id!,
-        transfer_week: newTransferData.value.transferWeek
-      }
+        transfer_week: newTransferData.value.transferWeek,
+      },
     ]);
 
     // Build a new transfer obj using the new data returned
@@ -54,11 +54,12 @@ const addNewTransfer = async () => {
       drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
-      data: newTransferData.value.player
+      data: newTransferData.value.player,
     });
 
     handleApiSuccess(`Transfer was successful`, toast);
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     handleApiError(err, toast);
   }
 };
@@ -70,25 +71,45 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     }
     await draftedTeamsStore.deleteTransfer(draftedTransferID);
     draftedPlayer.value.transfers = draftedPlayer.value.transfers.filter(
-      (x) => x.drafted_transfer_id !== draftedTransferID
+      x => x.drafted_transfer_id !== draftedTransferID,
     );
     handleApiSuccess('Transfer was removed', toast);
-  } catch (err) {
+  }
+  catch (err) {
     handleApiError(err, toast);
   }
 };
 </script>
 
 <template>
-  <Dialog pt:header="!justify-end" v-model:visible="visible" header="" modal :dismissable-mask="true">
+  <Dialog
+    v-model:visible="visible"
+    pt:header="!justify-end"
+    header=""
+    modal
+    :dismissable-mask="true"
+  >
     <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
-      <div class="lg:col-span-2" :class="{ 'lg:col-span-3': !props.editable }">
+      <div
+        class="lg:col-span-2"
+        :class="{ 'lg:col-span-3': !props.editable }"
+      >
         <div class="mb-10">
-          <h2 class="pb-2.5 text-lg font-black uppercase">Original Player</h2>
-          <DraftedPlayer v-if="draftedPlayer" :drafted-player="draftedPlayer" />
+          <h2 class="pb-2.5 text-lg font-black uppercase">
+            Original Player
+          </h2>
+          <DraftedPlayer
+            v-if="draftedPlayer"
+            :drafted-player="draftedPlayer"
+          />
         </div>
-        <div v-if="draftedPlayer?.transfers.length" class="mb-5">
-          <h2 class="mb-2.5 text-lg font-black uppercase">Transfers</h2>
+        <div
+          v-if="draftedPlayer?.transfers.length"
+          class="mb-5"
+        >
+          <h2 class="mb-2.5 text-lg font-black uppercase">
+            Transfers
+          </h2>
           <div
             v-for="playerTransfer in draftedPlayer.transfers"
             :key="playerTransfer.drafted_transfer_id"
@@ -113,14 +134,19 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
                   handleDeleteTransfer(playerTransfer.drafted_transfer_id)
                 "
               >
-                <Icon class="h-8 w-8" name="typcn:delete" />
+                <Icon
+                  class="h-8 w-8"
+                  name="typcn:delete"
+                />
               </Button>
             </div>
           </div>
         </div>
       </div>
       <div v-if="props.editable">
-        <h2 class="mb-2.5 text-lg font-black uppercase">Submit new transfer</h2>
+        <h2 class="mb-2.5 text-lg font-black uppercase">
+          Submit new transfer
+        </h2>
         <form class="flex flex-col items-start gap-5">
           <div class="flex w-full flex-col gap-2">
             <label for="new-transfer-id">Player</label>
@@ -130,7 +156,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
               filter
               :options="
                 playerStore.players.filter(
-                  (x) => x.position === draftedPlayer?.data.position
+                  (x) => x.position === draftedPlayer?.data.position,
                 )
               "
               option-label="web_name"

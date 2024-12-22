@@ -4,26 +4,28 @@ import type { DraftedPlayer } from '~/types/DraftedPlayer';
 const props = defineProps({
   draftedPlayer: {
     type: Object as PropType<DraftedPlayer>,
-    default: null
+    default: null,
   },
   activeGameweek: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const findActiveGameweekPlayer = computed(() => {
   const player = props.draftedPlayer;
 
-  if (player.transfers.some((x) => x.transfer_week <= props.activeGameweek)) {
+  if (player.transfers.some(x => x.transfer_week <= props.activeGameweek)) {
     return player.transfers.findLast(
-      (x) => x.transfer_week <= props.activeGameweek
+      x => x.transfer_week <= props.activeGameweek,
     );
-  } else {
+  }
+  else {
     return player;
   }
 });
 </script>
+
 <template>
   <div class="player-container">
     <DraftedPlayerWithPoints

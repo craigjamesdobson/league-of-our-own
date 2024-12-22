@@ -11,12 +11,12 @@ const playerStore = usePlayerStore();
 const router = useRouter();
 
 definePageMeta({
-  middleware: ['auth']
+  middleware: ['auth'],
 });
 
 const selectedDraftedTeamID = ref(0);
 const selectedDraftedTeam = computed(() =>
-  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
+  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value),
 );
 
 const toast = useToast();
@@ -28,9 +28,11 @@ const handleUpsertPlayerData = async () => {
     updating.value = true;
     await playerStore.upsertPlayerData(playerData.value);
     handleApiSuccess('Player data has been updated', toast);
-  } catch (err) {
+  }
+  catch (err) {
     handleApiError(err, toast);
-  } finally {
+  }
+  finally {
     updating.value = false;
   }
 };
@@ -39,14 +41,15 @@ const handleUserLogout = async () => {
   try {
     await accountStore.signUserOut();
     router.push({ path: '/account/login' });
-  } catch (err) {
+  }
+  catch (err) {
     handleApiError(err, toast);
   }
 };
 
 const transfersRemainingCount = (team: DraftedTeam) => {
   const totalTransfersMade = team.players
-    .map((x) => x.transfers.length)
+    .map(x => x.transfers.length)
     .reduce((total, transfers) => total + transfers, 0);
 
   return 4 - totalTransfersMade;
@@ -58,8 +61,14 @@ const transfersRemainingCount = (team: DraftedTeam) => {
     <Toast />
     <h1 class="main-heading flex items-center">
       <span>Admin Dashboard</span>
-      <button title="Sign out" @click.prevent="handleUserLogout">
-        <Icon class="ml-2" name="la:sign-out-alt" />
+      <button
+        title="Sign out"
+        @click.prevent="handleUserLogout"
+      >
+        <Icon
+          class="ml-2"
+          name="la:sign-out-alt"
+        />
       </button>
     </h1>
     <div v-if="accountStore.userIsLoggedIn">
@@ -80,13 +89,16 @@ const transfersRemainingCount = (team: DraftedTeam) => {
             @click="handleUpsertPlayerData"
           />
         </div>
-        <div v-if="draftedTeamStore.draftedTeams" class="flex flex-col gap-4">
+        <div
+          v-if="draftedTeamStore.draftedTeams"
+          class="flex flex-col gap-4"
+        >
           <Select
             v-model="selectedDraftedTeamID"
             class="!w-full"
             :options="
               draftedTeamStore.getDraftedTeams?.filter(
-                (x) => x.allowed_transfers
+                (x) => x.allowed_transfers,
               )
             "
             filter
@@ -99,7 +111,7 @@ const transfersRemainingCount = (team: DraftedTeam) => {
               <div
                 class="flex items-center justify-between w-full"
                 :class="{
-                  'opacity-25': transfersRemainingCount(slotProps.option) === 0
+                  'opacity-25': transfersRemainingCount(slotProps.option) === 0,
                 }"
               >
                 <div class="align-items-center flex flex-col gap-1 uppercase">
@@ -109,17 +121,20 @@ const transfersRemainingCount = (team: DraftedTeam) => {
                   <span class="text-xs">{{ slotProps.option.team_owner }}</span>
                 </div>
                 <Tag
+                  v-tooltip="`${transfersRemainingCount(slotProps.option)} transfers remaining`"
                   severity="info"
                   class="h-6 w-6"
                   rounded
-                  v-tooltip="`${transfersRemainingCount(slotProps.option)} transfers remaining`"
                   :value="transfersRemainingCount(slotProps.option)"
-                ></Tag>
+                />
               </div>
             </template>
           </Select>
           <div v-if="selectedDraftedTeam">
-            <DraftedTeam :editable="true" :drafted-team="selectedDraftedTeam" />
+            <DraftedTeam
+              :editable="true"
+              :drafted-team="selectedDraftedTeam"
+            />
           </div>
         </div>
       </div>

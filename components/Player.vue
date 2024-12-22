@@ -7,7 +7,7 @@
         :src="player.image"
         :alt="player.web_name"
         @error="loadPlayerFallbackImage"
-      />
+      >
     </span>
     <span class="w-1/12 p-2">{{ player.team_short_name }}</span>
     <span class="w-5/12 p-2 text-center">{{ player.web_name }}</span>

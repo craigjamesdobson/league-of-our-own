@@ -1,6 +1,8 @@
 <template>
   <div class="h-full flex justify-center items-center">
-    <Message :closable="false">Team entries are now closed. Teams will be available to view before the season begins</Message>
+    <Message :closable="false">
+      Team entries are now closed. Teams will be available to view before the season begins
+    </Message>
   </div>
 </template>
 
@@ -22,16 +24,14 @@ const draftedTeamData: Ref<TablesInsert<'drafted_teams'>> = ref({
   team_email: '',
   contact_number: null,
   allow_communication: false,
-  allowed_transfers: false
+  allowed_transfers: false,
 });
-
-const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
 
 const teamStructure = [
   { position: PlayerPosition.GOALKEEPER, count: 1 },
   { position: PlayerPosition.DEFENDER, count: 4 },
   { position: PlayerPosition.MIDFIELDER, count: 3 },
-  { position: PlayerPosition.FORWARD, count: 3 }
+  { position: PlayerPosition.FORWARD, count: 3 },
 ];
 
 interface DraftedTeamPlayer {
@@ -52,7 +52,7 @@ const fetchDraftedTeamData = async () => {
           drafted_team,
           ...players_view(*)
         )
-      `
+      `,
     )
     .eq('key', route.query.id)
     .returns<DraftedTeam[]>()
@@ -63,24 +63,24 @@ const fetchDraftedTeamData = async () => {
       severity: 'error',
       summary: 'No team found',
       detail: 'No team was found using that id',
-      life: 3000
+      life: 3000,
     });
     setTeamPlayers(teamStructure);
     return;
   }
 
   Object.assign(draftedTeamData.value, data);
-  // @ts-ignore - TODO: fix the typing for this...
+  // @ts-expect-error - TODO: fix the typing for this...
   setTeamPlayers(teamStructure, data.players);
 };
 
 const setTeamPlayers = (
   teamStructure: { position: number; count: number }[],
-  players: Player[] | null = null
+  players: Player[] | null = null,
 ) => {
   teamStructure.forEach(({ position, count }) => {
     const playersForPosition = players
-      ? players.filter((player) => player.position === position)
+      ? players.filter(player => player.position === position)
       : [];
 
     const playersToAdd = players
@@ -88,27 +88,22 @@ const setTeamPlayers = (
       : Array.from({ length: count }, () => null);
 
     draftedTeamPlayers.value.push(
-      // @ts-ignore -  This shouldnt be inherting the type never...
+      // @ts-expect-error -  This shouldnt be inherting the type never...
       ...playersToAdd.map((selectedPlayer: DraftedPlayer | null) => ({
         draftedPlayerID: selectedPlayer?.drafted_player_id ?? 0,
         position,
-        selectedPlayer
-      }))
+        selectedPlayer,
+      })),
     );
   });
 };
 
 if (route.query.id) {
   fetchDraftedTeamData();
-} else {
+}
+else {
   setTeamPlayers(teamStructure);
 }
-
-const selectedPlayerIds = computed(() => {
-  return draftedTeamPlayers.value
-    .filter((player) => player.selectedPlayer !== null)
-    .map((player) => player.selectedPlayer?.player_id);
-});
 </script>
 
 <style scoped></style>

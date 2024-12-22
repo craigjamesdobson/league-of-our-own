@@ -2,7 +2,7 @@ enum PlayerPosition {
   GOALKEEPER = 1,
   DEFENDER,
   MIDFIELDER,
-  FORWARD
+  FORWARD,
 }
 
 export { PlayerPosition };

@@ -9,11 +9,12 @@ export default defineEventHandler(async (event) => {
       from: 'Jim & Craig <leagueofourown@craigjamesdobson.dev>',
       to: [body.email],
       subject: 'A new team has been submitted',
-      html: body.html
+      html: body.html,
     });
 
     return data;
-  } catch (error) {
+  }
+  catch (error) {
     return { error };
   }
 });

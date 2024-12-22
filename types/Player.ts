@@ -1,6 +1,6 @@
 import type { Tables } from './database.types';
 
-interface Player extends Tables<'players_view'> {}
+type Player = Tables<'players_view'>;
 
 interface PlayerWithStats extends Player {
   week_goals: number;

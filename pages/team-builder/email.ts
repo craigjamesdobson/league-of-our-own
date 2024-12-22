@@ -1,22 +1,26 @@
-import type { Player } from "~/types/Player";
-import { PlayerPosition } from "~/types/PlayerPosition";
+import type { Player } from '~/types/Player';
+import { PlayerPosition } from '~/types/PlayerPosition';
 
 const config = useRuntimeConfig();
 
 interface DraftedTeamPlayer {
-    draftedPlayerID?: number;
-    position: PlayerPosition;
-    selectedPlayer: Player;
+  draftedPlayerID?: number;
+  position: PlayerPosition;
+  selectedPlayer: Player;
 }
 
-const generateTeamEmail = (players: DraftedTeamPlayer[], data: any) => {
+const generateTeamEmail = (players: DraftedTeamPlayer[], data: {
+  team_name: string;
+  allowed_transfers: boolean;
+  total_team_value: number;
+  key: string;
+}) => {
+  const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
+  const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
+  const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
+  const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
 
-    const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
-    const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
-    const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
-    const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
-
-    return `
+  return `
         <html>
         <body>
             <h1>Your Team - ${data.team_name}</h1>
@@ -30,16 +34,22 @@ const generateTeamEmail = (players: DraftedTeamPlayer[], data: any) => {
         </body>
         </html>
     `;
-}
+};
 
-const generateAdminEmail = (players: DraftedTeamPlayer[], data: any) => {
+const generateAdminEmail = (players: DraftedTeamPlayer[], data: {
+  team_name: string;
+  team_owner: string;
+  team_email: string;
+  allowed_transfers: boolean;
+  total_team_value: number;
+  key: string;
+}) => {
+  const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
+  const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
+  const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
+  const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
 
-    const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
-    const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
-    const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
-    const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
-
-    return `
+  return `
         <html>
         <body>
             <h1>New Team - ${data.team_name}</h1>
@@ -55,6 +65,6 @@ const generateAdminEmail = (players: DraftedTeamPlayer[], data: any) => {
         </body>
         </html>
     `;
-}
+};
 
-export { generateTeamEmail, generateAdminEmail }
+export { generateTeamEmail, generateAdminEmail };

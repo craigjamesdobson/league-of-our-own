@@ -12,7 +12,7 @@ const useFilters = () => {
   const filterData: FilterData = reactive({
     filterName: '',
     filterPrice: 0,
-    filterTeam: undefined
+    filterTeam: undefined,
   });
 
   const setFilteredPlayers = () => {
@@ -22,7 +22,7 @@ const useFilters = () => {
   const selectfilteredTeam = (event: Event) => {
     document
       .querySelectorAll('.icon-container')
-      .forEach((e) => e.classList.remove('active'));
+      .forEach(e => e.classList.remove('active'));
 
     if (!(event.currentTarget instanceof HTMLElement)) {
       return;
@@ -41,7 +41,7 @@ const useFilters = () => {
   const resetFilteredTeams = () => {
     document
       .querySelectorAll('.icon-container')
-      .forEach((e) => e.classList.remove('active'));
+      .forEach(e => e.classList.remove('active'));
 
     filterData.filterTeam = undefined;
     return setFilteredPlayers();
@@ -52,7 +52,7 @@ const useFilters = () => {
     playerStore,
     selectfilteredTeam,
     resetFilteredTeams,
-    setFilteredPlayers
+    setFilteredPlayers,
   };
 };
 

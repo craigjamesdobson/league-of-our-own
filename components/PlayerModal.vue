@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Player } from '~/types/Player';
+
 const router = useRouter();
 
 const { selectedPlayer } = defineProps<{
@@ -23,22 +24,25 @@ const modelValue = defineModel<boolean>();
       class="m-5 rounded-lg relative overflow-hidden w-[90%] lg:w-1/2 2xl:w-1/3 bg-white"
       pt:header="!justify-end"
       :pt="{
-      root: selectedPlayer.unavailable_for_season
-        ? '!border-2 !border-red-500'
-        : selectedPlayer.is_unavailable
-        ? '!border-2 !border-yellow-300'
-        : 'default-class',
-    }"
+        root: selectedPlayer.unavailable_for_season
+          ? '!border-2 !border-red-500'
+          : selectedPlayer.is_unavailable
+            ? '!border-2 !border-yellow-300'
+            : 'default-class',
+      }"
       modal
       :dismissable-mask="true"
       @hide="clearPlayerQueryParam"
     >
-      <div v-if="selectedPlayer" class="px-4">
+      <div
+        v-if="selectedPlayer"
+        class="px-4"
+      >
         <div class="">
           <img
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
-          />
+          >
           <div class="items-top flex flex-row justify-between gap-4">
             <div class="z-10 w-24">
               <img
@@ -46,7 +50,7 @@ const modelValue = defineModel<boolean>();
                 :src="selectedPlayer.image_large"
                 :alt="selectedPlayer.web_name"
                 @error="loadPlayerFallbackImage"
-              />
+              >
             </div>
             <h4
               class="flex flex-col items-end text-right text-2xl uppercase leading-none md:text-4xl"
@@ -71,9 +75,9 @@ const modelValue = defineModel<boolean>();
                     class="rounded-full bg-green-500 text-white"
                     :class="{
                       'bg-yellow-500':
-                        !selectedPlayer.unavailable_for_season &&
-                        selectedPlayer.is_unavailable,
-                      'bg-red-500': selectedPlayer.unavailable_for_season
+                        !selectedPlayer.unavailable_for_season
+                        && selectedPlayer.is_unavailable,
+                      'bg-red-500': selectedPlayer.unavailable_for_season,
                     }"
                   />
                 </span>
@@ -112,8 +116,8 @@ const modelValue = defineModel<boolean>();
                   </li>
                   <li
                     v-if="
-                      selectedPlayer.position === 1 ||
-                      selectedPlayer.position === 2
+                      selectedPlayer.position === 1
+                        || selectedPlayer.position === 2
                     "
                     class="flex w-full justify-between"
                   >

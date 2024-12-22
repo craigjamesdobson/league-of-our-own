@@ -6,22 +6,17 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "eslint --ext .ts,.js,.vue .",
-    "lint:fix": "eslint --ext .ts,.js,.vue . --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "typecheck": "nuxi typecheck",
     "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts"
   },
   "dependencies": {
-    "@nuxtjs/eslint-config-typescript": "^12.1.0",
-    "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia/nuxt": "^0.4.11",
     "@supabase/supabase-js": "^2.39.1",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
-    "eslint-config-prettier": "^8.10.0",
     "pinia": "^2.1.7",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.13",
     "primevue": "^4.2.5",
     "resend": "^3.1.0",
     "tailwindcss": "^3.4.16",
@@ -32,13 +27,15 @@
   "devDependencies": {
     "@iconify/json": "^2.2.163",
     "@nuxt/devtools": "^0.8.5",
+    "@nuxt/eslint": "0.7.3",
+    "@nuxt/eslint-config": "^0.7.3",
     "@nuxtjs/fontaine": "^0.2.5",
     "@nuxtjs/supabase": "^1.1.5",
     "@primevue/nuxt-module": "^4.2.5",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@zadigetvoltaire/nuxt-gtm": "^0.0.13",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-vue": "^9.9.0",
@@ -52,5 +49,6 @@
     "typescript": "^4.9.5",
     "unplugin-icons": "^0.15.3",
     "vue-tsc": "^1.8.27"
-  }
+  },
+  "packageManager": "pnpm@9.6.0+sha1.65cd48c20dd329b7f455088b6dd17d4d5b6d02e3"
 }

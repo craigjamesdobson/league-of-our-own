@@ -2,6 +2,7 @@
 
 module.exports = {
   plugins: [require('tailwindcss-primeui')],
+  darkMode: false,
   theme: {
     extend: {
       fontFamily: {

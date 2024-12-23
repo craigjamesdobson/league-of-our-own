@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@zadigetvoltaire/nuxt-gtm',
     'nuxt-module-hotjar',
     '@nuxt/eslint',
+    '@nuxtjs/color-mode'
   ],
 
   ssr: false,
@@ -67,6 +68,10 @@ export default defineNuxtConfig({
     options: {
       theme: 'none',
     },
+  },
+
+  colorMode: {
+    preference: 'light',
   },
 
   supabase: {

@@ -19,6 +19,12 @@ watch(selectedWeek, async (newWeek) => {
     query: { week: newWeek },
   });
 }, { immediate: true });
+
+const op = ref();
+
+const toggle = (event) => {
+  op.value.toggle(event);
+};
 </script>
 
 <template>
@@ -83,7 +89,6 @@ watch(selectedWeek, async (newWeek) => {
           <template #header>
             <div
               v-tooltip.top="'Previous Position'"
-              class="whitespace-nowrap"
             >
               Prv Pos.
             </div>
@@ -126,12 +131,27 @@ watch(selectedWeek, async (newWeek) => {
           header="Team"
         >
           <template #body="slotProps">
-            <div class="flex flex-col gap-1 uppercase">
-              <div class="font-black lg:text-base">
-                {{ slotProps.data.team_name }}
-              </div>
-              <div class="text-xs">
-                {{ slotProps.data.team_owner }}
+            <div class="flex gap-2.5 items-center">
+              <Button
+                class="!p-1 w-8 h-8"
+                aria-label="View week points"
+                title="View week points"
+                variant="text"
+                rounded
+                @click="toggle($event)"
+              >
+                <Icon
+                  size="20"
+                  name="ic:outline-info"
+                />
+              </Button>
+              <div class="flex flex-col gap-1 uppercase">
+                <div class="font-black lg:text-base">
+                  {{ slotProps.data.team_name }}
+                </div>
+                <div class="text-xs">
+                  {{ slotProps.data.team_owner }}
+                </div>
               </div>
             </div>
           </template>
@@ -192,6 +212,13 @@ watch(selectedWeek, async (newWeek) => {
       </DataTable>
       <SkeletonTable v-else />
     </div>
+    <Popover ref="op">
+      <div class="flex flex-col gap-2.5">
+        <div>
+          <span class="font-medium block">Team Members</span>
+        </div>
+      </div>
+    </Popover>
     <div class="flex flex-col gap-2.5 lg:col-span-2">
       <WeeklyWinners />
     </div>

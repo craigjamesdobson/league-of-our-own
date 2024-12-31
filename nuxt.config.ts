@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     '@zadigetvoltaire/nuxt-gtm',
     'nuxt-module-hotjar',
     '@nuxt/eslint',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
   ],
 
   ssr: false,
@@ -43,6 +43,10 @@ export default defineNuxtConfig({
 
   css: ['@/assets/styles/base.css'],
 
+  colorMode: {
+    preference: 'light',
+  },
+
   runtimeConfig: {
     public: {
       SITE_URL: process.env.SITE_URL,
@@ -68,10 +72,6 @@ export default defineNuxtConfig({
     options: {
       theme: 'none',
     },
-  },
-
-  colorMode: {
-    preference: 'light',
   },
 
   supabase: {

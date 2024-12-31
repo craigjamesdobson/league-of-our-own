@@ -38,14 +38,20 @@ const handleEditPlayer = (playerID: number) => {
 const calculatedWeeklyStats = computed(() => {
   return props.draftedTeam.players.reduce(
     (accumulatedStats, player: DraftedPlayerWithWeeklyStats) => {
-      // Check if player or any transfer has selected: true
-      const selectedTransfer = player.selected
-        ? player
-        : player.transfers.find(transfer => transfer.selected);
+
+      let activePlayer = player.transfers.find(x => x.transfer_week <= fixtureStore.selectedGameweek) || player;
+
+      if (player.selected) {
+        activePlayer = player;
+      }
+
+      if (player.transfers.find(transfer => transfer.selected)) {
+        activePlayer = player.transfers.find(transfer => transfer.selected);
+      }
 
       // Calculate points based on the selected transfer or the usual logic
-      const currentPlayerPoints = selectedTransfer
-        ? selectedTransfer.points || 0
+      const currentPlayerPoints = activePlayer
+        ? activePlayer.points || 0
         : player.transfers.reduce((points, transfer) => {
             return transfer.transfer_week <= fixtureStore.selectedGameweek
               ? transfer.points
@@ -55,11 +61,11 @@ const calculatedWeeklyStats = computed(() => {
       return {
         drafted_team_id: props.draftedTeam.drafted_team_id,
         points: accumulatedStats.points + currentPlayerPoints,
-        goals: accumulatedStats.goals + (player.week_goals || 0),
-        assists: accumulatedStats.assists + (player.week_assists || 0),
-        red_cards: accumulatedStats.red_cards + (player.week_redcards ? 1 : 0),
+        goals: accumulatedStats.goals + (activePlayer?.week_goals || 0),
+        assists: accumulatedStats.assists + (activePlayer?.week_assists || 0),
+        red_cards: accumulatedStats.red_cards + (activePlayer?.week_redcards ? 1 : 0),
         clean_sheets:
-          accumulatedStats.clean_sheets + (player.week_cleansheets ? 1 : 0),
+          accumulatedStats.clean_sheets + (activePlayer?.week_cleansheets ? 1 : 0),
       };
     },
     {

@@ -84,7 +84,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
 <template>
   <Dialog
     v-model:visible="visible"
-    pt:header="!justify-end"
+    pt:header:class="!justify-end"
     header=""
     modal
     :dismissable-mask="true"

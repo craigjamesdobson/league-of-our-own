@@ -11,7 +11,7 @@ interface DraftedTransfer {
 
 interface DraftedPlayer {
   drafted_player_id: number;
-  transfers: DraftedTransfer[];
+  transfers: DraftedTransferWithWeeklyStats[];
   data: Tables<'players_view'>;
   selected: boolean;
 }
@@ -24,4 +24,11 @@ interface DraftedPlayerWithWeeklyStats extends DraftedPlayer {
   week_cleansheets?: number;
 }
 
-export type { DraftedPlayer, DraftedTransfer, DraftedPlayerWithWeeklyStats };
+interface DraftedTransferWithWeeklyStats extends DraftedTransfer {
+  week_goals?: number;
+  week_assists?: number;
+  week_redcards?: number;
+  week_cleansheets?: number;
+}
+
+export type { DraftedPlayer, DraftedTransfer, DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats };

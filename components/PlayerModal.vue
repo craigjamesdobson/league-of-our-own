@@ -22,7 +22,7 @@ const modelValue = defineModel<boolean>();
       v-if="selectedPlayer"
       v-model:visible="modelValue"
       class="m-5 rounded-lg relative overflow-hidden w-[90%] lg:w-1/2 2xl:w-1/3 bg-white"
-      pt:header="!justify-end"
+      pt:header:class="!justify-end"
       :pt="{
         root: selectedPlayer.unavailable_for_season
           ? '!border-2 !border-red-500'

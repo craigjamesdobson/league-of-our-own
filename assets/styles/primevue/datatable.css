@@ -73,7 +73,7 @@
 }
 
 .p-datatable-column-header-content {
-    @apply flex items-center gap-2
+    @apply flex items-center gap-2 uppercase font-bold whitespace-nowrap
 }
 
 .p-datatable-column-resize-indicator {

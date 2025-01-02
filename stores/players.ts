@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Player } from '~/types/Player';
+import type { Player, PlayerInsertData } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database } from '~/types/database.types';
 
@@ -58,20 +58,61 @@ export const usePlayerStore = defineStore('player-store', () => {
   };
 
   const upsertPlayerData = async (playerData: string) => {
-    const formattedPlayerData = JSON.parse(playerData)?.elements;
+    const formattedPlayerData: PlayerInsertData[] = JSON.parse(playerData)?.elements;
     if (formattedPlayerData === null) {
       throw new Error('Player data was not correct, please try again.');
     }
 
+
     const { error } = await supabase
       .from('players')
       .upsert(
-        formattedPlayerData.map(
-          ({ id, region, ...rest }: { id: number; region?: string; [key: string]: unknown }) => ({
-            player_id: id,
-            ...rest,
-          }),
-        ),
+        formattedPlayerData.map(({
+          id,
+          code,
+          cost_change_event,
+          cost_change_start_fall,
+          cost_change_start,
+          element_type,
+          first_name,
+          news,
+          news_added,
+          now_cost,
+          photo,
+          second_name,
+          status,
+          team,
+          team_code,
+          web_name,
+          minutes,
+          goals_scored,
+          assists,
+          clean_sheets,
+          red_cards
+        }) => ({
+          player_id: id,
+          code,
+          cost_change_event,
+          cost_change_start_fall,
+          cost_change_start,
+          element_type,
+          first_name,
+          news,
+          news_added,
+          now_cost,
+          photo,
+          second_name,
+          status,
+          team,
+          team_code,
+          web_name,
+          minutes,
+          goals_scored,
+          assists,
+          clean_sheets,
+          red_cards
+        }))
+
       )
       .select();
 

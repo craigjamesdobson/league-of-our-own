@@ -168,7 +168,7 @@ const updateWeeklyStats = async () => {
         class="grid w-full gap-5 lg:w-2/3 lg:grid-cols-3"
       >
         <template
-          v-for="(draftedTeam, index) in draftedTeamsWithPoints""
+          v-for="(draftedTeam, index) in draftedTeamsWithPoints"
           :key="index"
         >
           <DraftedTeamWithPoints

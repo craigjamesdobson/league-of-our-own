@@ -63,7 +63,6 @@ export const usePlayerStore = defineStore('player-store', () => {
       throw new Error('Player data was not correct, please try again.');
     }
 
-
     const { error } = await supabase
       .from('players')
       .upsert(
@@ -88,7 +87,7 @@ export const usePlayerStore = defineStore('player-store', () => {
           goals_scored,
           assists,
           clean_sheets,
-          red_cards
+          red_cards,
         }) => ({
           player_id: id,
           code,
@@ -110,8 +109,8 @@ export const usePlayerStore = defineStore('player-store', () => {
           goals_scored,
           assists,
           clean_sheets,
-          red_cards
-        }))
+          red_cards,
+        })),
 
       )
       .select();

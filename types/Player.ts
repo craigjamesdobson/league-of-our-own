@@ -2,6 +2,10 @@ import type { Tables } from './database.types';
 
 interface Player extends Tables<'players_view'> {}
 
+interface PlayerInsertData extends Tables<'players'> {
+  id: number;
+}
+
 interface PlayerWithStats extends Player {
   week_goals: number;
   week_assists: number;
@@ -10,4 +14,4 @@ interface PlayerWithStats extends Player {
   week_points: number;
 }
 
-export type { Player, PlayerWithStats };
+export type { Player, PlayerWithStats, PlayerInsertData };

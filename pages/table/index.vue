@@ -19,12 +19,6 @@ watch(selectedWeek, async (newWeek) => {
     query: { week: newWeek },
   });
 }, { immediate: true });
-
-const op = ref();
-
-const toggle = (event) => {
-  op.value.toggle(event);
-};
 </script>
 
 <template>
@@ -132,19 +126,6 @@ const toggle = (event) => {
         >
           <template #body="slotProps">
             <div class="flex gap-2.5 items-center">
-              <Button
-                class="!p-1 w-8 h-8"
-                aria-label="View week points"
-                title="View week points"
-                variant="text"
-                rounded
-                @click="toggle($event)"
-              >
-                <Icon
-                  size="20"
-                  name="ic:outline-info"
-                />
-              </Button>
               <div class="flex flex-col gap-1 uppercase">
                 <div class="font-black lg:text-base">
                   {{ slotProps.data.team_name }}

@@ -12,7 +12,7 @@ const { draftedPlayer } = defineProps({
 <template>
   <div class="player-container">
     <DraftedPlayer
-      :is-transfer="true"
+      :transfer-count="draftedPlayer.transfers.length"
       :drafted-player="draftedPlayer.transfers.at(-1)"
     />
   </div>

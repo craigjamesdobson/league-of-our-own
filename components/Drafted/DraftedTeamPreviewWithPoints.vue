@@ -95,7 +95,6 @@ const calculatedWeeklyStats = computed(() => {
         <DraftedPlayerWithPoints
           v-if="!player.transfers.length"
           :drafted-player="player"
-          :weekly-stats="calculatedWeeklyStats"
         />
         <DraftedActivePlayer
           v-else-if="player.transfers.at(-1) !== null"

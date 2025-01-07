@@ -38,7 +38,9 @@ const handleEditPlayer = (playerID: number) => {
 const calculatedWeeklyStats = computed(() => {
   return props.draftedTeam.players.reduce(
     (accumulatedStats, player: DraftedPlayerWithWeeklyStats) => {
-      let activePlayer = player.transfers.find(x => x.transfer_week <= fixtureStore.selectedGameweek) || player;
+      let activePlayer = player.transfers
+        .filter(x => x.transfer_week <= fixtureStore.selectedGameweek)
+        .sort((a, b) => b.transfer_week - a.transfer_week)[0] || player;
 
       if (player.selected) {
         activePlayer = player;

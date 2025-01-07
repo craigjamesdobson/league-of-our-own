@@ -29,7 +29,7 @@ const findActiveGameweekPlayer = computed(() => {
 <template>
   <div class="player-container">
     <DraftedPlayerWithPoints
-      :is-transfer="true"
+      :transfer-count="draftedPlayer.transfers.length"
       :drafted-player="findActiveGameweekPlayer"
     />
   </div>

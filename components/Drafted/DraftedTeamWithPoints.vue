@@ -142,9 +142,9 @@ watch(calculatedWeeklyStats, (newValue) => {
         />
       </div>
     </div>
-    <div class="flex justify-between px-2.5 pt-2.5">
+    <div class="flex justify-between py-2.5 pl-2.5 bg-surface-50">
       <span>Total</span>
-      <strong>
+      <strong class="w-2/12 text-center">
         {{ calculatedWeeklyStats.points }}
       </strong>
     </div>

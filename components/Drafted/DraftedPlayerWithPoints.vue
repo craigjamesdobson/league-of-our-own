@@ -40,7 +40,7 @@ const props = defineProps({
             name="oi:shield" />
         </div>
         <div v-if="props.draftedPlayer?.week_redcards"  v-tooltip.top="'Sent off'">
-          <Icon title="Goals" class="text-surface-600" size="20"
+          <Icon title="Goals" class="text-surface-600" size="18"
             name="gravity-ui:square-exclamation" />
         </div>
       </div>

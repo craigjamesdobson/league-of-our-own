@@ -64,6 +64,11 @@ const calculatedWeeklyStats = computed(() => {
   );
 });
 
+const emit = defineEmits(['calculated-weekly-stats']);
+watch(calculatedWeeklyStats, (newValue) => {
+  emit('calculated-weekly-stats', newValue);
+});
+
 </script>
 
 <template>

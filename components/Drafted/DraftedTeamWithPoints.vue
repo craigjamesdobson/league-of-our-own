@@ -54,10 +54,10 @@ const calculatedWeeklyStats = computed(() => {
       const currentPlayerPoints = activePlayer
         ? activePlayer.points || 0
         : player.transfers.reduce((points, transfer) => {
-          return transfer.transfer_week <= fixtureStore.selectedGameweek
-            ? transfer.points
-            : points;
-        }, player.points || 0);
+            return transfer.transfer_week <= fixtureStore.selectedGameweek
+              ? transfer.points
+              : points;
+          }, player.points || 0);
 
       return {
         drafted_team_id: props.draftedTeam.drafted_team_id,
@@ -86,34 +86,60 @@ watch(calculatedWeeklyStats, (newValue) => {
 </script>
 
 <template>
-  <div v-if="props.draftedTeam" class="rounded-sm bg-white p-4">
-    <div class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0" :class="{
-      'bg-red-200': props.draftedTeam?.is_invalid_team,
-    }">
+  <div
+    v-if="props.draftedTeam"
+    class="rounded-sm bg-white p-4"
+  >
+    <div
+      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
+      :class="{
+        'bg-red-200': props.draftedTeam?.is_invalid_team,
+      }"
+    >
       <div class="flex flex-col uppercase">
         <span class="text-lg font-black">{{
           props.draftedTeam?.team_name
-          }}</span>
+        }}</span>
         <span class="text-xs font-light">{{
           props.draftedTeam?.team_owner
-          }}</span>
+        }}</span>
       </div>
-      <span v-if="props.draftedTeam?.allowed_transfers" v-tooltip.top="'Transfers allowed'" title="Transfers allowed">
-        <Icon size="24" name="ic:round-swap-horiz" />
+      <span
+        v-if="props.draftedTeam?.allowed_transfers"
+        v-tooltip.top="'Transfers allowed'"
+        title="Transfers allowed"
+      >
+        <Icon
+          size="24"
+          name="ic:round-swap-horiz"
+        />
       </span>
     </div>
-    <div v-for="player in props.draftedTeam.players" :key="player.drafted_player_id" class="relative text-sm" :class="{
-      'bg-yellow-200 hover:bg-yellow-300':
-        !!player.transfers.length
-        && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-      'bg-green-200 transition-all hover:bg-green-300':
-        !!player.transfers.length
-        && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-    }">
+    <div
+      v-for="player in props.draftedTeam.players"
+      :key="player.drafted_player_id"
+      class="relative text-sm"
+      :class="{
+        'bg-yellow-200 hover:bg-yellow-300':
+          !!player.transfers.length
+          && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
+        'bg-green-200 transition-all hover:bg-green-300':
+          !!player.transfers.length
+          && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
+      }"
+    >
       <div class="flex w-full items-center border-b border-gray-100">
-        <DraftedPlayerWithPoints v-if="!player.transfers.length" :drafted-player="player" />
-        <DraftedActivePlayer v-else-if="player.transfers.at(-1) !== null" :active-gameweek="activeWeek"
-          :drafted-player="player" class="w-full cursor-pointer" @click="handleEditPlayer(player.data.player_id!)" />
+        <DraftedPlayerWithPoints
+          v-if="!player.transfers.length"
+          :drafted-player="player"
+        />
+        <DraftedActivePlayer
+          v-else-if="player.transfers.at(-1) !== null"
+          :active-gameweek="activeWeek"
+          :drafted-player="player"
+          class="w-full cursor-pointer"
+          @click="handleEditPlayer(player.data.player_id!)"
+        />
       </div>
     </div>
     <div class="flex justify-between px-2.5 pt-2.5">
@@ -123,6 +149,9 @@ watch(calculatedWeeklyStats, (newValue) => {
       </strong>
     </div>
   </div>
-  <DraftedTransferSelectionDialog v-if="selectedDraftedPlayer" v-model:drafted-player="selectedDraftedPlayer"
-    v-model:visible="showDialog" />
+  <DraftedTransferSelectionDialog
+    v-if="selectedDraftedPlayer"
+    v-model:drafted-player="selectedDraftedPlayer"
+    v-model:visible="showDialog"
+  />
 </template>

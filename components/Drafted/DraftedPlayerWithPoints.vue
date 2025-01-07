@@ -6,7 +6,7 @@ const props = defineProps({
     type: Object as PropType<DraftedPlayer | DraftedTransfer>,
     default: null,
   },
-  isTransfer: { type: Boolean, default: false },
+  transferCount: { type: Number, default: 0 },
 });
 </script>
 
@@ -16,13 +16,25 @@ const props = defineProps({
     <span class="w-2/12 p-2">{{
       props.draftedPlayer.data.team_short_name
     }}</span>
-    <span class="w-7/12 p-2 text-center text-sm">{{ props.draftedPlayer.data.web_name }}
-      <Icon
-        v-if="props.isTransfer"
-        class="ml-2"
-        size="18"
-        name="ic:round-swap-horiz"
-      />
+    <span class="flex justify-center gap-1 w-5/12 p-2 text-center text-sm whitespace-nowrap">{{
+                                                                                               props.draftedPlayer.data.web_name }}
+      <div
+        v-if="props.transferCount > 0"
+        class="flex items-center relative"
+      >
+        <Icon
+          class="ml-1"
+          size="20"
+          name="fluent:arrow-swap-20-regular"
+        />
+        <div
+          v-if="transferCount > 1"
+          title="View transfer details"
+          class="flex items-center justify-center text-[8px] border border-black rounded-full w-4 h-4 -mt-2"
+        >
+          {{ props.transferCount }}
+        </div>
+      </div>
     </span>
     <span
       v-if="props.draftedPlayer.points !== undefined"

@@ -30,7 +30,7 @@ watch(selectedWeek, async (newWeek) => {
 
 const visible = ref(false);
 
-const showTeamPoints = (event: Event, id: number) => {
+const showTeamPoints = (id: number) => {
   selectedDraftedTeam.value = draftedTeamsWithPoints.value.find(x => x.drafted_team_id === id);
   visible.value = true;
 };
@@ -105,7 +105,7 @@ const showTeamPoints = (event: Event, id: number) => {
         <Column field="team_name" header="Team">
           <template #body="slotProps">
             <div class="flex gap-2.5">
-              <Button title="Show points breakdown" @click="showTeamPoints($event, slotProps.data.drafted_team_id)" class="w-8 h-8 !p-1" rounded text
+              <Button title="Show points breakdown" @click="showTeamPoints(slotProps.data.drafted_team_id)" class="w-8 h-8 !p-1" rounded text
                 aria-label="Team information">
                 <Icon size="18" name="lucide:info" />
               </Button>
@@ -164,10 +164,10 @@ const showTeamPoints = (event: Event, id: number) => {
         <div class="flex flex-col uppercase">
           <span class="text-sm font-black mb-2.5 pb-2.5 border-b">Week {{ selectedWeek }} score</span>
           <span class="text-lg font-black">{{
-            selectedDraftedTeam.team_name
+            selectedDraftedTeam?.team_name
             }}</span>
           <span class="text-xs font-light">{{
-            selectedDraftedTeam.team_owner
+            selectedDraftedTeam?.team_owner
             }}</span>
         </div>
       </template>

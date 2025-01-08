@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DraftedTeam } from '~/types/DraftedTeam';
 import { useWeeklyStatistics } from '~/composables/useWeeklyStatistics';
+import type { DraftedPlayer, DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '~/types/DraftedPlayer';
 
 const props = defineProps({
   draftedTeam: {
@@ -13,11 +14,18 @@ const props = defineProps({
   },
 });
 
-const isActiveTransfer = (transferDate: Date) => {
-  return new Date(transferDate) > new Date();
-};
-
 const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.activeWeek);
+
+const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats => {
+  if (player.transfers.some(x => x.transfer_week <= props.activeWeek)) {
+    return player.transfers.findLast(
+      x => x.transfer_week <= props.activeWeek,
+    )!;
+  }
+  else {
+    return player;
+  }
+};
 </script>
 
 <template>
@@ -37,23 +45,15 @@ const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.a
       class="relative text-sm"
       :class="{
         'bg-yellow-200':
-          !!player.transfers.length
-          && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
+          findActiveGameweekPlayer(player).transfer_week === props.activeWeek,
         'bg-green-200':
-          !!player.transfers.length
-          && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
+          findActiveGameweekPlayer(player).transfer_week < props.activeWeek,
       }"
     >
       <div class="flex w-full items-center border-b border-gray-100">
         <DraftedPlayerWithPoints
-          v-if="!player.transfers.length"
-          :drafted-player="player"
-        />
-        <DraftedActivePlayer
-          v-else-if="player.transfers.at(-1) !== null"
-          :active-gameweek="activeWeek"
-          :drafted-player="player"
-          class="w-full"
+          :drafted-player="findActiveGameweekPlayer(player)"
+          :is-transfer="findActiveGameweekPlayer(player).transfer_week"
         />
       </div>
     </div>

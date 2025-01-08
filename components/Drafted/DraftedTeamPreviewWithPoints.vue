@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { DraftedTeam } from '~/types/DraftedTeam';
-import { useFixtureStore } from '~/stores/fixtures';
-import type { DraftedPlayerWithWeeklyStats } from '~/types/DraftedPlayer';
+import { useWeeklyStatistics } from '~/composables/useWeeklyStatistics';
 
-const fixtureStore = useFixtureStore();
 
 const props = defineProps({
   draftedTeam: {
@@ -20,54 +18,7 @@ const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
 };
 
-const calculatedWeeklyStats = computed(() => {
-  return props.draftedTeam.players.reduce(
-    (accumulatedStats, player: DraftedPlayerWithWeeklyStats) => {
-      let activePlayer = player.transfers
-        .filter(x => x.transfer_week <= fixtureStore.selectedGameweek)
-        .sort((a, b) => b.transfer_week - a.transfer_week)[0] || player;
-
-      if (player.selected) {
-        activePlayer = player;
-      }
-
-      if (player.transfers.find(transfer => transfer.selected)) {
-        activePlayer = player.transfers.find(transfer => transfer.selected);
-      }
-
-      // Calculate points based on the selected transfer or the usual logic
-      const currentPlayerPoints = activePlayer
-        ? activePlayer.points || 0
-        : player.transfers.reduce((points, transfer) => {
-            return transfer.transfer_week <= fixtureStore.selectedGameweek
-              ? transfer.points
-              : points;
-          }, player.points || 0);
-
-      return {
-        drafted_team_id: props.draftedTeam.drafted_team_id,
-        points: accumulatedStats.points + currentPlayerPoints,
-        goals: accumulatedStats.goals + (activePlayer?.week_goals || 0),
-        assists: accumulatedStats.assists + (activePlayer?.week_assists || 0),
-        red_cards: accumulatedStats.red_cards + (activePlayer?.week_redcards ? 1 : 0),
-        clean_sheets:
-          accumulatedStats.clean_sheets + (activePlayer?.week_cleansheets ? 1 : 0),
-      };
-    },
-    {
-      points: 0,
-      goals: 0,
-      assists: 0,
-      red_cards: 0,
-      clean_sheets: 0,
-    },
-  );
-});
-
-const emit = defineEmits(['calculated-weekly-stats']);
-watch(calculatedWeeklyStats, (newValue) => {
-  emit('calculated-weekly-stats', newValue);
-});
+const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.activeWeek);
 
 </script>
 

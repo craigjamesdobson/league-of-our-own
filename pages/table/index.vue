@@ -140,7 +140,7 @@ const showTeamPoints = (id: number) => {
           <template #body="slotProps">
             <div class="flex gap-2.5">
               <Button
-                title="Show points breakdown"
+                v-tooltip.top="`Show points breakdown`"
                 class="w-8 h-8 !p-1"
                 rounded
                 text
@@ -244,6 +244,71 @@ const showTeamPoints = (id: number) => {
         :active-week="selectedWeek"
         :drafted-team="selectedDraftedTeam"
       />
+      <div class="grid grid-cols-2 gap-2.5 px-5 pb-5 justify-center">
+        <div class="flex gap-2.5 items-end">
+          <div class="h-5 w-5 bg-yellow-200" />
+          <p class="text-xs">
+            Current week transfer
+          </p>
+        </div>
+        <div class="flex gap-2.5 items-end">
+          <div class="h-5 w-5 bg-green-200" />
+          <p class="text-xs">
+            Previous week transfer
+          </p>
+        </div>
+        <div class="flex gap-2.5 items-end">
+          <Icon
+            class="text-surface-600 flex items-end justify-center"
+            size="22"
+            name="mage:goals"
+          />
+          <p class="text-xs">
+            Goals scored
+          </p>
+        </div>
+        <div class="flex gap-2.5 items-end">
+          <Icon
+            class="text-surface-600 flex items-end justify-center"
+            size="20"
+            name="icon-park-outline:soccer-one"
+          />
+          <p class="text-xs">
+            Assists made
+          </p>
+        </div>
+        <div class="flex gap-2.5 items-end">
+          <Icon
+            class="text-surface-600 flex items-end justify-center"
+            size="20"
+            name="oi:shield"
+          />
+          <p class="text-xs">
+            Clean sheet
+          </p>
+        </div>
+        <div class="flex gap-2.5 items-end">
+          <Icon
+            class="text-surface-600 flex items-end justify-center"
+            size="20"
+            name="gravity-ui:square-exclamation"
+          />
+          <p class="text-xs">
+            Sent off
+          </p>
+        </div>
+      </div>
+      <Message
+        class="mx-4 my-1"
+        severity="info"
+      >
+        See the <NuxtLink
+          class="underline"
+          to="/rules"
+        >rules</NuxtLink> for a
+        full
+        breakdown of score calculations
+      </Message>
     </Dialog>
     <div class="flex flex-col gap-2.5 lg:col-span-2">
       <WeeklyWinners />

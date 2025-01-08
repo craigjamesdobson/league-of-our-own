@@ -2,7 +2,6 @@
 import type { DraftedTeam } from '~/types/DraftedTeam';
 import { useWeeklyStatistics } from '~/composables/useWeeklyStatistics';
 
-
 const props = defineProps({
   draftedTeam: {
     type: Object as PropType<DraftedTeam>,
@@ -19,7 +18,6 @@ const isActiveTransfer = (transferDate: Date) => {
 };
 
 const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.activeWeek);
-
 </script>
 
 <template>
@@ -32,8 +30,7 @@ const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.a
       :class="{
         'bg-red-200': props.draftedTeam?.is_invalid_team,
       }"
-    >
-    </div>
+    />
     <div
       v-for="player in props.draftedTeam.players"
       :key="player.drafted_player_id"

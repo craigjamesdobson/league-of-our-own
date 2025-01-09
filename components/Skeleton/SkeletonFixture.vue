@@ -1,19 +1,19 @@
 <template>
   <div class="flex justify-around">
-    <div class="my-5 flex flex-col items-center gap-5">
+    <div class="flex flex-col items-center gap-2.5">
       <Skeleton
         shape="circle"
         size="4rem"
       />
-      <Skeleton width="10rem" />
+      <Skeleton width="5rem" />
       <Skeleton width="2rem" />
     </div>
-    <div class="my-5 flex flex-col items-center gap-5">
+    <div class="flex flex-col items-center gap-2.5">
       <Skeleton
         shape="circle"
         size="4rem"
       />
-      <Skeleton width="10rem" />
+      <Skeleton width="5em" />
       <Skeleton width="2rem" />
     </div>
   </div>

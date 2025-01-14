@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import type { Database } from '~/types/database.types';
+import type { WeeklyData, WeeklyWinners } from '~/types/Table';
 
 export const useTableStore = defineStore('table-store', () => {
   const supabase = useSupabaseClient<Database>();
 
-  const weeklyData = ref();
-  const weeklyWinners = ref();
+  const weeklyData: Ref<WeeklyData[] | undefined> = ref();
+  const weeklyWinners: Ref<WeeklyWinners[] | undefined> = ref();
 
   const fetchWeeklyStats = async (week: number) => {
     const { data, error } = await supabase.rpc(
@@ -27,6 +28,7 @@ export const useTableStore = defineStore('table-store', () => {
       throw new Error(error.message);
     }
 
+    // @ts-expect-error - type returned from supabase is not correct
     weeklyWinners.value = data;
   };
 

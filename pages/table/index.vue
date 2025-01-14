@@ -30,8 +30,6 @@ watch(selectedWeek, async (newWeek) => {
 }, { immediate: true });
 
 const visible = ref(false);
-
-
 </script>
 
 <template>
@@ -42,9 +40,17 @@ const visible = ref(false);
           Week {{ selectedWeek }}
         </h1>
         <div class="mb-5 flex flex-col items-end gap-2.5">
-          <label class="font-bold uppercase" for="gameweeks">Select a game week</label>
+          <label
+            class="font-bold uppercase"
+            for="gameweeks"
+          >Select a game week</label>
           <div class="flex gap-2.5">
-            <Select v-model="selectedWeek" :options="weeks" placeholder="Select a gameweek" scroll-height="25rem">
+            <Select
+              v-model="selectedWeek"
+              :options="weeks"
+              placeholder="Select a gameweek"
+              scroll-height="25rem"
+            >
               <template #value="slotProps">
                 <div class="flex items-center">
                   <div>WEEK {{ slotProps.value }}</div>
@@ -60,31 +66,55 @@ const visible = ref(false);
         </div>
       </div>
       <div
-        class="lg:hidden bg-blue-600/10 border border-blue-600 p-2.5 text-blue-600 flex justify-between rounded mb-5">
+        class="lg:hidden bg-blue-600/10 border border-blue-600 p-2.5 text-blue-600 flex justify-between rounded mb-5"
+      >
         <span>Swipe table to view full details</span>
-        <Icon class="ml-2.5 w-5 h-5" name="ic:outline-swipe" />
+        <Icon
+          class="ml-2.5 w-5 h-5"
+          name="ic:outline-swipe"
+        />
       </div>
-      <TableData :weekly-data="tableStore.weeklyData" :drafted-teams-with-points="draftedTeamsWithPoints"
-        v-model:selected-drafted-team="selectedDraftedTeam" v-model:visible="visible" />
+      <TableData
+        v-model:selected-drafted-team="selectedDraftedTeam"
+        v-model:visible="visible"
+        :weekly-data="tableStore.weeklyData"
+        :drafted-teams-with-points="draftedTeamsWithPoints"
+      />
     </div>
-    <Dialog v-model:visible="visible" class="w-[90%] sm:w-[500px]" pt:header:class="!items-start !pb-2"
-      pt:title:class="uppercase !font-black" pt:content:class="!p-0 !pb-2" dismissable-mask modal
-      :header="`Week ${selectedWeek} score`">
+    <Dialog
+      v-model:visible="visible"
+      class="w-[90%] sm:w-[500px]"
+      pt:header:class="!items-start !pb-2"
+      pt:title:class="uppercase !font-black"
+      pt:content:class="!p-0 !pb-2"
+      dismissable-mask
+      modal
+      :header="`Week ${selectedWeek} score`"
+    >
       <template #header>
         <div class="flex flex-col uppercase">
           <span class="text-sm font-black mb-2.5 pb-2.5 border-b">Week {{ selectedWeek }} score</span>
           <span class="text-lg font-black">{{
             selectedDraftedTeam?.team_name
-            }}</span>
+          }}</span>
           <span class="text-xs font-light">{{
             selectedDraftedTeam?.team_owner
-            }}</span>
+          }}</span>
         </div>
       </template>
-      <DraftedTeamPreviewWithPoints :active-week="selectedWeek" :drafted-team="selectedDraftedTeam" />
+      <DraftedTeamPreviewWithPoints
+        :active-week="selectedWeek"
+        :drafted-team="selectedDraftedTeam"
+      />
       <CommonCalculationsLegend />
-      <Message class="mx-4 my-1" severity="info">
-        See the <NuxtLink class="underline" to="/rules">rules</NuxtLink> for a
+      <Message
+        class="mx-4 my-1"
+        severity="info"
+      >
+        See the <NuxtLink
+          class="underline"
+          to="/rules"
+        >rules</NuxtLink> for a
         full
         breakdown of score calculations
       </Message>

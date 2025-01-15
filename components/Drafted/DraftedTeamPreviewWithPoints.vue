@@ -12,6 +12,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  showPlayerOverride: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { calculatedWeeklyStats } = useWeeklyStatistics(props.draftedTeam, props.activeWeek);
@@ -26,12 +30,28 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
     return player;
   }
 };
+
+const selectedDraftedPlayer = ref();
+const showDialog = ref(false);
+
+const handleEditPlayer = (playerID: number) => {
+  try {
+    selectedDraftedPlayer.value = props.draftedTeam.players.find(
+      x => x.data.player_id === playerID,
+    );
+    showDialog.value = true;
+  }
+  catch (error) {
+    console.error('Error fetching drafted player:', error);
+  }
+};
+
 </script>
 
 <template>
   <div
     v-if="props.draftedTeam"
-    class="rounded-sm bg-white p-4 pt-0"
+    class="rounded-sm bg-white p-4"
   >
   <div class="flex flex-col uppercase">
     <span class="text-lg font-black">{{
@@ -59,9 +79,16 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
       }"
     >
       <div class="flex w-full items-center border-b border-gray-100">
+        <Button class="m-1 w-8 h-8 !p-0" v-if="showPlayerOverride && player.transfers.length" variant="text" rounded aria-label="Change active player" size="small">
+          <Icon
+            size="20"
+            name="mingcute:user-edit-line"
+            @click="handleEditPlayer(player.data.player_id)"
+          />
+        </Button>
         <DraftedPlayerWithPoints
           :drafted-player="findActiveGameweekPlayer(player)"
-          :is-transfer="findActiveGameweekPlayer(player).transfer_week"
+          :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
         />
       </div>
     </div>

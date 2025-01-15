@@ -171,9 +171,10 @@ const updateWeeklyStats = async () => {
           v-for="(draftedTeam, index) in draftedTeamsWithPoints"
           :key="index"
         >
-          <DraftedTeamWithPoints
+          <DraftedTeamPreviewWithPoints
             :drafted-team="draftedTeam"
             :active-week="selectedWeek"
+            :show-player-override="true"
             @calculated-weekly-stats="populateWeeklyStats"
           />
         </template>

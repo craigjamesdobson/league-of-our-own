@@ -33,6 +33,14 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
     v-if="props.draftedTeam"
     class="rounded-sm bg-white p-4 pt-0"
   >
+  <div class="flex flex-col uppercase">
+    <span class="text-lg font-black">{{
+      props.draftedTeam?.team_name
+    }}</span>
+    <span class="text-xs font-light">{{
+      props.draftedTeam?.team_owner
+    }}</span>
+  </div>
     <div
       class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
       :class="{
@@ -64,4 +72,9 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
       </strong>
     </div>
   </div>
+  <LazyDraftedTransferSelectionDialog
+    v-if="selectedDraftedPlayer && showPlayerOverride"
+    v-model:drafted-player="selectedDraftedPlayer"
+    v-model:visible="showDialog"
+  />
 </template>

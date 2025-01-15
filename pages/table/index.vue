@@ -84,24 +84,13 @@ const visible = ref(false);
     <Dialog
       v-model:visible="visible"
       class="w-[90%] sm:w-[500px]"
-      pt:header:class="!items-start !pb-2"
-      pt:title:class="uppercase !font-black"
+      pt:header:class="!pb-0"
+      pt:title:class="uppercase !mb-0"
       pt:content:class="!p-0 !pb-2"
       dismissable-mask
       modal
       :header="`Week ${selectedWeek} score`"
     >
-      <template #header>
-        <div class="flex flex-col uppercase">
-          <span class="text-sm font-black mb-2.5 pb-2.5 border-b">Week {{ selectedWeek }} score</span>
-          <span class="text-lg font-black">{{
-            selectedDraftedTeam?.team_name
-          }}</span>
-          <span class="text-xs font-light">{{
-            selectedDraftedTeam?.team_owner
-          }}</span>
-        </div>
-      </template>
       <DraftedTeamPreviewWithPoints
         :active-week="selectedWeek"
         :drafted-team="selectedDraftedTeam"

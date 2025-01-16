@@ -80,14 +80,14 @@ const handleEditPlayer = (playerID: number) => {
       <div class="flex w-full items-center border-b border-gray-100">
         <Button
           v-if="showPlayerOverride && player.transfers.length"
-          class="m-1 w-8 h-8 !p-0"
+          class="mx-1 w-6 h-6 !p-0"
           variant="text"
           rounded
           aria-label="Change active player"
           size="small"
         >
           <Icon
-            size="20"
+            size="16"
             name="mingcute:user-edit-line"
             @click="handleEditPlayer(player.data.player_id)"
           />

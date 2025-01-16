@@ -1,7 +1,7 @@
 <template>
   <DataTable
-    pt:tableContainer:class="h-[320px] items-start bg-white"
     v-model:filters="filters"
+    pt:table-container:class="h-[320px] items-start bg-white"
     :value="filteredPlayers?.sort((a, b) => a.position - b.position)"
     :global-filter-fields="['web_name']"
     paginator

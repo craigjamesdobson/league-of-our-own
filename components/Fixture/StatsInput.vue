@@ -1,123 +1,90 @@
 <template>
-  <DataTable
-    pt:table:class="h-[320px] justify-start bg-white"
-    :value="filteredPlayers?.sort((a, b) => a.position - b.position)"
-    paginator
-    :rows="5"
-  >
+  <DataTable pt:tableContainer:class="h-[320px] items-start bg-white"
+    :value="filteredPlayers?.sort((a, b) => a.position - b.position)" v-model:filters="filters"
+    :globalFilterFields="['web_name']" paginator :rows="5">
     <template #header>
-      <div class="flex gap-2.5 justify-end p-2.5 items-center uppercase">
-        <span class="mr-5">Filter by position:</span>
-        <template
-          v-for="position in playerPositions"
-          :key="position.value"
-        >
-          <Button
-            :title="position.key"
-            rounded
-            :outlined="!position.selected"
-            :label="position.key"
-            @click="filterByPosition(position.value)"
-          >
-            <Icon
-              :name="position.icon"
-              size="22"
-            />
-          </Button>
-        </template>
+      <div class="flex gap-2.5 justify-between p-2.5 items-center uppercase">
+        <div class="flex justify-end">
+          <IconField>
+            <InputIcon>
+              <Icon size="16" name="tabler:search" />
+            </InputIcon>
+            <InputText v-model="filters['global'].value" placeholder="Player Search" />
+          </IconField>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="mr-5">Filter by position:</span>
+          <template v-for="position in playerPositions" :key="position.value">
+            <Button :title="position.key" rounded :outlined="!position.selected" :label="position.key"
+              @click="filterByPosition(position.value)">
+              <Icon :name="position.icon" size="22" />
+            </Button>
+          </template>
+        </div>
       </div>
     </template>
-    <Column
-      class="w-[20%]"
-      field="web_name"
-      header="Player"
-    />
-    <Column
-      class="w-[10%]"
-      header="Goals"
-    >
+    <Column class="w-[20%]" field="web_name" header="Player" />
+    <Column class="w-[10%]" header="Goals">
       <template #body="slotProps">
-        <input
-          v-model="slotProps.data.week_goals"
-          class="w-16 rounded border p-1"
-          type="number"
-          min="0"
-          :class="{
-            'bg-green-500 text-white': slotProps.data.week_goals > 0,
-          }"
-          @click="calculatePlayerPoints(slotProps.data)"
-        >
+        <input v-model="slotProps.data.week_goals" class="w-16 rounded border p-1" type="number" min="0" :class="{
+          'bg-green-500 text-white': slotProps.data.week_goals > 0,
+        }" @click="calculatePlayerPoints(slotProps.data)">
       </template>
     </Column>
-    <Column
-      class="w-[10%]"
-      header="Assists"
-    >
+    <Column class="w-[10%]" header="Assists">
       <template #body="slotProps">
-        <input
-          v-model="slotProps.data.week_assists"
-          class="w-16 rounded border p-1"
-          type="number"
-          min="0"
-          :class="{
-            'bg-green-500 text-white': slotProps.data.week_assists > 0,
-          }"
-          @click="calculatePlayerPoints(slotProps.data)"
-        >
+        <input v-model="slotProps.data.week_assists" class="w-16 rounded border p-1" type="number" min="0" :class="{
+          'bg-green-500 text-white': slotProps.data.week_assists > 0,
+        }" @click="calculatePlayerPoints(slotProps.data)">
       </template>
     </Column>
-    <Column
-      class="w-[10%]"
-      header="Clean sheet"
-    >
+    <Column class="w-[10%]" header="Clean sheet">
       <template #body="slotProps">
-        <Checkbox
-          v-model="slotProps.data.week_cleansheet"
-          :disabled="disableCleansheet"
-          :binary="true"
-          @change="calculatePlayerPoints(slotProps.data)"
-        />
+        <Checkbox v-model="slotProps.data.week_cleansheet" :disabled="disableCleansheet" :binary="true"
+          @change="calculatePlayerPoints(slotProps.data)" />
       </template>
     </Column>
-    <Column
-      class="w-[10%]"
-      header="Red card"
-    >
+    <Column class="w-[10%]" header="Red card">
       <template #body="slotProps">
-        <Checkbox
-          v-model="slotProps.data.week_redcard"
-          :pt-options="{ mergeProps: true }"
-          :pt:box:class="{
-            '!bg-red-600 border-red-600': slotProps.data.week_redcard,
-            'peer-hover:!border-red-600': true,
-          }"
-          :binary="true"
-          @change="calculatePlayerPoints(slotProps.data)"
-        />
+        <Checkbox v-model="slotProps.data.week_redcard" :pt-options="{ mergeProps: true }" :pt:box:class="{
+          '!bg-red-600 border-red-600': slotProps.data.week_redcard,
+          'peer-hover:!border-red-600': true,
+        }" :binary="true" @change="calculatePlayerPoints(slotProps.data)" />
       </template>
     </Column>
-    <Column
-      class="w-[10%]"
-      field="week_points"
-      header="Points"
-    />
+    <Column class="w-[10%]" field="week_points" header="Points" />
   </DataTable>
 </template>
 
 <script setup lang="ts">
 import { calculatePlayerPoints } from '~/logic/fixtures';
+import { FilterMatchMode } from '@primevue/core/api';
 import type { PlayerWithStats } from '~/types/Player';
 
 const players = defineModel<PlayerWithStats[]>('players');
 
 const filteredPlayers = ref(players.value);
 
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
 const filterByPosition = (position: number) => {
-  playerPositions.value.forEach((pos) => {
-    pos.selected = pos.value === position;
-  });
-  filteredPlayers.value = players.value.filter(player => player.position === position);
+  const isAlreadySelected = playerPositions.value.some(pos => pos.selected && pos.value === position);
+
+  if (isAlreadySelected) {
+    // Clear selection and reset filteredPlayers to all players
+    playerPositions.value.forEach(pos => pos.selected = false);
+    filteredPlayers.value = players.value;
+  } else {
+    // Set selected position and filter players
+    playerPositions.value.forEach(pos => {
+      pos.selected = pos.value === position;
+    });
+    filteredPlayers.value = players.value?.filter(player => player.position === position);
+  }
 };
+
 
 const { disableCleansheet } = defineProps<{
   disableCleansheet: boolean;

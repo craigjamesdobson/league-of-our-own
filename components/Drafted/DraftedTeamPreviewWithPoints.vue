@@ -45,7 +45,6 @@ const handleEditPlayer = (playerID: number) => {
     console.error('Error fetching drafted player:', error);
   }
 };
-
 </script>
 
 <template>
@@ -53,14 +52,14 @@ const handleEditPlayer = (playerID: number) => {
     v-if="props.draftedTeam"
     class="rounded-sm bg-white p-4"
   >
-  <div class="flex flex-col uppercase">
-    <span class="text-lg font-black">{{
-      props.draftedTeam?.team_name
-    }}</span>
-    <span class="text-xs font-light">{{
-      props.draftedTeam?.team_owner
-    }}</span>
-  </div>
+    <div class="flex flex-col uppercase">
+      <span class="text-lg font-black">{{
+        props.draftedTeam?.team_name
+      }}</span>
+      <span class="text-xs font-light">{{
+        props.draftedTeam?.team_owner
+      }}</span>
+    </div>
     <div
       class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
       :class="{
@@ -79,7 +78,14 @@ const handleEditPlayer = (playerID: number) => {
       }"
     >
       <div class="flex w-full items-center border-b border-gray-100">
-        <Button class="m-1 w-8 h-8 !p-0" v-if="showPlayerOverride && player.transfers.length" variant="text" rounded aria-label="Change active player" size="small">
+        <Button
+          v-if="showPlayerOverride && player.transfers.length"
+          class="m-1 w-8 h-8 !p-0"
+          variant="text"
+          rounded
+          aria-label="Change active player"
+          size="small"
+        >
           <Icon
             size="20"
             name="mingcute:user-edit-line"

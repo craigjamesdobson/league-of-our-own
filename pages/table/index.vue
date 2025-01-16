@@ -75,11 +75,15 @@ const visible = ref(false);
         />
       </div>
       <TableData
+        v-if="tableStore.weeklyData?.length"
         v-model:selected-drafted-team="selectedDraftedTeam"
         v-model:visible="visible"
         :weekly-data="tableStore.weeklyData"
         :drafted-teams-with-points="draftedTeamsWithPoints"
       />
+      <Message v-else>
+        This week is not yet available
+      </Message>
     </div>
     <Dialog
       v-model:visible="visible"

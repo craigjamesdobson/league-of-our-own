@@ -1,12 +1,12 @@
 import type { DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '~/types/DraftedPlayer';
 import type { DraftedTeam, WeeklyStats } from '~/types/DraftedTeam';
 
-export function useWeeklyStatistics(draftedTeam: DraftedTeam, selectedGameweek: number) {
+export function useWeeklyStatistics(draftedTeam: Ref<DraftedTeam>, selectedGameweek: Ref<number>) {
   const calculatedWeeklyStats = computed(() => {
-    return draftedTeam.players.reduce(
+    return draftedTeam.value.players.reduce(
       (accumulatedStats: WeeklyStats, player: DraftedPlayerWithWeeklyStats) => {
         let activePlayer: DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats = player.transfers
-          .filter(x => x.transfer_week <= selectedGameweek)
+          .filter(x => x.transfer_week <= selectedGameweek.value)
           .sort((a, b) => b.transfer_week - a.transfer_week)[0] || player;
 
         if (player.selected) {
@@ -22,13 +22,13 @@ export function useWeeklyStatistics(draftedTeam: DraftedTeam, selectedGameweek: 
         const currentPlayerPoints = activePlayer
           ? activePlayer.points || 0
           : player.transfers.reduce((points, transfer) => {
-              return transfer.transfer_week <= selectedGameweek
+              return transfer.transfer_week <= selectedGameweek.value
                 ? transfer.points
                 : points;
             }, player.points || 0);
 
         return {
-          drafted_team_id: draftedTeam.drafted_team_id,
+          drafted_team_id: draftedTeam.value.drafted_team_id,
           points: accumulatedStats.points + currentPlayerPoints,
           goals: accumulatedStats.goals + (activePlayer?.week_goals || 0),
           assists: accumulatedStats.assists + (activePlayer?.week_assists || 0),
@@ -40,7 +40,7 @@ export function useWeeklyStatistics(draftedTeam: DraftedTeam, selectedGameweek: 
         };
       },
       {
-        drafted_team_id: draftedTeam.drafted_team_id,
+        drafted_team_id: draftedTeam.value.drafted_team_id,
         points: 0,
         goals: 0,
         assists: 0,

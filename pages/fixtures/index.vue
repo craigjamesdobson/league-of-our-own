@@ -132,16 +132,16 @@ const updateWeeklyStats = async () => {
         </div>
       </div>
     </div>
-    <div class="flex flex-col items-start gap-5 lg:flex-row">
+    <div class="flex flex-col gap-5">
       <div
         v-if="fixtureStore.fixtures"
-        class="flex w-full flex-col gap-2.5 lg:w-1/3"
+        class="grid grid-cols-2 lg:grid-cols-5 gap-5"
       >
         <NuxtLink
           v-for="(fixture, index) in fixtureStore.fixtures"
           :key="fixture.id"
           :to="`/fixtures/${fixture.id}`"
-          class="bg-surface-50 hover:border-primary rounded-sm border p-5 duration-300 ease-in-out *:transition-all"
+          class="bg-white hover:border-primary rounded-sm border p-5 duration-300 ease-in-out *:transition-all"
           :class="{
             'border-green-500':
               fixture.home_team_score !== null
@@ -153,10 +153,10 @@ const updateWeeklyStats = async () => {
       </div>
       <div
         v-else
-        class="flex w-full flex-col gap-2.5 lg:w-1/3"
+        class="grid grid-cols-2 lg:grid-cols-5 gap-5"
       >
         <div
-          v-for="i in 6"
+          v-for="i in 10"
           :key="i"
           class="bg-surface-50 border p-5"
         >
@@ -164,8 +164,8 @@ const updateWeeklyStats = async () => {
         </div>
       </div>
       <div
-        v-if="draftedTeamsWithPoints"
-        class="grid w-full gap-5 lg:w-2/3 lg:grid-cols-3"
+        v-if="draftedTeamsWithPoints?.length"
+        class="grid w-full gap-5 lg:grid-cols-3"
       >
         <template
           v-for="(draftedTeam, index) in draftedTeamsWithPoints"
@@ -174,16 +174,17 @@ const updateWeeklyStats = async () => {
           <DraftedTeamWithPoints
             :drafted-team="draftedTeam"
             :active-week="selectedWeek"
+            :show-player-override="true"
             @calculated-weekly-stats="populateWeeklyStats"
           />
         </template>
       </div>
       <div
         v-else
-        class="grid w-2/3 grid-cols-3 gap-5"
+        class="grid grid-cols-4 gap-5"
       >
         <template
-          v-for="(_, index) in 6"
+          v-for="(_, index) in 4"
           :key="index"
         >
           <SkeletonDraftedTeam />

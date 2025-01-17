@@ -254,7 +254,7 @@ const formIsValid = () => {
         class="font-bold uppercase"
         for="team_name"
       >Team name</label>
-      <GenericFormField
+      <CommonFormField
         v-model="draftedTeamData.team_name"
         :validation="v$.team_name"
         type="text"
@@ -265,7 +265,7 @@ const formIsValid = () => {
         class="font-bold uppercase"
         for="team_owner"
       >Team owner</label>
-      <GenericFormField
+      <CommonFormField
         v-model="draftedTeamData.team_owner"
         :validation="v$.team_owner"
         type="text"
@@ -276,7 +276,7 @@ const formIsValid = () => {
         class="font-bold uppercase"
         for="team_email"
       >Team email</label>
-      <GenericFormField
+      <CommonFormField
         v-model="draftedTeamData.team_email"
         :validation="v$.team_email"
         type="email"
@@ -287,7 +287,7 @@ const formIsValid = () => {
         class="font-bold uppercase"
         for="contact_number"
       >Contact number</label>
-      <GenericFormField
+      <CommonFormField
         v-model="draftedTeamData.contact_number"
         :validation="v$.contact_number"
         type="text"

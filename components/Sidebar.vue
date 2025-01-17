@@ -33,7 +33,7 @@ const routes = reactive([
 
 <template>
   <nav
-    class="bg-primary fixed bottom-0 z-10 flex w-full items-center justify-between p-4 xl:sticky xl:top-0 xl:h-screen xl:w-auto xl:flex-col"
+    class="bg-primary w-full fixed bottom-0 z-10 flex items-center justify-between p-4 xl:sticky xl:top-0 xl:h-screen xl:flex-col"
   >
     <!-- SideNavBar -->
 

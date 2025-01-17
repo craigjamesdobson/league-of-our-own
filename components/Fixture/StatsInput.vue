@@ -1,30 +1,48 @@
 <template>
   <DataTable
-    pt:table:class="h-[320px] justify-start bg-white"
+    v-model:filters="filters"
+    pt:table-container:class="h-[320px] items-start bg-white"
     :value="filteredPlayers?.sort((a, b) => a.position - b.position)"
+    :global-filter-fields="['web_name']"
     paginator
     :rows="5"
   >
     <template #header>
-      <div class="flex gap-2.5 justify-end p-2.5 items-center uppercase">
-        <span class="mr-5">Filter by position:</span>
-        <template
-          v-for="position in playerPositions"
-          :key="position.value"
-        >
-          <Button
-            :title="position.key"
-            rounded
-            :outlined="!position.selected"
-            :label="position.key"
-            @click="filterByPosition(position.value)"
-          >
-            <Icon
-              :name="position.icon"
-              size="22"
+      <div class="flex gap-2.5 justify-between p-2.5 items-center uppercase">
+        <div class="flex justify-end">
+          <IconField>
+            <InputIcon>
+              <Icon
+                size="16"
+                name="tabler:search"
+              />
+            </InputIcon>
+            <InputText
+              v-model="filters['global'].value"
+              placeholder="Player Search"
             />
-          </Button>
-        </template>
+          </IconField>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="mr-5">Filter by position:</span>
+          <template
+            v-for="position in playerPositions"
+            :key="position.value"
+          >
+            <Button
+              :title="position.key"
+              rounded
+              :outlined="!position.selected"
+              :label="position.key"
+              @click="filterByPosition(position.value)"
+            >
+              <Icon
+                :name="position.icon"
+                size="22"
+              />
+            </Button>
+          </template>
+        </div>
       </div>
     </template>
     <Column
@@ -105,6 +123,7 @@
 </template>
 
 <script setup lang="ts">
+import { FilterMatchMode } from '@primevue/core/api';
 import { calculatePlayerPoints } from '~/logic/fixtures';
 import type { PlayerWithStats } from '~/types/Player';
 
@@ -112,11 +131,25 @@ const players = defineModel<PlayerWithStats[]>('players');
 
 const filteredPlayers = ref(players.value);
 
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
 const filterByPosition = (position: number) => {
-  playerPositions.value.forEach((pos) => {
-    pos.selected = pos.value === position;
-  });
-  filteredPlayers.value = players.value.filter(player => player.position === position);
+  const isAlreadySelected = playerPositions.value.some(pos => pos.selected && pos.value === position);
+
+  if (isAlreadySelected) {
+    // Clear selection and reset filteredPlayers to all players
+    playerPositions.value.forEach(pos => pos.selected = false);
+    filteredPlayers.value = players.value;
+  }
+  else {
+    // Set selected position and filter players
+    playerPositions.value.forEach((pos) => {
+      pos.selected = pos.value === position;
+    });
+    filteredPlayers.value = players.value?.filter(player => player.position === position);
+  }
 };
 
 const { disableCleansheet } = defineProps<{

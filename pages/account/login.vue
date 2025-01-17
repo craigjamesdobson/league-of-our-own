@@ -29,7 +29,7 @@ const handleUserLogin = async () => {
         class="flex flex-col gap-6"
         @submit.prevent="handleUserLogin"
       >
-        <GenericFormField
+        <CommonFormField
           v-model="formData.email"
           label="Email"
           type="text"
@@ -37,7 +37,7 @@ const handleUserLogin = async () => {
           icon="material-symbols:alternate-email"
           @keydown.enter="handleUserLogin"
         />
-        <GenericFormField
+        <CommonFormField
           v-model="formData.password"
           label="Password"
           type="password"

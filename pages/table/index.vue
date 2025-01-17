@@ -33,8 +33,8 @@ const visible = ref(false);
 </script>
 
 <template>
-  <div class="grid lg:grid-cols-6 lg:gap-10">
-    <div class="col-span-1 lg:col-span-4 mb-5">
+  <div class="grid grid-cols-1 lg:grid-cols-6 lg:gap-10">
+    <div class="lg:col-span-4 mb-5">
       <div class="flex justify-between">
         <h1 class="mb-5 text-2xl font-black uppercase">
           Week {{ selectedWeek }}

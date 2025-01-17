@@ -86,8 +86,8 @@ const handleEditPlayer = (playerID: number) => {
     >
       <div class="relative flex w-full items-center border-b border-gray-100">
         <DraftedPlayerWithPoints
-        :drafted-player="findActiveGameweekPlayer(player)"
-        :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
+          :drafted-player="findActiveGameweekPlayer(player)"
+          :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
         />
         <div class="flex absolute left-[30%]">
           <Button

@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-sm bg-white p-4">
+  <div class="rounded-sm bg-white p-5">
     <div class="flex flex-col gap-5 px-5">
       <SkeletonLoader class="h-5 w-32" />
       <SkeletonLoader class="h-5 w-20" />

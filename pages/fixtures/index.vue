@@ -164,14 +164,14 @@ const updateWeeklyStats = async () => {
         </div>
       </div>
       <div
-        v-if="draftedTeamsWithPoints"
-        class="grid w-full gap-5 lg:grid-cols-4"
+        v-if="draftedTeamsWithPoints?.length"
+        class="grid w-full gap-5 lg:grid-cols-3"
       >
         <template
           v-for="(draftedTeam, index) in draftedTeamsWithPoints"
           :key="index"
         >
-          <DraftedTeamPreviewWithPoints
+          <DraftedTeamWithPoints
             :drafted-team="draftedTeam"
             :active-week="selectedWeek"
             :show-player-override="true"

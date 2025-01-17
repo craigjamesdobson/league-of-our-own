@@ -95,7 +95,7 @@ const visible = ref(false);
       modal
       :header="`Week ${selectedWeek} score`"
     >
-      <DraftedTeamPreviewWithPoints
+      <DraftedTeamWithPoints
         :active-week="selectedWeek"
         :drafted-team="selectedDraftedTeam"
       />

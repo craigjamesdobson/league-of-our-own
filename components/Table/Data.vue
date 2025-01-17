@@ -8,11 +8,11 @@ const selectedDraftedTeam = defineModel<DraftedTeamWithWeeklyStats>('selectedDra
 
 const props = defineProps<{
   weeklyData: WeeklyData[] | undefined;
-  draftedTeamsWithPoints: DraftedTeamWithWeeklyStats[];
+  draftedTeamsWithPoints: DraftedTeamWithWeeklyStats[] | undefined;
 }>();
 
 const showTeamPoints = (id: number) => {
-  selectedDraftedTeam.value = props.draftedTeamsWithPoints.find(x => x.drafted_team_id === id);
+  selectedDraftedTeam.value = props.draftedTeamsWithPoints?.find(x => x.drafted_team_id === id);
   visible.value = true;
 };
 </script>

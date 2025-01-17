@@ -57,7 +57,7 @@ const handleEditPlayer = (playerID: number) => {
 <template>
   <div
     v-if="props.draftedTeam"
-    class="rounded-sm bg-white p-4"
+    class="rounded-sm bg-white p-5"
   >
     <div class="flex flex-col uppercase">
       <span class="text-lg font-black">{{
@@ -84,25 +84,28 @@ const handleEditPlayer = (playerID: number) => {
           findActiveGameweekPlayer(player).transfer_week < props.activeWeek,
       }"
     >
-      <div class="flex w-full items-center border-b border-gray-100">
-        <Button
-          v-if="showPlayerOverride && player.transfers.length"
-          class="mx-1 w-6 h-6 !p-0"
-          variant="text"
-          rounded
-          aria-label="Change active player"
-          size="small"
-        >
-          <Icon
-            size="16"
-            name="mingcute:user-edit-line"
-            @click="handleEditPlayer(player.data.player_id)"
-          />
-        </Button>
+      <div class="relative flex w-full items-center border-b border-gray-100">
         <DraftedPlayerWithPoints
-          :drafted-player="findActiveGameweekPlayer(player)"
-          :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
+        :drafted-player="findActiveGameweekPlayer(player)"
+        :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
         />
+        <div class="flex absolute left-[30%]">
+          <Button
+            v-if="showPlayerOverride && player.transfers.length"
+            class="w-5 h-5 !p-0"
+            severity="primary"
+            rounded
+            aria-label="Change active player"
+            title="Change active player"
+            size="small"
+          >
+            <Icon
+              size="14"
+              name="mingcute:user-edit-line"
+              @click="handleEditPlayer(player.data.player_id)"
+            />
+          </Button>
+        </div>
       </div>
     </div>
     <div class="flex justify-between py-2.5 pl-2.5 bg-surface-50">

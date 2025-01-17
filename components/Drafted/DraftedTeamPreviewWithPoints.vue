@@ -24,7 +24,6 @@ const { calculatedWeeklyStats } = useWeeklyStatistics(draftedTeam, activeWeek);
 const emit = defineEmits(['calculated-weekly-stats']);
 
 watch(calculatedWeeklyStats, (newValue) => {
-  console.log('Watcher triggered with:', newValue);
   emit('calculated-weekly-stats', newValue);
 });
 

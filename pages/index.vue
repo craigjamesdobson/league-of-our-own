@@ -11,10 +11,10 @@
         width: '100%',
         height: '100%',
         position: 'fixed',
-        background: 'linear-gradient(180deg, #0a1a2f 0%, #1a2740 100%)',
+        background: 'linear-gradient(rgb(6 3 16) 0%, rgb(26, 39, 64) 100%)',
       }"
     />
-    <div class="fixed top-10 left-0 right-0 z-5 text-primary font-display flex items-center justify-center">
+    <div class="fixed top-0 left-0 right-0 z-5 text-primary font-display flex items-center justify-center">
       <div class="flex flex-col rounded-sm text-white p-10 text-center">
         <div class="flex justify-items-center self-center rounded-full p-4">
           <Icon
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div class="fixed inset-0 z-5 text-primary font-display flex items-center justify-center">
-      <div class="flex flex-col gap-5 text-4xl text-center text-white">
+      <div class="p-5 flex flex-col gap-5 text-4xl text-center text-white">
         <p>The 2024/25 season has officially concluded!</p>
         <p> Congratulations to <strong>Sarah Cornish (SARAHSCARERS)</strong> on a fantastic win!</p>
         <p class="text-lg">

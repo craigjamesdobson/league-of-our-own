@@ -14,7 +14,7 @@
         background: 'linear-gradient(rgb(6 3 16) 0%, rgb(26, 39, 64) 100%)',
       }"
     />
-    <div class="fixed top-0 left-0 right-0 z-5 text-primary font-display flex items-center justify-center">
+    <div class="relative z-5 text-primary font-display flex flex-col items-center justify-center">
       <div class="flex flex-col rounded-sm text-white p-10 text-center">
         <div class="flex justify-items-center self-center rounded-full p-4">
           <Icon
@@ -28,15 +28,19 @@
         >
           League of our own
         </h1>
-        <span class="text-xl">ESTABLISHED. 1989/1990</span>
+        <span class="text-xl mb-5">ESTABLISHED. 1989/1990</span>
+        <hr>
       </div>
-    </div>
-    <div class="fixed inset-0 z-5 text-primary font-display flex items-center justify-center">
       <div class="p-5 flex flex-col gap-5 text-4xl text-center text-white">
         <p>The 2024/25 season has officially concluded!</p>
-        <p> Congratulations to <strong>Sarah Cornish (SARAHSCARERS)</strong> on a fantastic win!</p>
+        <p> Congratulations to <strong>Sarah Cornish</strong> on a fantastic win!</p>
+        <NuxtLink class="text-sm uppercase" :to="'/table?week=38'">Click here to view the final week 38 table</NuxtLink>
+        <hr class="m-5">
         <p class="text-lg">
-          A huge thank you to everyone who took part this season — we hope you enjoyed the ride. Have a great summer, and we look forward to seeing you all again next season!
+          A huge thank you to everyone who took part this season — we hope you enjoyed the ride. We will be in touch over the next few weeks to arrange prize distribution.
+        </p>
+        <p class="text-2xl">
+          Have a great summer, and we look forward to seeing you all again next season!
         </p>
       </div>
     </div>

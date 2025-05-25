@@ -28,7 +28,7 @@
         >
           League of our own
         </h1>
-        <span class="text-xl mb-5">ESTABLISHED. 1989/1990</span>
+        <span class="text-sm mb-5">ESTABLISHED. 1989/1990</span>
         <hr>
       </div>
       <div class="p-5 flex flex-col gap-5 text-4xl text-center text-white">

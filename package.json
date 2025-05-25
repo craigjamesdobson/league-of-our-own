@@ -12,6 +12,7 @@
     "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts"
   },
   "dependencies": {
+    "@fireworks-js/vue": "^2.10.8",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@pinia/nuxt": "^0.4.11",
     "@primevue/core": "^4.2.5",

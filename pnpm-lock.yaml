@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fireworks-js/vue':
+        specifier: ^2.10.8
+        version: 2.10.8(vue@3.5.13(typescript@4.9.5))
       '@nuxtjs/tailwindcss':
         specifier: ^6.12.2
         version: 6.12.2(magicast@0.3.5)(rollup@4.29.1)
@@ -660,6 +663,11 @@ packages:
   '@eslint/object-schema@2.1.5':
     resolution: {integrity: sha512-o0bhxnL89h5Bae5T318nFoFzGy+YE5i/gGkoPAgkmTVdRKTiv3p8JHevPiPaMwoloKfEiiaHlawCqaZMqRm+XQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fireworks-js/vue@2.10.8':
+    resolution: {integrity: sha512-XcLfgSO5OHxV6ffn3T3KC0vgJa1in3oLB/Laqzfgc3OBtx2bpwsfbayZNNiQdscRijl1yxHTC0fqe0q83m/dzg==}
+    peerDependencies:
+      vue: '>=3.0.0'
 
   '@gtm-support/core@2.3.1':
     resolution: {integrity: sha512-eD0hndQjhgKm5f/7IA9fZYujmHiVMY+fnYv4mdZSmz5XJQlS4TiTmpdZx2l7I2A9rI9J6Ysz8LpXYYNo/Xq4LQ==}
@@ -2768,6 +2776,9 @@ packages:
   find-up@7.0.0:
     resolution: {integrity: sha512-YyZM99iHrqLKjmt4LJDj58KI+fYyufRLBSYcqycxf//KpBk9FoewoGX0450m9nB44qrZnovzC2oeP5hUibxc/g==}
     engines: {node: '>=18'}
+
+  fireworks-js@2.10.8:
+    resolution: {integrity: sha512-UZNxeJvRmQzLisN4iriWXqKojG9TDJqc0dPmkUw0/+AEQQ3w8z1Jx2YdFSiBGSVb/u4dPTQXU109GMVblzhfpg==}
 
   flat-cache@3.2.0:
     resolution: {integrity: sha512-CYcENa+FtcUKLmhhqyctpclsq7QF38pKjZHsGNiSQF5r4FtoKDWabFDl3hzaEQMvT1LHEysw5twgLvpYYb4vbw==}
@@ -6129,6 +6140,11 @@ snapshots:
 
   '@eslint/object-schema@2.1.5': {}
 
+  '@fireworks-js/vue@2.10.8(vue@3.5.13(typescript@4.9.5))':
+    dependencies:
+      fireworks-js: 2.10.8
+      vue: 3.5.13(typescript@4.9.5)
+
   '@gtm-support/core@2.3.1': {}
 
   '@gtm-support/vue-gtm@2.2.0(vue@3.5.13(typescript@4.9.5))':
@@ -8950,6 +8966,8 @@ snapshots:
       locate-path: 7.2.0
       path-exists: 5.0.0
       unicorn-magic: 0.1.0
+
+  fireworks-js@2.10.8: {}
 
   flat-cache@3.2.0:
     dependencies:

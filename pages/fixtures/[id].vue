@@ -64,6 +64,50 @@ const updateFixture = async () => {
     handleApiError(error, toast);
   }
 };
+
+const toggleVerification = async () => {
+  if (!fixture.value) return;
+
+  try {
+    const newStatus = !fixture.value.verified;
+    await fixtureStore.updateFixtureVerificationStatus(fixture.value.id, newStatus);
+    fixture.value.verified = newStatus;
+    handleApiSuccess(
+      `Fixture ${newStatus ? 'verified' : 'unverified'}`,
+      toast,
+    );
+
+    // Return to fixtures page after verification
+    if (newStatus) {
+      await navigateTo({
+        path: '/fixtures',
+        query: {
+          week: fixture.value.game_week,
+        },
+      });
+    }
+  }
+  catch (error) {
+    handleApiError(error, toast);
+  }
+};
+
+const nextUnverifiedFixture = computed(() => {
+  if (!fixtureStore.fixtures || !fixture.value) return null;
+
+  return fixtureStore.fixtures.find(f =>
+    f.id !== fixture.value!.id
+    && !f.verified
+    && f.home_team_score !== null
+    && f.away_team_score !== null,
+  );
+});
+
+const goToNextUnverified = () => {
+  if (nextUnverifiedFixture.value) {
+    navigateTo(`/fixtures/${nextUnverifiedFixture.value.id}`);
+  }
+};
 </script>
 
 <template>
@@ -133,11 +177,43 @@ const updateFixture = async () => {
           </div>
         </div>
       </div>
-      <Button
-        class="mx-auto my-5"
-        label="Save Fixture"
-        @click="updateFixture"
-      />
+      <div class="flex justify-center gap-4 my-5">
+        <Button
+          label="Save Fixture"
+          @click="updateFixture"
+        />
+        <Button
+          :label="fixture.verified ? 'Unverify Fixture' : 'Verify Fixture'"
+          :severity="fixture.verified ? 'secondary' : 'success'"
+          :disabled="!fixture.verified && (fixture.home_team_score === null || fixture.away_team_score === null)"
+          @click="toggleVerification"
+        />
+        <Button
+          v-if="nextUnverifiedFixture"
+          label="Next Unverified"
+          severity="secondary"
+          icon="pi pi-arrow-right"
+          @click="goToNextUnverified"
+        />
+        <Button
+          label="Back to Fixtures"
+          severity="secondary"
+          icon="pi pi-arrow-left"
+          @click="navigateTo({ path: '/fixtures', query: { week: fixture.game_week } })"
+        />
+      </div>
+      <div
+        v-if="fixture.verified"
+        class="text-center"
+      >
+        <Message
+          class="!m-0 inline-flex"
+          :closable="false"
+          severity="success"
+        >
+          This fixture has been verified
+        </Message>
+      </div>
     </div>
     <div v-else>
       Loading...

@@ -12,8 +12,8 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
-const weeks = ref(Array.from({ length: 38 }, (_, index) => index + 1));
-const selectedWeek = ref(+route.query.week || 1);
+const weeks = ref(Array.from({ length: 38 }, (_, i) => i + 1));
+const selectedWeek = ref(Number(route.query.week) || 1);
 
 const draftedTeamsStore = useDraftedTeamsStore();
 const draftedTeamsWithPoints: Ref<DraftedTeamWithWeeklyStats[] | undefined>
@@ -78,20 +78,6 @@ const progressStats = computed(() => {
   };
 });
 
-const nextUnverifiedFixture = computed(() => {
-  if (!fixtureStore.fixtures) return null;
-
-  return fixtureStore.fixtures.find(f =>
-    !f.verified && f.home_team_score !== null && f.away_team_score !== null,
-  );
-});
-
-const goToNextUnverified = () => {
-  if (nextUnverifiedFixture.value) {
-    router.push(`/fixtures/${nextUnverifiedFixture.value.id}`);
-  }
-};
-
 const populateWeeklyStats = (data: WeeklyStats) => {
   const currentDraftedTeam = draftedTeamsWithPoints.value?.find(
     x => x.drafted_team_id === data.drafted_team_id,
@@ -134,14 +120,14 @@ const updateWeeklyStats = async () => {
 
         <div class="flex gap-2.5">
           <Message
-            v-if="weekIsInComplete"
+            v-if="fixtureStore.fixtures && weekIsInComplete"
             class="!m-0"
             :closable="false"
           >
             This week is currently incomplete ({{ (progressStats?.total || 0) - (progressStats?.populated || 0) }} fixtures remaining)
           </Message>
           <Message
-            v-else-if="!weekIsVerified"
+            v-else-if="fixtureStore.fixtures && !weekIsVerified"
             class="!m-0"
             :closable="false"
             severity="warn"
@@ -149,7 +135,7 @@ const updateWeeklyStats = async () => {
             {{ progressStats?.needsVerification || 0 }} fixture{{ (progressStats?.needsVerification || 0) === 1 ? '' : 's' }} need{{ (progressStats?.needsVerification || 0) === 1 ? 's' : '' }} verification before saving
           </Message>
           <Message
-            v-else
+            v-else-if="fixtureStore.fixtures"
             class="!m-0"
             :closable="false"
             severity="success"
@@ -181,13 +167,6 @@ const updateWeeklyStats = async () => {
               </div>
             </template>
           </Select>
-          <Button
-            v-if="nextUnverifiedFixture"
-            label="Next Unverified"
-            severity="secondary"
-            icon="pi pi-arrow-right"
-            @click="goToNextUnverified"
-          />
           <Button
             label="Save week"
             :disabled="weekIsInComplete || !weekIsVerified"
@@ -340,8 +319,8 @@ const updateWeeklyStats = async () => {
         class="grid w-full gap-5 lg:grid-cols-3"
       >
         <template
-          v-for="(draftedTeam, index) in draftedTeamsWithPoints"
-          :key="index"
+          v-for="draftedTeam in draftedTeamsWithPoints"
+          :key="draftedTeam.drafted_team_id"
         >
           <DraftedTeamWithPoints
             :drafted-team="draftedTeam"
@@ -356,8 +335,8 @@ const updateWeeklyStats = async () => {
         class="grid grid-cols-4 gap-5"
       >
         <template
-          v-for="(_, index) in 4"
-          :key="index"
+          v-for="_ in 4"
+          :key="_"
         >
           <SkeletonDraftedTeam />
         </template>

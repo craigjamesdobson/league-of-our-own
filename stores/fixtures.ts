@@ -67,7 +67,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
   const playerStore = usePlayerStore();
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
-  const selectedGameweek = ref(+route.query.week || 1);
+  const selectedGameweek = ref(+(route.query.week || 1));
 
   const fetchFixtures = async (gameweekID: number) => {
     fixtures.value = null;
@@ -76,8 +76,10 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       .select(
         `
           id,
+          game_week,
           home_team_score,
           away_team_score,
+          verified,
           home_team (id, name, short_name),
           away_team (id, name, short_name)
         `,
@@ -97,6 +99,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
           game_week,
           home_team_score,
           away_team_score,
+          verified,
           home_team (id, name, short_name),
           away_team (id, name, short_name)
         `,
@@ -188,6 +191,22 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     if (error) throw new Error(error.message);
   };
 
+  const updateFixtureVerificationStatus = async (fixtureId: number, verified: boolean) => {
+    const { error } = await supabase
+      .from('fixtures')
+      .update({ verified })
+      .eq('id', fixtureId);
+
+    if (error) throw new Error(error.message);
+  };
+
+  const checkWeekVerificationStatus = (gameweek: number) => {
+    if (!fixtures.value) return false;
+
+    const weekFixtures = fixtures.value.filter(f => f.game_week === gameweek);
+    return weekFixtures.length > 0 && weekFixtures.every(f => f.verified === true);
+  };
+
   return {
     fixtures,
     selectedGameweek,
@@ -197,5 +216,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fetchPlayersWithStatisticsByGameweek,
     updateFixtureScore,
     updatePlayerStatistics,
+    updateFixtureVerificationStatus,
+    checkWeekVerificationStatus,
   };
 });

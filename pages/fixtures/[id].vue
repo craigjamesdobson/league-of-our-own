@@ -69,9 +69,14 @@ const toggleVerification = async () => {
   if (!fixture.value) return;
 
   try {
-    const newStatus = !fixture.value.verified;
-    await fixtureStore.updateFixtureVerificationStatus(fixture.value.id, newStatus);
-    fixture.value.verified = newStatus;
+    const newStatus = !isVerified.value;
+    const updatedFixture = await fixtureStore.updateFixtureVerificationStatus(fixture.value.id, newStatus);
+
+    // Update local fixture with returned data instead of refetching
+    if (updatedFixture) {
+      fixture.value = updatedFixture;
+    }
+
     handleApiSuccess(
       `Fixture ${newStatus ? 'verified' : 'unverified'}`,
       toast,
@@ -97,7 +102,8 @@ const nextUnverifiedFixture = computed(() => {
 
   return fixtureStore.fixtures.find(f =>
     f.id !== fixture.value!.id
-    && !f.verified
+    && !f.verified_by // Not verified (no verified_by means not verified)
+    && f.populated_by && f.populated_at // Is populated (both fields required)
     && f.home_team_score !== null
     && f.away_team_score !== null,
   );
@@ -108,6 +114,37 @@ const goToNextUnverified = () => {
     navigateTo(`/fixtures/${nextUnverifiedFixture.value.id}`);
   }
 };
+
+const currentUser = useSupabaseUser();
+
+const isPopulated = computed(() => {
+  return !!(fixture.value?.populated_by && fixture.value?.populated_at);
+});
+
+const isVerified = computed(() => {
+  return !!(fixture.value?.verified_by && fixture.value?.verified_at);
+});
+
+const canVerify = computed(() => {
+  if (!fixture.value || !currentUser.value) return false;
+
+  // Can't verify if fixture hasn't been populated
+  if (!isPopulated.value) {
+    return false;
+  }
+
+  // Can't verify if already verified
+  if (isVerified.value) {
+    return false;
+  }
+
+  // Can't verify if the same user populated the fixture
+  if (fixture.value.populated_by === currentUser.value.id) {
+    return false;
+  }
+
+  return true;
+});
 </script>
 
 <template>
@@ -183,9 +220,9 @@ const goToNextUnverified = () => {
           @click="updateFixture"
         />
         <Button
-          :label="fixture.verified ? 'Unverify Fixture' : 'Verify Fixture'"
-          :severity="fixture.verified ? 'secondary' : 'success'"
-          :disabled="!fixture.verified && (fixture.home_team_score === null || fixture.away_team_score === null)"
+          :label="isVerified ? 'Unverify Fixture' : 'Verify Fixture'"
+          :severity="isVerified ? 'secondary' : 'success'"
+          :disabled="!isVerified && !canVerify"
           @click="toggleVerification"
         />
         <Button
@@ -202,16 +239,51 @@ const goToNextUnverified = () => {
           @click="navigateTo({ path: '/fixtures', query: { week: fixture.game_week } })"
         />
       </div>
-      <div
-        v-if="fixture.verified"
-        class="text-center"
-      >
+      <div class="flex flex-col justify-center items-center gap-5">
         <Message
+          v-if="fixture.populated_by"
+          class="!m-0 inline-flex"
+          :closable="false"
+          severity="info"
+        >
+          <strong>Populated by:</strong> {{ fixtureStore.getUserFullName(fixture.populated_profile) }}
+          <span
+            v-if="fixture.populated_at"
+          >
+            on {{ new Date(fixture.populated_at).toLocaleString() }}
+          </span>
+        </Message>
+
+        <Message
+          v-if="fixture.verified_by"
           class="!m-0 inline-flex"
           :closable="false"
           severity="success"
         >
-          This fixture has been verified
+          <strong>Verified by:</strong> {{ fixtureStore.getUserFullName(fixture.verified_profile) }}
+          <span
+            v-if="fixture.verified_at"
+          >
+            on {{ new Date(fixture.verified_at).toLocaleString() }}
+          </span>
+        </Message>
+
+        <Message
+          v-if="!canVerify && fixture.populated_by === currentUser?.id"
+          class="!m-0 inline-flex"
+          :closable="false"
+          severity="warn"
+        >
+          You cannot verify a fixture you populated. Please ask another admin to verify.
+        </Message>
+
+        <Message
+          v-if="!canVerify && !isPopulated"
+          class="!m-0 inline-flex"
+          :closable="false"
+          severity="info"
+        >
+          Fixture must be populated before it can be verified.
         </Message>
       </div>
     </div>

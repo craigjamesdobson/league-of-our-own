@@ -79,9 +79,14 @@ export const useFixtureStore = defineStore('fixture-store', () => {
           game_week,
           home_team_score,
           away_team_score,
-          verified,
+          verified_by,
+          verified_at,
+          populated_by,
+          populated_at,
           home_team (id, name, short_name),
-          away_team (id, name, short_name)
+          away_team (id, name, short_name),
+          verified_profile:profiles!verified_by(full_name),
+          populated_profile:profiles!populated_by(full_name)
         `,
       )
       .eq('game_week', gameweekID)
@@ -99,9 +104,14 @@ export const useFixtureStore = defineStore('fixture-store', () => {
           game_week,
           home_team_score,
           away_team_score,
-          verified,
+          verified_by,
+          verified_at,
+          populated_by,
+          populated_at,
           home_team (id, name, short_name),
-          away_team (id, name, short_name)
+          away_team (id, name, short_name),
+          verified_profile:profiles!verified_by(full_name),
+          populated_profile:profiles!populated_by(full_name)
         `,
       )
       .eq('id', id)
@@ -111,10 +121,15 @@ export const useFixtureStore = defineStore('fixture-store', () => {
   };
 
   const updateFixtureScore = async (fixtureData: Fixture) => {
+    const user = useSupabaseUser();
+    const currentTime = new Date().toISOString();
+
     const formattedFixture: TablesInsert<'fixtures'> = {
       id: fixtureData.id,
       home_team_score: fixtureData.home_team_score,
       away_team_score: fixtureData.away_team_score,
+      populated_by: user.value?.id || null,
+      populated_at: currentTime,
     };
 
     const selectedFixtureIndex = fixtures.value?.findIndex(
@@ -123,7 +138,12 @@ export const useFixtureStore = defineStore('fixture-store', () => {
 
     if (selectedFixtureIndex === undefined || !fixtures.value) throw new Error('No fixture found');
 
-    fixtures.value[selectedFixtureIndex] = fixtureData;
+    // Update local fixture data with population info
+    fixtures.value[selectedFixtureIndex] = {
+      ...fixtureData,
+      populated_by: user.value?.id || null,
+      populated_at: currentTime,
+    };
 
     const { error } = await supabase
       .from('fixtures')
@@ -162,6 +182,8 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     PlayersWithStats: PlayerWithStats[],
     fixtureID: number,
   ) => {
+    const user = useSupabaseUser();
+
     const { error: deleteError } = await supabase
       .from('player_statistics')
       .delete()
@@ -180,6 +202,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
         clean_sheet: x.week_cleansheet,
         red_card: x.week_redcard,
         points: x.week_points,
+        author: user.value?.id || null,
       };
     });
 
@@ -191,20 +214,41 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     if (error) throw new Error(error.message);
   };
 
+  const getUserFullName = (profile: { full_name: string | null } | null | undefined) => {
+    if (!profile?.full_name) return 'Unknown User';
+    return profile.full_name;
+  };
+
   const updateFixtureVerificationStatus = async (fixtureId: number, verified: boolean) => {
+    const user = useSupabaseUser();
+    const currentTime = new Date().toISOString();
+
+    const updateData = verified
+      ? {
+          verified_by: user.value?.id || null,
+          verified_at: currentTime,
+        }
+      : {
+          verified_by: null,
+          verified_at: null,
+        };
+
     const { error } = await supabase
       .from('fixtures')
-      .update({ verified })
+      .update(updateData)
       .eq('id', fixtureId);
 
     if (error) throw new Error(error.message);
+
+    // Return the updated fixture with profile data
+    return await fetchFixtureByID(fixtureId);
   };
 
   const checkWeekVerificationStatus = (gameweek: number) => {
     if (!fixtures.value) return false;
 
     const weekFixtures = fixtures.value.filter(f => f.game_week === gameweek);
-    return weekFixtures.length > 0 && weekFixtures.every(f => f.verified === true);
+    return weekFixtures.length > 0 && weekFixtures.every(f => f.verified_by && f.verified_at);
   };
 
   return {
@@ -217,6 +261,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     updateFixtureScore,
     updatePlayerStatistics,
     updateFixtureVerificationStatus,
+    getUserFullName,
     checkWeekVerificationStatus,
   };
 });

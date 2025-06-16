@@ -50,7 +50,7 @@ watch(
 
 const weekIsInComplete = computed(() => {
   return fixtureStore.fixtures?.some(fixture =>
-    fixture.home_team_score === null || fixture.away_team_score === null,
+    !fixture.populated_by || !fixture.populated_at,
   );
 });
 
@@ -63,9 +63,9 @@ const progressStats = computed(() => {
 
   const total = fixtureStore.fixtures.length;
   const populated = fixtureStore.fixtures.filter(f =>
-    f.home_team_score !== null && f.away_team_score !== null,
+    f.populated_by && f.populated_at,
   ).length;
-  const verified = fixtureStore.fixtures.filter(f => f.verified).length;
+  const verified = fixtureStore.fixtures.filter(f => f.verified_by && f.verified_at).length;
   const needsVerification = populated - verified;
 
   return {
@@ -186,25 +186,25 @@ const updateWeeklyStats = async () => {
           :to="`/fixtures/${fixture.id}`"
           class="bg-white hover:border-primary rounded-sm border-2 py-2.5 px-5 duration-300 ease-in-out *:transition-all relative group"
           :class="{
-            'border-green-500 bg-green-50': fixture.verified,
-            'border-yellow-400 bg-yellow-50': !fixture.verified && fixture.home_team_score !== null && fixture.away_team_score !== null,
-            'border-gray-200 bg-gray-50': fixture.home_team_score === null || fixture.away_team_score === null,
-            'hover:border-green-600': fixture.verified,
-            'hover:border-yellow-500': !fixture.verified && fixture.home_team_score !== null && fixture.away_team_score !== null,
-            'hover:border-primary': fixture.home_team_score === null || fixture.away_team_score === null,
+            'border-green-500 bg-green-50': fixture.verified_by && fixture.verified_at,
+            'border-yellow-400 bg-yellow-50': !(fixture.verified_by && fixture.verified_at) && fixture.populated_by && fixture.populated_at,
+            'border-gray-200 bg-gray-50': !fixture.populated_by || !fixture.populated_at,
+            'hover:border-green-600': fixture.verified_by && fixture.verified_at,
+            'hover:border-yellow-500': !(fixture.verified_by && fixture.verified_at) && fixture.populated_by && fixture.populated_at,
+            'hover:border-primary': !fixture.populated_by || !fixture.populated_at,
           }"
         >
           <!-- Status header with badge and icon -->
           <div class="flex justify-between items-center mb-5">
             <!-- Status badge -->
             <span
-              v-if="fixture.verified"
+              v-if="fixture.verified_by && fixture.verified_at"
               class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
             >
               Verified
             </span>
             <span
-              v-else-if="fixture.home_team_score !== null && fixture.away_team_score !== null"
+              v-else-if="fixture.populated_by && fixture.populated_at"
               class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
             >
               Needs Verification
@@ -220,7 +220,7 @@ const updateWeeklyStats = async () => {
             <div class="flex gap-1">
               <!-- Verified icon -->
               <div
-                v-if="fixture.verified"
+                v-if="fixture.verified_by && fixture.verified_at"
                 class="opacity-80"
                 title="Verified"
               >
@@ -246,7 +246,7 @@ const updateWeeklyStats = async () => {
 
               <!-- Needs verification icon -->
               <div
-                v-else-if="fixture.home_team_score !== null && fixture.away_team_score !== null"
+                v-else-if="fixture.populated_by && fixture.populated_at"
                 class="opacity-70"
                 title="Needs Verification"
               >

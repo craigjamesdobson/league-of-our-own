@@ -183,7 +183,10 @@ export type Database = {
           home_team: number | null;
           home_team_score: number | null;
           id: number;
-          verified: boolean | null;
+          populated_at: string | null;
+          populated_by: string | null;
+          verified_at: string | null;
+          verified_by: string | null;
         };
         Insert: {
           away_team?: number | null;
@@ -193,7 +196,10 @@ export type Database = {
           home_team?: number | null;
           home_team_score?: number | null;
           id?: number;
-          verified?: boolean | null;
+          populated_at?: string | null;
+          populated_by?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
         };
         Update: {
           away_team?: number | null;
@@ -203,9 +209,26 @@ export type Database = {
           home_team?: number | null;
           home_team_score?: number | null;
           id?: number;
-          verified?: boolean | null;
+          populated_at?: string | null;
+          populated_by?: string | null;
+          verified_at?: string | null;
+          verified_by?: string | null;
         };
         Relationships: [
+          {
+            foreignKeyName: 'fixtures_populated_by_fkey1';
+            columns: ['populated_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'fixtures_verified_by_fkey1';
+            columns: ['verified_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'public_fixtures_away_team_fkey';
             columns: ['away_team'];

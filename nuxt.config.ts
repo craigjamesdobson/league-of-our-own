@@ -1,3 +1,24 @@
+import { definePreset } from '@primeuix/themes';
+import Aura from '@primeuix/themes/aura';
+
+const AuraCustom = definePreset(Aura, {
+  semantic: {
+    primary: {
+      50: '#e6e6f2',
+      100: '#c8c9e6',
+      200: '#a4a5d4',
+      300: '#7e80c1',
+      400: '#5558a3',
+      500: '#0b0c3d',
+      600: '#090a32',
+      700: '#070827',
+      800: '#05061d',
+      900: '#030414',
+      950: '#01010a',
+    },
+  },
+});
+
 export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
@@ -69,8 +90,18 @@ export default defineNuxtConfig({
   },
 
   primevue: {
+    autoImport: true,
     options: {
-      theme: 'none',
+      ripple: true,
+      inputVariant: 'filled',
+      theme: {
+        preset: AuraCustom,
+        options: {
+          prefix: 'p',
+          darkModeSelector: false,
+          cssLayer: false,
+        },
+      },
     },
   },
 

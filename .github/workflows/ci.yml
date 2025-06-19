@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, staging]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+          
+      - name: Test Supabase migrations
+        run: |
+          supabase db start
+          echo "✅ Migrations applied successfully"

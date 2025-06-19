@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "nuxi typecheck",
     "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
-    "db:push:dev": "supabase db push --db-url $SUPABASE_DEV_DB_URL"
+    "generate-types:local": "npx supabase gen types typescript --local > types/database-generated.types.ts"
   },
   "dependencies": {
     "@fireworks-js/vue": "^2.10.8",

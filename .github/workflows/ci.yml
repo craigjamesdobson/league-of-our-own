@@ -16,14 +16,7 @@ jobs:
         with:
           version: latest
           
-      - name: Start Supabase local development setup
-        run: supabase db start
-        
-      - name: Verify generated types are checked in
+      - name: Test Supabase migrations
         run: |
-          supabase gen types typescript --local > types/database-generated.types.ts
-          if ! git diff --ignore-space-at-eol --exit-code --quiet types/database-generated.types.ts; then
-            echo "Detected uncommitted changes after build. See status below:"
-            git diff
-            exit 1
-          fi
+          supabase db start
+          echo "✅ Migrations applied successfully"

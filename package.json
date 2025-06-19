@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "nuxi typecheck",
-    "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts"
+    "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
+    "db:push:dev": "supabase db push --db-url $SUPABASE_DEV_DB_URL"
   },
   "dependencies": {
     "@fireworks-js/vue": "^2.10.8",
@@ -51,6 +52,7 @@
     "postcss-import": "^16.1.0",
     "sass": "^1.83.0",
     "sass-loader": "^13.3.3",
+    "supabase": "^2.26.9",
     "typescript": "^5.8.3",
     "unplugin-icons": "^0.15.3",
     "vue-tsc": "^1.8.27"

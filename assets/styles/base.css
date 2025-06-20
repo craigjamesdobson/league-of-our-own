@@ -1,5 +1,3 @@
-@import "./primevue/tailwind.css";
-
 :root {
   --p-primary-50: #e6e6f2;
   --p-primary-100: #c8c9e6;
@@ -44,9 +42,13 @@
   --p-text-muted-color: var(--p-surface-500);
   --p-text-hover-muted-color: var(--p-surface-600);
   --p-scrollbar-width: 17px;
-}
-body {
-  @apply text-sm;
+  --p-tooltip-max-width: 12.5rem;
+  --p-tooltip-gutter: 0.25rem;
+  --p-tooltip-shadow: var(--p-overlay-popover-shadow);
+  --p-tooltip-padding: 0.5rem 0.75rem;
+  --p-tooltip-border-radius: var(--p-overlay-popover-border-radius);
+  --p-tooltip-background: var(--p-surface-700);
+  --p-tooltip-color: var(--p-surface-0);
 }
 
 .main-heading {

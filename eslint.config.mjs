@@ -10,6 +10,7 @@ export default createConfigForNuxt({
   {
     ignores: [
       'tailwind.config.ts',
+      'types/database-generated.types.ts',
     ],
   }).override('nuxt/vue/rules', {
   rules: {

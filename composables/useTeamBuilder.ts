@@ -1,4 +1,3 @@
-
 import { useToast } from 'primevue/usetoast';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeam } from '~/types/DraftedTeam';
@@ -8,6 +7,10 @@ import type { Database, TablesInsert, Tables } from '~/types/database.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { delay } from '@/utils/utility';
+
+// IMPORTANT: This composable should only be used in ONE component per page to avoid
+// dual instance issues. Use a single instance pattern where the parent component
+// calls this composable and passes data to children via props.
 
 // Types for the composable
 interface LoadingState {
@@ -66,14 +69,20 @@ export const useTeamBuilder = () => {
     draftedTeamData.value.allowed_transfers ? 85 : 90,
   );
 
-  const teamValue = computed(() => {
-    return draftedTeamPlayers.value.reduce(
+  // Team value calculation using watchEffect for explicit dependency tracking
+  // Uses watchEffect instead of computed to ensure proper reactivity tracking
+  // of nested selectedPlayer properties within the draftedTeamPlayers array
+  const teamValue = ref(0);
+  watchEffect(() => {
+    const value = draftedTeamPlayers.value.reduce(
       (prev: number, curr: DraftedTeamPlayer) =>
         prev + (curr.selectedPlayer?.cost ?? 0),
       0,
     );
+    teamValue.value = value;
   });
 
+  // Remaining budget calculation - recalculates when teamBudget or teamValue changes
   const remainingBudget = computed(() => {
     return teamBudget.value - teamValue.value;
   });
@@ -143,29 +152,74 @@ export const useTeamBuilder = () => {
     }
   };
 
+  // Helper functions for team player management
+  const filterPlayersByPosition = (players: DraftedPlayer[], position: number): DraftedPlayer[] => {
+    try {
+      return players.filter(player => player.data.position === position);
+    }
+    catch (error) {
+      console.error('Error filtering players by position:', error);
+      return [];
+    }
+  };
+
+  const createEmptyPlayerSlots = (count: number): null[] => {
+    if (count < 0) {
+      console.warn('Invalid count for creating empty player slots:', count);
+      return [];
+    }
+    return Array.from({ length: count }, () => null);
+  };
+
+  const createDraftedTeamPlayer = (draftedPlayer: DraftedPlayer | null, position: number): DraftedTeamPlayer => {
+    return reactive({
+      draftedPlayerID: draftedPlayer?.drafted_player_id ?? undefined,
+      position,
+      selectedPlayer: draftedPlayer?.data ?? null,
+    });
+  };
+
+  const mapPlayersToTeamStructure = (
+    players: DraftedPlayer[] | null,
+    position: number,
+    count: number,
+  ): DraftedTeamPlayer[] => {
+    try {
+      if (!players) {
+        const emptySlots = createEmptyPlayerSlots(count);
+        return emptySlots.map(slot => createDraftedTeamPlayer(slot, position));
+      }
+
+      const playersForPosition = filterPlayersByPosition(players, position);
+      const playersToAdd = playersForPosition.slice(0, count);
+      return playersToAdd.map(draftedPlayer => createDraftedTeamPlayer(draftedPlayer, position));
+    }
+    catch (error) {
+      console.error('Error mapping players to team structure:', error);
+      const emptySlots = createEmptyPlayerSlots(count);
+      return emptySlots.map(slot => createDraftedTeamPlayer(slot, position));
+    }
+  };
+
   const setTeamPlayers = (
     teamStructure: { position: number; count: number }[],
     players: DraftedPlayer[] | null = null,
   ): void => {
-    draftedTeamPlayers.value = [];
+    try {
+      // Build the new array
+      const newPlayers: DraftedTeamPlayer[] = [];
+      teamStructure.forEach(({ position, count }) => {
+        const mappedPlayers = mapPlayersToTeamStructure(players, position, count);
+        newPlayers.push(...mappedPlayers);
+      });
 
-    teamStructure.forEach(({ position, count }) => {
-      const playersForPosition = players
-        ? players.filter(player => player.data.position === position)
-        : [];
-
-      const playersToAdd = players
-        ? playersForPosition.slice(0, count)
-        : Array.from({ length: count }, () => null);
-
-      draftedTeamPlayers.value.push(
-        ...playersToAdd.map((draftedPlayer: DraftedPlayer | null): DraftedTeamPlayer => ({
-          draftedPlayerID: draftedPlayer?.drafted_player_id ?? undefined,
-          position,
-          selectedPlayer: draftedPlayer?.data ?? null,
-        })),
-      );
-    });
+      // Replace the entire array to trigger reactivity
+      draftedTeamPlayers.value = newPlayers;
+    }
+    catch (error) {
+      console.error('Error setting team players:', error);
+      draftedTeamPlayers.value = [];
+    }
   };
 
   const submitTeam = async (): Promise<void> => {
@@ -323,7 +377,7 @@ export const useTeamBuilder = () => {
     isExistingDraftedTeam,
     selectedPlayerIds,
     teamBudget,
-    teamValue,
+    teamValue: readonly(teamValue),
     remainingBudget,
     isOverBudget,
 

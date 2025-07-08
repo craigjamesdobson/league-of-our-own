@@ -2,18 +2,35 @@
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
+import type { TablesInsert } from '~/types/database.types';
 
 const toast = useToast();
 
-// Use the team builder composable
-const {
-  draftedTeamData,
-  isExistingDraftedTeam,
-  remainingBudget,
-  isOverBudget,
-  loading,
-  submitTeam,
-} = useTeamBuilder();
+// Accept props from parent component
+const props = defineProps<{
+  draftedTeamData: TablesInsert<'drafted_teams'>;
+  isExistingDraftedTeam: boolean;
+  remainingBudget: number;
+  isOverBudget: boolean;
+  loading: { submittingForm: boolean };
+  submitTeam: () => Promise<void>;
+}>();
+
+// Emit changes back to parent
+const emit = defineEmits<{
+  'update:draftedTeamData': [value: TablesInsert<'drafted_teams'>];
+}>();
+
+// Use props instead of composable
+const { isExistingDraftedTeam } = toRefs(props);
+
+// Create a reactive model for the form data
+const draftedTeamData = reactive({ ...props.draftedTeamData });
+
+// Watch for changes and emit them back to parent
+watch(() => draftedTeamData.allowed_transfers, () => {
+  emit('update:draftedTeamData', { ...draftedTeamData });
+}, { immediate: false });
 
 const rules = computed(() => {
   return {
@@ -38,18 +55,18 @@ const rules = computed(() => {
 
 // Create a reactive object for validation that only includes the fields we validate
 const validationData = computed(() => ({
-  team_name: draftedTeamData.value.team_name,
-  team_owner: draftedTeamData.value.team_owner,
-  team_email: draftedTeamData.value.team_email,
-  contact_number: draftedTeamData.value.contact_number,
+  team_name: draftedTeamData.team_name,
+  team_owner: draftedTeamData.team_owner,
+  team_email: draftedTeamData.team_email,
+  contact_number: draftedTeamData.contact_number,
 }));
 
 const v$ = useVuelidate(rules, validationData);
 
 const contactNumber = computed({
-  get: () => draftedTeamData.value.contact_number || '',
+  get: () => draftedTeamData.contact_number || '',
   set: (value: string) => {
-    draftedTeamData.value.contact_number = value.trim() || null;
+    draftedTeamData.contact_number = value.trim() || null;
   },
 });
 
@@ -68,7 +85,7 @@ const handleTeamSubmit = async () => {
   }
 
   // Use the composable's submit function (which handles team/player validation)
-  await submitTeam();
+  await props.submitTeam();
 };
 </script>
 
@@ -195,7 +212,7 @@ const handleTeamSubmit = async () => {
       </div>
     </div>
     <Message
-      :severity="isOverBudget ? 'error' : 'success'"
+      :severity="props.isOverBudget ? 'error' : 'success'"
       class="w-full !my-0"
       :closable="false"
     >
@@ -210,13 +227,13 @@ const handleTeamSubmit = async () => {
         <div class="flex items-center gap-2.5">
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
-            remainingBudget.toFixed(1)
+            props.remainingBudget.toFixed(1)
           }}</span>
         </div>
       </div>
     </Message>
     <Button
-      :loading="loading.submittingForm"
+      :loading="props.loading.submittingForm"
       class="w-full"
       label="Submit team"
       @click="handleTeamSubmit"

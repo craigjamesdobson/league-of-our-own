@@ -7,7 +7,12 @@
       </h2>
       <TeamBuilderForm
         :drafted-team-data="draftedTeamData"
-        :drafted-team-players="draftedTeamPlayers"
+        :is-existing-drafted-team="isExistingDraftedTeam"
+        :remaining-budget="remainingBudget"
+        :is-over-budget="isOverBudget"
+        :loading="loading"
+        :submit-team="submitTeam"
+        @update:drafted-team-data="(newData) => Object.assign(draftedTeamData, newData)"
       />
     </div>
     <div class="flex flex-col">
@@ -72,6 +77,10 @@ const {
   draftedTeamPlayers,
   selectedPlayerIds,
   isExistingDraftedTeam,
+  remainingBudget,
+  isOverBudget,
+  loading,
+  submitTeam,
   fetchDraftedTeamData,
   setTeamPlayers,
 } = useTeamBuilder();

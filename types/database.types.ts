@@ -8,6 +8,19 @@ export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
+      Tables: {
+        drafted_teams: {
+          Row: {
+            total_team_value: number; // Override to make non-nullable
+          };
+          Insert: {
+            total_team_value: number; // Override to make non-nullable for inserts
+          };
+          Update: {
+            total_team_value?: number; // Override to make non-nullable for updates
+          };
+        };
+      };
       Views: {
         players_view: {
           Row: {

@@ -1,13 +1,12 @@
-import type { Player } from '~/types/Player';
+import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
 import { PlayerPosition } from '~/types/PlayerPosition';
 
 const config = useRuntimeConfig();
 
-interface DraftedTeamPlayer {
-  draftedPlayerID?: number;
-  position: PlayerPosition;
-  selectedPlayer: Player;
-}
+// Helper type for players that definitely have a selected player
+type CompleteDraftedTeamPlayer = DraftedTeamPlayer & {
+  selectedPlayer: NonNullable<DraftedTeamPlayer['selectedPlayer']>;
+};
 
 const generateTeamEmail = (players: DraftedTeamPlayer[], data: {
   team_name: string;
@@ -15,10 +14,14 @@ const generateTeamEmail = (players: DraftedTeamPlayer[], data: {
   total_team_value: number;
   key: string;
 }) => {
-  const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
-  const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
-  const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
-  const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
+  // Filter out any null players and group by position
+  const validPlayers = players.filter(
+    (player): player is CompleteDraftedTeamPlayer => player.selectedPlayer !== null,
+  );
+  const goalkeepers = validPlayers.filter(player => player.position === PlayerPosition.GOALKEEPER);
+  const defenders = validPlayers.filter(player => player.position === PlayerPosition.DEFENDER);
+  const midfielders = validPlayers.filter(player => player.position === PlayerPosition.MIDFIELDER);
+  const forwards = validPlayers.filter(player => player.position === PlayerPosition.FORWARD);
 
   return `
         <html>
@@ -44,10 +47,14 @@ const generateAdminEmail = (players: DraftedTeamPlayer[], data: {
   total_team_value: number;
   key: string;
 }) => {
-  const goalkeepers = players.filter(player => player.position === PlayerPosition.GOALKEEPER);
-  const defenders = players.filter(player => player.position === PlayerPosition.DEFENDER);
-  const midfielders = players.filter(player => player.position === PlayerPosition.MIDFIELDER);
-  const forwards = players.filter(player => player.position === PlayerPosition.FORWARD);
+  // Filter out any null players and group by position
+  const validPlayers = players.filter(
+    (player): player is CompleteDraftedTeamPlayer => player.selectedPlayer !== null,
+  );
+  const goalkeepers = validPlayers.filter(player => player.position === PlayerPosition.GOALKEEPER);
+  const defenders = validPlayers.filter(player => player.position === PlayerPosition.DEFENDER);
+  const midfielders = validPlayers.filter(player => player.position === PlayerPosition.MIDFIELDER);
+  const forwards = validPlayers.filter(player => player.position === PlayerPosition.FORWARD);
 
   return `
         <html>

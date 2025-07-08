@@ -9,22 +9,21 @@ interface DraftedTransfer {
   selected: boolean;
 }
 
-interface DraftedPlayer {
-  drafted_player_id: number;
-  transfers: DraftedTransferWithWeeklyStats[];
-  data: Tables<'players_view'>;
-  selected: boolean;
-}
-
-interface DraftedPlayerWithWeeklyStats extends DraftedPlayer {
-  points?: number;
+interface DraftedTransferWithWeeklyStats extends DraftedTransfer {
   week_goals?: number;
   week_assists?: number;
   week_redcards?: number;
   week_cleansheets?: number;
 }
 
-interface DraftedTransferWithWeeklyStats extends DraftedTransfer {
+interface DraftedPlayer {
+  drafted_player_id: number;
+  transfers: DraftedTransferWithWeeklyStats[];
+  data: Tables<'players_view'>;
+}
+
+interface DraftedPlayerWithWeeklyStats extends DraftedPlayer {
+  points?: number;
   week_goals?: number;
   week_assists?: number;
   week_redcards?: number;

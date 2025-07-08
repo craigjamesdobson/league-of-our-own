@@ -3,14 +3,14 @@ import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
 import { delay } from '@/utils/utility';
-import type { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert } from '~/types/database-generated.types';
-import type { Player } from '~/types/Player';
+import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
+import type { TablesInsert } from '~/types/database.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
+import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
-const supabase = useSupabaseClient<Database>();
 const router = useRouter();
 const toast = useToast();
+const draftedTeamsStore = useDraftedTeamsStore();
 
 const loading = ref(false);
 
@@ -38,27 +38,38 @@ const rules = computed(() => {
 const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', { required: true });
 const draftedTeamPlayers = defineModel<DraftedTeamPlayer[]>('draftedTeamPlayers', { required: true });
 const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
-const v$ = useVuelidate(rules, draftedTeamData);
 
-interface DraftedTeamPlayer {
-  draftedPlayerID?: number;
-  position: PlayerPosition;
-  selectedPlayer: Player;
-}
+// Create a reactive object for validation that only includes the fields we validate
+const validationData = computed(() => ({
+  team_name: draftedTeamData.value.team_name,
+  team_owner: draftedTeamData.value.team_owner,
+  team_email: draftedTeamData.value.team_email,
+  contact_number: draftedTeamData.value.contact_number,
+}));
+
+const v$ = useVuelidate(rules, validationData);
 
 const teamBudget = computed(() =>
   draftedTeamData.value.allowed_transfers ? 85 : 90,
 );
 
-const calculateRemainingBudget = (): number => {
-  const remainingBudget = teamBudget.value;
+const contactNumber = computed({
+  get: () => draftedTeamData.value.contact_number || '',
+  set: (value: string) => {
+    draftedTeamData.value.contact_number = value.trim() || null;
+  },
+});
 
-  const totalCost: number = draftedTeamPlayers.value.reduce(
+const calculateTeamValue = (): number => {
+  return draftedTeamPlayers.value.reduce(
     (prev: number, curr: DraftedTeamPlayer) =>
       prev + (curr.selectedPlayer?.cost ?? 0),
     0,
   );
-  return remainingBudget - totalCost;
+};
+
+const calculateRemainingBudget = (): number => {
+  return teamBudget.value - calculateTeamValue();
 };
 
 const upsertTeamData = async (isEditing: boolean) => {
@@ -70,24 +81,16 @@ const upsertTeamData = async (isEditing: boolean) => {
     allow_communication: draftedTeamData.value.allow_communication,
     allowed_transfers: draftedTeamData.value.allowed_transfers,
     active_season: '24-25',
-    total_team_value: teamBudget.value - calculateRemainingBudget(),
+    total_team_value: calculateTeamValue(),
   };
 
   if (isEditing) {
     draftedTeamUpsertData.drafted_team_id
       = draftedTeamData.value.drafted_team_id;
-    draftedTeamUpsertData.edited_count = draftedTeamData.value.edited_count! += 1;
+    draftedTeamUpsertData.edited_count = (draftedTeamData.value.edited_count ?? 0) + 1;
   }
 
-  const { data, error } = await supabase
-    .from('drafted_teams')
-    .upsert(draftedTeamUpsertData)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
+  return await draftedTeamsStore.upsertDraftedTeam(draftedTeamUpsertData);
 };
 
 const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean) => {
@@ -104,9 +107,7 @@ const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean) => {
     return data;
   });
 
-  await supabase
-    .from('drafted_players')
-    .upsert(draftedPlayersUpsertData);
+  await draftedTeamsStore.upsertDraftedPlayers(draftedPlayersUpsertData);
 };
 
 const handleTeamSubmit = async () => {
@@ -131,7 +132,7 @@ const handleTeamSubmit = async () => {
     await useFetch('/api/user-email', {
       method: 'post',
       body: {
-        title: data.edited_count > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
+        title: (data.edited_count ?? 0) > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
         email: draftedTeamData.value.team_email,
         html: generateTeamEmail(draftedTeamPlayers.value, data),
       },
@@ -211,8 +212,13 @@ const formIsValid = () => {
       severity="info"
       :closable="false"
     >
-      You are editing your existing team. <br> It was last edited on <strong>{{ new
-        Date(draftedTeamData.updated_at ?? draftedTeamData.created_at).toLocaleDateString('en-GB') }}</strong>
+      You are editing your existing team. <br> It was last edited on <strong>{{
+        draftedTeamData.updated_at
+          ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+          : draftedTeamData.created_at
+            ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+            : 'Unknown'
+      }}</strong>
     </Message>
     <div
       v-else
@@ -288,7 +294,7 @@ const formIsValid = () => {
         for="contact_number"
       >Contact number</label>
       <CommonFormField
-        v-model="draftedTeamData.contact_number"
+        v-model="contactNumber"
         :validation="v$.contact_number"
         type="text"
       />
@@ -326,7 +332,7 @@ const formIsValid = () => {
       class="w-full !my-0"
       :closable="false"
     >
-      <template #messageicon>
+      <template #icon>
         <Icon
           class="mr-2.5 self-start"
           size="22"

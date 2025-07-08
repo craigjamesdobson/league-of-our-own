@@ -55,6 +55,8 @@ const addNewTransfer = async () => {
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
       data: newTransferData.value.player,
+      points: 0,
+      selected: false,
     });
 
     handleApiSuccess(`Transfer was successful`, toast);

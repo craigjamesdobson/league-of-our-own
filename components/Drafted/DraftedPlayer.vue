@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { DraftedPlayer, DraftedTransfer } from '@/types/DraftedPlayer';
+import type { DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '@/types/DraftedPlayer';
 import { loadPlayerFallbackImage } from '@/utils/images';
 
 const props = defineProps({
   draftedPlayer: {
-    type: Object as PropType<DraftedPlayer | DraftedTransfer>,
+    type: Object as PropType<DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats>,
     default: null,
   },
   transferCount: { type: Number, default: 0 },

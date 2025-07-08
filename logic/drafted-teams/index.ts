@@ -26,7 +26,7 @@ const setTeamValidity = (draftedTeamData: DraftedTeam) => {
   }
 };
 
-const initDraftedTeamData = (draftedTeamsData: DraftedTeam[]) => {
+const initDraftedTeamData = (draftedTeamsData: DraftedTeam[] | null) => {
   if (!draftedTeamsData) return;
   const draftedTeamData: DraftedTeam[] = draftedTeamsData.map(
     (draftedTeam: DraftedTeam) => {

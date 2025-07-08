@@ -91,6 +91,12 @@ export default defineNuxtConfig({
 
   primevue: {
     autoImport: true,
+    components: {
+      exclude: [
+        'Form',
+        'FormField',
+      ],
+    },
     options: {
       ripple: true,
       inputVariant: 'filled',

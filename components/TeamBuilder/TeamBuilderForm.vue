@@ -2,17 +2,18 @@
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
-import { delay } from '@/utils/utility';
-import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
-import type { TablesInsert } from '~/types/database.types';
-import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
-import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
-const router = useRouter();
 const toast = useToast();
-const draftedTeamsStore = useDraftedTeamsStore();
 
-const loading = ref(false);
+// Use the team builder composable
+const {
+  draftedTeamData,
+  isExistingDraftedTeam,
+  remainingBudget,
+  isOverBudget,
+  loading,
+  submitTeam,
+} = useTeamBuilder();
 
 const rules = computed(() => {
   return {
@@ -35,10 +36,6 @@ const rules = computed(() => {
   };
 });
 
-const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', { required: true });
-const draftedTeamPlayers = defineModel<DraftedTeamPlayer[]>('draftedTeamPlayers', { required: true });
-const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
-
 // Create a reactive object for validation that only includes the fields we validate
 const validationData = computed(() => ({
   team_name: draftedTeamData.value.team_name,
@@ -49,10 +46,6 @@ const validationData = computed(() => ({
 
 const v$ = useVuelidate(rules, validationData);
 
-const teamBudget = computed(() =>
-  draftedTeamData.value.allowed_transfers ? 85 : 90,
-);
-
 const contactNumber = computed({
   get: () => draftedTeamData.value.contact_number || '',
   set: (value: string) => {
@@ -60,112 +53,8 @@ const contactNumber = computed({
   },
 });
 
-const calculateTeamValue = (): number => {
-  return draftedTeamPlayers.value.reduce(
-    (prev: number, curr: DraftedTeamPlayer) =>
-      prev + (curr.selectedPlayer?.cost ?? 0),
-    0,
-  );
-};
-
-const calculateRemainingBudget = (): number => {
-  return teamBudget.value - calculateTeamValue();
-};
-
-const upsertTeamData = async (isEditing: boolean) => {
-  const draftedTeamUpsertData: TablesInsert<'drafted_teams'> = {
-    team_name: draftedTeamData.value.team_name,
-    team_owner: draftedTeamData.value.team_owner,
-    team_email: draftedTeamData.value.team_email,
-    contact_number: draftedTeamData.value.contact_number,
-    allow_communication: draftedTeamData.value.allow_communication,
-    allowed_transfers: draftedTeamData.value.allowed_transfers,
-    active_season: '24-25',
-    total_team_value: calculateTeamValue(),
-  };
-
-  if (isEditing) {
-    draftedTeamUpsertData.drafted_team_id
-      = draftedTeamData.value.drafted_team_id;
-    draftedTeamUpsertData.edited_count = (draftedTeamData.value.edited_count ?? 0) + 1;
-  }
-
-  return await draftedTeamsStore.upsertDraftedTeam(draftedTeamUpsertData);
-};
-
-const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean) => {
-  const draftedPlayersUpsertData = draftedTeamPlayers.value.map((x) => {
-    const data: TablesInsert<'drafted_players'> = {
-      drafted_player: x.selectedPlayer?.player_id,
-      drafted_team: draftedTeamID,
-    };
-
-    if (isEditing) {
-      data.drafted_player_id = x.draftedPlayerID;
-    }
-
-    return data;
-  });
-
-  await draftedTeamsStore.upsertDraftedPlayers(draftedPlayersUpsertData);
-};
-
 const handleTeamSubmit = async () => {
-  try {
-    loading.value = true;
-
-    await delay(1000);
-
-    if (!formIsValid()) {
-      return;
-    }
-
-    const data = await upsertTeamData(isExistingDraftedTeam.value);
-
-    await upsertPlayerData(data.drafted_team_id, isExistingDraftedTeam.value);
-
-    router.push({
-      path: 'team-builder',
-      query: { id: data.key },
-    });
-
-    await useFetch('/api/user-email', {
-      method: 'post',
-      body: {
-        title: (data.edited_count ?? 0) > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
-        email: draftedTeamData.value.team_email,
-        html: generateTeamEmail(draftedTeamPlayers.value, data),
-      },
-    });
-
-    if (!isExistingDraftedTeam.value) {
-      await useFetch('/api/admin-email', {
-        method: 'post',
-        body: {
-          email: 'leagueofourown.fpl@gmail.com',
-          html: generateAdminEmail(draftedTeamPlayers.value, data),
-        },
-      });
-    }
-
-    Object.assign(draftedTeamData.value, data);
-
-    toast.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Your team has been submitted, thank you!',
-      life: 3000,
-    });
-  }
-  catch (err) {
-    console.log(err);
-  }
-  finally {
-    loading.value = false;
-  }
-};
-
-const formIsValid = () => {
+  // Validate form fields first
   if (v$.value.$invalid) {
     v$.value.$touch();
 
@@ -175,33 +64,11 @@ const formIsValid = () => {
       detail: 'Team details are incorrect, please review validation errors',
       life: 3000,
     });
-    return false;
+    return;
   }
 
-  if (
-    draftedTeamPlayers.value.some(
-      draftedTeamPlayer => draftedTeamPlayer.selectedPlayer === null,
-    )
-  ) {
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Please select all players before submitting team',
-      life: 3000,
-    });
-    return false;
-  }
-
-  if (calculateRemainingBudget() < 0) {
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Your team is overbudget, please adjust your players',
-      life: 3000,
-    });
-    return false;
-  }
-  return true;
+  // Use the composable's submit function (which handles team/player validation)
+  await submitTeam();
 };
 </script>
 
@@ -328,7 +195,7 @@ const formIsValid = () => {
       </div>
     </div>
     <Message
-      :severity="calculateRemainingBudget() < 0 ? 'error' : 'success'"
+      :severity="isOverBudget ? 'error' : 'success'"
       class="w-full !my-0"
       :closable="false"
     >
@@ -343,13 +210,13 @@ const formIsValid = () => {
         <div class="flex items-center gap-2.5">
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
-            calculateRemainingBudget().toFixed(1)
+            remainingBudget.toFixed(1)
           }}</span>
         </div>
       </div>
     </Message>
     <Button
-      :loading="loading"
+      :loading="loading.submittingForm"
       class="w-full"
       label="Submit team"
       @click="handleTeamSubmit"

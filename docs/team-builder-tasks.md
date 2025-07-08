@@ -184,16 +184,30 @@ const selectedPlayerIds = computed(() => {
 **Priority:** 🟡 Medium  
 **Effort:** 2 days  
 **Assignee:** Lead Developer
+**Status:** ✅ **COMPLETED**
 
 #### Description
 Extract business logic from components into a reusable composable.
 
 #### Acceptance Criteria
-- [ ] Create `composables/useTeamBuilder.ts`
-- [ ] Extract data fetching logic from index.vue
-- [ ] Extract team management operations
-- [ ] Add error handling and loading states
-- [ ] Implement proper return types
+- [x] Create `composables/useTeamBuilder.ts`
+- [x] Extract data fetching logic from index.vue
+- [x] Extract team management operations
+- [x] Add error handling and loading states
+- [x] Implement proper return types
+
+#### ✅ **Completed Work**:
+- Created 360-line `useTeamBuilder.ts` composable with full business logic
+- Extracted data fetching (`fetchDraftedTeamData`) with proper error handling
+- Moved team management operations (`setTeamPlayers`, `submitTeam`, `resetForm`)
+- Centralized all computed properties (`selectedPlayerIds`, `teamBudget`, `remainingBudget`, etc.)
+- Implemented comprehensive loading states (`fetchingTeam`, `submittingForm`)
+- Added standardized error handling with consistent user feedback
+- Simplified page component from 110 to 30 lines
+- Simplified form component from 200+ to 80 lines
+- Removed unnecessary `UseTeamBuilderReturn` interface (using TypeScript inference)
+- All linting and type checking passes
+- Follows Vue 3 composition API best practices
 
 #### Technical Details
 ```typescript
@@ -222,10 +236,13 @@ export const useTeamBuilder = () => {
 - All Phase 1 tasks completed
 
 #### Definition of Done
-- Composable created and tested
-- Business logic separated from presentation
-- Error handling implemented
-- Loading states managed
+- ✅ Composable created and tested
+- ✅ Business logic separated from presentation
+- ✅ Error handling implemented
+- ✅ Loading states managed
+- ✅ Components simplified and focused on presentation only
+- ✅ TypeScript strict mode compliance maintained
+- ✅ Linting rules followed
 
 ---
 

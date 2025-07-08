@@ -66,114 +66,30 @@
 </template>
 
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
-import type { DraftedPlayer } from '~/types/DraftedPlayer';
-import type { DraftedTeam } from '~/types/DraftedTeam';
-import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
-import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert } from '~/types/database.types';
+// Use the team builder composable
+const {
+  draftedTeamData,
+  draftedTeamPlayers,
+  selectedPlayerIds,
+  isExistingDraftedTeam,
+  fetchDraftedTeamData,
+  setTeamPlayers,
+} = useTeamBuilder();
 
-const supabase = useSupabaseClient<Database>();
+// Handle initial data loading
 const route = useRoute();
-const toast = useToast();
-
-const draftedTeamData: Ref<TablesInsert<'drafted_teams'>> = ref({
-  active_season: '24-25',
-  team_name: '',
-  team_owner: '',
-  team_email: '',
-  contact_number: null,
-  allow_communication: false,
-  allowed_transfers: false,
-  total_team_value: 0,
-});
-
-const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
-
-const teamStructure = [
-  { position: PlayerPosition.GOALKEEPER, count: 1 },
-  { position: PlayerPosition.DEFENDER, count: 4 },
-  { position: PlayerPosition.MIDFIELDER, count: 3 },
-  { position: PlayerPosition.FORWARD, count: 3 },
-];
-
-const draftedTeamPlayers: Ref<DraftedTeamPlayer[]> = ref([]);
-
-const fetchDraftedTeamData = async () => {
-  if (!route.query.id || typeof route.query.id !== 'string') {
-    toast.add({
-      severity: 'error',
-      summary: 'Invalid team ID',
-      detail: 'No valid team ID provided',
-      life: 3000,
-    });
-    setTeamPlayers(teamStructure);
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from('drafted_teams')
-    .select(
-      ` *,
-        players:drafted_players(
-          drafted_player_id,
-          drafted_team,
-          ...players_view(*)
-        )
-      `,
-    )
-    .eq('key', route.query.id)
-    .returns<DraftedTeam[]>()
-    .single();
-
-  if (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'No team found',
-      detail: 'No team was found using that id',
-      life: 3000,
-    });
-    setTeamPlayers(teamStructure);
-    return;
-  }
-
-  Object.assign(draftedTeamData.value, data);
-  setTeamPlayers(teamStructure, data.players);
-};
-
-const setTeamPlayers = (
-  teamStructure: { position: number; count: number }[],
-  players: DraftedPlayer[] | null = null,
-) => {
-  teamStructure.forEach(({ position, count }) => {
-    const playersForPosition = players
-      ? players.filter(player => player.data.position === position)
-      : [];
-
-    const playersToAdd = players
-      ? playersForPosition.slice(0, count)
-      : Array.from({ length: count }, () => null);
-
-    draftedTeamPlayers.value.push(
-      ...playersToAdd.map((draftedPlayer: DraftedPlayer | null): DraftedTeamPlayer => ({
-        draftedPlayerID: draftedPlayer?.drafted_player_id ?? undefined,
-        position,
-        selectedPlayer: draftedPlayer?.data ?? null,
-      })),
-    );
-  });
-};
 
 if (route.query.id) {
   fetchDraftedTeamData();
 }
 else {
+  // Set up default team structure for new teams
+  const teamStructure = [
+    { position: 1, count: 1 }, // GOALKEEPER
+    { position: 2, count: 4 }, // DEFENDER
+    { position: 3, count: 3 }, // MIDFIELDER
+    { position: 4, count: 3 }, // FORWARD
+  ];
   setTeamPlayers(teamStructure);
 }
-
-const selectedPlayerIds = computed(() => {
-  return draftedTeamPlayers.value
-    .filter(player => player.selectedPlayer !== null)
-    .map(player => player.selectedPlayer!.player_id);
-});
 </script>

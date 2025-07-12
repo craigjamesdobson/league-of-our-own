@@ -1,9 +1,8 @@
 import { useToast } from 'primevue/usetoast';
-import type { DraftedPlayer } from '~/types/DraftedPlayer';
-import type { DraftedTeam } from '~/types/DraftedTeam';
 import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert, Tables } from '~/types/database.types';
+import type { Database as DatabaseGenerated } from '~/types/database-generated.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { delay } from '@/utils/utility';
@@ -17,6 +16,12 @@ interface LoadingState {
   fetchingTeam: boolean;
   submittingForm: boolean;
 }
+
+// Type for individual player from the query result - use the generated types (with nulls)
+type DraftedPlayerFromQuery = {
+  drafted_player_id: number;
+  drafted_team: number | null;
+} & DatabaseGenerated['public']['Views']['players_view']['Row'];
 
 // Default team structure
 const DEFAULT_TEAM_STRUCTURE = [
@@ -53,7 +58,7 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
-  const draftedTeamData = ref<TablesInsert<'drafted_teams'>>(createEmptyTeamData());
+  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData());
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
 
   // Computed properties
@@ -119,7 +124,6 @@ export const useTeamBuilder = () => {
           `,
         )
         .eq('key', route.query.id)
-        .returns<DraftedTeam[]>()
         .single();
 
       if (fetchError) {
@@ -134,7 +138,7 @@ export const useTeamBuilder = () => {
         return;
       }
 
-      Object.assign(draftedTeamData.value, data);
+      draftedTeamData.value = data;
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE, data.players);
     }
     catch {
@@ -153,9 +157,9 @@ export const useTeamBuilder = () => {
   };
 
   // Helper functions for team player management
-  const filterPlayersByPosition = (players: DraftedPlayer[], position: number): DraftedPlayer[] => {
+  const filterPlayersByPosition = (players: DraftedPlayerFromQuery[], position: number): DraftedPlayerFromQuery[] => {
     try {
-      return players.filter(player => player.data.position === position);
+      return players.filter(player => player.position === position);
     }
     catch (error) {
       console.error('Error filtering players by position:', error);
@@ -171,16 +175,16 @@ export const useTeamBuilder = () => {
     return Array.from({ length: count }, () => null);
   };
 
-  const createDraftedTeamPlayer = (draftedPlayer: DraftedPlayer | null, position: number): DraftedTeamPlayer => {
+  const createDraftedTeamPlayer = (draftedPlayer: DraftedPlayerFromQuery | null, position: number): DraftedTeamPlayer => {
     return reactive({
       draftedPlayerID: draftedPlayer?.drafted_player_id ?? undefined,
       position,
-      selectedPlayer: draftedPlayer?.data ?? null,
+      selectedPlayer: draftedPlayer ? draftedPlayer as Tables<'players_view'> : null,
     });
   };
 
   const mapPlayersToTeamStructure = (
-    players: DraftedPlayer[] | null,
+    players: DraftedPlayerFromQuery[] | null,
     position: number,
     count: number,
   ): DraftedTeamPlayer[] => {
@@ -203,7 +207,7 @@ export const useTeamBuilder = () => {
 
   const setTeamPlayers = (
     teamStructure: { position: number; count: number }[],
-    players: DraftedPlayer[] | null = null,
+    players: DraftedPlayerFromQuery[] | null = null,
   ): void => {
     try {
       // Build the new array
@@ -268,7 +272,7 @@ export const useTeamBuilder = () => {
       }
 
       // Update local state
-      Object.assign(draftedTeamData.value, teamData);
+      draftedTeamData.value = teamData;
 
       // Show success message
       toast.add({

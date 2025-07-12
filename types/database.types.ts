@@ -1,5 +1,6 @@
 import type { MergeDeep } from 'type-fest';
 import type { Database as DatabaseGenerated } from './database-generated.types';
+import type { DraftedTeam } from './DraftedTeam';
 
 export type { Json } from './database-generated.types';
 
@@ -8,6 +9,12 @@ export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
+      Functions: {
+        get_drafted_teams_by_season: {
+          Args: { active_season_param: string };
+          Returns: DraftedTeam[];
+        };
+      };
       Tables: {
         drafted_teams: {
           Row: {

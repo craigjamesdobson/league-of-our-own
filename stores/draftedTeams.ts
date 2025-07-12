@@ -3,7 +3,6 @@ import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type {
   DraftedTeam,
-  DraftedTeamWithWeeklyStats,
 } from '~/types/DraftedTeam';
 import type { Database, TablesInsert } from '~/types/database.types';
 
@@ -26,8 +25,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   const fetchDraftedTeams = async () => {
     const { data, error } = await supabase
-      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON })
-      .returns<DraftedTeam[]>();
+      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON });
     if (error) throw error;
     draftedTeams.value = data;
   };
@@ -38,13 +36,12 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     const { data, error } = await supabase
       .rpc('get_drafted_teams_with_player_points_by_gameweek', {
         game_week_param: selectedGameWeek,
-      })
-      .returns<DraftedTeamWithWeeklyStats[]>();
+      });
     if (error) throw error;
     return data;
   };
 
-  const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
+  const fetchDraftedPlayerByID = async (draftedPlayerID: number) => {
     const { data, error } = await supabase
       .from('drafted_players')
       .select(

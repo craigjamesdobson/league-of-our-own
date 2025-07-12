@@ -6,9 +6,13 @@ import type { TablesInsert } from '~/types/database.types';
 
 const toast = useToast();
 
-// Accept props from parent component
+// Use defineModel for two-way binding
+const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', {
+  required: true,
+});
+
+// Accept other props from parent component
 const props = defineProps<{
-  draftedTeamData: TablesInsert<'drafted_teams'>;
   isExistingDraftedTeam: boolean;
   remainingBudget: number;
   isOverBudget: boolean;
@@ -16,21 +20,8 @@ const props = defineProps<{
   submitTeam: () => Promise<void>;
 }>();
 
-// Emit changes back to parent
-const emit = defineEmits<{
-  'update:draftedTeamData': [value: TablesInsert<'drafted_teams'>];
-}>();
-
 // Use props instead of composable
 const { isExistingDraftedTeam } = toRefs(props);
-
-// Create a reactive model for the form data
-const draftedTeamData = reactive({ ...props.draftedTeamData });
-
-// Watch for changes and emit them back to parent
-watch(() => draftedTeamData.allowed_transfers, () => {
-  emit('update:draftedTeamData', { ...draftedTeamData });
-}, { immediate: false });
 
 const rules = computed(() => {
   return {
@@ -55,18 +46,18 @@ const rules = computed(() => {
 
 // Create a reactive object for validation that only includes the fields we validate
 const validationData = computed(() => ({
-  team_name: draftedTeamData.team_name,
-  team_owner: draftedTeamData.team_owner,
-  team_email: draftedTeamData.team_email,
-  contact_number: draftedTeamData.contact_number,
+  team_name: draftedTeamData.value.team_name,
+  team_owner: draftedTeamData.value.team_owner,
+  team_email: draftedTeamData.value.team_email,
+  contact_number: draftedTeamData.value.contact_number,
 }));
 
 const v$ = useVuelidate(rules, validationData);
 
 const contactNumber = computed({
-  get: () => draftedTeamData.contact_number || '',
+  get: () => draftedTeamData.value.contact_number || '',
   set: (value: string) => {
-    draftedTeamData.contact_number = value.trim() || null;
+    draftedTeamData.value.contact_number = value.trim() || null;
   },
 });
 
@@ -90,11 +81,12 @@ const handleTeamSubmit = async () => {
 </script>
 
 <template>
-  <div class="hidden 2xl:block">
+  <div class="hidden 2xl:flex flex-col gap-5">
     <Message
       v-if="isExistingDraftedTeam"
       severity="info"
       :closable="false"
+      size="small"
     >
       You are editing your existing team. <br> It was last edited on <strong>{{
         draftedTeamData.updated_at
@@ -137,6 +129,7 @@ const handleTeamSubmit = async () => {
   </div>
   <form
     v-if="draftedTeamData"
+    :key="draftedTeamData.key || 'new-team'"
     class="flex flex-col items-start gap-5"
   >
     <div class="flex w-full flex-col gap-1">

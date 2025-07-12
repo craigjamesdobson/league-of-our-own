@@ -1,18 +1,17 @@
 <template>
   <div class="flex flex-col-reverse gap-5 2xl:flex-row">
-    <Toast position="top-center" />
+    <Toast position="top-right" />
     <div class="px-5 2xl:w-96">
       <h2 class="mb-2.5 text-xl font-black uppercase text-center 2xl:text-left">
         Team Details
       </h2>
       <TeamBuilderForm
-        :drafted-team-data="draftedTeamData"
+        v-model:drafted-team-data="draftedTeamData"
         :is-existing-drafted-team="isExistingDraftedTeam"
         :remaining-budget="remainingBudget"
         :is-over-budget="isOverBudget"
         :loading="loading"
         :submit-team="submitTeam"
-        @update:drafted-team-data="(newData) => Object.assign(draftedTeamData, newData)"
       />
     </div>
     <div class="flex flex-col">

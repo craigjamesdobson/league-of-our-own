@@ -25,7 +25,6 @@
         }"
         class="border-surface-300 rounded-md border bg-white px-4 py-2 focus:outline-none"
         :type="type"
-        autocomplete="chrome-off"
         @change="validation?.$touch"
       >
     </div>
@@ -62,7 +61,10 @@ defineProps({
   },
 });
 
-const modelValue = defineModel<string>('modelValue');
+const modelValue = defineModel<string | null>('modelValue', {
+  get: value => value ?? '',
+  set: value => value === '' ? null : value,
+});
 </script>
 
 <style scoped></style>

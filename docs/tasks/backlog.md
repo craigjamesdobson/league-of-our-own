@@ -46,6 +46,13 @@ From existing analysis documents, we have identified several areas for potential
 ### Configuration & Maintenance
 - _To be scoped based on operational needs_
 
+### Infrastructure Improvements
+- **ESM Migration**: Resolve Vite CJS deprecation warning by migrating to full ESM (`"type": "module"` in package.json)
+  - **Context**: Vitest currently shows "CJS build of Vite's Node API is deprecated" warning
+  - **Impact**: Future-proofing for Vite 6+ compatibility
+  - **Priority**: Low (warning only, functionality works)
+  - **Effort**: Medium (need to verify all configurations work with ESM)
+
 ---
 
 ## Planning Process

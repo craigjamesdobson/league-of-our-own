@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build**: `pnpm build`
 - **Lint**: `pnpm lint` (check) or `pnpm lint:fix` (auto-fix)
 - **Type checking**: `pnpm typecheck`
+- **Testing**: `pnpm test` (run once), `pnpm test:watch` (watch mode), `pnpm test:ui` (visual interface)
 - **Generate Supabase types**: `pnpm generate-types`
 
 Always run lint and typecheck after making changes to ensure code quality.

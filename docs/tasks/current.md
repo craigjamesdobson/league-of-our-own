@@ -124,7 +124,9 @@ tests/
 ## Next Milestones
 
 ### This Week
-- [ ] Set up Vitest configuration for team builder
+- [x] Set up Vitest configuration for team builder ✅ **COMPLETED**
+- [x] Configure global Supabase mocking ✅ **COMPLETED**
+- [x] Create test directory structure and scripts ✅ **COMPLETED**
 - [ ] Create test data factories for core types
 - [ ] Write first behavior-driven test for budget calculations
 - [ ] Document TDD patterns in CLAUDE.md

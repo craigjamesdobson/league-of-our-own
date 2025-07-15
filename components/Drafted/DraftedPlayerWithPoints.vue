@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { DraftedPlayer, DraftedTransfer } from '@/types/DraftedPlayer';
+import type { DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '@/types/DraftedPlayer';
 import { pluralise } from '@/utils/locale';
 
 const props = defineProps({
   draftedPlayer: {
-    type: Object as PropType<DraftedPlayer | DraftedTransfer>,
+    type: Object as PropType<DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats>,
     default: null,
   },
   transferCount: { type: Number, default: 0 },
@@ -40,8 +40,8 @@ const props = defineProps({
       </div>
       <div class="flex gap-1">
         <div
-          v-if="props.draftedPlayer?.week_goals > 0"
-          v-tooltip.top="pluralise(draftedPlayer.week_goals, 'goal')"
+          v-if="props.draftedPlayer?.week_goals && props.draftedPlayer.week_goals > 0"
+          v-tooltip.top="pluralise(draftedPlayer.week_goals!, 'goal')"
         >
           <Icon
             class="text-surface-600 flex items-center justify-center"
@@ -50,8 +50,8 @@ const props = defineProps({
           />
         </div>
         <div
-          v-if="props.draftedPlayer?.week_assists > 0"
-          v-tooltip.top="pluralise(draftedPlayer.week_assists, 'assist')"
+          v-if="props.draftedPlayer?.week_assists && props.draftedPlayer.week_assists > 0"
+          v-tooltip.top="pluralise(draftedPlayer.week_assists!, 'assist')"
         >
           <Icon
             class="text-surface-600 flex items-center justify-center"

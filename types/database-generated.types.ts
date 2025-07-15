@@ -90,7 +90,7 @@ export type Database = {
           team_email: string
           team_name: string
           team_owner: string
-          total_team_value: number | null
+          total_team_value: number
           updated_at: string | null
         }
         Insert: {
@@ -105,7 +105,7 @@ export type Database = {
           team_email: string
           team_name: string
           team_owner: string
-          total_team_value?: number | null
+          total_team_value: number
           updated_at?: string | null
         }
         Update: {
@@ -120,7 +120,7 @@ export type Database = {
           team_email?: string
           team_name?: string
           team_owner?: string
-          total_team_value?: number | null
+          total_team_value?: number
           updated_at?: string | null
         }
         Relationships: []

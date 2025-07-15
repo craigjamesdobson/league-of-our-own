@@ -37,21 +37,6 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
     return player;
   }
 };
-
-const selectedDraftedPlayer = ref();
-const showDialog = ref(false);
-
-const handleEditPlayer = (playerID: number) => {
-  try {
-    selectedDraftedPlayer.value = props.draftedTeam.players.find(
-      x => x.data.player_id === playerID,
-    );
-    showDialog.value = true;
-  }
-  catch (error) {
-    console.error('Error fetching drafted player:', error);
-  }
-};
 </script>
 
 <template>
@@ -89,23 +74,6 @@ const handleEditPlayer = (playerID: number) => {
           :drafted-player="findActiveGameweekPlayer(player)"
           :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
         />
-        <div class="flex absolute left-[30%]">
-          <Button
-            v-if="showPlayerOverride && player.transfers.length"
-            class="w-5 h-5 !p-0"
-            severity="primary"
-            rounded
-            aria-label="Change active player"
-            title="Change active player"
-            size="small"
-          >
-            <Icon
-              size="14"
-              name="mingcute:user-edit-line"
-              @click="handleEditPlayer(player.data.player_id)"
-            />
-          </Button>
-        </div>
       </div>
     </div>
     <div class="flex justify-between py-2.5 pl-2.5 bg-surface-50">
@@ -115,9 +83,4 @@ const handleEditPlayer = (playerID: number) => {
       </strong>
     </div>
   </div>
-  <LazyDraftedTransferSelectionDialog
-    v-if="selectedDraftedPlayer && showPlayerOverride"
-    v-model:drafted-player="selectedDraftedPlayer"
-    v-model:visible="showDialog"
-  />
 </template>

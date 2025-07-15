@@ -2,17 +2,26 @@
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators';
 import { useToast } from 'primevue/usetoast';
-import { delay } from '@/utils/utility';
-import type { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert } from '~/types/database-generated.types';
-import type { Player } from '~/types/Player';
-import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
+import type { TablesInsert } from '~/types/database.types';
 
-const supabase = useSupabaseClient<Database>();
-const router = useRouter();
 const toast = useToast();
 
-const loading = ref(false);
+// Use defineModel for two-way binding
+const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', {
+  required: true,
+});
+
+// Accept other props from parent component
+const props = defineProps<{
+  isExistingDraftedTeam: boolean;
+  remainingBudget: number;
+  isOverBudget: boolean;
+  loading: { submittingForm: boolean };
+  submitTeam: () => Promise<void>;
+}>();
+
+// Use props instead of composable
+const { isExistingDraftedTeam } = toRefs(props);
 
 const rules = computed(() => {
   return {
@@ -35,136 +44,25 @@ const rules = computed(() => {
   };
 });
 
-const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', { required: true });
-const draftedTeamPlayers = defineModel<DraftedTeamPlayer[]>('draftedTeamPlayers', { required: true });
-const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
-const v$ = useVuelidate(rules, draftedTeamData);
+// Create a reactive object for validation that only includes the fields we validate
+const validationData = computed(() => ({
+  team_name: draftedTeamData.value.team_name,
+  team_owner: draftedTeamData.value.team_owner,
+  team_email: draftedTeamData.value.team_email,
+  contact_number: draftedTeamData.value.contact_number,
+}));
 
-interface DraftedTeamPlayer {
-  draftedPlayerID?: number;
-  position: PlayerPosition;
-  selectedPlayer: Player;
-}
+const v$ = useVuelidate(rules, validationData);
 
-const teamBudget = computed(() =>
-  draftedTeamData.value.allowed_transfers ? 85 : 90,
-);
-
-const calculateRemainingBudget = (): number => {
-  const remainingBudget = teamBudget.value;
-
-  const totalCost: number = draftedTeamPlayers.value.reduce(
-    (prev: number, curr: DraftedTeamPlayer) =>
-      prev + (curr.selectedPlayer?.cost ?? 0),
-    0,
-  );
-  return remainingBudget - totalCost;
-};
-
-const upsertTeamData = async (isEditing: boolean) => {
-  const draftedTeamUpsertData: TablesInsert<'drafted_teams'> = {
-    team_name: draftedTeamData.value.team_name,
-    team_owner: draftedTeamData.value.team_owner,
-    team_email: draftedTeamData.value.team_email,
-    contact_number: draftedTeamData.value.contact_number,
-    allow_communication: draftedTeamData.value.allow_communication,
-    allowed_transfers: draftedTeamData.value.allowed_transfers,
-    active_season: '24-25',
-    total_team_value: teamBudget.value - calculateRemainingBudget(),
-  };
-
-  if (isEditing) {
-    draftedTeamUpsertData.drafted_team_id
-      = draftedTeamData.value.drafted_team_id;
-    draftedTeamUpsertData.edited_count = draftedTeamData.value.edited_count! += 1;
-  }
-
-  const { data, error } = await supabase
-    .from('drafted_teams')
-    .upsert(draftedTeamUpsertData)
-    .select()
-    .single();
-
-  if (error) throw new Error(error.message);
-
-  return data;
-};
-
-const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean) => {
-  const draftedPlayersUpsertData = draftedTeamPlayers.value.map((x) => {
-    const data: TablesInsert<'drafted_players'> = {
-      drafted_player: x.selectedPlayer?.player_id,
-      drafted_team: draftedTeamID,
-    };
-
-    if (isEditing) {
-      data.drafted_player_id = x.draftedPlayerID;
-    }
-
-    return data;
-  });
-
-  await supabase
-    .from('drafted_players')
-    .upsert(draftedPlayersUpsertData);
-};
+const contactNumber = computed({
+  get: () => draftedTeamData.value.contact_number || '',
+  set: (value: string) => {
+    draftedTeamData.value.contact_number = value.trim() || null;
+  },
+});
 
 const handleTeamSubmit = async () => {
-  try {
-    loading.value = true;
-
-    await delay(1000);
-
-    if (!formIsValid()) {
-      return;
-    }
-
-    const data = await upsertTeamData(isExistingDraftedTeam.value);
-
-    await upsertPlayerData(data.drafted_team_id, isExistingDraftedTeam.value);
-
-    router.push({
-      path: 'team-builder',
-      query: { id: data.key },
-    });
-
-    await useFetch('/api/user-email', {
-      method: 'post',
-      body: {
-        title: data.edited_count > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
-        email: draftedTeamData.value.team_email,
-        html: generateTeamEmail(draftedTeamPlayers.value, data),
-      },
-    });
-
-    if (!isExistingDraftedTeam.value) {
-      await useFetch('/api/admin-email', {
-        method: 'post',
-        body: {
-          email: 'leagueofourown.fpl@gmail.com',
-          html: generateAdminEmail(draftedTeamPlayers.value, data),
-        },
-      });
-    }
-
-    Object.assign(draftedTeamData.value, data);
-
-    toast.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Your team has been submitted, thank you!',
-      life: 3000,
-    });
-  }
-  catch (err) {
-    console.log(err);
-  }
-  finally {
-    loading.value = false;
-  }
-};
-
-const formIsValid = () => {
+  // Validate form fields first
   if (v$.value.$invalid) {
     v$.value.$touch();
 
@@ -174,45 +72,29 @@ const formIsValid = () => {
       detail: 'Team details are incorrect, please review validation errors',
       life: 3000,
     });
-    return false;
+    return;
   }
 
-  if (
-    draftedTeamPlayers.value.some(
-      draftedTeamPlayer => draftedTeamPlayer.selectedPlayer === null,
-    )
-  ) {
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Please select all players before submitting team',
-      life: 3000,
-    });
-    return false;
-  }
-
-  if (calculateRemainingBudget() < 0) {
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Your team is overbudget, please adjust your players',
-      life: 3000,
-    });
-    return false;
-  }
-  return true;
+  // Use the composable's submit function (which handles team/player validation)
+  await props.submitTeam();
 };
 </script>
 
 <template>
-  <div class="hidden 2xl:block">
+  <div class="hidden 2xl:flex flex-col gap-5">
     <Message
       v-if="isExistingDraftedTeam"
       severity="info"
       :closable="false"
+      size="small"
     >
-      You are editing your existing team. <br> It was last edited on <strong>{{ new
-        Date(draftedTeamData.updated_at ?? draftedTeamData.created_at).toLocaleDateString('en-GB') }}</strong>
+      You are editing your existing team. <br> It was last edited on <strong>{{
+        draftedTeamData.updated_at
+          ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+          : draftedTeamData.created_at
+            ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+            : 'Unknown'
+      }}</strong>
     </Message>
     <div
       v-else
@@ -247,6 +129,7 @@ const formIsValid = () => {
   </div>
   <form
     v-if="draftedTeamData"
+    :key="draftedTeamData.key || 'new-team'"
     class="flex flex-col items-start gap-5"
   >
     <div class="flex w-full flex-col gap-1">
@@ -288,7 +171,7 @@ const formIsValid = () => {
         for="contact_number"
       >Contact number</label>
       <CommonFormField
-        v-model="draftedTeamData.contact_number"
+        v-model="contactNumber"
         :validation="v$.contact_number"
         type="text"
       />
@@ -322,11 +205,11 @@ const formIsValid = () => {
       </div>
     </div>
     <Message
-      :severity="calculateRemainingBudget() < 0 ? 'error' : 'success'"
+      :severity="props.isOverBudget ? 'error' : 'success'"
       class="w-full !my-0"
       :closable="false"
     >
-      <template #messageicon>
+      <template #icon>
         <Icon
           class="mr-2.5 self-start"
           size="22"
@@ -337,13 +220,13 @@ const formIsValid = () => {
         <div class="flex items-center gap-2.5">
           Transfer Budget Remaining:
           <span class="text-lg font-black">{{
-            calculateRemainingBudget().toFixed(1)
+            props.remainingBudget.toFixed(1)
           }}</span>
         </div>
       </div>
     </Message>
     <Button
-      :loading="loading"
+      :loading="props.loading.submittingForm"
       class="w-full"
       label="Submit team"
       @click="handleTeamSubmit"

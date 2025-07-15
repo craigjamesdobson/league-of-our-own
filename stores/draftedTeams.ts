@@ -3,9 +3,8 @@ import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type {
   DraftedTeam,
-  DraftedTeamWithWeeklyStats,
 } from '~/types/DraftedTeam';
-import type { Database } from '~/types/database.types';
+import type { Database, TablesInsert } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
@@ -26,8 +25,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   const fetchDraftedTeams = async () => {
     const { data, error } = await supabase
-      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON })
-      .returns<DraftedTeam[]>();
+      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON });
     if (error) throw error;
     draftedTeams.value = data;
   };
@@ -38,13 +36,12 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     const { data, error } = await supabase
       .rpc('get_drafted_teams_with_player_points_by_gameweek', {
         game_week_param: selectedGameWeek,
-      })
-      .returns<DraftedTeamWithWeeklyStats[]>();
+      });
     if (error) throw error;
     return data;
   };
 
-  const fetchDraftedPlayerByID = async (draftedPlayerID: string) => {
+  const fetchDraftedPlayerByID = async (draftedPlayerID: number) => {
     const { data, error } = await supabase
       .from('drafted_players')
       .select(
@@ -58,7 +55,26 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     return data;
   };
 
-  const upsertTeamData = (teamData: string) => {
+  const upsertDraftedTeam = async (draftedTeamData: TablesInsert<'drafted_teams'>) => {
+    const { data, error } = await supabase
+      .from('drafted_teams')
+      .upsert(draftedTeamData)
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  };
+
+  const upsertDraftedPlayers = async (draftedPlayersData: TablesInsert<'drafted_players'>[]) => {
+    const { error } = await supabase
+      .from('drafted_players')
+      .upsert(draftedPlayersData);
+
+    if (error) throw new Error(error.message);
+  };
+
+  const bulkUpsertDraftedTeams = (teamData: string) => {
     const parsedDraftedTeams: DraftedTeam[] = JSON.parse(teamData);
     parsedDraftedTeams.map(async ({ players, ...draftedTeamData }) => {
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
@@ -67,7 +83,16 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
           drafted_team: draftedTeamData.drafted_team_id,
         };
       });
-      await supabase.from('drafted_teams').upsert(draftedTeamData);
+      await supabase.from('drafted_teams').upsert({
+        drafted_team_id: draftedTeamData.drafted_team_id,
+        team_name: draftedTeamData.team_name,
+        team_owner: draftedTeamData.team_owner,
+        team_email: draftedTeamData.team_email,
+        allowed_transfers: draftedTeamData.allowed_transfers,
+        total_team_value: draftedTeamData.total_team_value ?? 0,
+        is_invalid_team: draftedTeamData.is_invalid_team ?? false,
+        active_season: config.public.ACTIVE_SEASON,
+      });
       await supabase.from('drafted_players').upsert(formattedDraftedPlayers);
     });
   };
@@ -110,7 +135,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     fetchDraftedTeams,
     fetchDraftedPlayerByID,
     fetchDraftedTeamsWithPlayerPointsByGameweek,
-    upsertTeamData,
+    upsertDraftedTeam,
+    upsertDraftedPlayers,
+    bulkUpsertDraftedTeams,
     addNewTransfer,
     deleteTransfer,
   };

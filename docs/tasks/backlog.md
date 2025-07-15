@@ -53,6 +53,13 @@ From existing analysis documents, we have identified several areas for potential
   - **Priority**: Low (warning only, functionality works)
   - **Effort**: Medium (need to verify all configurations work with ESM)
 
+- **Hash-Based RLS Security**: Enhance database security by validating access tokens at the RLS policy level
+  - **Context**: Current RLS policies allow public access, relying on hash-based URLs for security
+  - **Technical Approach**: Pass query hash as header (`x-team-hash`), validate against `access_token` column in RLS policies
+  - **Impact**: Prevents direct Supabase endpoint access bypass, provides true database-level security
+  - **Priority**: Low (current approach is appropriate for friends/family use case)
+  - **Effort**: Medium (requires client header changes + RLS policy updates + schema migration)
+
 ---
 
 ## Planning Process

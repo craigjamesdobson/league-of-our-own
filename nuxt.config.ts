@@ -95,6 +95,8 @@ export default defineNuxtConfig({
       exclude: [
         'Form',
         'FormField',
+        'Editor',
+        'Chart',
       ],
     },
     options: {

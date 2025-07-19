@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { getImageUrl } from '@/utils/images';
+import type { Fixture } from '@/types/Fixture';
+
+defineModel<Fixture | undefined>('fixture');
+</script>
+
 <template>
   <div
     v-if="fixture"
@@ -30,9 +37,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Fixture } from '~/types/Fixture';
-
-const fixture = defineModel<Fixture>('fixture');
-</script>

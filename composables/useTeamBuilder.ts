@@ -33,7 +33,7 @@ const DEFAULT_TEAM_STRUCTURE = [
 
 // Factory function for empty team data
 const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
-  active_season: '24-25',
+  active_season: '25-26',
   team_name: '',
   team_owner: '',
   team_email: '',
@@ -341,7 +341,7 @@ export const useTeamBuilder = () => {
       contact_number: draftedTeamData.value.contact_number,
       allow_communication: draftedTeamData.value.allow_communication,
       allowed_transfers: draftedTeamData.value.allowed_transfers,
-      active_season: '24-25',
+      active_season: '25-26',
       total_team_value: teamValue.value,
     };
 

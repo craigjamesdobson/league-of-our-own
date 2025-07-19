@@ -28,6 +28,7 @@ interface DraftedPlayerWithWeeklyStats extends DraftedPlayer {
   week_assists?: number;
   week_redcards?: number;
   week_cleansheets?: number;
+  selected?: boolean;
 }
 
 export type { DraftedPlayer, DraftedTransfer, DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats };

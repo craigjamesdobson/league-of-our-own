@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import DraftedPlayer from './DraftedPlayer.vue';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
 const props = defineProps({
   draftedTeam: {
-    type: Object as PropType<DraftedTeam>,
+    type: Object as PropType<DraftedTeamWithPlayers>,
     default: null,
   },
   editable: {

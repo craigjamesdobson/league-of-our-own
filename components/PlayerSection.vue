@@ -2,7 +2,7 @@
 import { PlayerPosition } from '~/types/PlayerPosition';
 import { usePlayerStore } from '~/stores/players';
 import type { Player } from '~/types/Player';
-import { PLACEHOLDER_PLAYER_IMAGE } from '~/utils/images';
+import { PLACEHOLDER_PLAYER_IMAGE, loadPlayerFallbackImage, getImageUrl } from '~/utils/images';
 
 const playerStore = usePlayerStore();
 

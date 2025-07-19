@@ -729,7 +729,9 @@ export type Database = {
         Returns: Json
       }
       get_drafted_teams_with_player_points_by_gameweek: {
-        Args: { game_week_param: number }
+        Args:
+          | { game_week_param: number }
+          | { game_week_param: number; active_season_param: string }
         Returns: {
           drafted_team_id: number
           team_name: string
@@ -821,7 +823,9 @@ export type Database = {
         }[]
       }
       get_weekly_stats_for_gameweek: {
-        Args: { target_week: number }
+        Args:
+          | { target_week: number }
+          | { target_week: number; active_season_param: string }
         Returns: {
           drafted_team_id: number
           team_name: string

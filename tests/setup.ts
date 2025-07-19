@@ -75,10 +75,17 @@ global._testMocks = {
 global._watchEffects = [];
 
 // Assign mocks to global scope for composable access
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.useSupabaseClient = global._testMocks.useSupabaseClient;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.useRoute = global._testMocks.useRoute;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.useRouter = global._testMocks.useRouter;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.ref = global._testMocks.ref;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.computed = global._testMocks.computed;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.watchEffect = global._testMocks.watchEffect;
+// @ts-expect-error - TypeScript doesn't recognize these auto-imported composables on global object
 global.readonly = global._testMocks.readonly;

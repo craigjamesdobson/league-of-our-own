@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { TEAM_DATA } from '@/logic/teams/constants';
 import { populateFilterPrices } from '@/utils/filters';
-import type { Player } from '~/types/Player';
+import { getImageUrl } from '@/utils/images';
 
 const {
   filterData,
@@ -10,8 +10,6 @@ const {
   setFilteredPlayers,
   resetFilteredTeams,
 } = useFilters();
-
-const players = defineModel<Player[]>('players');
 </script>
 
 <template>
@@ -83,7 +81,7 @@ const players = defineModel<Player[]>('players');
               :key="team.id"
               :data-teamID="team.id"
               class="icon-container"
-              @click.prevent="players = selectfilteredTeam($event)"
+              @click.prevent="selectfilteredTeam($event)"
             >
               <img
                 class="h-full w-full"

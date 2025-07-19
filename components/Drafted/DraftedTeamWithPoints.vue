@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
+import type { DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
 import { useWeeklyStatistics } from '~/composables/useWeeklyStatistics';
 import type { DraftedPlayer, DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '~/types/DraftedPlayer';
 
 const props = defineProps({
   draftedTeam: {
-    type: Object as PropType<DraftedTeam>,
+    type: Object as PropType<DraftedTeamWithPlayers | DraftedTeamWithPlayerPointsByGameweek>,
     default: null,
   },
   activeWeek: {
@@ -24,7 +25,10 @@ const { calculatedWeeklyStats } = useWeeklyStatistics(draftedTeam, activeWeek);
 const emit = defineEmits(['calculated-weekly-stats']);
 
 watch(calculatedWeeklyStats, (newValue) => {
-  emit('calculated-weekly-stats', newValue);
+  emit('calculated-weekly-stats', {
+    teamId: props.draftedTeam.drafted_team_id,
+    stats: newValue,
+  });
 });
 
 const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats => {
@@ -36,6 +40,10 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
   else {
     return player;
   }
+};
+
+const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats): number | null => {
+  return 'transfer_week' in activePlayer ? activePlayer.transfer_week : null;
 };
 </script>
 
@@ -64,15 +72,16 @@ const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeekl
       class="relative text-sm"
       :class="{
         'bg-yellow-200':
-          findActiveGameweekPlayer(player).transfer_week === props.activeWeek,
+          getTransferWeek(findActiveGameweekPlayer(player)) === props.activeWeek,
         'bg-green-200':
-          findActiveGameweekPlayer(player).transfer_week < props.activeWeek,
+          getTransferWeek(findActiveGameweekPlayer(player)) !== null
+          && getTransferWeek(findActiveGameweekPlayer(player))! < props.activeWeek,
       }"
     >
       <div class="relative flex w-full items-center border-b border-gray-100">
         <DraftedPlayerWithPoints
           :drafted-player="findActiveGameweekPlayer(player)"
-          :transfer-count="player.transfers.filter(x => x.transfer_week <= props.activeWeek).length"
+          :transfer-count="player.transfers.filter((x: DraftedTransferWithWeeklyStats) => x.transfer_week <= props.activeWeek).length"
         />
       </div>
     </div>

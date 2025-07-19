@@ -1,27 +1,16 @@
-import type { DraftedPlayer } from './DraftedPlayer';
+import type { Tables } from './database.types';
+import type { DraftedPlayerWithWeeklyStats } from './DraftedPlayer';
 
-interface DraftedTeam {
-  drafted_team_id: number;
-  team_name: string;
-  team_owner: string;
-  team_email: string;
-  allowed_transfers: boolean;
-  players: DraftedPlayer[];
-  total_team_value?: number;
-  is_invalid_team?: boolean;
-}
+type DraftedTeam = Tables<'drafted_teams'> & { is_invalid_team: boolean };
+type DraftedTeamWithPlayers = DraftedTeam & {
+  players: DraftedPlayerWithWeeklyStats[];
+};
 
-interface WeeklyStats {
-  drafted_team_id: number;
-  points: number;
-  goals: number;
-  assists: number;
-  clean_sheets: number;
-  red_cards: number;
-}
+type DraftedTeamWithWeeklyStats = DraftedTeam & {
+  players: DraftedPlayerWithWeeklyStats[];
+  weekly_stats: Tables<'weekly_statistics'>[];
+};
 
-interface DraftedTeamWithWeeklyStats extends DraftedTeam {
-  weekly_stats: WeeklyStats;
-}
+type WeeklyStats = Tables<'weekly_statistics'>;
 
-export type { DraftedTeam, DraftedTeamWithWeeklyStats, WeeklyStats };
+export type { DraftedTeam, DraftedTeamWithPlayers, DraftedTeamWithWeeklyStats, WeeklyStats };

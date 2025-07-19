@@ -3,11 +3,11 @@ import { useToast } from 'primevue/usetoast';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 import type {
-  DraftedTeamWithWeeklyStats,
   WeeklyStats,
 } from '~/types/DraftedTeam';
+import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
 
-const supabase = useSupabaseClient();
+const supabase = useSupabaseClient<Database>();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
@@ -16,7 +16,7 @@ const weeks = ref(Array.from({ length: 38 }, (_, i) => i + 1));
 const selectedWeek = ref(Number(route.query.week) || 1);
 
 const draftedTeamsStore = useDraftedTeamsStore();
-const draftedTeamsWithPoints: Ref<DraftedTeamWithWeeklyStats[] | undefined>
+const draftedTeamsWithPoints: Ref<DraftedTeamWithPlayerPointsByGameweek[] | undefined>
   = ref();
 
 onMounted(async () => {
@@ -78,23 +78,28 @@ const progressStats = computed(() => {
   };
 });
 
-const populateWeeklyStats = (data: WeeklyStats) => {
+const populateWeeklyStats = (data: { teamId: number; stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'> }) => {
   const currentDraftedTeam = draftedTeamsWithPoints.value?.find(
-    x => x.drafted_team_id === data.drafted_team_id,
+    x => x.drafted_team_id === data.teamId,
   );
-  currentDraftedTeam!.weekly_stats = data;
+  if (currentDraftedTeam) {
+    currentDraftedTeam.weekly_stats = data.stats;
+  }
 };
 
 const updateWeeklyStats = async () => {
-  const formattedWeeklyData = draftedTeamsWithPoints.value!.map(x => ({
-    team: x.drafted_team_id,
-    week: selectedWeek.value,
-    points: x.weekly_stats.points,
-    goals: x.weekly_stats.goals,
-    assists: x.weekly_stats.assists,
-    clean_sheets: x.weekly_stats.clean_sheets,
-    red_cards: x.weekly_stats.red_cards,
-  }));
+  const formattedWeeklyData = draftedTeamsWithPoints.value!.map((x) => {
+    const stats = x.weekly_stats as WeeklyStats;
+    return {
+      team: x.drafted_team_id,
+      week: selectedWeek.value,
+      points: stats.points,
+      goals: stats.goals,
+      assists: stats.assists,
+      clean_sheets: stats.clean_sheets,
+      red_cards: stats.red_cards,
+    };
+  });
 
   const { error: deleteError } = await supabase
     .from('weekly_statistics')

@@ -1,4 +1,4 @@
-import type { DraftedTeam } from '@/types/DraftedTeam';
+import type { DraftedTeamWithPlayers } from '@/types/DraftedTeam';
 import type { TablesInsert, Tables } from '@/types/database.types';
 
 /**
@@ -6,17 +6,24 @@ import type { TablesInsert, Tables } from '@/types/database.types';
  * Uses sensible defaults and allows partial overrides.
  */
 export const createMockDraftedTeam = (
-  overrides?: Partial<DraftedTeam>,
-): DraftedTeam => {
+  overrides?: Partial<DraftedTeamWithPlayers>,
+): DraftedTeamWithPlayers => {
   return {
+    key: '1',
     drafted_team_id: 1,
+    active_season: '25-26',
     team_name: 'Test Team FC',
     team_owner: 'Test Owner',
     team_email: 'test@example.com',
+    contact_number: null,
+    allow_communication: false,
     allowed_transfers: false,
-    players: [],
     total_team_value: 0,
+    created_at: '2025-01-12T10:00:00Z',
+    updated_at: null,
+    edited_count: null,
     is_invalid_team: false,
+    players: [],
     ...overrides,
   };
 };
@@ -29,7 +36,7 @@ export const createMockTeamInsertData = (
   overrides?: Partial<TablesInsert<'drafted_teams'>>,
 ): TablesInsert<'drafted_teams'> => {
   return {
-    active_season: '24-25',
+    active_season: '25-26',
     team_name: 'Test Team FC',
     team_owner: 'Test Owner',
     team_email: 'test@example.com',
@@ -49,7 +56,7 @@ export const createMockTeamTableData = (
   return {
     key: '1',
     drafted_team_id: 1,
-    active_season: '24-25',
+    active_season: '25-26',
     team_name: 'Test Team FC',
     team_owner: 'Test Owner',
     team_email: 'test@example.com',

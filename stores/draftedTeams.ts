@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type {
-  DraftedTeam,
+  DraftedTeamWithPlayers,
 } from '~/types/DraftedTeam';
 import type { Database, TablesInsert } from '~/types/database.types';
 
@@ -10,7 +10,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
   const config = useRuntimeConfig();
 
-  const draftedTeams: Ref<Array<DraftedTeam> | null> = ref(null);
+  const draftedTeams: Ref<DraftedTeamWithPlayers[] | null> = ref(null);
 
   const getDraftedTeams = computed(() =>
     initDraftedTeamData(draftedTeams.value),
@@ -36,6 +36,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     const { data, error } = await supabase
       .rpc('get_drafted_teams_with_player_points_by_gameweek', {
         game_week_param: selectedGameWeek,
+        active_season_param: config.public.ACTIVE_SEASON,
       });
     if (error) throw error;
     return data;
@@ -75,8 +76,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   };
 
   const bulkUpsertDraftedTeams = (teamData: string) => {
-    const parsedDraftedTeams: DraftedTeam[] = JSON.parse(teamData);
-    parsedDraftedTeams.map(async ({ players, ...draftedTeamData }) => {
+    const parsedDraftedTeams: DraftedTeamWithPlayers[] = JSON.parse(teamData);
+    parsedDraftedTeams.map(async (team) => {
+      const { players, ...draftedTeamData } = team;
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
           drafted_player: x.data.player_id,

@@ -30,6 +30,7 @@ export const createMockPlayer = (
     red_cards: 0,
     status: 'a',
     web_name: 'Test Player',
+    minutes: 90,
     ...overrides,
   };
 };

@@ -3,6 +3,9 @@ import { useToast } from 'primevue/usetoast';
 import { useFixtureStore } from '~/stores/fixtures';
 import type { Fixture } from '~/types/Fixture';
 import type { PlayerWithStats } from '~/types/Player';
+import { handleApiError, handleApiSuccess } from '~/utils/api';
+import { getImageUrl } from '~/utils/images';
+import { navigateTo } from '#app';
 
 definePageMeta({
   keepalive: true,
@@ -235,7 +238,6 @@ const canVerify = computed(() => {
         <Button
           label="Back to Fixtures"
           severity="secondary"
-          icon="pi pi-arrow-left"
           @click="navigateTo({ path: '/fixtures', query: { week: fixture.game_week } })"
         />
       </div>

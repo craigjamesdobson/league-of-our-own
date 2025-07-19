@@ -1,8 +1,14 @@
 import type { MergeDeep } from 'type-fest';
 import type { Database as DatabaseGenerated } from './database-generated.types';
-import type { DraftedTeam } from './DraftedTeam';
+import type { DraftedTeamWithPlayers, WeeklyStats } from './DraftedTeam';
 
 export type { Json } from './database-generated.types';
+
+// Type for the database function that returns teams with weekly stats and players
+// This represents the actual structure returned by get_drafted_teams_with_player_points_by_gameweek
+type DraftedTeamWithPlayerPointsByGameweek = DraftedTeamWithPlayers & {
+  weekly_stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'>;
+};
 
 // Override the type for a specific column in a view:
 export type Database = MergeDeep<
@@ -12,7 +18,11 @@ export type Database = MergeDeep<
       Functions: {
         get_drafted_teams_by_season: {
           Args: { active_season_param: string };
-          Returns: DraftedTeam[];
+          Returns: DraftedTeamWithPlayers[];
+        };
+        get_drafted_teams_with_player_points_by_gameweek: {
+          Args: { game_week_param: number };
+          Returns: DraftedTeamWithPlayerPointsByGameweek[];
         };
       };
       Tables: {
@@ -139,3 +149,5 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
     ? PublicSchema['Enums'][PublicEnumNameOrOptions]
     : never;
+
+export type { DraftedTeamWithPlayerPointsByGameweek };

@@ -47,6 +47,13 @@ From existing analysis documents, we have identified several areas for potential
 - _To be scoped based on operational needs_
 
 ### Infrastructure Improvements
+- **Nuxt 4 Migration**: Upgrade to Nuxt 4 for improved performance and modern features
+  - **Context**: Nuxt 4 introduces significant improvements and prepares for future ecosystem changes
+  - **Impact**: Better performance, improved developer experience, future-proofing
+  - **Priority**: Medium (major version upgrade with breaking changes)
+  - **Effort**: High (requires comprehensive testing and potential breaking changes handling)
+  - **Reference**: https://nuxt.com/blog/v4
+
 - **ESM Migration**: Resolve Vite CJS deprecation warning by migrating to full ESM (`"type": "module"` in package.json)
   - **Context**: Vitest currently shows "CJS build of Vite's Node API is deprecated" warning
   - **Impact**: Future-proofing for Vite 6+ compatibility

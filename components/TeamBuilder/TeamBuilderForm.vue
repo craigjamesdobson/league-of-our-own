@@ -124,7 +124,7 @@ const handleTeamSubmit = async () => {
   >
     <p>Deadline for submissions are</p>
     <p class="uppercase font-black">
-      11.59pm Wed 14th Aug 2024
+      Wed 15th Aug 2025
     </p>
   </div>
   <form

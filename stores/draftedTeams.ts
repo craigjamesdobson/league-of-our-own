@@ -68,11 +68,13 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   };
 
   const upsertDraftedPlayers = async (draftedPlayersData: TablesInsert<'drafted_players'>[]) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('drafted_players')
-      .upsert(draftedPlayersData);
+      .upsert(draftedPlayersData)
+      .select();
 
     if (error) throw new Error(error.message);
+    return data;
   };
 
   const bulkUpsertDraftedTeams = (teamData: string) => {

@@ -11,5 +11,5 @@ dist
 # Working docs and private directories
 docs/_*/
 
-# Temporary folders
+# Development email files and temporary folders
 temp/

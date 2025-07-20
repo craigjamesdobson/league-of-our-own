@@ -50,12 +50,11 @@ const addNewTransfer = async () => {
 
     // Build a new transfer obj using the new data returned
     // from DB and push it to the players transfer array
-    draftedPlayer.value!.transfers.push({
+    draftedPlayer.value.transfers.push({
       drafted_transfer_id: newTransfer[0].drafted_transfer_id,
       active_transfer_expiry: newTransferData.value.activeExpiryDate,
       transfer_week: newTransferData.value.transferWeek,
       data: newTransferData.value.player,
-      points: 0,
       selected: false,
     });
 
@@ -166,11 +165,14 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
             >
               <template #option="slotProps">
                 <div class="align-items-center flex w-full">
-                  <div class="w-1/5">
+                  <div class="w-2/6">
                     {{ slotProps.option.player_id }}
                   </div>
-                  <div class="w-4/5">
+                  <div class="w-3/6">
                     {{ slotProps.option.web_name }}
+                  </div>
+                  <div class="w-1/6">
+                    {{ slotProps.option.cost }}
                   </div>
                 </div>
               </template>
@@ -180,7 +182,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
             <label for="new-transfer-week">Transfer Week</label>
             <InputNumber
               v-model="newTransferData.transferWeek"
-              :min="0"
+              :min="1"
               :max="38"
               class="!w-full"
               show-buttons
@@ -188,7 +190,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
           </div>
           <div class="flex flex-col gap-2">
             <label for="new-transfer-expiry-date">Active expiry date</label>
-            <Calendar
+            <Datepicker
               v-model="newTransferData.activeExpiryDate"
               date-format="dd/mm/yy"
               show-icon

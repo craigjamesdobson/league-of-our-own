@@ -5,11 +5,11 @@ interface DraftedTransfer {
   active_transfer_expiry: Date;
   transfer_week: number;
   data: Tables<'players_view'>;
-  points: number;
   selected: boolean;
 }
 
 interface DraftedTransferWithWeeklyStats extends DraftedTransfer {
+  points?: number;
   week_goals?: number;
   week_assists?: number;
   week_redcards?: number;

@@ -18,7 +18,7 @@ const setTeamValidity = (draftedTeamData: DraftedTeamWithPlayers & { total_team_
     return draftedTeamData.total_team_value > 85;
   }
   else {
-    return draftedTeamData.total_team_value > 95;
+    return draftedTeamData.total_team_value > 90;
   }
 };
 

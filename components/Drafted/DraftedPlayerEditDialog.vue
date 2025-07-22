@@ -3,6 +3,7 @@ import { useToast } from 'primevue/usetoast';
 import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
+import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 import type { Player } from '~/types/Player';
 
 interface TransferData {
@@ -16,7 +17,7 @@ const toast = useToast();
 const newTransferData: Ref<TransferData> = ref({
   player: null,
   activeExpiryDate: new Date(),
-  transferWeek: 0,
+  transferWeek: 1,
 });
 
 const visible = defineModel<boolean>('visible');
@@ -27,10 +28,47 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  team: {
+    type: Object as PropType<DraftedTeamWithPlayers>,
+    default: null,
+  },
 });
 
 const playerStore = usePlayerStore();
 const draftedTeamsStore = useDraftedTeamsStore();
+
+// Budget validation logic
+const budgetLimit = computed(() => {
+  return props.team?.allowed_transfers ? 85 : 90;
+});
+
+const currentTeamValue = computed(() => {
+  if (!props.team?.players) return 0;
+  return props.team.players.reduce((total, player) => {
+    const playerCost = player.transfers.length > 0
+      ? player.transfers[player.transfers.length - 1].data.cost
+      : player.data.cost;
+    return total + playerCost;
+  }, 0);
+});
+
+const transferWouldExceedBudget = computed(() => {
+  if (!newTransferData.value.player || !props.team) return false;
+
+  // Calculate team value with the new transfer
+  const originalPlayerCost = draftedPlayer.value?.transfers.length
+    ? draftedPlayer.value.transfers[draftedPlayer.value.transfers.length - 1].data.cost
+    : draftedPlayer.value?.data.cost || 0;
+
+  const newPlayerCost = newTransferData.value.player.cost;
+  const teamValueWithTransfer = currentTeamValue.value - originalPlayerCost + newPlayerCost;
+
+  return teamValueWithTransfer > budgetLimit.value;
+});
+
+const isSubmitDisabled = computed(() => {
+  return !newTransferData.value.player || transferWouldExceedBudget.value;
+});
 
 const addNewTransfer = async () => {
   try {
@@ -168,10 +206,10 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
                   <div class="w-2/6">
                     {{ slotProps.option.player_id }}
                   </div>
-                  <div class="w-3/6">
+                  <div class="w-4/5 text-center">
                     {{ slotProps.option.web_name }}
                   </div>
-                  <div class="w-1/6">
+                  <div class="w-1/5">
                     {{ slotProps.option.cost }}
                   </div>
                 </div>
@@ -190,15 +228,47 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
           </div>
           <div class="flex flex-col gap-2">
             <label for="new-transfer-expiry-date">Active expiry date</label>
-            <Datepicker
+            <DatePicker
               v-model="newTransferData.activeExpiryDate"
               date-format="dd/mm/yy"
               show-icon
             />
           </div>
+          <div
+            v-if="newTransferData.player"
+            class="flex w-full flex-col gap-2"
+          >
+            <div class="text-sm font-semibold">
+              Budget Status
+            </div>
+            <div
+              class="rounded border p-2 text-sm"
+              :class="transferWouldExceedBudget
+                ? 'border-red-300 bg-red-50 text-red-700'
+                : 'border-green-300 bg-green-50 text-green-700'"
+            >
+              <div class="flex justify-between">
+                <span>Budget Limit:</span>
+                <span>£{{ budgetLimit }}m</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Current Team Value:</span>
+                <span>£{{ currentTeamValue.toFixed(1) }}m</span>
+              </div>
+              <div class="flex justify-between">
+                <span>With New Transfer:</span>
+                <span :class="transferWouldExceedBudget ? 'font-bold' : ''">
+                  £{{ (currentTeamValue - (draftedPlayer?.transfers.length
+                    ? draftedPlayer.transfers[draftedPlayer.transfers.length - 1].data.cost
+                    : draftedPlayer?.data.cost || 0) + newTransferData.player.cost).toFixed(1) }}m
+                </span>
+              </div>
+            </div>
+          </div>
           <Button
             class="flex self-start"
             label="Submit"
+            :disabled="isSubmitDisabled"
             @click="addNewTransfer"
           />
         </form>

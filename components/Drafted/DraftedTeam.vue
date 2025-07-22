@@ -88,7 +88,6 @@ const handleEditPlayer = (playerID: number) => {
         />
         <Button
           v-if="props.editable"
-          icon="pi pi-check"
           aria-label="Edit Player"
           title="Edit Player"
           class="mr-2"
@@ -118,5 +117,6 @@ const handleEditPlayer = (playerID: number) => {
     v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog"
     :editable="props.editable"
+    :team="props.draftedTeam"
   />
 </template>

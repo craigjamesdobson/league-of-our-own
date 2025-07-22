@@ -95,8 +95,9 @@ export const useTeamBuilder = () => {
   const isOverBudget = computed(() => remainingBudget.value < 0);
 
   // Methods
-  const fetchDraftedTeamData = async (): Promise<void> => {
-    if (!route.query.id || typeof route.query.id !== 'string') {
+  const fetchDraftedTeamData = async (teamId?: string): Promise<void> => {
+    const id = teamId || route.query.id;
+    if (!id || typeof id !== 'string') {
       error.value = 'Invalid team ID';
       toast.add({
         severity: 'error',
@@ -123,7 +124,7 @@ export const useTeamBuilder = () => {
             )
           `,
         )
-        .eq('key', route.query.id)
+        .eq('key', id)
         .single();
 
       if (fetchError) {
@@ -271,8 +272,7 @@ export const useTeamBuilder = () => {
         });
       }
 
-      // Update local state
-      draftedTeamData.value = teamData;
+      await fetchDraftedTeamData(teamData.key);
 
       // Show success message
       toast.add({

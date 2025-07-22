@@ -71,6 +71,7 @@ export default defineNuxtConfig({
     public: {
       SITE_URL: process.env.SITE_URL,
       ACTIVE_SEASON: process.env.ACTIVE_SEASON,
+      nodeEnv: process.env.NODE_ENV || 'development',
     },
   },
 

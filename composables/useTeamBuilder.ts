@@ -7,23 +7,16 @@ import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/emai
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { delay } from '@/utils/utility';
 
-// IMPORTANT: This composable should only be used in ONE component per page to avoid
-// dual instance issues. Use a single instance pattern where the parent component
-// calls this composable and passes data to children via props.
-
-// Types for the composable
 interface LoadingState {
   fetchingTeam: boolean;
   submittingForm: boolean;
 }
 
-// Type for individual player from the query result - use the generated types (with nulls)
 type DraftedPlayerFromQuery = {
   drafted_player_id: number;
   drafted_team: number | null;
 } & DatabaseGenerated['public']['Views']['players_view']['Row'];
 
-// Default team structure
 const DEFAULT_TEAM_STRUCTURE = [
   { position: PlayerPosition.GOALKEEPER, count: 1 },
   { position: PlayerPosition.DEFENDER, count: 4 },
@@ -31,7 +24,6 @@ const DEFAULT_TEAM_STRUCTURE = [
   { position: PlayerPosition.FORWARD, count: 3 },
 ];
 
-// Factory function for empty team data
 const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
   active_season: '25-26',
   team_name: '',
@@ -44,14 +36,12 @@ const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
 });
 
 export const useTeamBuilder = () => {
-  // Dependencies
   const supabase = useSupabaseClient<Database>();
   const route = useRoute();
   const router = useRouter();
   const toast = useToast();
   const draftedTeamsStore = useDraftedTeamsStore();
 
-  // Internal state
   const loading = ref<LoadingState>({
     fetchingTeam: false,
     submittingForm: false,
@@ -61,7 +51,6 @@ export const useTeamBuilder = () => {
   const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData());
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
 
-  // Computed properties
   const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
 
   const selectedPlayerIds = computed(() => {
@@ -74,9 +63,6 @@ export const useTeamBuilder = () => {
     draftedTeamData.value.allowed_transfers ? 85 : 90,
   );
 
-  // Team value calculation using watchEffect for explicit dependency tracking
-  // Uses watchEffect instead of computed to ensure proper reactivity tracking
-  // of nested selectedPlayer properties within the draftedTeamPlayers array
   const teamValue = ref(0);
   watchEffect(() => {
     const value = draftedTeamPlayers.value.reduce(
@@ -87,16 +73,15 @@ export const useTeamBuilder = () => {
     teamValue.value = value;
   });
 
-  // Remaining budget calculation - recalculates when teamBudget or teamValue changes
   const remainingBudget = computed(() => {
     return teamBudget.value - teamValue.value;
   });
 
   const isOverBudget = computed(() => remainingBudget.value < 0);
 
-  // Methods
-  const fetchDraftedTeamData = async (): Promise<void> => {
-    if (!route.query.id || typeof route.query.id !== 'string') {
+  const fetchDraftedTeamData = async (teamId?: string): Promise<void> => {
+    const id = teamId || route.query.id;
+    if (!id || typeof id !== 'string') {
       error.value = 'Invalid team ID';
       toast.add({
         severity: 'error',
@@ -123,7 +108,7 @@ export const useTeamBuilder = () => {
             )
           `,
         )
-        .eq('key', route.query.id)
+        .eq('key', id)
         .single();
 
       if (fetchError) {
@@ -156,7 +141,6 @@ export const useTeamBuilder = () => {
     }
   };
 
-  // Helper functions for team player management
   const filterPlayersByPosition = (players: DraftedPlayerFromQuery[], position: number): DraftedPlayerFromQuery[] => {
     try {
       return players.filter(player => player.position === position);
@@ -210,14 +194,12 @@ export const useTeamBuilder = () => {
     players: DraftedPlayerFromQuery[] | null = null,
   ): void => {
     try {
-      // Build the new array
       const newPlayers: DraftedTeamPlayer[] = [];
       teamStructure.forEach(({ position, count }) => {
         const mappedPlayers = mapPlayersToTeamStructure(players, position, count);
         newPlayers.push(...mappedPlayers);
       });
 
-      // Replace the entire array to trigger reactivity
       draftedTeamPlayers.value = newPlayers;
     }
     catch (error) {
@@ -233,24 +215,19 @@ export const useTeamBuilder = () => {
 
       await delay(1000);
 
-      // Validate form
       if (!validateForm()) {
         return;
       }
 
-      // Upsert team data
       const teamData = await upsertTeamData(isExistingDraftedTeam.value);
 
-      // Upsert player data
       await upsertPlayerData(teamData.drafted_team_id, isExistingDraftedTeam.value);
 
-      // Navigate to team with ID
       router.push({
         path: 'team-builder',
         query: { id: teamData.key },
       });
 
-      // Send user email
       await useFetch('/api/user-email', {
         method: 'post',
         body: {
@@ -260,7 +237,6 @@ export const useTeamBuilder = () => {
         },
       });
 
-      // Send admin email for new teams
       if (!isExistingDraftedTeam.value) {
         await useFetch('/api/admin-email', {
           method: 'post',
@@ -271,10 +247,8 @@ export const useTeamBuilder = () => {
         });
       }
 
-      // Update local state
-      draftedTeamData.value = teamData;
+      await fetchDraftedTeamData(teamData.key);
 
-      // Show success message
       toast.add({
         severity: 'success',
         summary: 'Success',
@@ -302,9 +276,7 @@ export const useTeamBuilder = () => {
     error.value = null;
   };
 
-  // Private helper methods
   const validateForm = (): boolean => {
-    // Check if team is incomplete
     if (
       draftedTeamPlayers.value.some(
         draftedTeamPlayer => draftedTeamPlayer.selectedPlayer === null,
@@ -319,7 +291,6 @@ export const useTeamBuilder = () => {
       return false;
     }
 
-    // Check if team is over budget
     if (isOverBudget.value) {
       toast.add({
         severity: 'error',
@@ -371,13 +342,11 @@ export const useTeamBuilder = () => {
   };
 
   return {
-    // State (read-only)
     loading: readonly(loading),
     error: readonly(error),
     draftedTeamData,
     draftedTeamPlayers,
 
-    // Computed
     isExistingDraftedTeam,
     selectedPlayerIds,
     teamBudget,
@@ -385,7 +354,6 @@ export const useTeamBuilder = () => {
     remainingBudget,
     isOverBudget,
 
-    // Methods
     fetchDraftedTeamData,
     setTeamPlayers,
     submitTeam,

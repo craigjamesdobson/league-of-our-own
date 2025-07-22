@@ -10,3 +10,6 @@ dist
 
 # Working docs and private directories
 docs/_*/
+
+# Development email files and temporary folders
+temp/

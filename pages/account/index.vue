@@ -14,6 +14,8 @@ definePageMeta({
   middleware: ['auth'],
 });
 
+await draftedTeamStore.fetchDraftedTeams();
+
 const selectedDraftedTeamID = ref(0);
 const selectedDraftedTeam = computed(() =>
   draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value),

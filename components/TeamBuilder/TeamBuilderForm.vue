@@ -81,14 +81,15 @@ const handleTeamSubmit = async () => {
 </script>
 
 <template>
-  <div class="hidden 2xl:flex flex-col gap-5">
+  <div class="hidden 2xl:flex flex-col">
     <Message
       v-if="isExistingDraftedTeam"
       severity="info"
       :closable="false"
       size="small"
+      class="mb-5"
     >
-      You are editing your existing team. <br> It was last edited on <strong>{{
+      You are editing your existing team. <br>It was last edited on <strong>{{
         draftedTeamData.updated_at
           ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
           : draftedTeamData.created_at
@@ -102,27 +103,26 @@ const handleTeamSubmit = async () => {
     >
       <Divider />
       <p class="mb-5">
-        Pick your team, fill in the form below and then submit your team.
+        Pick your team, fill in the form below, and then submit your team.
       </p>
       <p>
-        Once you submit your team you will recieve an email confirming your selection and a link to edit
-        your team if you
-        wish.
+        Once you submit your team, you will receive an email confirming your selection and a link to edit
+        your team if you wish.
       </p>
       <Divider />
     </div>
     <p class="font-bold text-xs mb-5">
-      If you do not receive an email when submitting or editing your team submission has
-      failed so please email us with as much detail as possible - <a
+      If you do not receive an email when submitting or editing, your team submission has
+      failed. Please email us with as much detail as possible: <a
         class="underline font-bold"
         href="mailto:leagueofourown.fpl@gmail.com"
-      > leagueofourown.fpl@gmail.com</a>.
+      >leagueofourown.fpl@gmail.com</a>.
     </p>
   </div>
   <div
     class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5"
   >
-    <p>Deadline for submissions are</p>
+    <p>Deadline for submissions is</p>
     <p class="uppercase font-black">
       Wed 15th Aug 2025
     </p>
@@ -188,7 +188,7 @@ const handleTeamSubmit = async () => {
           for="allow_communication"
           class="text-xs"
         >If you would like to be added to a WhatsApp group for
-          updates & general chat please check this box</label>
+          updates and general chat, please tick this box</label>
       </div>
     </div>
     <div class="flex w-full flex-col gap-1">
@@ -201,7 +201,7 @@ const handleTeamSubmit = async () => {
         <label
           for="allowed_transfers"
           class="font-bold uppercase"
-        >Transfers Allowed</label>
+        >Transfers allowed</label>
       </div>
     </div>
     <Message

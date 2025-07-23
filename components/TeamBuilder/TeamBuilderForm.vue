@@ -39,7 +39,7 @@ const rules = computed(() => {
       email: helpers.withMessage('Invalid email format', email),
     },
     contact_number: {
-      number: helpers.withMessage('Invalid phone number', helpers.regex(/^(07\d{8,9})$/)),
+      number: helpers.withMessage('Invalid phone number', helpers.regex(/^(07\d{9})$/)),
     },
   };
 });
@@ -124,7 +124,7 @@ const handleTeamSubmit = async () => {
   >
     <p>Deadline for submissions is</p>
     <p class="uppercase font-black">
-      Wed 15th Aug 2025
+      Wed 13th Aug 2025
     </p>
   </div>
   <form

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-full flex items-center justify-center px-4 -m-5 xl:-m-10">
     <div class="text-center max-w-xl">
-      <div class="mb-8 inline-flex items-center justify-center w-24 h-24 bg-slate-100 rounded-full border shadow-lg">
+      <div class="mb-8 inline-flex items-center justify-center w-24 h-24 bg-slate-200 rounded-full border border-slate-300 shadow-md">
         <Icon
           class="text-slate-800"
           size="40"
@@ -37,7 +37,7 @@
           :closable="false"
           class="flex justify-center"
         >
-          Team submission deadline: <strong>Friday 15th August 2025</strong>
+          Team submission deadline: <strong>Wed 13th August 2025</strong>
         </Message>
       </div>
     </div>

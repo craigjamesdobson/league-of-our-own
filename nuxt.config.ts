@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     'nuxt-module-hotjar',
     '@nuxt/eslint',
     '@nuxtjs/color-mode',
+    '@nuxtjs/turnstile',
   ],
 
   ssr: false,
@@ -68,10 +69,16 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    turnstile: {
+      secretKey: process.env.TURNSTILE_SECRET_KEY,
+    },
     public: {
       SITE_URL: process.env.SITE_URL,
       ACTIVE_SEASON: process.env.ACTIVE_SEASON,
       nodeEnv: process.env.NODE_ENV || 'development',
+      turnstile: {
+        siteKey: process.env.TURNSTILE_SITE_KEY,
+      },
     },
   },
 
@@ -115,5 +122,9 @@ export default defineNuxtConfig({
 
   supabase: {
     redirect: false,
+  },
+
+  turnstile: {
+    addValidateEndpoint: true,
   },
 });

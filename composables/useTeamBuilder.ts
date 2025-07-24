@@ -50,6 +50,7 @@ export const useTeamBuilder = () => {
   const error = ref<string | null>(null);
   const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData());
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
+  const turnstileToken = ref<string | null>(null);
 
   const isExistingDraftedTeam = computed(() => !!draftedTeamData.value.key);
 
@@ -219,6 +220,22 @@ export const useTeamBuilder = () => {
         return;
       }
 
+      // Verify Turnstile token using built-in endpoint
+      const turnstileVerification = await $fetch('/_turnstile/validate', {
+        method: 'POST',
+        body: { token: turnstileToken.value },
+      });
+
+      if (!turnstileVerification.success) {
+        toast.add({
+          severity: 'error',
+          summary: 'Security Check Failed',
+          detail: 'Security verification failed. Please try again.',
+          life: 3000,
+        });
+        return;
+      }
+
       const teamData = await upsertTeamData(isExistingDraftedTeam.value);
 
       await upsertPlayerData(teamData.drafted_team_id, isExistingDraftedTeam.value);
@@ -301,6 +318,16 @@ export const useTeamBuilder = () => {
       return false;
     }
 
+    if (!turnstileToken.value) {
+      toast.add({
+        severity: 'error',
+        summary: 'Security Check Required',
+        detail: 'Please complete the security check before submitting',
+        life: 3000,
+      });
+      return false;
+    }
+
     return true;
   };
 
@@ -346,6 +373,7 @@ export const useTeamBuilder = () => {
     error: readonly(error),
     draftedTeamData,
     draftedTeamPlayers,
+    turnstileToken,
 
     isExistingDraftedTeam,
     selectedPlayerIds,

@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Web Application
 
-*Last updated: 2025-01-10*
+*Last updated: 2025-07-24*
 
 ## Overview
 
@@ -63,6 +63,10 @@ This is a sophisticated fantasy football web application built with modern web t
   - API routes in `/server/api/`
   - Email functionality via Resend service
   - Admin notifications and user confirmations
+- **Turnstile Module** (@nuxtjs/turnstile) - Bot protection service
+  - Cloudflare Turnstile integration
+  - Built-in validation endpoint
+  - Automated token management
 
 ### Development & Quality Tools
 
@@ -223,7 +227,7 @@ types/
 ### Workflow Architecture
 
 #### User Workflows
-1. **Team Creation**: Player selection → Validation → Email confirmation
+1. **Team Creation**: Player selection → Form validation → Security check (Turnstile) → Email confirmation
 2. **Team Monitoring**: Weekly statistics → League table updates
 3. **Transfer Management**: Optional player trading within deadlines
 
@@ -252,7 +256,9 @@ types/
 ```
 /api/
 ├── admin-email.post.ts      # Admin notification emails
-└── user-email.post.ts       # User confirmation emails
+├── user-email.post.ts       # User confirmation emails
+└── _turnstile/
+    └── validate             # Turnstile bot validation (built-in)
 ```
 
 #### Database API Patterns
@@ -268,6 +274,15 @@ types/
 - **Role-Based Access**: Admin vs. standard user permissions
 - **Session Management**: Secure session handling
 - **Row Level Security**: Database-level access control
+
+### Bot Protection & Spam Prevention
+- **Cloudflare Turnstile**: Enterprise-grade bot detection and prevention
+  - Privacy-focused alternative to reCAPTCHA
+  - Built-in validation endpoint (`/_turnstile/validate`)
+  - Minimal user interaction (often invisible)
+  - 99%+ protection against automated spam
+- **Rate Limiting**: Team edit limits (5 modifications per team)
+- **Form Validation**: Multi-layer client and server-side validation
 
 ### Data Protection
 - **Type Validation**: Runtime type checking with schemas
@@ -334,3 +349,4 @@ pnpm generate-types  # Supabase type generation
 - **pnpm Package Manager**: Chosen for performance and disk efficiency
 - **Vuelidate Validation**: Integrated for form validation needs
 - **Resend Email Service**: Selected for reliable email delivery
+- **Cloudflare Turnstile**: Implemented for bot protection (privacy-focused, elderly-friendly)

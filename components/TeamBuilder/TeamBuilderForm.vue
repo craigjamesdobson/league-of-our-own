@@ -20,6 +20,17 @@ const props = defineProps<{
   submitTeam: () => Promise<void>;
 }>();
 
+// Use defineModel for turnstile token
+const turnstileTokenModel = defineModel<string | null>('turnstileToken');
+
+// Computed to handle null vs undefined for NuxtTurnstile
+const turnstileToken = computed({
+  get: () => turnstileTokenModel.value ?? undefined,
+  set: (value: string | undefined) => {
+    turnstileTokenModel.value = value ?? null;
+  },
+});
+
 // Use props instead of composable
 const { isExistingDraftedTeam } = toRefs(props);
 
@@ -225,6 +236,10 @@ const handleTeamSubmit = async () => {
         </div>
       </div>
     </Message>
+    <NuxtTurnstile
+      v-model="turnstileToken"
+      class="mx-auto"
+    />
     <Button
       :loading="props.loading.submittingForm"
       class="w-full"

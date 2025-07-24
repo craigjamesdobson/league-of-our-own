@@ -8,6 +8,9 @@ This directory contains documentation of lessons learned, architectural decision
 - **[Vue Reactivity Patterns](vue-reactivity-patterns.md)** - Common pitfalls and solutions for Vue reactivity issues
 - **[Composable Architecture](composable-architecture.md)** - Best practices for structuring and using Vue composables
 
+### Security & Performance
+- **[Security Implementation Patterns](security-implementation-patterns.md)** - Lessons from Turnstile bot protection implementation
+
 ### Architecture Decisions
 - **[2025-01-08: Composable vs Component Logic](architecture-decisions/2025-01-08-composable-vs-component-logic.md)** - Analysis of extracting business logic into composables
 
@@ -44,6 +47,11 @@ When documenting new lessons learned:
 - Performance optimizations
 - Developer experience improvements
 
+### 🔒 Security Patterns
+- Bot protection implementation
+- Third-party service integration
+- User experience considerations
+
 ---
 
-*Last updated: 2025-01-08*
+*Last updated: 2025-07-24*

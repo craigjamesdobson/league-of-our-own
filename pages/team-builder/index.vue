@@ -7,6 +7,7 @@
       </h2>
       <TeamBuilderForm
         v-model:drafted-team-data="draftedTeamData"
+        v-model:turnstile-token="turnstileToken"
         :is-existing-drafted-team="isExistingDraftedTeam"
         :remaining-budget="remainingBudget"
         :is-over-budget="isOverBudget"
@@ -82,6 +83,7 @@ const {
   submitTeam,
   fetchDraftedTeamData,
   setTeamPlayers,
+  turnstileToken,
 } = useTeamBuilder();
 
 // Handle initial data loading

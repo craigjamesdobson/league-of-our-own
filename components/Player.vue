@@ -1,3 +1,12 @@
+<script setup lang="ts">
+import { loadPlayerFallbackImage } from '@/utils/images';
+import type { Player } from '@/types/Player';
+
+defineProps<{
+  player: Player;
+}>();
+</script>
+
 <template>
   <div class="flex w-full items-center">
     <span class="w-1/12 p-2">{{ player.player_id }}</span>
@@ -41,13 +50,3 @@
     </span>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Player } from '~/types/Player';
-
-const { player } = defineProps<{
-  player: Player;
-}>();
-</script>
-
-<style scoped></style>

@@ -3,7 +3,7 @@ import { useToast } from 'primevue/usetoast';
 import { useAccountStore } from '~/stores/account';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { usePlayerStore } from '@/stores/players';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
 const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
@@ -13,6 +13,8 @@ const router = useRouter();
 definePageMeta({
   middleware: ['auth'],
 });
+
+await draftedTeamStore.fetchDraftedTeams();
 
 const selectedDraftedTeamID = ref(0);
 const selectedDraftedTeam = computed(() =>
@@ -47,7 +49,7 @@ const handleUserLogout = async () => {
   }
 };
 
-const transfersRemainingCount = (team: DraftedTeam) => {
+const transfersRemainingCount = (team: DraftedTeamWithPlayers) => {
   const totalTransfersMade = team.players
     .map(x => x.transfers.length)
     .reduce((total, transfers) => total + transfers, 0);

@@ -12,8 +12,8 @@ const routes = reactive([
   },
   {
     title: 'Teams',
-    icon: 'fluent:people-team-24-regular',
-    path: '/teams',
+    icon: 'fluent:people-team-add-20-regular',
+    path: '/team-builder',
     admin: false,
   },
   {

@@ -1,7 +1,7 @@
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
-import type { DraftedTeam } from '~/types/DraftedTeam';
+import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
-const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
+const setTotalTeamPrice = (draftedTeamData: DraftedTeamWithPlayers) => {
   return draftedTeamData.players.reduce((total: number, draftedPlayer: DraftedPlayer) => {
     const playerPrice
       = draftedPlayer.transfers.length > 0
@@ -13,27 +13,27 @@ const setTotalTeamPrice = (draftedTeamData: DraftedTeam) => {
   }, 0);
 };
 
-const setTeamValidity = (draftedTeamData: DraftedTeam) => {
-  if (!draftedTeamData.total_team_value) return;
-
+const setTeamValidity = (draftedTeamData: DraftedTeamWithPlayers & { total_team_value: number }): boolean => {
   if (draftedTeamData.allowed_transfers) {
-    return (draftedTeamData.is_invalid_team
-      = draftedTeamData.total_team_value > 85);
+    return draftedTeamData.total_team_value > 85;
   }
   else {
-    return (draftedTeamData.is_invalid_team
-      = draftedTeamData.total_team_value > 95);
+    return draftedTeamData.total_team_value > 90;
   }
 };
 
-const initDraftedTeamData = (draftedTeamsData: DraftedTeam[]) => {
+const initDraftedTeamData = (draftedTeamsData: DraftedTeamWithPlayers[] | null) => {
   if (!draftedTeamsData) return;
-  const draftedTeamData: DraftedTeam[] = draftedTeamsData.map(
-    (draftedTeam: DraftedTeam) => {
-      return {
+  const draftedTeamData: (DraftedTeamWithPlayers)[] = draftedTeamsData.map(
+    (draftedTeam: DraftedTeamWithPlayers) => {
+      const teamWithValue = {
         ...draftedTeam,
         total_team_value: setTotalTeamPrice(draftedTeam),
-        is_invalid_team: setTeamValidity(draftedTeam),
+      };
+
+      return {
+        ...teamWithValue,
+        is_invalid_team: setTeamValidity(teamWithValue),
       };
     },
   );

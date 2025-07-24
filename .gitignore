@@ -6,5 +6,10 @@ node_modules
 .output
 .env
 dist
-supabase/
 .env.LIVE
+
+# Working docs and private directories
+docs/_*/
+
+# Development email files and temporary folders
+temp/

@@ -1,13 +1,43 @@
 import type { MergeDeep } from 'type-fest';
-import type { Database as DatabaseGenerated } from './database-generated.types.ts';
+import type { Database as DatabaseGenerated } from './database-generated.types';
+import type { DraftedTeamWithPlayers, WeeklyStats } from './DraftedTeam';
 
-export type { Json } from './database-generated.types.ts';
+export type { Json } from './database-generated.types';
+
+// Type for the database function that returns teams with weekly stats and players
+// This represents the actual structure returned by get_drafted_teams_with_player_points_by_gameweek
+type DraftedTeamWithPlayerPointsByGameweek = DraftedTeamWithPlayers & {
+  weekly_stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'>;
+};
 
 // Override the type for a specific column in a view:
 export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
+      Functions: {
+        get_drafted_teams_by_season: {
+          Args: { active_season_param: string };
+          Returns: DraftedTeamWithPlayers[];
+        };
+        get_drafted_teams_with_player_points_by_gameweek: {
+          Args: { game_week_param: number };
+          Returns: DraftedTeamWithPlayerPointsByGameweek[];
+        };
+      };
+      Tables: {
+        drafted_teams: {
+          Row: {
+            total_team_value: number; // Override to make non-nullable
+          };
+          Insert: {
+            total_team_value: number; // Override to make non-nullable for inserts
+          };
+          Update: {
+            total_team_value?: number; // Override to make non-nullable for updates
+          };
+        };
+      };
       Views: {
         players_view: {
           Row: {
@@ -119,3 +149,5 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
     ? PublicSchema['Enums'][PublicEnumNameOrOptions]
     : never;
+
+export type { DraftedTeamWithPlayerPointsByGameweek };

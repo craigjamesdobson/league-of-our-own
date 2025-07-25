@@ -1,96 +1,60 @@
-# Team Builder Backlog & Future Planning
+# Team Builder Backlog
 
-**Last Updated**: 2025-01-10  
-**Status**: To be populated based on actual requirements and priorities  
+**Last Updated**: 2025-07-25
 
-## Current Status
+## 📋 Prioritized Backlog
 
-### ✅ Completed
-- **Phase 1**: Critical TypeScript fixes and reactive data issues
-- **Phase 2**: Business logic extraction to composables
+### **High Priority (Next Sprint)**
+- **Enhancement: Preserve team builder state during navigation**
+  - Add KeepAlive wrapper to maintain component state when navigating between pages
+  - Configure to preserve team selection and form progress when users visit fixtures, table, etc.
+  - Test state persistence across different navigation patterns
+  - Consider selective KeepAlive (only for team builder) vs global approach
+  - Implementation options:
+    - Layout-level KeepAlive wrapper around NuxtPage
+    - Selective KeepAlive with include pattern for team-builder pages
+    - Nuxt pageTransition configuration
+  - Ensure memory management - clear state on successful submission
+  - **Context**: Current issue where users lose team selection and form data when navigating away from team builder
 
-### 🔍 Immediate Priority
-- Fix form population bug when loading existing teams via query parameters
+## 🚀 Infrastructure Improvements
 
----
+### **Major Upgrades (Future Planning)**
+- **Chore: Nuxt 4 migration**
+  - Major version upgrade with breaking changes
+  - Improved performance and developer experience
+  - Future-proofing for ecosystem changes
+  - Comprehensive testing required
 
-## Future Planning Framework
+- **Chore: ESM migration**
+  - Resolve Vite CJS deprecation warnings
+  - Full ESM configuration (`"type": "module"`)
+  - Future-proofing for Vite 6+ compatibility
+  - Configuration verification needed
 
-### Known Technical Debt
-From existing analysis documents, we have identified several areas for potential improvement:
+- **Enhancement: Hash-based RLS security**
+  - Database-level security validation
+  - Header-based access token validation
+  - RLS policy updates and schema migration
+  - Prevents direct endpoint access bypass
 
-#### From `team-builder-analysis.md`:
-- Performance concerns with large datasets
-- Accessibility gaps (ARIA labels, keyboard navigation)
-- Hard-coded values scattered throughout codebase
-- Error handling could be more robust
+## 📊 Backlog Management
 
-#### From `team-builder-technical-specs.md`:
-- Configuration management system needed
-- Testing infrastructure to be developed
-- Documentation to be completed
+### **How This Gets Populated**
+This backlog grows organically based on:
+- **Real user feedback** from actual usage
+- **Technical discoveries** during development
+- **Performance bottlenecks** in production
+- **Security requirements** as they emerge
 
----
-
-## Potential Focus Areas
-
-### User Experience
-- _To be defined based on user feedback and business requirements_
-
-### Performance & Scalability  
-- _To be evaluated based on actual usage patterns_
-
-### Testing & Quality
-- _To be planned based on development priorities_
-
-### Configuration & Maintenance
-- _To be scoped based on operational needs_
-
-### Infrastructure Improvements
-- **Nuxt 4 Migration**: Upgrade to Nuxt 4 for improved performance and modern features
-  - **Context**: Nuxt 4 introduces significant improvements and prepares for future ecosystem changes
-  - **Impact**: Better performance, improved developer experience, future-proofing
-  - **Priority**: Medium (major version upgrade with breaking changes)
-  - **Effort**: High (requires comprehensive testing and potential breaking changes handling)
-  - **Reference**: https://nuxt.com/blog/v4
-
-- **ESM Migration**: Resolve Vite CJS deprecation warning by migrating to full ESM (`"type": "module"` in package.json)
-  - **Context**: Vitest currently shows "CJS build of Vite's Node API is deprecated" warning
-  - **Impact**: Future-proofing for Vite 6+ compatibility
-  - **Priority**: Low (warning only, functionality works)
-  - **Effort**: Medium (need to verify all configurations work with ESM)
-
-- **Hash-Based RLS Security**: Enhance database security by validating access tokens at the RLS policy level
-  - **Context**: Current RLS policies allow public access, relying on hash-based URLs for security
-  - **Technical Approach**: Pass query hash as header (`x-team-hash`), validate against `access_token` column in RLS policies
-  - **Impact**: Prevents direct Supabase endpoint access bypass, provides true database-level security
-  - **Priority**: Low (current approach is appropriate for friends/family use case)
-  - **Effort**: Medium (requires client header changes + RLS policy updates + schema migration)
-
----
-
-## Planning Process
-
-### How This Gets Populated
-1. **User feedback** - Real user pain points and requests
-2. **Business priorities** - Actual business requirements and goals  
-3. **Technical assessment** - Real performance bottlenecks or maintenance issues
-4. **Development capacity** - Available time and resources
-
-### Decision Framework
-- **Impact vs Effort** evaluation for each potential item
-- **User value** as primary driver
-- **Technical feasibility** assessment
-- **Resource constraints** consideration
-
----
-
-## Notes
-
-This backlog is intentionally minimal. It should grow organically based on:
-- Real user needs discovered through usage
-- Actual business requirements 
-- Genuine technical issues that emerge
-- Available development capacity
+### **Prioritization Approach**
+- **User Impact** - Direct benefit to end users
+- **Technical Health** - Code quality and maintainability
+- **Security & Reliability** - Application stability
+- **Development Velocity** - Future development speed
 
 *Avoid creating work for work's sake. Let real needs drive the roadmap.*
+
+---
+
+*This backlog represents identified opportunities based on actual technical analysis. Items are promoted to active sprints based on real need and available capacity.*

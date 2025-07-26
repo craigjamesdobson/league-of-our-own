@@ -31,6 +31,17 @@ const turnstileToken = computed({
   },
 });
 
+// Template ref for Turnstile widget
+const turnstileRef = ref();
+
+// Handle keepalive restoration for Turnstile widget
+onActivated(() => {
+  // Reset Turnstile widget when component is restored from cache
+  nextTick(() => {
+    turnstileRef.value?.reset();
+  });
+});
+
 // Use props instead of composable
 const { isExistingDraftedTeam } = toRefs(props);
 
@@ -237,6 +248,7 @@ const handleTeamSubmit = async () => {
       </div>
     </Message>
     <NuxtTurnstile
+      ref="turnstileRef"
       v-model="turnstileToken"
       class="mx-auto"
     />

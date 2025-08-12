@@ -59,7 +59,7 @@ const dropdownPlayerData = computed(() =>
       </Button>
       <img
         v-if="player"
-        class="h-24 w-24 rounded-full bg-white p-2 drop-shadow-lg"
+        class="h-24 w-24 rounded-full bg-white p-2 drop-shadow-lg object-cover object-top aspect-square"
         :src="player ? player!.image_large : PLACEHOLDER_PLAYER_IMAGE"
         :alt="player ? player!.web_name : 'Select a player'"
         @error="loadPlayerFallbackImage"

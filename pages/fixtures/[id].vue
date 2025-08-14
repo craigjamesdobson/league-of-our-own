@@ -157,7 +157,7 @@ const canVerify = computed(() => {
       v-if="!!fixture"
       class="flex flex-col"
     >
-      <div class="grid grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <div>
           <div
             class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border bg-white p-5"

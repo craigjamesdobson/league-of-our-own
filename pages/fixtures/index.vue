@@ -117,7 +117,7 @@ const updateWeeklyStats = async () => {
 <template>
   <div>
     <Toast />
-    <div class="flex justify-between mb-2.5">
+    <div class="flex flex-col md:flex-row gap-5 md:justify-between mb-2.5">
       <div class="flex flex-col gap-2.5">
         <h1 class="text-2xl font-black uppercase">
           Fixtures
@@ -149,7 +149,7 @@ const updateWeeklyStats = async () => {
           </Message>
         </div>
       </div>
-      <div class="mb-5 flex flex-col items-end gap-2.5">
+      <div class="mb-5 flex flex-col md:items-end gap-2.5">
         <label
           class="font-bold uppercase"
           for="gameweeks"
@@ -183,7 +183,7 @@ const updateWeeklyStats = async () => {
     <div class="flex flex-col gap-5">
       <div
         v-if="fixtureStore.fixtures"
-        class="grid grid-cols-2 lg:grid-cols-5 gap-5"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5"
       >
         <NuxtLink
           v-for="(fixture, index) in fixtureStore.fixtures"
@@ -309,7 +309,7 @@ const updateWeeklyStats = async () => {
       </div>
       <div
         v-else
-        class="grid grid-cols-2 lg:grid-cols-5 gap-5"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
       >
         <div
           v-for="i in 10"
@@ -321,7 +321,7 @@ const updateWeeklyStats = async () => {
       </div>
       <div
         v-if="draftedTeamsWithPoints?.length"
-        class="grid w-full gap-5 lg:grid-cols-3"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
       >
         <template
           v-for="draftedTeam in draftedTeamsWithPoints"
@@ -337,7 +337,7 @@ const updateWeeklyStats = async () => {
       </div>
       <div
         v-else
-        class="grid grid-cols-4 gap-5"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5"
       >
         <template
           v-for="_ in 4"

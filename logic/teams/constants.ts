@@ -1,4 +1,4 @@
-export const TEAM_DATA = [
+const TEAM_DATA_UNSORTED = [
   {
     code: 3,
     draw: 0,
@@ -460,3 +460,5 @@ export const TEAM_DATA = [
     pulse_id: 38,
   },
 ];
+
+export const TEAM_DATA = TEAM_DATA_UNSORTED.slice().sort((a, b) => a.name.localeCompare(b.name));

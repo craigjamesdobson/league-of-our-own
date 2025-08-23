@@ -8,7 +8,7 @@
     :rows="5"
   >
     <template #header>
-      <div class="flex gap-2.5 justify-between p-2.5 items-center uppercase">
+      <div class="flex flex-wrap gap-5 justify-between p-2.5 items-center uppercase">
         <div class="flex justify-end">
           <IconField>
             <InputIcon>
@@ -46,12 +46,12 @@
       </div>
     </template>
     <Column
-      class="w-[20%]"
+      class="w-[25%]"
       field="web_name"
       header="Player"
     />
     <Column
-      class="w-[10%]"
+      class="w-[15%]"
       header="Goals"
     >
       <template #body="slotProps">
@@ -68,7 +68,7 @@
       </template>
     </Column>
     <Column
-      class="w-[10%]"
+      class="w-[15%]"
       header="Assists"
     >
       <template #body="slotProps">
@@ -85,20 +85,20 @@
       </template>
     </Column>
     <Column
-      class="w-[10%]"
+      class="w-[15%]"
       header="Clean sheet"
     >
       <template #body="slotProps">
         <Checkbox
           v-model="slotProps.data.week_cleansheet"
-          :disabled="disableCleansheet"
+          :disabled="disableCleansheet || slotProps.data.position > 2"
           :binary="true"
           @change="calculatePlayerPoints(slotProps.data)"
         />
       </template>
     </Column>
     <Column
-      class="w-[10%]"
+      class="w-[15%]"
       header="Red card"
     >
       <template #body="slotProps">
@@ -115,7 +115,7 @@
       </template>
     </Column>
     <Column
-      class="w-[10%]"
+      class="w-[15%]"
       field="week_points"
       header="Points"
     />

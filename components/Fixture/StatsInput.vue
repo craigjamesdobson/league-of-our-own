@@ -91,7 +91,7 @@
       <template #body="slotProps">
         <Checkbox
           v-model="slotProps.data.week_cleansheet"
-          :disabled="disableCleansheet"
+          :disabled="disableCleansheet || slotProps.data.position > 2"
           :binary="true"
           @change="calculatePlayerPoints(slotProps.data)"
         />

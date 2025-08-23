@@ -17,6 +17,13 @@ const AuraCustom = definePreset(Aura, {
       950: '#01010a',
     },
   },
+  components: {
+    tooltip: {
+      root: {
+        maxWidth: '15rem',
+      },
+    },
+  },
 });
 
 export default defineNuxtConfig({

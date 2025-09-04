@@ -48,6 +48,14 @@ watch(
   { immediate: true },
 );
 
+onActivated(async () => {
+  if (draftedTeamsWithPoints.value) {
+    draftedTeamsWithPoints.value = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
+      selectedWeek.value,
+    );
+  }
+});
+
 const weekIsInComplete = computed(() => {
   return fixtureStore.fixtures?.some(fixture =>
     !fixture.populated_by || !fixture.populated_at,

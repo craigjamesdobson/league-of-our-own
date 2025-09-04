@@ -7,7 +7,7 @@ export type { Json } from './database-generated.types';
 // Type for the database function that returns teams with weekly stats and players
 // This represents the actual structure returned by get_drafted_teams_with_player_points_by_gameweek
 type DraftedTeamWithPlayerPointsByGameweek = DraftedTeamWithPlayers & {
-  weekly_stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'>;
+  weekly_stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'> | null;
 };
 
 // Override the type for a specific column in a view:

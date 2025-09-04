@@ -11,4 +11,11 @@ export {
   createMockDraftedTeamPlayerWithSelection,
   createMockTeamStructure,
   createMockTeamWithPlayers,
+  // Weekly statistics factory functions
+  createMockPlayerViewData,
+  createMockDraftedPlayerWithWeeklyStats,
+  createMockDraftedTransferWithWeeklyStats,
+  createMockDraftedTeamWithPlayers,
+  createMockPlayerWithStats,
+  createMockTransferWithStats,
 } from './players';

@@ -22,13 +22,7 @@ export function useWeeklyStatistics(draftedTeam: Ref<DraftedTeamWithPlayers>, se
           activePlayer = selectedTransfer;
         }
 
-        const currentPlayerPoints = activePlayer
-          ? activePlayer.points || 0
-          : player.transfers.reduce((points, transfer) => {
-              return transfer.transfer_week <= selectedGameweek.value
-                ? transfer.points
-                : points;
-            }, player.points || 0);
+        const currentPlayerPoints = activePlayer.points || 0;
 
         return {
           points: accumulatedStats.points + currentPlayerPoints,

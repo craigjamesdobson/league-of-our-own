@@ -1,26 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import type { Ref } from 'vue';
+import { describe, it, expect } from 'vitest';
+import { ref } from 'vue';
 import {
   createMockDraftedTeamWithPlayers,
   createMockPlayerWithStats,
   createMockTransferWithStats,
 } from '@/tests/factories';
 import { useWeeklyStatistics } from '@/composables/useWeeklyStatistics';
-import type { DraftedTeamWithPlayers } from '@/types/DraftedTeam';
+import { withSetup } from '@/tests/setup';
 
 describe('useWeeklyStatistics', () => {
-  let mockDraftedTeam: Ref<DraftedTeamWithPlayers>;
-  let mockSelectedGameweek: Ref<number>;
-
-  beforeEach(() => {
-    // Reset global watchEffects array
-    global._watchEffects = [];
-
-    // Create fresh reactive references for each test
-    mockDraftedTeam = global._testMocks.ref(createMockDraftedTeamWithPlayers()) as Ref<DraftedTeamWithPlayers>;
-    mockSelectedGameweek = global._testMocks.ref(1) as Ref<number>;
-  });
-
   describe('Basic Points Calculation', () => {
     it('should calculate total points from all players', () => {
       // Arrange: Create team with 3 players with different points
@@ -32,13 +20,16 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
-      // Act: Use the composable
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      // Act: Use the composable with real Vue reactivity
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert: Total points should be sum of all player points
-      expect(calculatedWeeklyStats.value.points).toBe(16);
+      expect(result.calculatedWeeklyStats.value.points).toBe(16);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should handle zero points correctly', () => {
@@ -50,13 +41,16 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert
-      expect(calculatedWeeklyStats.value.points).toBe(0);
+      expect(result.calculatedWeeklyStats.value.points).toBe(0);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should handle undefined/null points gracefully', () => {
@@ -68,13 +62,16 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert: Should treat undefined as 0
-      expect(calculatedWeeklyStats.value.points).toBe(5);
+      expect(result.calculatedWeeklyStats.value.points).toBe(5);
+
+      // Cleanup
+      app.unmount();
     });
   });
 
@@ -101,14 +98,17 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert
-      expect(calculatedWeeklyStats.value.goals).toBe(3); // 2 + 1 + 0
-      expect(calculatedWeeklyStats.value.assists).toBe(4); // 1 + 3 + 0
+      expect(result.calculatedWeeklyStats.value.goals).toBe(3); // 2 + 1 + 0
+      expect(result.calculatedWeeklyStats.value.assists).toBe(4); // 1 + 3 + 0
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should count red cards and clean sheets correctly', () => {
@@ -128,14 +128,17 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert: Red cards and clean sheets are binary (0 or 1 per player)
-      expect(calculatedWeeklyStats.value.red_cards).toBe(1); // 1 + 0
-      expect(calculatedWeeklyStats.value.clean_sheets).toBe(2); // 1 + 1
+      expect(result.calculatedWeeklyStats.value.red_cards).toBe(1); // 1 + 0
+      expect(result.calculatedWeeklyStats.value.clean_sheets).toBe(2); // 1 + 1
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should handle null stats gracefully', () => {
@@ -159,16 +162,19 @@ describe('useWeeklyStatistics', () => {
         ],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert: Should handle null/undefined gracefully
-      expect(calculatedWeeklyStats.value.goals).toBe(1);
-      expect(calculatedWeeklyStats.value.assists).toBe(2);
-      expect(calculatedWeeklyStats.value.red_cards).toBe(0);
-      expect(calculatedWeeklyStats.value.clean_sheets).toBe(1);
+      expect(result.calculatedWeeklyStats.value.goals).toBe(1);
+      expect(result.calculatedWeeklyStats.value.assists).toBe(2);
+      expect(result.calculatedWeeklyStats.value.red_cards).toBe(0);
+      expect(result.calculatedWeeklyStats.value.clean_sheets).toBe(1);
+
+      // Cleanup
+      app.unmount();
     });
   });
 
@@ -190,14 +196,16 @@ describe('useWeeklyStatistics', () => {
         players: [player],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 3; // After transfer week
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(3)), // After transfer week
+      );
 
       // Assert: Should use transfer points (10), not original points (5)
-      expect(calculatedWeeklyStats.value.points).toBe(10);
+      expect(result.calculatedWeeklyStats.value.points).toBe(10);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should use original player data when transfer_week > selectedGameweek', () => {
@@ -217,14 +225,16 @@ describe('useWeeklyStatistics', () => {
         players: [player],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 3; // Before transfer week
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(3)), // Before transfer week
+      );
 
       // Assert: Should use original points (5), not transfer points (10)
-      expect(calculatedWeeklyStats.value.points).toBe(5);
+      expect(result.calculatedWeeklyStats.value.points).toBe(5);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should use most recent transfer when multiple transfers exist', () => {
@@ -255,14 +265,16 @@ describe('useWeeklyStatistics', () => {
         players: [player],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 5; // After all transfers
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(5)), // After all transfers
+      );
 
       // Assert: Should use most recent transfer (week 4, points 9)
-      expect(calculatedWeeklyStats.value.points).toBe(9);
+      expect(result.calculatedWeeklyStats.value.points).toBe(9);
+
+      // Cleanup
+      app.unmount();
     });
   });
 
@@ -286,14 +298,16 @@ describe('useWeeklyStatistics', () => {
         players: [player],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 5; // After transfer week
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(5)), // After transfer week
+      );
 
       // Assert: Should use selected original player (7), not transfer (15)
-      expect(calculatedWeeklyStats.value.points).toBe(7);
+      expect(result.calculatedWeeklyStats.value.points).toBe(7);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should use selected transfer over other transfers', () => {
@@ -322,14 +336,16 @@ describe('useWeeklyStatistics', () => {
         players: [player],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 5; // After all transfers
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(5)), // After all transfers
+      );
 
       // Assert: Should use selected transfer (12)
-      expect(calculatedWeeklyStats.value.points).toBe(12);
+      expect(result.calculatedWeeklyStats.value.points).toBe(12);
+
+      // Cleanup
+      app.unmount();
     });
   });
 
@@ -340,15 +356,18 @@ describe('useWeeklyStatistics', () => {
         players: [],
       });
 
-      mockDraftedTeam.value = team;
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(1)),
+      );
 
       // Assert: Should return zero values
-      expect(calculatedWeeklyStats.value.points).toBe(0);
-      expect(calculatedWeeklyStats.value.goals).toBe(null);
-      expect(calculatedWeeklyStats.value.assists).toBe(null);
+      expect(result.calculatedWeeklyStats.value.points).toBe(0);
+      expect(result.calculatedWeeklyStats.value.goals).toBe(null);
+      expect(result.calculatedWeeklyStats.value.assists).toBe(null);
+
+      // Cleanup
+      app.unmount();
     });
 
     it('should handle mixed scenarios: some players with transfers, some without', () => {
@@ -376,16 +395,18 @@ describe('useWeeklyStatistics', () => {
         players: [playerWithTransfer, playerWithoutTransfer],
       });
 
-      mockDraftedTeam.value = team;
-      mockSelectedGameweek.value = 3; // After transfer week
-
       // Act
-      const { calculatedWeeklyStats } = useWeeklyStatistics(mockDraftedTeam, mockSelectedGameweek);
+      const [result, app] = withSetup(() =>
+        useWeeklyStatistics(ref(team), ref(3)), // After transfer week
+      );
 
       // Assert: Should combine transfer stats and original player stats
-      expect(calculatedWeeklyStats.value.points).toBe(14); // 8 (transfer) + 6 (original)
-      expect(calculatedWeeklyStats.value.goals).toBe(2); // 2 (from transfer)
-      expect(calculatedWeeklyStats.value.assists).toBe(1); // 1 (from original player)
+      expect(result.calculatedWeeklyStats.value.points).toBe(14); // 8 (transfer) + 6 (original)
+      expect(result.calculatedWeeklyStats.value.goals).toBe(2); // 2 (from transfer)
+      expect(result.calculatedWeeklyStats.value.assists).toBe(1); // 1 (from original player)
+
+      // Cleanup
+      app.unmount();
     });
   });
 });

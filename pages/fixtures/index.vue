@@ -2,10 +2,8 @@
 import { useToast } from 'primevue/usetoast';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
-import type {
-  WeeklyStats,
-} from '~/types/DraftedTeam';
 import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
+import { calculateWeeklyStats } from '~/composables/useWeeklyStats';
 
 const supabase = useSupabaseClient<Database>();
 const toast = useToast();
@@ -14,6 +12,7 @@ const router = useRouter();
 const fixtureStore = useFixtureStore();
 const weeks = ref(Array.from({ length: 38 }, (_, i) => i + 1));
 const selectedWeek = ref(Number(route.query.week) || 1);
+const isLoadingWeekChange = ref(false);
 
 const draftedTeamsStore = useDraftedTeamsStore();
 const draftedTeamsWithPoints: Ref<DraftedTeamWithPlayerPointsByGameweek[] | undefined>
@@ -33,13 +32,14 @@ definePageMeta({
 watch(
   selectedWeek,
   async (newWeek) => {
+    isLoadingWeekChange.value = true;
     await fixtureStore.fetchFixtures(newWeek);
-    draftedTeamsWithPoints.value = undefined;
     draftedTeamsWithPoints.value
       = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
         newWeek,
       );
     fixtureStore.selectedGameweek = newWeek;
+    isLoadingWeekChange.value = false;
     await router.push({
       path: 'fixtures',
       query: { week: newWeek },
@@ -86,20 +86,11 @@ const progressStats = computed(() => {
   };
 });
 
-const populateWeeklyStats = (data: { teamId: number; stats: Pick<WeeklyStats, 'points' | 'goals' | 'assists' | 'red_cards' | 'clean_sheets'> }) => {
-  const currentDraftedTeam = draftedTeamsWithPoints.value?.find(
-    x => x.drafted_team_id === data.teamId,
-  );
-  if (currentDraftedTeam) {
-    currentDraftedTeam.weekly_stats = data.stats;
-  }
-};
-
 const updateWeeklyStats = async () => {
-  const formattedWeeklyData = draftedTeamsWithPoints.value!.map((x) => {
-    const stats = x.weekly_stats as WeeklyStats;
+  const formattedWeeklyData = draftedTeamsWithPoints.value!.map((team) => {
+    const stats = calculateWeeklyStats(team, selectedWeek.value);
     return {
-      team: x.drafted_team_id,
+      team: team.drafted_team_id,
       week: selectedWeek.value,
       points: stats.points,
       goals: stats.goals,
@@ -328,7 +319,7 @@ const updateWeeklyStats = async () => {
         </div>
       </div>
       <div
-        v-if="draftedTeamsWithPoints?.length"
+        v-if="draftedTeamsWithPoints?.length && !isLoadingWeekChange"
         class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
       >
         <template
@@ -339,13 +330,12 @@ const updateWeeklyStats = async () => {
             :drafted-team="draftedTeam"
             :active-week="selectedWeek"
             :show-player-override="true"
-            @calculated-weekly-stats="populateWeeklyStats"
           />
         </template>
       </div>
       <div
         v-else
-        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5"
+        class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
       >
         <template
           v-for="_ in 4"

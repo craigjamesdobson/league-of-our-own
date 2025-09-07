@@ -5,10 +5,10 @@ import {
   createMockPlayerWithStats,
   createMockTransferWithStats,
 } from '@/tests/factories';
-import { useWeeklyStatistics } from '@/composables/useWeeklyStatistics';
+import { useWeeklyStats } from '@/composables/useWeeklyStats';
 import { withSetup } from '@/tests/setup';
 
-describe('useWeeklyStatistics', () => {
+describe('useWeeklyStats', () => {
   describe('Basic Points Calculation', () => {
     it('should calculate total points from all players', () => {
       // Arrange: Create team with 3 players with different points
@@ -22,7 +22,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act: Use the composable with real Vue reactivity
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert: Total points should be sum of all player points
@@ -43,7 +43,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert
@@ -64,7 +64,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert: Should treat undefined as 0
@@ -100,7 +100,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert
@@ -130,7 +130,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert: Red cards and clean sheets are binary (0 or 1 per player)
@@ -164,7 +164,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert: Should handle null/undefined gracefully
@@ -198,7 +198,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(3)), // After transfer week
+        useWeeklyStats(ref(team), ref(3)), // After transfer week
       );
 
       // Assert: Should use transfer points (10), not original points (5)
@@ -227,7 +227,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(3)), // Before transfer week
+        useWeeklyStats(ref(team), ref(3)), // Before transfer week
       );
 
       // Assert: Should use original points (5), not transfer points (10)
@@ -267,7 +267,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(5)), // After all transfers
+        useWeeklyStats(ref(team), ref(5)), // After all transfers
       );
 
       // Assert: Should use most recent transfer (week 4, points 9)
@@ -300,7 +300,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(5)), // After transfer week
+        useWeeklyStats(ref(team), ref(5)), // After transfer week
       );
 
       // Assert: Should use selected original player (7), not transfer (15)
@@ -338,7 +338,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(5)), // After all transfers
+        useWeeklyStats(ref(team), ref(5)), // After all transfers
       );
 
       // Assert: Should use selected transfer (12)
@@ -358,7 +358,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(1)),
+        useWeeklyStats(ref(team), ref(1)),
       );
 
       // Assert: Should return zero values
@@ -397,7 +397,7 @@ describe('useWeeklyStatistics', () => {
 
       // Act
       const [result, app] = withSetup(() =>
-        useWeeklyStatistics(ref(team), ref(3)), // After transfer week
+        useWeeklyStats(ref(team), ref(3)), // After transfer week
       );
 
       // Assert: Should combine transfer stats and original player stats

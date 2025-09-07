@@ -202,7 +202,7 @@ export const createMockDraftedTransferWithWeeklyStats = (
 
 /**
  * Factory function for creating mock DraftedTeamWithPlayers.
- * Used for testing the useWeeklyStatistics composable.
+ * Used for testing the useWeeklyStats composable.
  */
 export const createMockDraftedTeamWithPlayers = (
   overrides?: Partial<DraftedTeamWithPlayers>,

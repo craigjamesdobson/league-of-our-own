@@ -1,16 +1,8 @@
-import { resolve } from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineVitestConfig } from '@nuxt/test-utils/config';
 
-export default defineConfig({
+export default defineVitestConfig({
   test: {
-    environment: 'happy-dom',
+    environment: 'nuxt',
     globals: true,
-    setupFiles: ['./tests/setup.ts'],
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, '.'),
-      '~': resolve(__dirname, '.'),
-    },
   },
 });

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 import type { DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
-import { useWeeklyStatistics } from '~/composables/useWeeklyStatistics';
+import { useWeeklyStats } from '~/composables/useWeeklyStats';
 import type { DraftedPlayer, DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '~/types/DraftedPlayer';
 
 const props = defineProps({
@@ -20,16 +20,7 @@ const props = defineProps({
 });
 
 const { draftedTeam, activeWeek } = toRefs(props);
-const { calculatedWeeklyStats } = useWeeklyStatistics(draftedTeam, activeWeek);
-
-const emit = defineEmits(['calculated-weekly-stats']);
-
-watch(calculatedWeeklyStats, (newValue) => {
-  emit('calculated-weekly-stats', {
-    teamId: props.draftedTeam.drafted_team_id,
-    stats: newValue,
-  });
-});
+const { calculatedWeeklyStats } = useWeeklyStats(draftedTeam, activeWeek);
 
 const findActiveGameweekPlayer = (player: DraftedPlayer): DraftedPlayerWithWeeklyStats | DraftedTransferWithWeeklyStats => {
   if (player.transfers.some(x => x.transfer_week <= props.activeWeek)) {

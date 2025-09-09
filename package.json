@@ -1,5 +1,6 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev --host",
@@ -64,6 +65,7 @@
     "supabase": "^2.26.9",
     "typescript": "^5.8.3",
     "unplugin-icons": "^0.15.3",
+    "vite": "^7.1.4",
     "vitest": "^3.2.4",
     "vue-tsc": "^2.2.10"
   },

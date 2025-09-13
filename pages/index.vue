@@ -2,7 +2,6 @@
 import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
 import { useTableStore } from '@/stores/table';
 
-// Explicit component imports to ensure they're available
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 import TopPerformers from '@/components/Dashboard/TopPerformers.vue';
 import PositionMovers from '@/components/Dashboard/PositionMovers.vue';
@@ -10,18 +9,15 @@ import WeeklyStats from '@/components/Dashboard/WeeklyStats.vue';
 import WeeklyTransfers from '@/components/Dashboard/WeeklyTransfers.vue';
 import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vue';
 
-// Initialize dashboard functionality
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
 
-// Computed values for dashboard display
 const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasResults = computed(() => dashboard.hasResults());
 const weeklyData = computed(() => tableStore.weeklyData || []);
 const weeklyWinners = computed(() => tableStore.weeklyWinners || []);
 const isLoading = computed(() => dashboard.isLoading.value || tableStore.weeklyData === undefined);
 
-// Get league averages from dashboard composable
 const leagueAverages = computed(() => dashboard.leagueAverages.value);
 
 const positionMovers = computed(() => {
@@ -34,12 +30,10 @@ const positionMovers = computed(() => {
 const transfers = computed(() => dashboard.weeklyTransfers.value);
 const topPositionPlayers = computed(() => dashboard.topPositionPlayers.value);
 
-// Load dashboard data on mount
 onMounted(async () => {
   await dashboard.loadDashboardData();
 });
 
-// Error handling
 watchEffect(() => {
   if (dashboard.error.value) {
     console.error('Dashboard error:', dashboard.error.value);
@@ -116,7 +110,7 @@ watchEffect(() => {
                   Gameweek {{ currentGameweek }} Summary
                 </h2>
               </div>
-              
+
               <!-- Status Message - Inline on desktop -->
               <div
                 v-if="hasResults"

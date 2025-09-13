@@ -21,31 +21,24 @@ defineProps({
   },
 });
 
-// Get current week's top performers from weekly data
 const getTopPerformers = (weeklyData: WeeklyData[]) => {
   if (!weeklyData || weeklyData.length === 0) return [];
 
   const sorted = [...weeklyData].sort((a, b) => b.week_points - a.week_points);
 
-  // Get the highest score
   const highestScore = sorted[0]?.week_points || 0;
 
-  // Get all teams with the highest score (joint first place)
   const firstPlaceTeams = sorted.filter(team => team.week_points === highestScore);
 
-  // Get remaining teams after removing first place teams
   const remainingTeams = sorted.filter(team => team.week_points < highestScore);
 
-  // Calculate how many more teams we need to reach 5 total
   const spotsRemaining = 5 - firstPlaceTeams.length;
 
-  // Take the remaining teams to fill up to 5 total
   const additionalTeams = remainingTeams.slice(0, Math.max(0, spotsRemaining));
 
   return [...firstPlaceTeams, ...additionalTeams];
 };
 
-// Helper to determine if a team is in joint first place
 const isJointFirst = (team: WeeklyData, allTeams: WeeklyData[]) => {
   if (!allTeams || allTeams.length === 0) return false;
   const sortedTeams = [...allTeams].sort((a, b) => b.week_points - a.week_points);
@@ -53,7 +46,6 @@ const isJointFirst = (team: WeeklyData, allTeams: WeeklyData[]) => {
   return team.week_points === highestScore;
 };
 
-// Helper to get the actual position of a team
 const getActualPosition = (team: WeeklyData, allTeams: WeeklyData[]) => {
   if (!allTeams || allTeams.length === 0) return 1;
   const sortedTeams = [...allTeams].sort((a, b) => b.week_points - a.week_points);

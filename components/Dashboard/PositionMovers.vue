@@ -1,16 +1,6 @@
 <script setup lang="ts">
-import type { WeeklyData } from '@/types/Table';
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
-
-type PositionMover = WeeklyData & {
-  positionChange: number;
-  currentPosition: number;
-};
-
-type PositionMovers = {
-  biggestRisers: PositionMover[];
-  biggestFallers: PositionMover[];
-};
+import type { PositionMovers } from '@/types/Dashboard';
 
 defineProps({
   positionMovers: {

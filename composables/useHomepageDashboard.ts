@@ -2,65 +2,9 @@ import { ref, readonly } from 'vue';
 import { useTableStore } from '@/stores/table';
 import type { WeeklyData } from '@/types/Table';
 import type { Database } from '@/types/database.types';
+import type { WeeklyTransfer, TopPositionPlayers, LeagueAverages, PositionMover, PositionMovers } from '@/types/Dashboard';
 import { PlayerPosition } from '@/types/PlayerPosition';
-
-type LeagueAverages = {
-  averagePoints: number;
-  totalTeams: number;
-  highestPoints: number;
-  lowestPoints: number;
-  weeksPlayed: number;
-};
-
-type TopPositionPlayer = {
-  web_name: string;
-  points: number;
-  position: number;
-  image?: string;
-};
-
-type TopPositionPlayers = {
-  players: readonly TopPositionPlayer[];
-  points: number;
-};
-
-type PositionMover = WeeklyData & {
-  positionChange: number;
-  currentPosition: number;
-};
-
-type PositionMovers = {
-  biggestRisers: PositionMover[];
-  biggestFallers: PositionMover[];
-};
-
-type WeeklyTransfer = {
-  drafted_transfer_id: number;
-  transfer_week: number;
-  team_name: string;
-  team_owner: string;
-  player_out: string;
-  player_out_image: string;
-  player_out_team: string;
-  player_out_team_short: string;
-  player_out_cost: number;
-  player_in: string;
-  player_in_image: string;
-  player_in_team: string;
-  player_in_team_short: string;
-  player_in_cost: number;
-  player_in_position: string;
-};
-
-const getPositionName = (position: number): string => {
-  switch (position) {
-    case PlayerPosition.GOALKEEPER: return 'GK';
-    case PlayerPosition.DEFENDER: return 'DEF';
-    case PlayerPosition.MIDFIELDER: return 'MID';
-    case PlayerPosition.FORWARD: return 'FWD';
-    default: return 'UNK';
-  }
-};
+import { getPositionName } from '@/utils/playerPosition';
 
 export function useHomepageDashboard() {
   const tableStore = useTableStore();
@@ -83,8 +27,6 @@ export function useHomepageDashboard() {
     [PlayerPosition.FORWARD]: null,
   });
 
-  // Manual gameweek control - update this value as needed
-  // TODO: Later hook this up to database property editable in admin section
   const currentGameweek = ref<number>(4);
 
   const getCurrentGameweek = (): number => {
@@ -92,14 +34,12 @@ export function useHomepageDashboard() {
   };
 
   const hasResults = (): boolean => {
-    // Check if we have weekly data with actual points
     const weeklyData = tableStore.weeklyData;
     return !!(weeklyData && weeklyData.length > 0 && weeklyData.some(team => team.week_points > 0));
   };
 
   const getLeagueAverages = async (): Promise<LeagueAverages> => {
     try {
-      // Get all weekly statistics to find highest/lowest individual weekly scores
       const { data: allWeeklyStats, error } = await supabase
         .from('weekly_statistics')
         .select('points, week, team')
@@ -116,7 +56,6 @@ export function useHomepageDashboard() {
         };
       }
 
-      // Calculate statistics from individual weekly performances
       const weeklyScores = allWeeklyStats.map(stat => stat.points);
       const totalSum = weeklyScores.reduce((sum, points) => sum + points, 0);
       const uniqueTeams = new Set(allWeeklyStats.map(stat => stat.team)).size;
@@ -149,7 +88,6 @@ export function useHomepageDashboard() {
       };
     }
 
-    // Sort by total_points to determine current league positions
     const sortedTeams = [...weeklyData].sort((a, b) => b.total_points - a.total_points);
 
     const teamsWithMovement: PositionMover[] = sortedTeams.map((team, index) => {
@@ -163,7 +101,6 @@ export function useHomepageDashboard() {
       };
     });
 
-    // Filter for significant movers (more than 1 position change)
     const risers = teamsWithMovement
       .filter(team => team.positionChange > 1)
       .sort((a, b) => b.positionChange - a.positionChange)
@@ -184,11 +121,9 @@ export function useHomepageDashboard() {
     try {
       console.log('Fetching top position players overall');
 
-      // Get top player for each position based on overall performance
       const positions = [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD];
 
       const results = await Promise.all(positions.map(async (position) => {
-        // Get top performing player for this position overall by summing their points across all games
         const { data: topPlayerStats, error: statsError } = await supabase
           .from('player_statistics')
           .select(`
@@ -203,7 +138,6 @@ export function useHomepageDashboard() {
           return { position, player: null };
         }
 
-        // Calculate total points for each player
         const playerTotals = topPlayerStats.reduce((acc, stat) => {
           const playerId = stat.player_id;
           if (!acc[playerId]) {
@@ -218,7 +152,6 @@ export function useHomepageDashboard() {
           return acc;
         }, {} as Record<number, { totalPoints: number; web_name: string; position: number; image?: string }>);
 
-        // Find all players tied for the highest total points
         const sortedPlayers = Object.values(playerTotals)
           .sort((a, b) => b.totalPoints - a.totalPoints);
 
@@ -244,14 +177,12 @@ export function useHomepageDashboard() {
         };
       }));
 
-      // Update the ref with the results
       results.forEach(({ position, players }) => {
         topPositionPlayers.value[position] = players || null;
       });
     }
     catch (err) {
       console.error('Error fetching top position players:', err);
-      // Reset to null on error
       Object.keys(topPositionPlayers.value).forEach((key) => {
         topPositionPlayers.value[parseInt(key)] = null;
       });
@@ -261,7 +192,6 @@ export function useHomepageDashboard() {
   const fetchWeeklyTransfers = async (week: number): Promise<void> => {
     try {
       console.log('Fetching transfers for week:', week);
-      // Get transfers for the week
       const { data: transfers, error: transfersError } = await supabase
         .from('drafted_transfers')
         .select('drafted_transfer_id, transfer_week, drafted_player, player_id')
@@ -280,9 +210,7 @@ export function useHomepageDashboard() {
 
       console.log('Found transfers:', transfers);
 
-      // Get all the data we need in separate queries
       const results = await Promise.all(transfers.map(async (transfer) => {
-        // Get drafted player info and team
         const { data: draftedPlayer } = await supabase
           .from('drafted_players')
           .select(`
@@ -293,7 +221,6 @@ export function useHomepageDashboard() {
           .eq('drafted_player_id', transfer.drafted_player)
           .single();
 
-        // Get new player info
         const { data: newPlayer } = await supabase
           .from('players_view')
           .select('web_name, team_short_name, position, image, cost')
@@ -332,10 +259,8 @@ export function useHomepageDashboard() {
       isLoading.value = true;
       error.value = null;
 
-      // Use manual gameweek setting
       const currentWeek = currentGameweek.value;
 
-      // Load data for the current week
       await Promise.all([
         tableStore.fetchWeeklyStats(currentWeek),
         tableStore.fetchWeeklyWinners(),
@@ -343,7 +268,6 @@ export function useHomepageDashboard() {
         fetchTopPositionPlayers(),
       ]);
 
-      // Load league averages from weekly statistics
       leagueAverages.value = await getLeagueAverages();
     }
     catch (err) {

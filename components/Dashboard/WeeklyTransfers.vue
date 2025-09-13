@@ -1,30 +1,7 @@
 <script setup lang="ts">
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 import { loadPlayerFallbackImage } from '@/utils/images';
-
-type WeeklyTransfer = {
-  drafted_transfer_id: number;
-  transfer_week: number;
-  team_name: string;
-  team_owner: string;
-  player_out: string;
-  player_out_image: string;
-  player_out_team: string;
-  player_out_team_short: string;
-  player_out_cost: number;
-  player_in: string;
-  player_in_image: string;
-  player_in_team: string;
-  player_in_team_short: string;
-  player_in_cost: number;
-  player_in_position: string;
-};
-
-type TeamTransfers = {
-  team_name: string;
-  team_owner: string;
-  transfers: WeeklyTransfer[];
-};
+import type { WeeklyTransfer, TeamTransfers } from '@/types/Dashboard';
 
 const props = defineProps({
   transfers: {
@@ -45,7 +22,6 @@ const props = defineProps({
   },
 });
 
-// Group transfers by team
 const groupedTransfers = computed(() => {
   const grouped: Record<string, TeamTransfers> = {};
 
@@ -124,8 +100,12 @@ const groupedTransfers = computed(() => {
                 class="bg-red-100 text-red-700 border border-red-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
               />
               <div class="text-center text-sm md:absolute md:left-[calc(50%+40px)] md:top-1/2 md:-translate-y-1/2 md:whitespace-nowrap md:text-left">
-                <div class="font-semibold text-slate-800">{{ transfer.player_out }}</div>
-                <div class="text-xs md:text-sm text-slate-500">£{{ transfer.player_out_cost.toFixed(1) }}m</div>
+                <div class="font-semibold text-slate-800">
+                  {{ transfer.player_out }}
+                </div>
+                <div class="text-xs md:text-sm text-slate-500">
+                  £{{ transfer.player_out_cost.toFixed(1) }}m
+                </div>
               </div>
             </div>
 
@@ -155,8 +135,12 @@ const groupedTransfers = computed(() => {
                 class="bg-green-100 text-green-700 border border-green-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
               />
               <div class="text-center text-sm md:absolute md:right-[calc(50%+40px)] md:top-1/2 md:-translate-y-1/2 md:whitespace-nowrap md:text-right">
-                <div class="font-semibold text-slate-800">{{ transfer.player_in }}</div>
-                <div class="text-xs md:text-sm text-slate-500">£{{ transfer.player_in_cost.toFixed(1) }}m</div>
+                <div class="font-semibold text-slate-800">
+                  {{ transfer.player_in }}
+                </div>
+                <div class="text-xs md:text-sm text-slate-500">
+                  £{{ transfer.player_in_cost.toFixed(1) }}m
+                </div>
               </div>
             </div>
 

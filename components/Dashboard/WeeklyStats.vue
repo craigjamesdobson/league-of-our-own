@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
-
-type LeagueAverages = {
-  averagePoints: number;
-  totalTeams: number;
-  highestPoints: number;
-  lowestPoints: number;
-  weeksPlayed: number;
-};
+import type { LeagueAverages } from '@/types/Dashboard';
 
 defineProps({
   leagueAverages: {

@@ -2,18 +2,8 @@
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 import { PlayerPosition } from '@/types/PlayerPosition';
 import { loadPlayerFallbackImage } from '@/utils/images';
-
-type TopPositionPlayer = {
-  web_name: string;
-  points: number;
-  position: number;
-  image?: string;
-};
-
-type TopPositionPlayers = {
-  players: readonly TopPositionPlayer[];
-  points: number;
-};
+import { getPositionInfo } from '@/utils/playerPosition';
+import type { TopPositionPlayers } from '@/types/Dashboard';
 
 defineProps({
   topPositionPlayers: {
@@ -30,21 +20,6 @@ defineProps({
     default: false,
   },
 });
-
-const getPositionInfo = (position: number) => {
-  switch (position) {
-    case PlayerPosition.GOALKEEPER:
-      return { icon: 'tabler:hand-stop', label: 'Top Performing GK' };
-    case PlayerPosition.DEFENDER:
-      return { icon: 'oi:shield', label: 'Top Performing DEF' };
-    case PlayerPosition.MIDFIELDER:
-      return { icon: 'ph:brain-duotone', label: 'Top Performing MID' };
-    case PlayerPosition.FORWARD:
-      return { icon: 'mage:goals', label: 'Top Performing FWD' };
-    default:
-      return { icon: 'carbon:user', label: 'Top Performing' };
-  }
-};
 </script>
 
 <template>

@@ -5,10 +5,12 @@ import type { Database } from '@/types/database.types';
 import type { WeeklyTransfer, TopPositionPlayers, LeagueAverages, PositionMover, PositionMovers } from '@/types/Dashboard';
 import { PlayerPosition } from '@/types/PlayerPosition';
 import { getPositionName } from '@/utils/playerPosition';
+import { useAppSettings } from '@/composables/useAppSettings';
 
 export function useHomepageDashboard() {
   const tableStore = useTableStore();
   const supabase = useSupabaseClient<Database>();
+  const { getCurrentGameweek: getGameweekFromDB } = useAppSettings();
 
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -27,9 +29,20 @@ export function useHomepageDashboard() {
     [PlayerPosition.FORWARD]: null,
   });
 
-  const currentGameweek = ref<number>(4);
+  const currentGameweek = ref<number | null>(null);
+
+  const loadCurrentGameweek = async (): Promise<void> => {
+    currentGameweek.value = await getGameweekFromDB();
+  };
+
+  const isGameweekLoaded = (): boolean => {
+    return currentGameweek.value !== null;
+  };
 
   const getCurrentGameweek = (): number => {
+    if (currentGameweek.value === null) {
+      throw new Error('Current gameweek not loaded - call loadDashboardData first');
+    }
     return currentGameweek.value;
   };
 
@@ -65,7 +78,7 @@ export function useHomepageDashboard() {
         totalTeams: uniqueTeams,
         highestPoints: Math.max(...weeklyScores),
         lowestPoints: Math.min(...weeklyScores),
-        weeksPlayed: currentGameweek.value,
+        weeksPlayed: getCurrentGameweek(),
       };
     }
     catch (err) {
@@ -259,7 +272,9 @@ export function useHomepageDashboard() {
       isLoading.value = true;
       error.value = null;
 
-      const currentWeek = currentGameweek.value;
+      await loadCurrentGameweek();
+
+      const currentWeek = getCurrentGameweek();
 
       await Promise.all([
         tableStore.fetchWeeklyStats(currentWeek),
@@ -280,6 +295,7 @@ export function useHomepageDashboard() {
 
   return {
     getCurrentGameweek,
+    isGameweekLoaded,
     hasResults,
     getPositionMovers,
     loadDashboardData,

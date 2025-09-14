@@ -12,11 +12,18 @@ import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vu
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
 
-const currentGameweek = computed(() => dashboard.getCurrentGameweek());
+const currentGameweek = computed(() => {
+  try {
+    return dashboard.getCurrentGameweek();
+  } catch (error) {
+    console.error('Error getting current gameweek:', error);
+    return 1;
+  }
+});
 const hasResults = computed(() => dashboard.hasResults());
 const weeklyData = computed(() => tableStore.weeklyData || []);
 const weeklyWinners = computed(() => tableStore.weeklyWinners || []);
-const isLoading = computed(() => dashboard.isLoading.value || tableStore.weeklyData === undefined);
+const isLoading = computed(() => dashboard.isLoading.value || !dashboard.isGameweekLoaded() || tableStore.weeklyData === undefined);
 
 const leagueAverages = computed(() => dashboard.leagueAverages.value);
 

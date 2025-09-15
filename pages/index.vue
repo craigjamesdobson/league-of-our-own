@@ -2,7 +2,6 @@
 import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
 import { useTableStore } from '@/stores/table';
 
-import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 import TopPerformers from '@/components/Dashboard/TopPerformers.vue';
 import PositionMovers from '@/components/Dashboard/PositionMovers.vue';
 import WeeklyStats from '@/components/Dashboard/WeeklyStats.vue';
@@ -12,18 +11,13 @@ import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vu
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
 
-const currentGameweek = computed(() => {
-  try {
-    return dashboard.getCurrentGameweek();
-  } catch (error) {
-    console.error('Error getting current gameweek:', error);
-    return 1;
-  }
-});
+const currentGameweek = computed(() => dashboard.getCurrentGameweek());
+const hasGameweekData = computed(() => dashboard.hasGameweekData());
 const hasResults = computed(() => dashboard.hasResults());
 const weeklyData = computed(() => tableStore.weeklyData || []);
 const weeklyWinners = computed(() => tableStore.weeklyWinners || []);
-const isLoading = computed(() => dashboard.isLoading.value || !dashboard.isGameweekLoaded() || tableStore.weeklyData === undefined);
+const isLoading = computed(() => dashboard.isLoading.value);
+const isGameweekLoading = computed(() => isLoading.value || (hasGameweekData.value && tableStore.weeklyData === undefined));
 
 const leagueAverages = computed(() => dashboard.leagueAverages.value);
 
@@ -37,14 +31,14 @@ const positionMovers = computed(() => {
 const transfers = computed(() => dashboard.weeklyTransfers.value);
 const topPositionPlayers = computed(() => dashboard.topPositionPlayers.value);
 
+const refreshPage = () => {
+  if (typeof window !== 'undefined') {
+    window.location.reload();
+  }
+};
+
 onMounted(async () => {
   await dashboard.loadDashboardData();
-});
-
-watchEffect(() => {
-  if (dashboard.error.value) {
-    console.error('Dashboard error:', dashboard.error.value);
-  }
 });
 </script>
 
@@ -113,7 +107,13 @@ watchEffect(() => {
                   name="carbon:calendar"
                   size="28"
                 />
-                <h2 class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                <h2 v-if="isLoading" class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                  Loading Gameweek Data...
+                </h2>
+                <h2 v-else-if="!hasGameweekData" class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                  Gameweek Data Unavailable
+                </h2>
+                <h2 v-else class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
                   Gameweek {{ currentGameweek }} Summary
                 </h2>
               </div>
@@ -148,7 +148,11 @@ watchEffect(() => {
             </div>
           </div>
 
-          <div class="space-y-8">
+          <!-- Gameweek Content -->
+          <div
+            v-if="hasGameweekData && !isGameweekLoading"
+            class="space-y-8"
+          >
             <!-- Weekly Transfers -->
             <div class="w-full">
               <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
@@ -156,8 +160,8 @@ watchEffect(() => {
               </h2>
               <WeeklyTransfers
                 :transfers="transfers"
-                :current-gameweek="currentGameweek"
-                :is-loading="isLoading"
+                :current-gameweek="currentGameweek || undefined"
+                :is-loading="isGameweekLoading"
                 :has-results="hasResults"
               />
             </div>
@@ -172,7 +176,7 @@ watchEffect(() => {
                 <TopPerformers
                   :weekly-data="weeklyData"
                   :weekly-winners="weeklyWinners"
-                  :is-loading="isLoading"
+                  :is-loading="isGameweekLoading"
                   :has-results="hasResults"
                 />
               </div>
@@ -185,41 +189,82 @@ watchEffect(() => {
                 <div class="flex-1">
                   <PositionMovers
                     :position-movers="positionMovers"
-                    :is-loading="isLoading"
+                    :is-loading="isGameweekLoading"
                     :has-results="hasResults"
                   />
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Error State -->
-      <div
-        v-if="dashboard.error.value"
-        class="max-w-2xl mx-auto mt-6"
-      >
-        <WeeklySummaryCard title="Error">
-          <div class="text-center py-8">
+          <!-- Gameweek Loading State -->
+          <div
+            v-else-if="isLoading || isGameweekLoading"
+            class="space-y-8"
+          >
+            <!-- Show skeleton loading for gameweek content -->
+            <div class="w-full">
+              <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                WEEKLY TRANSFERS
+              </h2>
+              <WeeklyTransfers
+                :transfers="[]"
+                :current-gameweek="currentGameweek || undefined"
+                :is-loading="true"
+                :has-results="false"
+              />
+            </div>
+
+            <div class="flex flex-col space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:auto-rows-fr md:gap-8">
+              <div class="flex flex-col">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                  TOP PERFORMERS
+                </h2>
+                <TopPerformers
+                  :weekly-data="[]"
+                  :weekly-winners="[]"
+                  :is-loading="true"
+                  :has-results="false"
+                />
+              </div>
+              <div class="flex flex-col">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                  POSITION MOVERS
+                </h2>
+                <div class="flex-1">
+                  <PositionMovers
+                    :position-movers="{ biggestRisers: [], biggestFallers: [] }"
+                    :is-loading="true"
+                    :has-results="false"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gameweek Error State -->
+          <div
+            v-else
+            class="text-center py-12"
+          >
             <Icon
               name="carbon:warning"
               size="48"
-              class="mx-auto text-red-400 mb-2"
+              class="text-amber-500 mb-4"
             />
-            <p class="text-red-600 mb-2">
-              Failed to load dashboard data
-            </p>
-            <p class="text-sm text-slate-500 mb-4">
-              {{ dashboard.error.value }}
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">
+              Gameweek Data Unavailable
+            </h3>
+            <p class="text-slate-600 mb-4">
+              Unable to load current gameweek information. Please try refreshing the page.
             </p>
             <Button
-              label="Try Again"
-              :loading="dashboard.isLoading.value"
-              @click="dashboard.loadDashboardData"
+              label="Refresh Page"
+              icon="pi pi-refresh"
+              @click="refreshPage"
             />
           </div>
-        </WeeklySummaryCard>
+        </div>
       </div>
     </div>
   </div>

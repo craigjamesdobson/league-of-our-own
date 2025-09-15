@@ -39,11 +39,12 @@ export function useHomepageDashboard() {
     return currentGameweek.value !== null;
   };
 
-  const getCurrentGameweek = (): number => {
-    if (currentGameweek.value === null) {
-      throw new Error('Current gameweek not loaded - call loadDashboardData first');
-    }
+  const getCurrentGameweek = (): number | null => {
     return currentGameweek.value;
+  };
+
+  const hasGameweekData = (): boolean => {
+    return currentGameweek.value !== null;
   };
 
   const hasResults = (): boolean => {
@@ -52,6 +53,19 @@ export function useHomepageDashboard() {
   };
 
   const getLeagueAverages = async (): Promise<LeagueAverages> => {
+    const currentWeek = getCurrentGameweek();
+
+    if (currentWeek === null) {
+      console.warn('Cannot calculate league averages: gameweek data unavailable');
+      return {
+        averagePoints: 0,
+        totalTeams: 0,
+        highestPoints: 0,
+        lowestPoints: 0,
+        weeksPlayed: 0,
+      };
+    }
+
     try {
       const { data: allWeeklyStats, error } = await supabase
         .from('weekly_statistics')
@@ -78,7 +92,7 @@ export function useHomepageDashboard() {
         totalTeams: uniqueTeams,
         highestPoints: Math.max(...weeklyScores),
         lowestPoints: Math.min(...weeklyScores),
-        weeksPlayed: getCurrentGameweek(),
+        weeksPlayed: currentWeek,
       };
     }
     catch (err) {
@@ -132,7 +146,6 @@ export function useHomepageDashboard() {
 
   const fetchTopPositionPlayers = async (): Promise<void> => {
     try {
-      console.log('Fetching top position players overall');
 
       const positions = [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD];
 
@@ -204,7 +217,6 @@ export function useHomepageDashboard() {
 
   const fetchWeeklyTransfers = async (week: number): Promise<void> => {
     try {
-      console.log('Fetching transfers for week:', week);
       const { data: transfers, error: transfersError } = await supabase
         .from('drafted_transfers')
         .select('drafted_transfer_id, transfer_week, drafted_player, player_id')
@@ -216,12 +228,10 @@ export function useHomepageDashboard() {
       }
 
       if (!transfers || transfers.length === 0) {
-        console.log('No transfers found for week:', week);
         weeklyTransfers.value = [];
         return;
       }
 
-      console.log('Found transfers:', transfers);
 
       const results = await Promise.all(transfers.map(async (transfer) => {
         const { data: draftedPlayer } = await supabase
@@ -272,21 +282,40 @@ export function useHomepageDashboard() {
       isLoading.value = true;
       error.value = null;
 
-      await loadCurrentGameweek();
+      // Always load season-independent data first
+      await fetchTopPositionPlayers();
 
-      const currentWeek = getCurrentGameweek();
+      // Try to load gameweek-dependent data
+      try {
+        await loadCurrentGameweek();
+        const currentWeek = getCurrentGameweek();
 
-      await Promise.all([
-        tableStore.fetchWeeklyStats(currentWeek),
-        tableStore.fetchWeeklyWinners(),
-        fetchWeeklyTransfers(currentWeek),
-        fetchTopPositionPlayers(),
-      ]);
+        if (currentWeek === null) {
+          throw new Error('Failed to load current gameweek');
+        }
 
-      leagueAverages.value = await getLeagueAverages();
+        // Load gameweek-specific data
+        await Promise.all([
+          tableStore.fetchWeeklyStats(currentWeek),
+          tableStore.fetchWeeklyWinners(),
+          fetchWeeklyTransfers(currentWeek),
+        ]);
+
+        // League averages depend on gameweek but shouldn't fail the whole dashboard
+        leagueAverages.value = await getLeagueAverages();
+      }
+      catch (gameweekError) {
+        // Log gameweek-specific errors but don't crash the dashboard
+        console.error('Failed to load gameweek data:', gameweekError);
+        // Reset gameweek-dependent data to safe defaults
+        weeklyTransfers.value = [];
+        // Don't reset leagueAverages as getLeagueAverages handles its own errors
+      }
     }
     catch (err) {
+      // Only fail completely if season data fails
       error.value = err instanceof Error ? err.message : 'Failed to load dashboard data';
+      console.error('Failed to load dashboard data:', err);
     }
     finally {
       isLoading.value = false;
@@ -296,6 +325,7 @@ export function useHomepageDashboard() {
   return {
     getCurrentGameweek,
     isGameweekLoaded,
+    hasGameweekData,
     hasResults,
     getPositionMovers,
     loadDashboardData,

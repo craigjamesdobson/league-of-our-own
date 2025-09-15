@@ -45,6 +45,104 @@ const groupedTransfers = computed(() => {
   <WeeklySummaryCard
     :is-loading="isLoading"
   >
+    <template #skeleton>
+      <!-- Weekly Transfers Skeleton - matches team sections with transfer listings -->
+      <div class="h-full space-y-4">
+        <div
+          v-for="n in 2"
+          :key="n"
+          class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm"
+        >
+          <!-- Team Header -->
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <Skeleton
+                width="8rem"
+                height="1rem"
+                class="mb-2"
+              />
+              <Skeleton
+                width="10rem"
+                height="0.875rem"
+              />
+            </div>
+          </div>
+
+          <!-- Transfers in compact vertical layout -->
+          <div class="space-y-3">
+            <div
+              v-for="m in 1"
+              :key="m"
+              class="flex items-center md:grid md:grid-cols-[auto_1fr_auto_1fr_auto] gap-3 md:gap-8 p-3 rounded bg-gradient-to-r from-red-50 via-slate-50 to-green-50 border border-slate-200"
+            >
+              <!-- Left Arrow (desktop only) -->
+              <div class="hidden md:flex justify-start">
+                <Skeleton
+                  shape="circle"
+                  size="1.25rem"
+                />
+              </div>
+
+              <!-- Player Out Section -->
+              <div class="flex flex-col items-center gap-2 flex-1 md:relative md:flex-none">
+                <Skeleton
+                  shape="circle"
+                  size="3rem"
+                  class="border border-red-500"
+                />
+                <div class="text-center text-sm">
+                  <Skeleton
+                    width="4rem"
+                    height="1rem"
+                    class="mb-1"
+                  />
+                  <Skeleton
+                    width="2.5rem"
+                    height="0.75rem"
+                  />
+                </div>
+              </div>
+
+              <!-- Swap Icon -->
+              <div class="flex justify-center flex-shrink-0 px-4 md:px-0">
+                <Skeleton
+                  shape="circle"
+                  size="1.5rem"
+                />
+              </div>
+
+              <!-- Player In Section -->
+              <div class="flex flex-col items-center gap-2 flex-1 md:relative md:flex">
+                <Skeleton
+                  shape="circle"
+                  size="3rem"
+                  class="border border-green-500"
+                />
+                <div class="text-center text-sm">
+                  <Skeleton
+                    width="4rem"
+                    height="1rem"
+                    class="mb-1"
+                  />
+                  <Skeleton
+                    width="2.5rem"
+                    height="0.75rem"
+                  />
+                </div>
+              </div>
+
+              <!-- Right Arrow (desktop only) -->
+              <div class="hidden md:flex justify-end">
+                <Skeleton
+                  shape="circle"
+                  size="1.25rem"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
     <div
       v-if="groupedTransfers && groupedTransfers.length > 0"
       class="h-full space-y-4"

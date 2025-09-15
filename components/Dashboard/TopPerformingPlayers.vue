@@ -26,6 +26,55 @@ defineProps({
   <WeeklySummaryCard
     :is-loading="isLoading"
   >
+    <template #skeleton>
+      <!-- Top Performing Players Skeleton - matches 4-column grid with player images/avatars -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 h-full">
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="flex flex-col justify-between items-center p-5 bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 rounded-lg shadow-sm gap-4"
+        >
+          <!-- Profile/Name/Points grouped together -->
+          <div class="flex-shrink-0 text-center">
+            <!-- Player Image -->
+            <div class="mb-3">
+              <Skeleton
+                shape="circle"
+                size="4rem"
+                class="border-2 border-slate-300 shadow-md mx-auto"
+              />
+            </div>
+            <!-- Player Names -->
+            <div class="space-y-1 mb-2">
+              <Skeleton
+                width="5rem"
+                height="1.125rem"
+              />
+            </div>
+            <!-- Points -->
+            <Skeleton
+              width="3rem"
+              height="0.875rem"
+            />
+          </div>
+
+          <!-- Flexible space -->
+          <div class="flex-1" />
+
+          <!-- Position Title with icon -->
+          <div class="flex-shrink-0 flex flex-col items-center gap-2">
+            <Skeleton
+              shape="circle"
+              size="1.5rem"
+            />
+            <Skeleton
+              width="4rem"
+              height="0.875rem"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
     <div
       v-if="Object.values(topPositionPlayers).some(players => players?.players && players.players.length > 0)"
       class="h-full"

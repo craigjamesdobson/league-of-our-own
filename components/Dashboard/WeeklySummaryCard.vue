@@ -26,13 +26,9 @@ defineProps({
     <template #content>
       <div
         v-if="isLoading"
-        class="flex justify-center items-center py-12"
+        class="h-full"
       >
-        <ProgressSpinner
-          style="width:50px;height:50px"
-          stroke-width="4"
-          animation-duration=".8s"
-        />
+        <slot name="skeleton" />
       </div>
       <div
         v-else

@@ -24,6 +24,35 @@ defineProps({
   <WeeklySummaryCard
     :is-loading="isLoading"
   >
+    <template #skeleton>
+      <!-- Weekly Stats Skeleton - matches 2x2/4-column grid with icon/number/label structure -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 h-full">
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="flex flex-col justify-center items-center p-5 bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 rounded-lg shadow-sm"
+        >
+          <div class="mb-2">
+            <Skeleton
+              shape="circle"
+              size="2rem"
+            />
+          </div>
+          <div class="mb-1">
+            <Skeleton
+              width="3rem"
+              height="2.25rem"
+            />
+          </div>
+          <div>
+            <Skeleton
+              width="5rem"
+              height="0.75rem"
+            />
+          </div>
+        </div>
+      </div>
+    </template>
     <div
       v-if="leagueAverages.totalTeams > 0"
       class="h-full"

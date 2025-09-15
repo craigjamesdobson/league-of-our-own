@@ -168,7 +168,7 @@ const copyApiUrl = async () => {
                       :max="38"
                       show-buttons
                       :disabled="isUpdatingGameweek"
-                      :pt="{ pcInputText: { root: { class: 'w-20' } } }"
+                      class="!w-24"
                     />
                     <Button
                       label="Update"
@@ -219,13 +219,16 @@ const copyApiUrl = async () => {
                         https://fantasy.premierleague.com/api/bootstrap-static
                       </code>
                       <Button
+                        v-tooltip="'Copy API URL'"
                         size="small"
                         text
                         severity="secondary"
-                        v-tooltip="'Copy API URL'"
                         @click="copyApiUrl"
                       >
-                        <Icon name="carbon:copy" size="16" />
+                        <Icon
+                          name="carbon:copy"
+                          size="16"
+                        />
                       </Button>
                     </div>
                   </div>

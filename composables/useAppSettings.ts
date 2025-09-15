@@ -9,17 +9,40 @@ export function useAppSettings() {
       .single();
 
     if (error) {
-      throw new Error(`Failed to load current gameweek setting: ${error.message}`);
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Database Configuration Required',
+        data: {
+          message: 'Settings table not found. Please complete database setup.',
+          type: 'database_error',
+          details: error.message,
+        },
+      });
     }
 
     if (!data) {
-      throw new Error('Current gameweek setting not found in database');
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Settings Missing',
+        data: {
+          message: 'Current gameweek setting not found. Please configure in admin dashboard.',
+          type: 'configuration_error',
+        },
+      });
     }
 
     const gameweek = parseInt(data.setting_value, 10);
 
     if (isNaN(gameweek) || gameweek < 1 || gameweek > 38) {
-      throw new Error(`Invalid gameweek value in database: ${data.setting_value}`);
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Invalid Configuration',
+        data: {
+          message: 'Invalid gameweek value in database. Please check admin settings.',
+          type: 'validation_error',
+          invalidValue: data.setting_value,
+        },
+      });
     }
 
     return gameweek;
@@ -38,7 +61,15 @@ export function useAppSettings() {
       .eq('setting_key', 'current_gameweek');
 
     if (error) {
-      throw new Error(`Failed to update current gameweek setting: ${error.message}`);
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Update Failed',
+        data: {
+          message: 'Failed to update gameweek setting. Please try again.',
+          type: 'update_error',
+          details: error.message,
+        },
+      });
     }
   };
 

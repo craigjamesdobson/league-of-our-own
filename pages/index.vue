@@ -107,13 +107,22 @@ onMounted(async () => {
                   name="carbon:calendar"
                   size="28"
                 />
-                <h2 v-if="isLoading" class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                <h2
+                  v-if="isLoading"
+                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                >
                   Loading Gameweek Data...
                 </h2>
-                <h2 v-else-if="!hasGameweekData" class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                <h2
+                  v-else-if="!hasGameweekData"
+                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                >
                   Gameweek Data Unavailable
                 </h2>
-                <h2 v-else class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+                <h2
+                  v-else
+                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                >
                   Gameweek {{ currentGameweek }} Summary
                 </h2>
               </div>

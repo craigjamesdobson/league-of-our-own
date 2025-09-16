@@ -1,8 +1,10 @@
+import type { Database } from '@/types/database.types';
+
 export function useAppSettings() {
-  const supabase = useSupabaseClient();
+  const supabase = useSupabaseClient<Database>();
 
   const getCurrentGameweek = async (): Promise<number> => {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('settings')
       .select('setting_value')
       .eq('setting_key', 'current_gameweek')
@@ -51,7 +53,7 @@ export function useAppSettings() {
   const updateCurrentGameweek = async (gameweek: number): Promise<void> => {
     const user = useSupabaseUser();
 
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('settings')
       .update({
         setting_value: gameweek.toString(),

@@ -146,7 +146,6 @@ export function useHomepageDashboard() {
 
   const fetchTopPositionPlayers = async (): Promise<void> => {
     try {
-
       const positions = [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD];
 
       const results = await Promise.all(positions.map(async (position) => {
@@ -231,7 +230,6 @@ export function useHomepageDashboard() {
         weeklyTransfers.value = [];
         return;
       }
-
 
       const results = await Promise.all(transfers.map(async (transfer) => {
         const { data: draftedPlayer } = await supabase

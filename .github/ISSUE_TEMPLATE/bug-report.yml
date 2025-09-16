@@ -1,0 +1,28 @@
+name: Bug Report
+description: Report a bug or unexpected behaviour
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What's the bug and what should happen instead?
+      placeholder: Describe the issue...
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can this be reproduced?
+      placeholder: |
+        1. 
+        2. 
+        3. 
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other relevant information
+      placeholder: Error messages, screenshots, related code, etc.

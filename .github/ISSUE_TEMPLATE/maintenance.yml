@@ -1,0 +1,32 @@
+name: Maintenance
+description: Technical debt, refactoring, or maintenance tasks
+title: "[Maintenance]: "
+labels: ["maintenance"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be maintained or improved?
+      placeholder: Describe the maintenance task...
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this important?
+      placeholder: Performance, code quality, dependencies, technical debt, etc.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What files/areas will be affected?
+      placeholder: List of files, components, or areas that will need changes...
+
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Implementation Considerations
+      description: Any potential issues or things to watch out for?
+      placeholder: Breaking changes, testing requirements, dependencies, etc.

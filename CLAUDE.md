@@ -141,3 +141,51 @@ pnpm test                        # Run all tests
 pnpm test:watch                  # Watch mode for development
 pnpm test tests/team-builder/    # Run specific test directory
 ```
+
+## GitHub Issue Management
+
+This project uses GitHub Issues for tracking all work with a structured approach optimized for solo development.
+
+### Issue Templates
+
+Issue templates are available in `.github/ISSUE_TEMPLATE/` for consistent issue creation:
+
+- **Bug Report** (`bug-report.yml`): For tracking unexpected behaviour or defects
+- **Feature Request** (`feature-request.yml`): For new functionality or enhancements
+- **Maintenance** (`maintenance.yml`): For technical debt, refactoring, or maintenance tasks
+
+### Label System
+
+Issues are categorized using a systematic label system:
+
+- **Type Labels**: `bug`, `enhancement`, `maintenance`
+- **Technical Labels**: `dependencies`, `typescript`, `testing`
+
+### Workflow Pattern
+
+The standard workflow follows the GitHub integration pattern:
+
+```
+Idea/Request → GitHub Issue → Branch → PR → Merge → Close Issue
+```
+
+**Key Principles**:
+- All work should be tracked via GitHub Issues for audit trail and context
+- Issues are linked to PRs using closing keywords (`Fixes #32`, `Closes #33`)
+- Maintenance tasks (like dependency updates) use the maintenance template
+- Features use the feature request template with clear motivation and scope
+
+### Creating Issues
+
+Use the GitHub CLI or web interface with templates:
+
+```bash
+gh issue create --title "[Type]: Brief description" --label "appropriate-labels"
+gh issue list                    # View current issues
+gh issue view 32                 # View specific issue details
+```
+
+**Example Classifications**:
+- **Bug**: Weekly statistics showing incorrect values
+- **Enhancement**: Add weekly summary dashboard to homepage  
+- **Maintenance**: Update Supabase CLI to latest version

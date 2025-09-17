@@ -6,7 +6,6 @@ node_modules
 .output
 .env
 dist
-.env.LIVE
 
 # Working docs and private directories
 docs/_*/

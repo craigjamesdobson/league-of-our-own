@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import type { WeeklyData, WeeklyWinners } from '@/types/Table';
+import type { WeeklyData } from '@/types/Table';
 import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 
-defineProps({
+const props = defineProps({
   weeklyData: {
     type: Array as PropType<WeeklyData[]>,
-    default: () => [],
-  },
-  weeklyWinners: {
-    type: Array as PropType<WeeklyWinners[]>,
     default: () => [],
   },
   isLoading: {
@@ -21,36 +17,45 @@ defineProps({
   },
 });
 
-const getTopPerformers = (weeklyData: WeeklyData[]) => {
-  if (!weeklyData || weeklyData.length === 0) return [];
+type EnhancedTeamData = WeeklyData & {
+  isWinner: boolean;
+};
 
-  const sorted = [...weeklyData].sort((a, b) => b.week_points - a.week_points);
+const topPerformersWithWinnerStatus = computed((): EnhancedTeamData[] => {
+  if (!props.weeklyData || props.weeklyData.length === 0) return [];
 
-  const highestScore = sorted[0]?.week_points || 0;
+  const sorted = [...props.weeklyData].sort((a, b) => b.week_points - a.week_points);
 
-  const firstPlaceTeams = sorted.filter(team => team.week_points === highestScore);
+  // Get winners based on the weekly_winner boolean from the data
+  const firstPlaceTeams = sorted.filter(team => team.weekly_winner);
+  const remainingTeams = sorted.filter(team => !team.weekly_winner);
 
-  const remainingTeams = sorted.filter(team => team.week_points < highestScore);
-
+  // Get top 5 teams (handling ties)
   const spotsRemaining = 5 - firstPlaceTeams.length;
-
   const additionalTeams = remainingTeams.slice(0, Math.max(0, spotsRemaining));
+  const topTeams = [...firstPlaceTeams, ...additionalTeams];
 
-  return [...firstPlaceTeams, ...additionalTeams];
-};
+  // Use the existing weekly_winner property
+  return topTeams.map(team => ({
+    ...team,
+    isWinner: team.weekly_winner,
+  }));
+});
 
-const isJointFirst = (team: WeeklyData, allTeams: WeeklyData[]) => {
-  if (!allTeams || allTeams.length === 0) return false;
-  const sortedTeams = [...allTeams].sort((a, b) => b.week_points - a.week_points);
-  const highestScore = sortedTeams[0]?.week_points || 0;
-  return team.week_points === highestScore;
-};
+const getTeamContainerClasses = (isWinner: boolean) => ({
+  'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm': isWinner,
+  'bg-gray-50 border border-gray-200': !isWinner,
+});
 
-const getActualPosition = (team: WeeklyData, allTeams: WeeklyData[]) => {
-  if (!allTeams || allTeams.length === 0) return 1;
-  const sortedTeams = [...allTeams].sort((a, b) => b.week_points - a.week_points);
-  return sortedTeams.findIndex(t => t.drafted_team_id === team.drafted_team_id) + 1;
-};
+const getPositionIconClasses = (isWinner: boolean) => ({
+  'bg-yellow-500 text-white': isWinner,
+  'bg-slate-400 text-white': !isWinner,
+});
+
+const getBadgeClasses = (isWinner: boolean) => [
+  'font-bold text-lg px-3 py-2',
+  isWinner ? '!bg-yellow-500 !text-white' : '',
+];
 </script>
 
 <template>
@@ -62,29 +67,22 @@ const getActualPosition = (team: WeeklyData, allTeams: WeeklyData[]) => {
       class="flex h-full flex-col justify-evenly"
     >
       <div
-        v-for="team in getTopPerformers(weeklyData)"
+        v-for="(team, index) in topPerformersWithWinnerStatus"
         :key="team.drafted_team_id"
         class="flex items-center justify-between p-4 rounded-lg flex-1 mb-2 last:mb-0"
-        :class="{
-          'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm': isJointFirst(team, weeklyData),
-          'bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200': !isJointFirst(team, weeklyData) && getActualPosition(team, weeklyData) <= 3,
-          'bg-gray-50 border border-gray-200': !isJointFirst(team, weeklyData) && getActualPosition(team, weeklyData) > 3,
-        }"
+        :class="getTeamContainerClasses(team.isWinner)"
       >
         <div class="flex items-center space-x-4">
           <div
             class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold"
-            :class="{
-              'bg-yellow-500 text-white': isJointFirst(team, weeklyData),
-              'bg-slate-400 text-white': !isJointFirst(team, weeklyData),
-            }"
+            :class="getPositionIconClasses(team.isWinner)"
           >
             <Icon
-              v-if="isJointFirst(team, weeklyData)"
+              v-if="team.isWinner"
               name="carbon:star-filled"
               size="16"
             />
-            <span v-else>{{ getActualPosition(team, weeklyData) }}</span>
+            <span v-else>{{ index + 1 }}</span>
           </div>
           <div class="text-left">
             <div class="font-bold text-lg text-slate-800 uppercase">
@@ -100,7 +98,7 @@ const getActualPosition = (team: WeeklyData, allTeams: WeeklyData[]) => {
             :value="team.week_points.toString()"
             severity="success"
             size="large"
-            class="font-bold text-lg px-3 py-2"
+            :class="getBadgeClasses(team.isWinner)"
           />
           <div class="text-xs text-slate-500 font-medium uppercase tracking-wide">
             Points

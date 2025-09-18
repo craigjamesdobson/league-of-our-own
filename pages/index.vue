@@ -15,7 +15,6 @@ const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasGameweekData = computed(() => dashboard.hasGameweekData());
 const hasResults = computed(() => dashboard.hasResults());
 const weeklyData = computed(() => tableStore.weeklyData || []);
-const weeklyWinners = computed(() => tableStore.weeklyWinners || []);
 const isLoading = computed(() => dashboard.isLoading.value);
 const isGameweekLoading = computed(() => isLoading.value || (hasGameweekData.value && tableStore.weeklyData === undefined));
 
@@ -184,7 +183,6 @@ onMounted(async () => {
                 </h2>
                 <TopPerformers
                   :weekly-data="weeklyData"
-                  :weekly-winners="weeklyWinners"
                   :is-loading="isGameweekLoading"
                   :has-results="hasResults"
                 />
@@ -231,7 +229,6 @@ onMounted(async () => {
                 </h2>
                 <TopPerformers
                   :weekly-data="[]"
-                  :weekly-winners="[]"
                   :is-loading="true"
                   :has-results="false"
                 />

@@ -17,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -620,6 +620,33 @@ export type Database = {
         }
         Relationships: []
       }
+      settings: {
+        Row: {
+          created_at: string | null
+          setting_id: number
+          setting_key: string
+          setting_value: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          setting_id?: number
+          setting_key: string
+          setting_value: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          setting_id?: number
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           id: number
@@ -729,123 +756,120 @@ export type Database = {
         Returns: Json
       }
       get_drafted_teams_with_player_points_by_gameweek: {
-        Args:
-          | { game_week_param: number }
-          | { game_week_param: number; active_season_param: string }
+        Args: { active_season_param: string; game_week_param: number }
         Returns: {
-          drafted_team_id: number
-          team_name: string
-          team_email: string
-          team_owner: string
           allowed_transfers: boolean
-          weekly_stats: Json
+          drafted_team_id: number
           players: Json
+          team_email: string
+          team_name: string
+          team_owner: string
         }[]
       }
       get_drafted_teams_with_player_points_by_gameweek_2: {
         Args: { game_week_param: number }
         Returns: {
-          drafted_team_id: number
-          team_name: string
-          team_email: string
-          team_owner: string
           allowed_transfers: boolean
-          weekly_stats: Json
+          drafted_team_id: number
           players: Json
+          team_email: string
+          team_name: string
+          team_owner: string
+          weekly_stats: Json
         }[]
       }
       get_player_stats_by_team_id: {
         Args: { team_id_param: number }
         Returns: {
-          player_id: number
-          number_code: number
-          image: string
-          image_large: string
-          web_name: string
-          first_name: string
-          second_name: string
-          goals_scored: number
           assists: number
           clean_sheets: number
-          red_cards: number
           cost: number
-          status: string
+          first_name: string
+          goals_scored: number
+          image: string
+          image_large: string
           is_unavailable: boolean
-          unavailable_for_season: boolean
+          minutes: number
           news: string
+          number_code: number
+          player_id: number
           position: number
+          red_cards: number
+          second_name: string
+          status: string
           team: number
           team_name: string
           team_short_name: string
-          minutes: number
-          week_goals: number
+          unavailable_for_season: boolean
+          web_name: string
           week_assists: number
           week_cleansheet: boolean
+          week_goals: number
           week_redcard: boolean
         }[]
       }
       get_player_stats_by_team_id_for_fixture: {
-        Args: { team_id_param: number; fixture_id_param: number }
+        Args: { fixture_id_param: number; team_id_param: number }
         Returns: {
-          player_id: number
-          code: number
-          image: string
-          image_large: string
-          web_name: string
-          first_name: string
-          second_name: string
-          goals_scored: number
           assists: number
           clean_sheets: number
-          red_cards: number
+          code: number
           cost: number
-          status: string
+          first_name: string
+          goals_scored: number
+          image: string
+          image_large: string
           is_unavailable: boolean
-          unavailable_for_season: boolean
+          minutes: number
           news: string
+          player_id: number
           position: number
+          red_cards: number
+          second_name: string
+          status: string
           team: number
           team_name: string
           team_short_name: string
-          minutes: number
-          week_goals: number
+          unavailable_for_season: boolean
+          web_name: string
           week_assists: number
           week_cleansheet: boolean
+          week_goals: number
           week_redcard: boolean
         }[]
       }
       get_player_team: {
         Args: Record<PropertyKey, never>
         Returns: {
-          web_name: string
-          team_name: string
           team_id: number
+          team_name: string
+          web_name: string
         }[]
       }
       get_weekly_stats_for_gameweek: {
         Args:
+          | { active_season_param: string; target_week: number }
           | { target_week: number }
-          | { target_week: number; active_season_param: string }
         Returns: {
-          drafted_team_id: number
-          team_name: string
-          team_owner: string
-          goals: number
           assists: number
           clean_sheets: number
+          drafted_team_id: number
+          goals: number
+          prev_week_position: number
           red_cards: number
+          team_name: string
+          team_owner: string
           total_points: number
           week_points: number
           weekly_winner: boolean
-          prev_week_position: number
         }[]
       }
       get_weekly_winners: {
         Args: Record<PropertyKey, never>
         Returns: {
-          week: number
-          top_teams: Json[]
           points: number
+          top_teams: Json[]
+          week: number
         }[]
       }
       insert_or_update_data: {
@@ -862,21 +886,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -894,14 +922,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -917,14 +947,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -940,14 +972,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -955,14 +989,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

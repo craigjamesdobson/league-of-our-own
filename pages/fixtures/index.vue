@@ -2,6 +2,7 @@
 import { useToast } from 'primevue/usetoast';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
+import { useAppSettings } from '~/composables/useAppSettings';
 import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
 import { calculateWeeklyStats } from '~/composables/useWeeklyStats';
 
@@ -10,20 +11,66 @@ const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
+const { getCurrentGameweek } = useAppSettings();
 const weeks = ref(Array.from({ length: 38 }, (_, i) => i + 1));
-const selectedWeek = ref(Number(route.query.week) || 1);
+const selectedWeek = ref(1);
 const isLoadingWeekChange = ref(false);
+
+// Initialize selected week from URL query, current gameweek setting, or fallback to 1
+onMounted(async () => {
+  try {
+    const urlWeek = Number(route.query.week);
+    const currentGameweek = await getCurrentGameweek();
+    const finalWeek = urlWeek || currentGameweek || 1;
+
+    selectedWeek.value = finalWeek;
+
+    // Update URL if we determined a different week than what's in the URL
+    if (!urlWeek || urlWeek !== finalWeek) {
+      await router.push({
+        path: 'fixtures',
+        query: { week: finalWeek },
+      });
+    }
+
+    // Fetch initial data for the determined week
+    isLoadingWeekChange.value = true;
+    await fixtureStore.fetchFixtures(finalWeek);
+    draftedTeamsWithPoints.value
+      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
+        finalWeek,
+      );
+    fixtureStore.selectedGameweek = finalWeek;
+    isLoadingWeekChange.value = false;
+  }
+  catch (error) {
+    console.error('Failed to load current gameweek setting:', error);
+    const fallbackWeek = Number(route.query.week) || 1;
+    selectedWeek.value = fallbackWeek;
+
+    // Update URL if needed
+    if (!route.query.week || Number(route.query.week) !== fallbackWeek) {
+      await router.push({
+        path: 'fixtures',
+        query: { week: fallbackWeek },
+      });
+    }
+
+    // Fetch initial data for the fallback week
+    isLoadingWeekChange.value = true;
+    await fixtureStore.fetchFixtures(fallbackWeek);
+    draftedTeamsWithPoints.value
+      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
+        fallbackWeek,
+      );
+    fixtureStore.selectedGameweek = fallbackWeek;
+    isLoadingWeekChange.value = false;
+  }
+});
 
 const draftedTeamsStore = useDraftedTeamsStore();
 const draftedTeamsWithPoints: Ref<DraftedTeamWithPlayerPointsByGameweek[] | undefined>
   = ref();
-
-onMounted(async () => {
-  draftedTeamsWithPoints.value
-    = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-      selectedWeek.value,
-    );
-});
 
 definePageMeta({
   middleware: ['auth'],
@@ -45,7 +92,6 @@ watch(
       query: { week: newWeek },
     });
   },
-  { immediate: true },
 );
 
 onActivated(async () => {

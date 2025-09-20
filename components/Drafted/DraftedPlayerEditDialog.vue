@@ -5,6 +5,7 @@ import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 import type { Player } from '~/types/Player';
+import { useAppSettings } from '@/composables/useAppSettings';
 
 interface TransferData {
   player: Player | null;
@@ -12,12 +13,14 @@ interface TransferData {
   transferWeek: number;
 }
 
+const { getCurrentGameweek } = useAppSettings();
+
 const toast = useToast();
 
 const newTransferData: Ref<TransferData> = ref({
   player: null,
   activeExpiryDate: new Date(),
-  transferWeek: 1,
+  transferWeek: await getCurrentGameweek() || 1,
 });
 
 const visible = defineModel<boolean>('visible');

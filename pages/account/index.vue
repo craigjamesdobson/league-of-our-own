@@ -143,7 +143,7 @@ const copyApiUrl = async () => {
           <template #content>
             <!-- Current Gameweek Setting -->
             <div class="p-4 rounded-lg border border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50">
-              <div class="flex items-center justify-between">
+              <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-2">
                     <Icon
@@ -160,7 +160,7 @@ const copyApiUrl = async () => {
                   </p>
                 </div>
 
-                <div class="ml-6">
+                <div class="lg:ml-6">
                   <InputGroup>
                     <InputNumber
                       v-model="currentGameweek"
@@ -203,19 +203,42 @@ const copyApiUrl = async () => {
 
           <template #content>
             <div class="space-y-4">
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <!-- Automated Update Status -->
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div class="flex items-start gap-3">
                   <Icon
-                    name="carbon:information"
+                    name="carbon:checkmark-filled"
                     size="18"
-                    class="text-blue-600 mt-0.5"
+                    class="text-green-600 mt-0.5"
                   />
                   <div class="flex-1">
-                    <p class="text-sm text-slate-600 mb-2">
-                      Get the latest player data from the Premier League API and paste the JSON response below
+                    <h4 class="text-sm font-semibold text-green-800 mb-1">
+                      Automated Daily Updates
+                    </h4>
+                    <p class="text-sm text-green-700">
+                      Player data is automatically updated daily from the Premier League API. No manual intervention required.
                     </p>
-                    <div class="flex items-center gap-2">
-                      <code class="text-xs bg-white border rounded px-2 py-1 font-mono text-slate-800">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Manual Override Section -->
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                  <Icon
+                    name="carbon:warning-alt"
+                    size="18"
+                    class="text-amber-600 mt-0.5"
+                  />
+                  <div class="flex-1">
+                    <h4 class="text-sm font-semibold text-amber-800 mb-1">
+                      Manual Override
+                    </h4>
+                    <p class="text-sm text-amber-700 mb-2">
+                      Use this section only if the automated update fails or you need to force an immediate update. Get the latest data from the API below and paste the JSON response.
+                    </p>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <code class="text-xs bg-white border rounded px-2 py-1 font-mono text-slate-800 break-all sm:break-normal">
                         https://fantasy.premierleague.com/api/bootstrap-static
                       </code>
                       <Button
@@ -223,6 +246,7 @@ const copyApiUrl = async () => {
                         size="small"
                         text
                         severity="secondary"
+                        class="flex-shrink-0"
                         @click="copyApiUrl"
                       >
                         <Icon
@@ -257,7 +281,7 @@ const copyApiUrl = async () => {
         <!-- Team Management Section -->
         <Card
           v-if="draftedTeamStore.draftedTeams"
-          class="admin-section-card"
+          class="admin-section-card h-full flex flex-col"
         >
           <template #title>
             <div class="flex items-center gap-3 text-slate-800">
@@ -273,9 +297,9 @@ const copyApiUrl = async () => {
           </template>
 
           <template #content>
-            <div class="space-y-4">
+            <div class="space-y-4 flex-1 flex flex-col">
               <p class="text-sm text-slate-600">
-                Select and manage drafted teams, view transfers and make edits
+                Select a team below to view and manage transfers
               </p>
               <Select
                 v-model="selectedDraftedTeamID"
@@ -288,37 +312,81 @@ const copyApiUrl = async () => {
                 filter
                 option-label="team_name"
                 option-value="drafted_team_id"
-                placeholder="Select a team"
+                placeholder="Select a team to manage..."
                 scroll-height="400px"
               >
                 <template #option="slotProps">
-                  <div
-                    class="flex items-center justify-between w-full"
-                    :class="{
-                      'opacity-25': transfersRemainingCount(slotProps.option) === 0,
-                    }"
-                  >
-                    <div class="align-items-center flex flex-col gap-1 uppercase">
-                      <div class="font-black">
+                  <div class="flex items-center justify-between w-full p-1">
+                    <div class="flex flex-col gap-1">
+                      <div class="font-bold text-slate-800 uppercase">
                         {{ slotProps.option.team_name }}
                       </div>
-                      <span class="text-xs">{{ slotProps.option.team_owner }}</span>
+                      <div class="flex items-center gap-2 text-xs text-slate-600">
+                        <span class="uppercase">{{ slotProps.option.team_owner }}</span>
+                        <span class="text-slate-400">|</span>
+                        <span class="font-medium">
+                          {{ transfersRemainingCount(slotProps.option) }}/4 transfers left
+                        </span>
+                      </div>
                     </div>
+
                     <Tag
                       v-tooltip="`${transfersRemainingCount(slotProps.option)} transfers remaining`"
-                      severity="info"
-                      class="h-6 w-6"
+                      :severity="
+                        transfersRemainingCount(slotProps.option) > 2 ? 'success'
+                        : transfersRemainingCount(slotProps.option) > 0 ? 'warn'
+                          : 'danger'
+                      "
+                      class="h-6 w-6 text-xs font-bold"
                       rounded
                       :value="transfersRemainingCount(slotProps.option)"
                     />
                   </div>
                 </template>
               </Select>
+
+              <!-- Selected Team Display -->
               <div v-if="selectedDraftedTeam">
                 <DraftedTeam
                   :editable="true"
                   :drafted-team="selectedDraftedTeam"
                 />
+              </div>
+
+              <!-- Empty State / Guidance -->
+              <div
+                v-else
+                class="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center flex-1 flex items-center justify-center"
+              >
+                <div class="flex flex-col items-center gap-4">
+                  <Icon
+                    name="carbon:group"
+                    size="48"
+                    class="text-slate-400"
+                  />
+                  <div>
+                    <h3 class="text-xl font-semibold text-slate-700 mb-3">
+                      No Team Selected
+                    </h3>
+                    <p class="text-base text-slate-600 mb-6">
+                      Choose a team from the dropdown above to view and manage their transfers, players, and settings.
+                    </p>
+                    <div class="text-sm text-slate-500 space-y-2">
+                      <div class="flex items-center justify-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full" />
+                        <span>Green: 3+ transfers remaining</span>
+                      </div>
+                      <div class="flex items-center justify-center gap-3">
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full" />
+                        <span>Yellow: 1-2 transfers remaining</span>
+                      </div>
+                      <div class="flex items-center justify-center gap-3">
+                        <div class="w-3 h-3 bg-red-500 rounded-full" />
+                        <span>Red: No transfers remaining</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </template>

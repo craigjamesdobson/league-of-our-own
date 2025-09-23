@@ -34,7 +34,6 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxt/devtools',
     '@primevue/nuxt-module',
-    'nuxt-gtag',
     '@nuxt/scripts',
     'nuxt-module-hotjar',
     '@nuxt/eslint',
@@ -90,10 +89,6 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-12-17',
-
-  gtag: {
-    id: 'G-FWYYJ66CWG',
-  },
 
   hotjar: {
     hotjarId: 5090647,

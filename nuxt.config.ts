@@ -30,12 +30,12 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
-    'nuxt-icon',
+    '@nuxt/icon',
     '@nuxtjs/supabase',
     '@nuxt/devtools',
     '@primevue/nuxt-module',
     'nuxt-gtag',
-    '@zadigetvoltaire/nuxt-gtm',
+    '@nuxt/scripts',
     'nuxt-module-hotjar',
     '@nuxt/eslint',
     '@nuxtjs/color-mode',
@@ -95,10 +95,6 @@ export default defineNuxtConfig({
     id: 'G-FWYYJ66CWG',
   },
 
-  gtm: {
-    id: 'GTM-N3HLZXHC',
-  },
-
   hotjar: {
     hotjarId: 5090647,
   },
@@ -123,6 +119,14 @@ export default defineNuxtConfig({
           darkModeSelector: false,
           cssLayer: false,
         },
+      },
+    },
+  },
+
+  scripts: {
+    registry: {
+      googleTagManager: {
+        id: 'GTM-N3HLZXHC',
       },
     },
   },

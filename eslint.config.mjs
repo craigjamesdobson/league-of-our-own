@@ -4,6 +4,9 @@ export default createConfigForNuxt({
   features: {
     stylistic: {
       semi: true,
+      quotes: 'single',
+      indent: 2,
+      commaDangle: 'only-multiline',
     },
   },
 }).prepend(

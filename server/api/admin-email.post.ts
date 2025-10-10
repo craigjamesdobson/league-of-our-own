@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { handleEmailSending } from '~/server/utils/email';
+import { handleEmailSending } from '../utils/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

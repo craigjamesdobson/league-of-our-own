@@ -3,10 +3,10 @@ import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
 const setTotalTeamPrice = (draftedTeamData: DraftedTeamWithPlayers) => {
   return draftedTeamData.players.reduce((total: number, draftedPlayer: DraftedPlayer) => {
+    const lastTransfer = draftedPlayer.transfers[draftedPlayer.transfers.length - 1];
     const playerPrice
-      = draftedPlayer.transfers.length > 0
-        ? draftedPlayer.transfers[draftedPlayer.transfers.length - 1].data
-          .cost
+      = draftedPlayer.transfers.length > 0 && lastTransfer
+        ? lastTransfer.data.cost
         : draftedPlayer.data.cost;
 
     return total + playerPrice;

@@ -17,7 +17,12 @@ const toast = useToast();
 
 const fixture: Ref<Fixture | null> = ref(null);
 
-fixture.value = await fixtureStore.fetchFixtureByID(+route.params.id);
+const fixtureId = route.params.id;
+if (!fixtureId) {
+  throw createError({ statusCode: 404, statusMessage: 'Fixture not found' });
+}
+
+fixture.value = await fixtureStore.fetchFixtureByID(+fixtureId);
 
 if (!fixtureStore.fixtures && fixture.value?.game_week) {
   fixtureStore.fetchFixtures(fixture.value.game_week);

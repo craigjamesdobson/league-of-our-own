@@ -10,14 +10,13 @@ interface FilterData {
 }
 
 export const usePlayerStore = defineStore('player-store', () => {
-  const supabase = useSupabaseClient<Database>();
-
   const players: Ref<Player[] | []> = ref([]);
   const filteredPlayers: Ref<Player[] | []> = ref([]);
   const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
   const fetchPlayers = async () => {
+    const supabase = useSupabaseClient<Database>();
     try {
       const { data, error } = await supabase
         .from('players_view')
@@ -44,6 +43,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   };
 
   const fetchPlayerUpdatedDate = async () => {
+    const supabase = useSupabaseClient<Database>();
     const { data, error } = await supabase
       .from('players')
       .select('updated_at')
@@ -58,6 +58,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   };
 
   const upsertPlayerData = async (playerData: string) => {
+    const supabase = useSupabaseClient<Database>();
     const formattedPlayerData: PlayerInsertData[] = JSON.parse(playerData)?.elements;
     if (formattedPlayerData === null) {
       throw new Error('Player data was not correct, please try again.');

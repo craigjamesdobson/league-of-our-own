@@ -180,7 +180,7 @@ export function useHomepageDashboard() {
         const sortedPlayers = Object.values(playerTotals)
           .sort((a, b) => b.totalPoints - a.totalPoints);
 
-        if (sortedPlayers.length === 0) {
+        if (sortedPlayers.length === 0 || !sortedPlayers[0]) {
           console.error(`No players found for position ${getPositionName(position)}`);
           return { position, players: null };
         }

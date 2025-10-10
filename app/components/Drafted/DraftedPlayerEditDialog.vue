@@ -48,25 +48,30 @@ const budgetLimit = computed(() => {
 const currentTeamValue = computed(() => {
   if (!props.team?.players) return 0;
   return props.team.players.reduce((total, player) => {
-    const playerCost = player.transfers.length > 0
-      ? player.transfers[player.transfers.length - 1].data.cost
+    const lastTransfer = player.transfers[player.transfers.length - 1];
+    const playerCost = player.transfers.length > 0 && lastTransfer
+      ? lastTransfer.data.cost
       : player.data.cost;
     return total + playerCost;
   }, 0);
 });
 
-const transferWouldExceedBudget = computed(() => {
-  if (!newTransferData.value.player || !props.team) return false;
+const teamValueWithTransfer = computed(() => {
+  if (!newTransferData.value.player || !draftedPlayer.value) return currentTeamValue.value;
 
-  // Calculate team value with the new transfer
-  const originalPlayerCost = draftedPlayer.value?.transfers.length
-    ? draftedPlayer.value.transfers[draftedPlayer.value.transfers.length - 1].data.cost
-    : draftedPlayer.value?.data.cost || 0;
+  const lastTransfer = draftedPlayer.value.transfers[draftedPlayer.value.transfers.length - 1];
+  const originalPlayerCost = draftedPlayer.value.transfers.length && lastTransfer
+    ? lastTransfer.data.cost
+    : draftedPlayer.value.data.cost;
 
   const newPlayerCost = newTransferData.value.player.cost;
-  const teamValueWithTransfer = currentTeamValue.value - originalPlayerCost + newPlayerCost;
 
-  return teamValueWithTransfer > budgetLimit.value;
+  return currentTeamValue.value - originalPlayerCost + newPlayerCost;
+});
+
+const transferWouldExceedBudget = computed(() => {
+  if (!newTransferData.value.player || !props.team) return false;
+  return teamValueWithTransfer.value > budgetLimit.value;
 });
 
 const isSubmitDisabled = computed(() => {
@@ -91,15 +96,17 @@ const addNewTransfer = async () => {
 
     // Build a new transfer obj using the new data returned
     // from DB and push it to the players transfer array
-    draftedPlayer.value!.transfers.push({
-      drafted_transfer_id: newTransfer[0].drafted_transfer_id,
-      active_transfer_expiry: newTransferData.value.activeExpiryDate,
-      transfer_week: newTransferData.value.transferWeek,
-      data: newTransferData.value.player,
-      selected: false,
-    });
+    if (draftedPlayer.value && newTransfer[0]) {
+      draftedPlayer.value.transfers.push({
+        drafted_transfer_id: newTransfer[0].drafted_transfer_id,
+        active_transfer_expiry: newTransferData.value.activeExpiryDate,
+        transfer_week: newTransferData.value.transferWeek,
+        data: newTransferData.value.player,
+        selected: false,
+      });
 
-    handleApiSuccess(`Transfer was successful`, toast);
+      handleApiSuccess(`Transfer was successful`, toast);
+    }
   }
   catch (err: unknown) {
     handleApiError(err, toast);
@@ -261,9 +268,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
               <div class="flex justify-between">
                 <span>With New Transfer:</span>
                 <span :class="transferWouldExceedBudget ? 'font-bold' : ''">
-                  £{{ (currentTeamValue - (draftedPlayer?.transfers.length
-                    ? draftedPlayer.transfers[draftedPlayer.transfers.length - 1].data.cost
-                    : draftedPlayer?.data.cost || 0) + newTransferData.player.cost).toFixed(1) }}m
+                  £{{ teamValueWithTransfer.toFixed(1) }}m
                 </span>
               </div>
             </div>

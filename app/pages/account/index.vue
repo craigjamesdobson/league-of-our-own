@@ -72,6 +72,7 @@ onMounted(async () => {
       severity: 'error',
       summary: 'Settings Error',
       detail: 'Could not load current gameweek setting from database',
+      life: 3000,
     });
   }
 });
@@ -84,6 +85,7 @@ const updateGameweek = async () => {
       severity: 'success',
       summary: 'Dashboard Updated',
       detail: `Current gameweek set to ${currentGameweek.value}`,
+      life: 3000,
     });
   }
   catch (error) {

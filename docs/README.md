@@ -1,135 +1,203 @@
-# League of Our Own - Project Documentation
+# League of Our Own - Documentation
 
-**Fantasy Football Application - Technical Documentation Hub**
+**Fantasy Football Application - Technical Documentation**
 
-*Last updated: 2025-07-25*
-
-## About This Documentation
-
-This documentation tracks the **evolutionary improvement** of an established fantasy football web application. The project was already functional when systematic documentation began, so the tasks you'll see represent **planned enhancements** rather than initial development.
-
-## Quick Navigation
-
-### 🏗️ **Architecture & Implementation**
-- **[System Architecture](architecture.md)** - Complete technical stack and architectural decisions
-- **[Database Schema](database.md)** - PostgreSQL schema, patterns, and best practices
-
-### 📚 **Learning & Decision History**
-- **[Lessons Learned](lessons-learned/)** - Technical insights, patterns, and solutions discovered
-- **[Architecture Decisions](lessons-learned/architecture-decisions/)** - Rationale behind major technical choices
-
-### 📋 **Work Management**
-- **[Current Sprint](tasks/current.md)** - Active development focus and current tasks
-- **[Completed Work](tasks/completed.md)** - Historical record of completed tasks with story points
-- **[Backlog](tasks/backlog.md)** - Future enhancement candidates prioritized by value
-
-## Task Management System
-
-This project uses **standard agile methodology** with story points for estimation:
-
-### **Task Categories**
-- **Feature**: New functionality (e.g., security integration, new components)
-- **Enhancement**: Improvements to existing features (e.g., performance, architecture refactoring)
-- **Bug**: Something broken that needs fixing (e.g., form display issues, type errors)
-- **Chore**: Maintenance work (e.g., dependency updates, configuration, tooling)
-- **Documentation**: Doc updates and improvements
-
-### **Task Format**
-```
-✅ Enhancement: Extract business logic to composables - 2025-01-08
-🔄 Feature: Advanced player filtering
-📋 Chore: Nuxt 4 migration
-```
-
-## How to Use This Documentation
-
-### 🔍 **For Current Development**
-1. Check **[Current Sprint](tasks/current.md)** for active priorities and capacity
-2. Reference **[Architecture](architecture.md)** for implementation patterns
-3. Review **[Lessons Learned](lessons-learned/)** for similar challenges
-
-### 🐛 **For Debugging Issues**
-1. Start with **[Vue Reactivity Patterns](lessons-learned/vue-reactivity-patterns.md)** for common pitfalls
-2. Check **[Composable Architecture](lessons-learned/composable-architecture.md)** for component issues
-3. Review **[Completed Work](tasks/completed.md)** for similar fixes
-
-### 🚀 **For Planning New Features**
-1. Review **[Architecture Decisions](lessons-learned/architecture-decisions/)** for established patterns
-2. Check **[Backlog](tasks/backlog.md)** for related planned work
-3. Consider **[Security Patterns](lessons-learned/security-implementation-patterns.md)** for user-facing features
-
-### 🔧 **For Implementation Guidance**
-1. Follow established patterns in **[Architecture](architecture.md)**
-2. Use **[Database Schema](database.md)** for data modelling
-3. Apply lessons from **[Lessons Learned](lessons-learned/)** to avoid known pitfalls
-
-## Key Technical Context
-
-### **Application Status**
-- **Established**: 1989/1990 fantasy football league
-- **Technology**: Nuxt 3 SPA with Supabase backend
-- **Architecture**: Composable-based Vue 3 with TypeScript strict mode
-- **Users**: Friends/family league (private, trusted user base)
-
-### **Development Approach**
-- **Test-Driven Development**: All business logic must have failing tests first
-- **TypeScript Strict**: No `any` types, comprehensive type safety
-- **Functional Patterns**: Immutable data, pure functions, composition
-- **Incremental Improvement**: Small, safe changes maintaining working state
-
-### **Quality Standards**
-- **Zero Technical Debt**: All identified issues must be resolved
-- **Comprehensive Testing**: 100% behaviour coverage for business logic
-- **Documentation First**: All decisions and learnings must be captured
-- **User Experience**: Optimised for elderly users with simple, clear interfaces
-
-## Recent Major Achievements
-
-### **Team Builder Enhancement (2025)**
-- ✅ **Enhancement: Zero TypeScript errors** - Complete type safety restoration
-- ✅ **Enhancement: Composable architecture** - Business logic extracted for testability
-- ✅ **Feature: Cloudflare Turnstile security** - Bot protection integration
-- ✅ **Bug: Complex Vue reactivity issues** - Form display and state management fixes
-
-### **Infrastructure Improvements**
-- ✅ **Chore: TDD setup** - Vitest configuration with global mocking
-- ✅ **Enhancement: Type system** - Auto-generated types with custom overrides
-- ✅ **Documentation: Comprehensive lessons learned** - Knowledge capture
-
-## Development Progress
-
-Based on completed work, focus is on steady incremental improvements with quality over quantity approach.
-
-## Documentation Maintenance
-
-### **When to Update**
-- After completing any development task
-- When discovering new technical patterns or solutions
-- After resolving complex bugs or architectural issues
-- When making architectural or technology decisions
-
-### **What to Document**
-- **Rationale**: Why decisions were made, not just what was implemented
-- **Context**: Application state before and after changes
-- **Lessons**: What was learned that would be useful in future
-- **Patterns**: Reusable solutions and anti-patterns to avoid
-
-## Getting Help
-
-### **For Claude Code Sessions**
-This documentation is optimised for AI assistance. Key files provide:
-- **Context**: What's been tried before and why
-- **Patterns**: Established approaches that work
-- **Pitfalls**: Known issues and their solutions
-- **Standards**: Code quality and architectural requirements
-
-### **For Future Development**
-The lessons learned section captures institutional knowledge including:
-- Complex bug resolutions with root cause analysis
-- Architectural decision rationale
-- Performance and security implementation patterns
-- Vue 3 and TypeScript specific gotchas and solutions
+> **For development standards, TDD workflow, and code style**, see `~/.claude/CLAUDE.md`
 
 ---
 
-*This documentation represents the evolution of a working application through systematic improvement. Each task builds on established foundations while maintaining the high quality standards required for a production system.*
+## Quick Start
+
+**New to this project?**
+1. Read [Getting Started](getting-started.md) - Set up locally
+2. Review [Architecture](reference/architecture.md) - Understand the system
+3. Check [Local Development](guides/local-development.md) - Daily workflow
+
+---
+
+## Documentation by Purpose
+
+### 📘 **Guides** - How-To Documentation
+**Solve problems in this project**
+
+- [Getting Started](getting-started.md) - Initial setup and first run
+- [Local Development](guides/local-development.md) - Daily development workflow
+- [Database Restore](guides/database-restore.md) - Restore from backup
+- [Deployment](guides/deployment.md) - Production deployment
+- [Testing](guides/testing.md) - Test structure and running tests
+- [Troubleshooting](guides/troubleshooting.md) - Common issues and solutions
+
+→ **Full guide index:** [Guides](guides/)
+
+### 📕 **Reference** - Technical Specifications
+**Facts about this project's architecture**
+
+- [Architecture](reference/architecture.md) - System design and tech stack
+- [Database Schema](reference/database.md) - Tables, views, and relationships
+- [Configuration](reference/configuration.md) - Environment variables and setup
+- [API Endpoints](reference/api/) - Server-side endpoints
+
+→ **Full reference index:** [Reference](reference/)
+
+### 📗 **Explanations** - Understanding & Decisions
+**Why decisions were made and what we learned**
+
+- [Patterns](explanations/patterns/) - Effective approaches in this codebase
+- [Refactors](explanations/refactors/) - Case studies of major work
+- [Decisions](explanations/decisions/) - Architectural decision records
+
+→ **Full explanations index:** [Explanations](explanations/)
+
+### 🔧 **Migrations** - Version Upgrades
+**Time-bound procedures for major upgrades**
+
+- [Nuxt 4 Migration](migrations/nuxt-4-migration.md) - Upgrade from Nuxt 3 to Nuxt 4
+
+→ **Full migrations index:** [Migrations](migrations/)
+
+### 📊 **Project Management** - Sprint Tracking
+**Work history and current status**
+
+- [Current Sprint](project-management/current-sprint.md) - Active work
+- [Backlog](project-management/backlog.md) - Planned work
+- [Completed Work](project-management/completed.md) - Historical records
+
+→ **Full project management index:** [Project Management](project-management/)
+
+---
+
+## Finding What You Need
+
+### 🚀 **For Planning or Starting Work**
+1. Check [Current Sprint](project-management/current-sprint.md) - What's in progress?
+2. Review [Backlog](project-management/backlog.md) - What's planned?
+3. Read [Architecture](reference/architecture.md) - How should I structure this?
+
+### 🔍 **For Understanding the System**
+1. Start with [Architecture](reference/architecture.md) - Overall design
+2. Review [Database Schema](reference/database.md) - Data structure
+3. Check [Patterns](explanations/patterns/) - How things are done
+
+### 🐛 **For Debugging Issues**
+1. See [Troubleshooting](guides/troubleshooting.md) - Common problems
+2. Check [Patterns](explanations/patterns/) - Similar problems solved before
+3. Review [Completed Work](project-management/completed.md) - How similar bugs were fixed
+
+### 🛠️ **For Implementation**
+1. Read [Local Development](guides/local-development.md) - How to work locally
+2. Check [Testing](guides/testing.md) - How to write tests
+3. Review [Decisions](explanations/decisions/) - Why we chose this approach
+
+### 🚢 **For Deployment**
+1. Read [Deployment Guide](guides/deployment.md) - Step-by-step
+2. Check [Configuration](reference/configuration.md) - Environment setup
+3. See [Troubleshooting](guides/troubleshooting.md) - Deployment issues
+
+---
+
+## Project Overview
+
+### **Technology Stack**
+- **Framework:** Nuxt 4 (Vue 3, TypeScript)
+- **Styling:** Tailwind CSS + PrimeVue
+- **Backend:** Supabase (PostgreSQL)
+- **Testing:** Vitest + Vue Test Utils
+- **Deployment:** SPA mode (static hosting)
+
+### **Development Approach**
+- **TDD:** Test-driven development (RED-GREEN-REFACTOR)
+- **Type Safety:** TypeScript strict mode, no `any` types
+- **Code Quality:** Immutable data, pure functions, comprehensive testing
+- **Documentation:** All decisions and learnings captured
+
+### **Application Status**
+- **Established:** 1989/1990 fantasy football league
+- **Users:** Friends/family league (trusted, private)
+- **Development:** Incremental improvements maintaining stability
+
+---
+
+## Contributing Documentation
+
+New documentation? Follow these standards:
+
+- **File naming:** Use kebab-case (`my-document.md`)
+- **Date format:** ISO 8601 (`YYYY-MM-DD`)
+- **Directory:** Place in guides/, reference/, or explanations/
+- **References:** Link to `~/.claude/` instead of duplicating global principles
+
+Full guidelines in [CONTRIBUTING.md](../CONTRIBUTING.md)
+
+---
+
+## Key Concepts
+
+### **TDD (Test-Driven Development)**
+All business logic is written following RED-GREEN-REFACTOR:
+1. **RED** - Write failing test
+2. **GREEN** - Write minimum code to pass
+3. **REFACTOR** - Improve if beneficial
+
+See `~/.claude/docs/workflow.md` for principles.
+
+### **Type Safety**
+- Strict TypeScript mode enabled
+- No `any` types
+- Type-first development
+- Generated types from Supabase schema
+
+See `~/.claude/docs/typescript.md` for guidelines.
+
+### **Composables**
+Business logic extracted to reusable composables for:
+- Testability
+- Reusability
+- Separation of concerns
+
+See [Composable Architecture](explanations/patterns/composable-architecture.md).
+
+---
+
+## Recent Work
+
+### ✅ **Completed (2025)**
+- Full documentation restructure (Divio-inspired)
+- Nuxt 4 migration (complete)
+- Type system automation
+- TDD infrastructure setup
+- Security integration (Cloudflare Turnstile)
+
+### 🔄 **In Progress**
+- Performance optimization
+- Advanced filtering
+- Enhanced reporting
+
+See [Project Management](project-management/) for full history.
+
+---
+
+## Getting Help
+
+### **Documentation**
+- Can't find what you need? Check [Guides](guides/) → [Troubleshooting](guides/troubleshooting.md)
+- Want to understand why? Check [Explanations](explanations/)
+- Need technical details? Check [Reference](reference/)
+
+### **Development Standards**
+- See `~/.claude/CLAUDE.md` for:
+  - Code style and conventions
+  - Testing philosophy
+  - TypeScript guidelines
+  - TDD workflow
+
+### **External Resources**
+- [Nuxt Documentation](https://nuxt.com)
+- [Vue 3 Documentation](https://vuejs.org)
+- [Supabase Documentation](https://supabase.com/docs)
+- [Tailwind CSS](https://tailwindcss.com)
+
+---
+
+**Last updated:** 2025-11-09
+
+*This documentation supports systematic improvement of a working application. Navigate by purpose using the sections above.*

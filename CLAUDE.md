@@ -1,191 +1,353 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Project-specific guidance for **League of Our Own** - a Nuxt fantasy football web application.
 
-## Development Commands
+> **For general development practices** (TDD, TypeScript guidelines, code style, testing philosophy), see `~/.claude/CLAUDE.md` and the linked documentation.
 
-- **Development server**: `pnpm dev` (runs with --host flag for network access)
-- **Build**: `pnpm build`
-- **Lint**: `pnpm lint` (check) or `pnpm lint:fix` (auto-fix)
-- **Type checking**: `pnpm typecheck`
-- **Testing**: `pnpm test` (run once), `pnpm test:watch` (watch mode), `pnpm test:ui` (visual interface)
-- **Generate Supabase types**: `pnpm generate-types`
+## Quick Reference
 
-Always run lint and typecheck after making changes to ensure code quality.
+**Key Commands**:
+- Development: `pnpm dev` (runs with --host flag for network access)
+- Testing: `pnpm test` (run once), `pnpm test:watch` (watch mode), `pnpm test:ui` (visual interface)
+- Type Generation: `pnpm generate-types` (generates Supabase types)
+- Linting: `pnpm lint` (check) or `pnpm lint:fix` (auto-fix)
+- Build: `pnpm build`
+- Type checking: `pnpm typecheck`
 
-## Architecture Overview
+**Project Structure**: All application code is in `/app/` directory (Nuxt 4 pattern)
 
-This is a Nuxt 3 fantasy football web application with the following key architectural components:
+---
 
-### Frontend Stack
-- **Nuxt 3**: SSR disabled (SPA mode), TypeScript throughout
-- **PrimeVue**: UI component library with custom theme (theme: 'none')
-- **Tailwind CSS**: Utility-first styling with custom PrimeVue integration
-- **Pinia**: State management with stores in `/stores/`
+## Technology Stack
 
-### Backend Integration
-- **Supabase**: Backend-as-a-service for database, auth, and real-time features
-- **Nitro server endpoints**: Located in `/server/api/` for email functionality via Resend
+### Core Framework
+- **Nuxt 4**: SPA mode (SSR disabled), file-based routing, TypeScript throughout
+- **Vue 3**: Composition API with TypeScript
+- **Pinia**: State management with stores in `/app/stores/`
 
-### Key Architectural Patterns
+### UI & Styling
+- **PrimeVue**: UI component library with custom Aura theme preset (theme: 'none')
+- **Tailwind CSS**: Utility-first styling with PrimeVue integration
+- **tailwindcss-primeui**: PrimeVue-Tailwind integration plugin
 
-**Data Layer**:
-- Supabase client integration via `@nuxtjs/supabase` module
-- Type-safe database operations using generated types from `/types/database-generated.types.ts`
-- Custom type overrides in `/types/database.types.ts` (especially for `players_view`)
+### Backend & Data
+- **Supabase**: PostgreSQL database, authentication, real-time features
+- **Nitro**: Server endpoints for email via Resend (location: `/server/api/`)
+- **Type Generation**: Automated TypeScript types from Supabase schema
 
-**State Management**:
-- Pinia stores for: account, draftedTeams, fixtures, players, table
-- Composables in `/composables/` for reusable logic (filters, weekly statistics)
+### Testing
+- **Vitest**: Test framework with Nuxt environment
+- **Vue Test Utils**: Component testing utilities
+- **@nuxt/test-utils**: Nuxt-specific test utilities
 
-**Component Structure**:
-- `/components/` organized by feature areas (Drafted/, Fixture/, Skeleton/, etc.)
-- Modal components use a centralized Modal.vue with content injection
-- Player/team data rendering with consistent patterns across components
+---
 
-**Routing & Auth**:
-- File-based routing in `/pages/`
-- Auth middleware in `/middleware/auth.ts`
-- Supabase auth integration with redirect disabled
+## Project Structure
 
-### Notable Implementation Details
+All application code lives in `/app/` (Nuxt 4 convention):
 
-- Database types are generated via Supabase CLI and extended locally
-- Image assets organized in both `/assets/svg/` and `/public/` directories
-- Custom PrimeVue theme implementation via CSS files in `/assets/styles/primevue/`
-- Team builder functionality with email integration for admin notifications
+```
+app/
+├── components/      # Feature-organized Vue components
+│   ├── Common/      # Shared components
+│   ├── Dashboard/   # Dashboard-specific
+│   ├── Drafted/     # Drafted team management
+│   ├── Fixture/     # Match fixtures display
+│   ├── Player.vue, PlayerModal.vue
+│   ├── Skeleton/    # Loading skeletons
+│   ├── Table/       # League table
+│   ├── TeamBuilder/ # Team builder interface
+│   └── Filters.vue, FiltersDialog.vue
+├── composables/     # Reusable composition functions
+│   └── (filters, weekly statistics, etc.)
+├── stores/          # Pinia stores
+│   ├── account.ts
+│   ├── draftedTeams.ts
+│   ├── fixtures.ts
+│   ├── players.ts
+│   └── table.ts
+├── pages/           # File-based routing
+├── middleware/      # Route middleware (auth.ts)
+├── types/           # TypeScript type definitions
+├── tests/           # Vitest test suites
+├── logic/           # Business logic modules
+├── layouts/         # Layout components
+├── assets/          # Styles, images, static assets
+│   ├── styles/
+│   ├── svg/
+│   └── styles/primevue/  # Custom PrimeVue theme
+└── utils/           # Utility functions
 
-## Test-Driven Development (TDD) Guidelines
+server/
+├── api/             # Nitro API endpoints (email)
+└── utils/           # Server-side utilities
+```
 
-### Testing Infrastructure
+---
 
-This project uses Vitest for behavior-driven testing with the following setup:
+## Architecture Patterns
 
-**Test Environment**:
-- **Framework**: Vitest with Happy DOM environment
-- **Location**: Tests in `/tests/` directory with feature-based organization
-- **Mocking**: Global Supabase mocking and Nuxt composable mocks in `/tests/setup.ts`
+### Data Layer - Supabase Integration
 
-**Global Mocks Configuration**:
+**Type Generation**:
+```bash
+pnpm generate-types              # Generate from remote Supabase project
+```
+
+**Type System**:
+- `app/types/database-generated.types.ts` - Auto-generated from Supabase schema (never edit manually)
+- `app/types/database.types.ts` - Manual overrides and extensions for views like `players_view`
+- Domain-specific types in `app/types/` (Dashboard.ts, DraftedTeam.ts, Player.ts, etc.)
+
+**Type-Safe Queries**:
 ```typescript
-// Supabase client is globally mocked for controlled test responses
-// Nuxt composables (useSupabaseClient, useRoute, useRouter) are mocked
-// Vue reactivity (ref, computed, watchEffect, readonly) is mocked for test environment
+import type { Database } from '~/types/database.types';
+
+const supabase = useSupabaseClient<Database>();
+
+const { data } = await supabase
+  .from('players_view')
+  .select('*')
+  .eq('season', activeSeason);
 ```
 
-### TDD Patterns Established
+### State Management - Pinia Stores
 
-**Test Data Factories** (Located in `/tests/team-builder/fixtures/`):
-- Use `Partial<T>` overrides for flexible test data creation
-- Return complete objects with realistic defaults following real project schemas
-- Compose factories for complex scenarios (e.g., `createMockTeamWithPlayers`)
+Stores in `/app/stores/`:
+- **account.ts** - User account and authentication state
+- **draftedTeams.ts** - User's drafted teams
+- **fixtures.ts** - Match fixtures and results
+- **players.ts** - Available players data
+- **table.ts** - League table standings
 
-**Behavior-Driven Testing Approach**:
-- Test through public APIs only - composables as black boxes
-- Focus on business behavior, not implementation details
-- Use real project types, never redefine schemas in tests
-- Organize tests by business behavior, not code structure
+### Component Organization
 
-**Vue Composable Testing Patterns**:
-```typescript
-// Pattern for testing reactive composables:
-1. Arrange: Set up test data using factories
-2. Act: Update composable state via public interface
-3. Trigger: Call triggerWatchEffects() to simulate reactivity
-4. Assert: Verify expected business behavior
+Components in `/app/components/` organized by feature domain.
+
+**Modal Pattern**: Use centralized `Modal.vue` with content injection rather than creating individual modal components.
+
+### Routing & Authentication
+
+- **File-based routing**: Pages in `/app/pages/`
+- **Auth middleware**: `/app/middleware/auth.ts` protects authenticated routes
+- **Supabase auth**: Configured with `redirect: false` in nuxt.config.ts
+
+---
+
+## Testing Configuration & Patterns
+
+### Test Environment
+
+**Framework**: Vitest with **Nuxt environment** (not Happy DOM)
+
+Configuration in `vitest.config.ts` uses `environment: 'nuxt'` via `@nuxt/test-utils` for proper Nuxt feature support.
+
+### Test Organization
+
 ```
-
-**Critical Discovery - watchEffect Handling**:
-In the test environment, `watchEffect` doesn't automatically re-execute when dependencies change. Use the helper function `triggerWatchEffects()` to manually trigger updates after changing reactive dependencies.
-
-### Test Organization Structure
-
-```
-tests/
-├── setup.ts                    # Global mocks and test configuration
+app/tests/
+├── setup.ts                    # Test utilities (withSetup helper)
+├── factories/                  # Centralized test data factories
+│   ├── index.ts                # Central exports
+│   ├── teams.ts                # DraftedTeam factory functions
+│   └── players.ts              # DraftedTeamPlayer factory functions
 ├── team-builder/
-│   ├── composables/
-│   │   └── useTeamBuilder.test.ts  # Behavior tests for business logic
-│   └── fixtures/
-│       ├── index.ts             # Central exports
-│       ├── teams.ts             # DraftedTeam factory functions
-│       └── players.ts           # DraftedTeamPlayer factory functions
+│   └── composables/            # Team builder composable tests
+├── weekly-statistics/
+│   └── composables/            # Weekly statistics composable tests
+├── homepage-dashboard/
+│   └── composables/            # Homepage dashboard composable tests
+└── transfers/                  # Transfer functionality tests
 ```
 
-### Successful TDD Implementation
+### Testing Vue Composables
 
-**Phase 3 Achievement**: Established comprehensive TDD foundation for team builder with:
-- ✅ 10 behavior-driven tests covering budget calculations
-- ✅ Test data factories using real project schemas  
-- ✅ Working Vitest configuration with proper mocking
-- ✅ Documented patterns for future TDD development
+Use the `withSetup` helper from `app/tests/setup.ts` for testing composables within proper Vue context:
 
-**Test Coverage Areas**:
-- Budget allocation logic (90 vs 85 based on transfer allowance)
-- Team value calculation from selected players
-- Over-budget detection and validation
-- Remaining budget calculations
+```typescript
+import { withSetup } from '~/tests/setup';
 
-### TDD Best Practices for This Project
+describe('useMyComposable', () => {
+  it('should test reactive behavior', () => {
+    const [result, app] = withSetup(() => useMyComposable());
 
-1. **Always Test Behavior**: Focus on what the composable should do, not how it does it
-2. **Use Real Schemas**: Import types from `/types/`, never redefine in tests
-3. **Manual Reactivity**: Call `triggerWatchEffects()` after updating reactive dependencies
-4. **Factory Pattern**: Use consistent factory functions with partial overrides
-5. **Single Responsibility**: One composable instance per test, fresh beforeEach
+    // Test composable behavior with real Vue reactivity
+    expect(result.someValue.value).toBe(expected);
+
+    // Always cleanup
+    app.unmount();
+  });
+});
+```
+
+### Test Data Factories
+
+All test factories centralized in `/app/tests/factories/`:
+
+```typescript
+import { createMockTeam, createMockPlayer } from '~/tests/factories';
+
+// Factories use Partial<T> overrides for flexibility
+const team = createMockTeam({
+  budget: 85,
+  allowTransfers: true
+});
+
+const player = createMockPlayer({
+  cost: 7.5,
+  position: 'MID'
+});
+```
+
+**Key Principles**:
+- Import real types from `/app/types/` - never redefine schemas in tests
+- Use centralized factories for consistency
+- Compose factories for complex scenarios
 
 ### Running Tests
 
 ```bash
-pnpm test                        # Run all tests
+pnpm test                        # Run all tests once
 pnpm test:watch                  # Watch mode for development
-pnpm test tests/team-builder/    # Run specific test directory
+pnpm test:ui                     # Visual test UI
+pnpm test app/tests/team-builder/ # Run specific test directory
 ```
 
-## GitHub Issue Management
+---
 
-This project uses GitHub Issues for tracking all work with a structured approach optimized for solo development.
+## PrimeVue Configuration
+
+**Custom Theme**: Uses Aura preset with custom primary color palette defined in `nuxt.config.ts`
+
+**Component Auto-Import**: PrimeVue components auto-imported EXCEPT:
+- Form, FormField (using custom form components)
+- Editor (not needed)
+- Chart (not needed)
+
+**Styling**:
+- Base PrimeVue theme via `@primeuix/themes`
+- Tailwind integration via `tailwindcss-primeui`
+- Custom styles in `/app/assets/styles/primevue/`
+- Global styles in `/app/assets/styles/base.css`
+
+---
+
+## Environment Configuration
+
+**Runtime Config** (defined in `nuxt.config.ts`):
+
+```typescript
+runtimeConfig: {
+  public: {
+    SITE_URL: process.env.SITE_URL,           // Application base URL
+    ACTIVE_SEASON: process.env.ACTIVE_SEASON, // Current football season (e.g., "2024-25")
+    nodeEnv: process.env.NODE_ENV,
+    turnstile: {
+      siteKey: process.env.TURNSTILE_SITE_KEY // Cloudflare Turnstile (bot protection)
+    }
+  }
+}
+```
+
+**Usage**:
+```typescript
+const config = useRuntimeConfig();
+const activeSeason = config.public.ACTIVE_SEASON;
+```
+
+---
+
+## Path Import Pattern
+
+Always use the `~/` alias for imports from `/app/`:
+
+```typescript
+import type { DraftedTeam } from '~/types/DraftedTeam';
+import { useTeamBuilder } from '~/composables/useTeamBuilder';
+import { createMockTeam } from '~/tests/factories';
+```
+
+---
+
+## Known Issues & Gotchas
+
+### Supabase Type Generation
+
+**Issue**: Generated types are overwritten on each generation.
+
+**Solution**:
+- Never edit `app/types/database-generated.types.ts` directly
+- Put custom types and overrides in `app/types/database.types.ts`
+- Particularly important for views like `players_view` which need manual type refinement
+
+### Testing watchEffect in Composables
+
+**Issue**: In test environment, `watchEffect` may not automatically re-execute when dependencies change.
+
+**Solution**: Use `triggerWatchEffects()` helper after updating reactive dependencies:
+
+```typescript
+const [result, app] = withSetup(() => useMyComposable());
+
+// Update reactive dependency
+result.dependency.value = newValue;
+
+// Manually trigger watch effects
+triggerWatchEffects();
+
+// Now assertions on watchers will work correctly
+expect(result.computedValue.value).toBe(expected);
+```
+
+---
+
+## GitHub Workflow
+
+This project uses GitHub Issues for all work tracking.
 
 ### Issue Templates
 
-Issue templates are available in `.github/ISSUE_TEMPLATE/` for consistent issue creation:
-
-- **Bug Report** (`bug-report.yml`): For tracking unexpected behaviour or defects
-- **Feature Request** (`feature-request.yml`): For new functionality or enhancements
-- **Maintenance** (`maintenance.yml`): For technical debt, refactoring, or maintenance tasks
+Templates in `.github/ISSUE_TEMPLATE/`:
+- **bug-report.yml**: Bugs and unexpected behavior
+- **feature-request.yml**: New features and enhancements
+- **maintenance.yml**: Technical debt, dependencies, refactoring
 
 ### Label System
 
-Issues are categorized using a systematic label system:
-
-- **Type Labels**: `bug`, `enhancement`, `maintenance`
-- **Technical Labels**: `dependencies`, `typescript`, `testing`
+- **Type**: `bug`, `enhancement`, `maintenance`
+- **Technical**: `dependencies`, `typescript`, `testing`
 
 ### Workflow Pattern
 
-The standard workflow follows the GitHub integration pattern:
-
 ```
-Idea/Request → GitHub Issue → Branch → PR → Merge → Close Issue
+Idea → GitHub Issue → Branch → PR → Merge → Close Issue
 ```
 
-**Key Principles**:
-- All work should be tracked via GitHub Issues for audit trail and context
-- Issues are linked to PRs using closing keywords (`Fixes #32`, `Closes #33`)
-- Maintenance tasks (like dependency updates) use the maintenance template
-- Features use the feature request template with clear motivation and scope
+**Key Practices**:
+- All work tracked via issues for audit trail
+- Link PRs with closing keywords (`Fixes #32`, `Closes #33`)
+- Use appropriate template for issue type
 
-### Creating Issues
-
-Use the GitHub CLI or web interface with templates:
-
+**Creating Issues**:
 ```bash
-gh issue create --title "[Type]: Brief description" --label "appropriate-labels"
-gh issue list                    # View current issues
-gh issue view 32                 # View specific issue details
+gh issue create --title "[Type]: Description" --label "labels"
+gh issue list
+gh issue view 32
 ```
 
 **Example Classifications**:
 - **Bug**: Weekly statistics showing incorrect values
-- **Enhancement**: Add weekly summary dashboard to homepage  
+- **Enhancement**: Add weekly summary dashboard to homepage
 - **Maintenance**: Update Supabase CLI to latest version
+
+---
+
+## Code Quality
+
+Always run these after making changes:
+
+```bash
+pnpm lint      # Check for linting issues
+pnpm typecheck # TypeScript strict mode validation
+pnpm test      # Run test suite
+```

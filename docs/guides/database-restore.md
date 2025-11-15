@@ -114,13 +114,17 @@ SET session_replication_role = replica;
 ### Step 4: Execute via SQL Editor
 
 1. **Access Dev Database**: Go to development Supabase project → SQL Editor
-2. **Execute in Order**:
+
+2. **Pre-Execution Check**: Before running part5, search the file for the storage.buckets section and **remove it** to avoid duplicate key errors (see "Storage Bucket Duplicate Key Errors" in Common Issues section)
+
+3. **Execute in Order**:
    - `clear.sql` (verify tables show 0 rows)
-   - `part1_auth.sql`
+   - `part1_auth_audit.sql`
    - `part2_auth_users.sql`
    - `part3_teams_players.sql`
    - `part4_drafted_data.sql`
-   - `part5_statistics.sql`
+   - `part5_profiles_fixtures_stats.sql` ⚠️ (after removing storage.buckets INSERT)
+   - `part6_sequences.sql`
 
 ### Step 5: Verify Success
 
@@ -156,17 +160,44 @@ ORDER BY table_name;
 
 **Solution**: This method completely bypasses network connectivity by using the web interface.
 
+### Storage Bucket Duplicate Key Errors
+
+**Error**: `ERROR: 23505: duplicate key value violates unique constraint "buckets_pkey" DETAIL: Key (id)=(avatars) already exists.`
+
+**Root Cause**: The `storage.buckets` table in your dev database already contains infrastructure buckets (like 'avatars') that were created during initial Supabase project setup. The seed.sql dump includes these buckets, causing conflicts when restoring.
+
+**Solution**: Remove the storage bucket INSERT statements from the restoration files before execution:
+
+1. **Locate the storage section** in your part file containing statistics data (typically part5):
+   ```sql
+   --
+   -- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
+   --
+
+   INSERT INTO "storage"."buckets" ("id", "name", "owner", "created_at", "updated_at", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types", "owner_id", "type") VALUES
+   	('avatars', 'avatars', NULL, '2023-07-30 17:46:08.561788+00', '2023-07-30 17:46:08.561788+00', false, false, NULL, NULL, NULL, 'STANDARD');
+   ```
+
+2. **Delete these lines entirely** - from the comment block through the INSERT statement and blank lines
+
+3. **Keep the footer**: Make sure `SET session_replication_role = DEFAULT;` remains at the end of the file
+
+**Why this is safe**: Storage buckets are infrastructure that persist across environments. They don't need to be restored from live database dumps - your dev database buckets are appropriate for development.
+
 ## File Organization
 
 ```
 temp/
-├── clear.sql              # Data clearing script
-├── part1_auth.sql         # Auth audit logs (~1969 lines)
-├── part2_auth_users.sql   # Users & sessions (~741 lines)
-├── part3_teams_players.sql # Teams & players (~825 lines)
-├── part4_drafted_data.sql # Draft data (~915 lines)
-├── part5_statistics.sql   # Statistics & sequences (~594 lines)
-└── README.md              # File documentation
+├── clear.sql                          # Data clearing script (42 lines)
+├── part1_auth_audit.sql               # Auth audit logs (2,459 lines)
+├── part2_auth_users.sql               # Users, sessions & tokens (1,046 lines)
+├── part3_teams_players.sql            # Teams & players (842 lines)
+├── part4_drafted_data.sql             # Drafted players & transfers (543 lines)
+├── part5_profiles_fixtures_stats.sql  # Profiles, fixtures & statistics (1,681 lines)
+│   └── ⚠️ Remove storage.buckets INSERT before execution
+├── part6_sequences.sql                # Sequence resets (62 lines)
+├── README.md                          # File documentation
+└── EXECUTION_GUIDE.md                 # Step-by-step instructions
 ```
 
 ## Safety Guarantees

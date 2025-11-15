@@ -168,17 +168,17 @@ ssr: false  // SPA mode (no server-side rendering)
 ```
 
 ### Import Aliases
-```typescript
-alias: {
-  '~': fileURLToPath(new URL('./app', import.meta.url))
-}
-```
 
-All imports use `~/` prefix:
+In Nuxt 4, the `~/` alias automatically resolves to the `/app/` directory:
+
 ```typescript
+// All imports reference the /app/ directory
 import Button from '~/components/Button.vue'
 import { useTeamBuilder } from '~/composables/useTeamBuilder'
+import type { DraftedTeam } from '~/types/DraftedTeam'
 ```
+
+**Nuxt 4 Convention:** All application code lives in `/app/` directory.
 
 ### PrimeVue Configuration
 
@@ -432,4 +432,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2025-11-15

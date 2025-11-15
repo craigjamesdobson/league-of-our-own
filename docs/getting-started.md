@@ -2,6 +2,7 @@
 
 Welcome to League of Our Own! This guide walks you through setting up the project locally.
 
+> **Technology Stack**: Nuxt 4, Vue 3, PrimeVue, Supabase, TypeScript
 > **For TDD workflow and code standards**, see `~/.claude/CLAUDE.md`
 
 ## Prerequisites
@@ -162,4 +163,4 @@ pnpm generate-types         # Regenerate Supabase types
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2025-11-15

@@ -28,30 +28,54 @@ const AuraCustom = definePreset(Aura, {
 
 export default defineNuxtConfig({
   modules: [
-    '@nuxtjs/tailwindcss',
+    // Core framework modules
     '@pinia/nuxt',
-    'nuxt-icon',
     '@nuxtjs/supabase',
-    '@nuxt/devtools',
+
+    // UI and styling modules
+    '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
-    'nuxt-gtag',
-    '@zadigetvoltaire/nuxt-gtm',
-    'nuxt-module-hotjar',
-    '@nuxt/eslint',
+    '@nuxt/icon',
     '@nuxtjs/color-mode',
+
+    // Analytics and tracking
+    '@nuxt/scripts',
+    'nuxt-module-hotjar',
     '@nuxtjs/turnstile',
+
+    // Development and tooling
+    '@nuxt/devtools',
+    '@nuxt/eslint',
   ],
 
   ssr: false,
 
+  // Modern Nuxt 4 app configuration
   app: {
     head: {
       title: 'League of our own',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'A fantasy football league management platform for friends and family' },
+        { name: 'theme-color', content: '#0b0c3d' },
+        { property: 'og:title', content: 'League of our own' },
+        { property: 'og:description', content: 'A fantasy football league management platform for friends and family' },
+        { property: 'og:type', content: 'website' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'League of our own' },
+        { name: 'twitter:description', content: 'A fantasy football league management platform for friends and family' },
       ],
       link: [
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.googleapis.com',
+        },
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.gstatic.com',
+          crossorigin: '',
+        },
         {
           rel: 'icon',
           type: 'image/png',
@@ -59,7 +83,7 @@ export default defineNuxtConfig({
         },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900',
+          href: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap',
         },
         {
           rel: 'stylesheet',
@@ -72,7 +96,8 @@ export default defineNuxtConfig({
   css: ['@/assets/styles/base.css'],
 
   colorMode: {
-    preference: 'light',
+    preference: 'system', // Respects user's system preference
+    fallback: 'light', // Fallback when system preference can't be determined
   },
 
   runtimeConfig: {
@@ -90,14 +115,6 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-12-17',
-
-  gtag: {
-    id: 'G-FWYYJ66CWG',
-  },
-
-  gtm: {
-    id: 'GTM-N3HLZXHC',
-  },
 
   hotjar: {
     hotjarId: 5090647,
@@ -123,6 +140,14 @@ export default defineNuxtConfig({
           darkModeSelector: false,
           cssLayer: false,
         },
+      },
+    },
+  },
+
+  scripts: {
+    registry: {
+      googleTagManager: {
+        id: 'GTM-N3HLZXHC',
       },
     },
   },

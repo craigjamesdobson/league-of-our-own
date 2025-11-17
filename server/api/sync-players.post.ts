@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import type { H3Event } from 'h3';
-import { handleEmailSending } from '~/server/utils/email';
-import type { Database, TablesInsert } from '~/types/database.types';
+import { handleEmailSending } from '../utils/email';
+import type { Database, TablesInsert } from '@/types/database.types';
 
 interface FPLPlayer {
   id: number;

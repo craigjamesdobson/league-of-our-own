@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { usePlayerStore } from './players';
 import type { Fixture } from '~/types/Fixture';
-import type { Player, PlayerWithStats } from '~/types/Player';
+import type { PlayerWithStats } from '~/types/Player';
 import type {
   Database,
-  Tables,
   TablesInsert,
 } from '~/types/database.types';
+import { populatePlayersWithStats } from '~/logic/players/stats';
 
 const route = useRoute();
 
@@ -18,47 +18,6 @@ const getPlayersWithStats = (players: PlayerWithStats[]) => {
       || player.week_redcard
       || player.week_cleansheet
     );
-  });
-};
-
-const populatePlayersWithStats = (
-  players: Player[],
-  PlayerStats: Tables<'player_statistics'>[],
-  teamID?: number,
-): PlayerWithStats[] => {
-  let filteredPlayers = players;
-
-  if (teamID) {
-    filteredPlayers = filteredPlayers.filter(x => x.team === teamID);
-  }
-
-  const weekDataMap = new Map<number, (typeof PlayerStats)[number]>();
-  PlayerStats.forEach((data: Tables<'player_statistics'>) =>
-    weekDataMap.set(data.player_id!, data),
-  );
-
-  return filteredPlayers.map((player) => {
-    const weekPlayerData = weekDataMap.get(player.player_id);
-    if (weekPlayerData) {
-      return {
-        ...player,
-        week_goals: weekPlayerData.goals || 0,
-        week_assists: weekPlayerData.assists || 0,
-        week_redcard: weekPlayerData.red_card || false,
-        week_cleansheet: weekPlayerData.clean_sheet || false,
-        week_points: weekPlayerData.points || 0,
-      };
-    }
-    else {
-      return {
-        ...player,
-        week_goals: 0,
-        week_assists: 0,
-        week_redcard: false,
-        week_cleansheet: false,
-        week_points: 0,
-      };
-    }
   });
 };
 

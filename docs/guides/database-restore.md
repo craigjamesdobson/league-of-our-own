@@ -25,7 +25,7 @@ Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all ne
 
 ### Prerequisites
 
-1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only`)
+1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only --f supabase/seed.sql`)
 2. **Development database** access via Supabase web dashboard
 3. **Working directory**: Create `temp/` folder for split files
 

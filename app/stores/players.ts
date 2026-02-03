@@ -1,17 +1,12 @@
 import { defineStore } from 'pinia';
-import type { Player, PlayerInsertData } from '~/types/Player';
-import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database } from '~/types/database.types';
-
-interface FilterData {
-  filterName: string;
-  filterPrice: number;
-  filterTeam: number | undefined;
-}
+import type { Player, PlayerInsertData, PlayerSeasonStats } from '~/types/Player';
+import type { Database as DatabaseGenerated } from '~/types/database-generated.types';
+import type { Database, Tables } from '~/types/database.types';
+import { mapSeasonTotals, mergePlayersWithSeasonTotals } from '~/logic/players/stats';
 
 export const usePlayerStore = defineStore('player-store', () => {
   const players: Ref<Player[] | []> = ref([]);
-  const filteredPlayers: Ref<Player[] | []> = ref([]);
+  const playersWithSeasonStats: Ref<PlayerSeasonStats[] | []> = ref([]);
   const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
@@ -28,7 +23,7 @@ export const usePlayerStore = defineStore('player-store', () => {
         return;
       }
       players.value = data;
-      filteredPlayers.value = players.value;
+      await fetchPlayerSeasonStatistics();
       await fetchPlayerUpdatedDate();
       isLoaded.value = true;
     }
@@ -42,8 +37,25 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
   };
 
-  const fetchPlayerUpdatedDate = async () => {
+  const fetchPlayerSeasonStatistics = async () => {
     const supabase = useSupabaseClient<Database>();
+    const { data, error } = await supabase
+      .from('player_statistics_totals')
+      .select();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const totals = mapSeasonTotals(data as Tables<'player_statistics_totals'>[]);
+    playersWithSeasonStats.value = mergePlayersWithSeasonTotals(
+      [...players.value],
+      totals,
+    );
+  };
+
+  const fetchPlayerUpdatedDate = async () => {
+    const supabase = useSupabaseClient<DatabaseGenerated>();
     const { data, error } = await supabase
       .from('players')
       .select('updated_at')
@@ -58,7 +70,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   };
 
   const upsertPlayerData = async (playerData: string) => {
-    const supabase = useSupabaseClient<Database>();
+    const supabase = useSupabaseClient<DatabaseGenerated>();
     const formattedPlayerData: PlayerInsertData[] = JSON.parse(playerData)?.elements;
     if (formattedPlayerData === null) {
       throw new Error('Player data was not correct, please try again.');
@@ -121,37 +133,6 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
   };
 
-  const filterPlayers = ({
-    filterName = '',
-    filterPrice = 0,
-    filterTeam = 0,
-  }: FilterData) => {
-    let newFilteredPlayers = [...players.value];
-    if (filterName) {
-      newFilteredPlayers = newFilteredPlayers.filter(player =>
-        (player.web_name ?? '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036F]/g, '')
-          .toLowerCase()
-          .includes(filterName.toLowerCase()),
-      );
-    }
-
-    if (filterPrice) {
-      newFilteredPlayers = newFilteredPlayers.filter(
-        player => player.cost === +filterPrice,
-      );
-    }
-
-    if (filterTeam) {
-      newFilteredPlayers = newFilteredPlayers.filter(
-        p => p.team === filterTeam,
-      );
-    }
-
-    filteredPlayers.value = newFilteredPlayers;
-  };
-
   const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
 
   const getPlayerByID = computed(
@@ -159,46 +140,17 @@ export const usePlayerStore = defineStore('player-store', () => {
   );
 
   const getPlayers = computed(() => players.value);
-
-  const formatFilteredPlayersByPosition = computed(() => {
-    return [
-      {
-        position: 'Goalkeepers',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.GOALKEEPER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Defenders',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.DEFENDER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Midfielders',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.MIDFIELDER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Forwards',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.FORWARD)
-          .sort((a, b) => a.team - b.team),
-      },
-    ];
-  });
+  const getPlayersWithSeasonStats = computed(() => playersWithSeasonStats.value);
 
   return {
     players,
-    filteredPlayers,
     isLoaded,
     fetchPlayers,
+    fetchPlayerSeasonStatistics,
     upsertPlayerData,
-    filterPlayers,
     getPlayers,
+    getPlayersWithSeasonStats,
     getPlayerByID,
     getPlayerLastUpdatedDate,
-    formatFilteredPlayersByPosition,
   };
 });

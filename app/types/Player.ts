@@ -14,4 +14,12 @@ interface PlayerWithStats extends Player {
   week_points: number;
 }
 
-export type { Player, PlayerWithStats, PlayerInsertData };
+interface PlayerSeasonStats extends Player {
+  season_goals: number;
+  season_assists: number;
+  season_points: number;
+  season_clean_sheets: number;
+  season_red_cards: number;
+}
+
+export type { Player, PlayerSeasonStats, PlayerWithStats, PlayerInsertData };

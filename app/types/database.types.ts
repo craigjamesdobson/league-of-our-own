@@ -36,6 +36,32 @@ export type Database = MergeDeep<
         };
       };
       Views: {
+        player_statistics_totals: {
+          Row: {
+            player_id: number;
+            goals: number;
+            assists: number;
+            points: number;
+            clean_sheets: number;
+            red_cards: number;
+          };
+          Insert: {
+            player_id: number;
+            goals: number;
+            assists: number;
+            points: number;
+            clean_sheets: number;
+            red_cards: number;
+          };
+          Update: {
+            player_id?: number;
+            goals?: number;
+            assists?: number;
+            points?: number;
+            clean_sheets?: number;
+            red_cards?: number;
+          };
+        };
         players_view: {
           Row: {
             assists: number;

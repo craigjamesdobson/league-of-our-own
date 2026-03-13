@@ -37,6 +37,7 @@ const makeChain = (response: MockResponse) => {
   const chain = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
+    in: vi.fn().mockReturnThis(),
     lt: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
@@ -64,36 +65,21 @@ describe('useHomepageDashboard', () => {
     mockWeeklyWinners.value = undefined;
   });
 
-  it('should exist and be importable', async () => {
-    // This test will fail initially - the composable doesn't exist yet
-    try {
-      const module = await import('@/composables/useHomepageDashboard');
-      expect(module.useHomepageDashboard).toBeDefined();
-      expect(typeof module.useHomepageDashboard).toBe('function');
-    }
-    catch (error) {
-      // Expected to fail on first run
-      expect(String(error)).toContain('Cannot resolve module');
-    }
+  it('should exist and be importable', () => {
+    expect(useHomepageDashboard).toBeDefined();
+    expect(typeof useHomepageDashboard).toBe('function');
   });
 
-  it('should return dashboard functionality when implemented', async () => {
-    // This will also fail initially but shows the expected interface
-    try {
-      const { useHomepageDashboard: composable } = await import('@/composables/useHomepageDashboard');
-      const [dashboard] = withSetup(() => composable());
+  it('should return dashboard functionality when implemented', () => {
+    const [dashboard, app] = withSetup(() => useHomepageDashboard());
 
-      // Expected interface
-      expect(dashboard).toHaveProperty('getCurrentGameweek');
-      expect(dashboard).toHaveProperty('getPositionMovers');
-      expect(dashboard).toHaveProperty('loadDashboardData');
-      expect(dashboard).toHaveProperty('isLoading');
-      expect(dashboard).toHaveProperty('error');
-    }
-    catch (error) {
-      // Expected to fail initially
-      expect(error).toBeDefined();
-    }
+    expect(dashboard).toHaveProperty('getCurrentGameweek');
+    expect(dashboard).toHaveProperty('getPositionMovers');
+    expect(dashboard).toHaveProperty('loadDashboardData');
+    expect(dashboard).toHaveProperty('isLoading');
+    expect(dashboard).toHaveProperty('error');
+
+    app.unmount();
   });
 });
 
@@ -127,22 +113,27 @@ describe('fetchWeeklyTransfers - player_out resolution', () => {
         data: [{ drafted_transfer_id: 1, transfer_week: 10, drafted_player: 1, player_id: 20 }],
         error: null,
       },
-      // Prior-transfer check: no prior transfers exist for this slot
+      // Prior-transfers batch: no prior transfers for this slot
       { data: [], error: null },
     ];
+    // Batch fetch: drafted_players (consumed first in Promise.all)
     tableQueues['drafted_players'] = [
       {
-        data: {
-          drafted_player: 1,
-          drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
-          players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
-        },
+        data: [
+          {
+            drafted_player_id: 1,
+            drafted_player: 1,
+            drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
+            players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
+          },
+        ],
         error: null,
       },
     ];
     tableQueues['players_view'] = [
-      // player_in (Player Y)
-      { data: { web_name: 'Player Y', team_short_name: 'ARS', position: 3, image: 'y.png', cost: 8.0 }, error: null },
+      // Batch fetch: new players (Player Y) — consumed second in Promise.all
+      { data: [{ player_id: 20, web_name: 'Player Y', team_short_name: 'ARS', position: 3, image: 'y.png', cost: 8.0 }], error: null },
+      // No prior players batch (priorPlayerIds is empty since no prior transfers)
     ];
 
     const [dashboard, app] = withSetup(() => useHomepageDashboard());
@@ -167,25 +158,29 @@ describe('fetchWeeklyTransfers - player_out resolution', () => {
         data: [{ drafted_transfer_id: 2, transfer_week: 30, drafted_player: 1, player_id: 10 }],
         error: null,
       },
-      // Prior-transfer check: GW10 had Player Y (id=20) transferred in
-      { data: [{ player_id: 20 }], error: null },
+      // Prior-transfers batch: GW10 had Player Y (id=20) transferred in
+      { data: [{ drafted_player: 1, player_id: 20, transfer_week: 10 }], error: null },
     ];
+    // Batch fetch: drafted_players (consumed first in Promise.all)
     tableQueues['drafted_players'] = [
       {
-        data: {
-          drafted_player: 1,
-          drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
-          // drafted_players always points to the original player — Player X
-          players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
-        },
+        data: [
+          {
+            drafted_player_id: 1,
+            drafted_player: 1,
+            drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
+            // drafted_players always points to the original player — Player X
+            players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
+          },
+        ],
         error: null,
       },
     ];
     tableQueues['players_view'] = [
-      // player_in (Player X returning)
-      { data: { web_name: 'Player X', team_short_name: 'MCI', position: 3, image: 'x.png', cost: 9.0 }, error: null },
-      // prior player — Player Y who was actually occupying the slot
-      { data: { web_name: 'Player Y', image: 'y.png', team_short_name: 'ARS', cost: 8.0 }, error: null },
+      // Batch fetch: new players (Player X returning) — consumed second in Promise.all
+      { data: [{ player_id: 10, web_name: 'Player X', team_short_name: 'MCI', position: 3, image: 'x.png', cost: 9.0 }], error: null },
+      // Batch fetch: prior players (Player Y who was in the slot)
+      { data: [{ player_id: 20, web_name: 'Player Y', image: 'y.png', team_short_name: 'ARS', cost: 8.0 }], error: null },
     ];
 
     const [dashboard, app] = withSetup(() => useHomepageDashboard());
@@ -211,24 +206,28 @@ describe('fetchWeeklyTransfers - player_out resolution', () => {
         data: [{ drafted_transfer_id: 3, transfer_week: 30, drafted_player: 1, player_id: 30 }],
         error: null,
       },
-      // Prior-transfer check: GW10 had Player Y (id=20) transferred in
-      { data: [{ player_id: 20 }], error: null },
+      // Prior-transfers batch: GW10 had Player Y (id=20) transferred in
+      { data: [{ drafted_player: 1, player_id: 20, transfer_week: 10 }], error: null },
     ];
+    // Batch fetch: drafted_players (consumed first in Promise.all)
     tableQueues['drafted_players'] = [
       {
-        data: {
-          drafted_player: 1,
-          drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
-          players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
-        },
+        data: [
+          {
+            drafted_player_id: 1,
+            drafted_player: 1,
+            drafted_teams: { team_name: 'Team A', team_owner: 'Owner A' },
+            players_view: { web_name: 'Player X', image: 'x.png', team_short_name: 'MCI', cost: 9.0 },
+          },
+        ],
         error: null,
       },
     ];
     tableQueues['players_view'] = [
-      // player_in (Player Z)
-      { data: { web_name: 'Player Z', team_short_name: 'LIV', position: 3, image: 'z.png', cost: 7.5 }, error: null },
-      // prior player — Player Y who was in the slot
-      { data: { web_name: 'Player Y', image: 'y.png', team_short_name: 'ARS', cost: 8.0 }, error: null },
+      // Batch fetch: new players (Player Z) — consumed second in Promise.all
+      { data: [{ player_id: 30, web_name: 'Player Z', team_short_name: 'LIV', position: 3, image: 'z.png', cost: 7.5 }], error: null },
+      // Batch fetch: prior players (Player Y who was in the slot)
+      { data: [{ player_id: 20, web_name: 'Player Y', image: 'y.png', team_short_name: 'ARS', cost: 8.0 }], error: null },
     ];
 
     const [dashboard, app] = withSetup(() => useHomepageDashboard());

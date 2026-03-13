@@ -248,16 +248,41 @@ export function useHomepageDashboard() {
           .eq('player_id', transfer.player_id)
           .single();
 
+        // For repeated transfers on the same slot, the original drafted_players.players_view
+        // always points to the original player, not the most recently transferred-in player.
+        // Find the most recent prior transfer on this slot to determine the correct player out.
+        const { data: priorTransfers } = await supabase
+          .from('drafted_transfers')
+          .select('player_id')
+          .eq('drafted_player', transfer.drafted_player)
+          .lt('transfer_week', transfer.transfer_week)
+          .order('transfer_week', { ascending: false })
+          .limit(1);
+
+        const priorTransfer = priorTransfers?.[0] ?? null;
+
+        let playerOut = draftedPlayer?.players_view;
+        if (priorTransfer) {
+          const { data: priorPlayer } = await supabase
+            .from('players_view')
+            .select('web_name, image, team_short_name, cost')
+            .eq('player_id', priorTransfer.player_id)
+            .single();
+          if (priorPlayer) {
+            playerOut = priorPlayer;
+          }
+        }
+
         return {
           drafted_transfer_id: transfer.drafted_transfer_id,
           transfer_week: transfer.transfer_week || 0,
           team_name: draftedPlayer?.drafted_teams?.team_name || 'Unknown Team',
           team_owner: draftedPlayer?.drafted_teams?.team_owner || 'Unknown Owner',
-          player_out: draftedPlayer?.players_view?.web_name || 'Unknown Player',
-          player_out_image: draftedPlayer?.players_view?.image || '',
-          player_out_team: draftedPlayer?.players_view?.team_short_name || 'Unknown',
-          player_out_team_short: draftedPlayer?.players_view?.team_short_name || 'Unknown',
-          player_out_cost: draftedPlayer?.players_view?.cost || 0,
+          player_out: playerOut?.web_name || 'Unknown Player',
+          player_out_image: playerOut?.image || '',
+          player_out_team: playerOut?.team_short_name || 'Unknown',
+          player_out_team_short: playerOut?.team_short_name || 'Unknown',
+          player_out_cost: playerOut?.cost || 0,
           player_in: newPlayer?.web_name || 'Unknown Player',
           player_in_image: newPlayer?.image || '',
           player_in_team: newPlayer?.team_short_name || 'Unknown',

@@ -4,6 +4,16 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 
 > **For general development practices** (TDD, TypeScript guidelines, code style, testing philosophy), see `~/.claude/CLAUDE.md` and the linked documentation.
 
+## Hard Rules
+
+**Never run Supabase CLI commands.**
+
+Do not run `supabase` in the terminal under any circumstances — not `supabase db push`, `supabase db pull`, `supabase link`, `supabase migration`, or any other subcommand. Running these can mutate the real database without the user's knowledge.
+
+If a Supabase CLI command is needed, tell the user what to run and let them execute it.
+
+---
+
 ## Quick Reference
 
 **Key Commands**:

@@ -11,7 +11,7 @@ set -euo pipefail
 # Usage:
 #   ./scripts/db-restore-staging.sh \
 #     --prod-project-id <PROD_ID> \
-#     --access-token <TOKEN> \
+#     --prod-db-password <PROD_DB_PASSWORD> \
 #     --staging-project-id <STAGING_ID> \
 #     --staging-db-password <PASSWORD>
 #
@@ -41,14 +41,14 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 # -----------------------------------------------------------------------------
 usage() {
   cat <<EOF
-Usage: $0 --prod-project-id <ID> --access-token <TOKEN> --staging-project-id <ID> --staging-db-password <PASSWORD>
+Usage: $0 --prod-project-id <ID> --prod-db-password <PASSWORD> --staging-project-id <ID> --staging-db-password <PASSWORD>
 
 Dumps production data (read-only) and restores it into an existing staging Supabase project.
 Staging must already have migrations applied (via CI/CD).
 
 Options:
   --prod-project-id       Production Supabase project ID (read-only dump)
-  --access-token          Supabase personal access token
+  --prod-db-password      Production database password
   --staging-project-id    Staging Supabase project ID (write target)
   --staging-db-password   Staging database password
   --skip-dump             Skip the dump step and use existing supabase/seed.sql
@@ -61,7 +61,7 @@ EOF
 # Parse arguments
 # -----------------------------------------------------------------------------
 PROD_PROJECT_ID=""
-ACCESS_TOKEN=""
+PROD_DB_PASSWORD=""
 STAGING_PROJECT_ID=""
 STAGING_DB_PASSWORD=""
 SKIP_DUMP=false
@@ -69,7 +69,7 @@ SKIP_DUMP=false
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --prod-project-id)      PROD_PROJECT_ID="$2"; shift 2 ;;
-    --access-token)         ACCESS_TOKEN="$2"; shift 2 ;;
+    --prod-db-password)     PROD_DB_PASSWORD="$2"; shift 2 ;;
     --staging-project-id)   STAGING_PROJECT_ID="$2"; shift 2 ;;
     --staging-db-password)  STAGING_DB_PASSWORD="$2"; shift 2 ;;
     --skip-dump)            SKIP_DUMP=true; shift ;;
@@ -81,7 +81,7 @@ done
 # Validate required arguments
 if [[ "$SKIP_DUMP" == false ]]; then
   [[ -z "$PROD_PROJECT_ID" ]]   && { error "Missing: --prod-project-id"; usage; }
-  [[ -z "$ACCESS_TOKEN" ]]       && { error "Missing: --access-token"; usage; }
+  [[ -z "$PROD_DB_PASSWORD" ]]  && { error "Missing: --prod-db-password"; usage; }
 fi
 [[ -z "$STAGING_PROJECT_ID" ]]    && { error "Missing: --staging-project-id"; usage; }
 [[ -z "$STAGING_DB_PASSWORD" ]]   && { error "Missing: --staging-db-password"; usage; }
@@ -169,8 +169,9 @@ fi
 # -----------------------------------------------------------------------------
 if [[ "$SKIP_DUMP" == false ]]; then
   info "Dumping production data (read-only)..."
-  SUPABASE_ACCESS_TOKEN="$ACCESS_TOKEN" npx supabase db dump \
-    --project-ref "$PROD_PROJECT_ID" \
+  PROD_DB_URL="postgresql://postgres.${PROD_PROJECT_ID}:${PROD_DB_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
+  npx supabase db dump \
+    --db-url "$PROD_DB_URL" \
     --data-only \
     -f "$DUMP_FILE"
   success "Production dump saved to ${DUMP_FILE}"

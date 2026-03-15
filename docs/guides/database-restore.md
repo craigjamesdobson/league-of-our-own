@@ -1,214 +1,117 @@
-# Database Restoration Guide: Live to Development
+# Database Restoration Guide
 
-This guide documents the proven method for safely restoring live database data to development database when network connectivity issues prevent direct database connections.
+This guide covers the three data restoration workflows for the project. All workflows are **read-only against production** — only dump operations are performed against the live database.
 
-## Problem Statement
+For full script documentation, see `scripts/README.md`.
 
-**WSL2 IPv6 Connectivity Issues**: Direct psql connections to remote Supabase databases fail in Windows Subsystem for Linux 2 (WSL2) environments due to IPv6 network configuration problems.
+## Prerequisites
 
-**Specific Error**:
-```bash
-psql: error: connection to server at "db.YOUR_DEV_PROJECT_ID.supabase.co" (2a05:d01c:30c:9d03:c0f7:5424:becb:f4d0), port 5432 failed: Network is unreachable
-```
+- **psql** installed (PostgreSQL client tools) — verify with `psql --version`
+- **Supabase CLI** installed (included as dev dependency — `pnpm install`)
+- **Supabase personal access token** — generate at https://supabase.com/dashboard/account/tokens
+- **Production project ID** — available from the Supabase dashboard
 
-**Root Cause**: WSL2's virtualized networking layer attempts IPv6 connections first, but the IPv6 stack is not properly configured, causing "Network is unreachable" errors. The system tries to connect via IPv6 addresses that aren't accessible from the WSL2 environment.
+## Workflow 1: Restore Live Data to Local
 
-**Failed Solutions Attempted**:
-- Direct psql connections (IPv6 timeout)
-- `npx supabase db reset --db-url` (same IPv6 issue)
-- DNS resolution works but returns unreachable IPv6 addresses
-- Installing Windows PostgreSQL tools in WSL2 not feasible
+Pull production data into your local Supabase Docker instance for development.
 
-## Solution: SQL Editor Method
+**When to use:** Setting up a local dev environment with realistic data.
 
-Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all network connectivity issues.
-
-### Prerequisites
-
-1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only`)
-2. **Development database** access via Supabase web dashboard
-3. **Working directory**: Create `temp/` folder for split files
-
-### Step 1: Split the Database Dump
-
-Split the large seed.sql file into manageable chunks for SQL Editor execution:
+**Prerequisites:** Local Supabase must be running (`supabase start`).
 
 ```bash
-# Create temporary directory
-mkdir temp/
-
-# Split by table sections (adjust line numbers based on your dump structure)
-sed -n '1,1969p' supabase/seed.sql > temp/part1_auth.sql
-sed -n '1970,2707p' supabase/seed.sql > temp/part2_auth_users.sql
-sed -n '2708,3529p' supabase/seed.sql > temp/part3_teams_players.sql
-sed -n '3530,4441p' supabase/seed.sql > temp/part4_drafted_data.sql
-sed -n '4442,5032p' supabase/seed.sql > temp/part5_statistics.sql
+./scripts/db-restore-local.sh \
+  --project-id YOUR_PROD_PROJECT_ID \
+  --access-token YOUR_SUPABASE_ACCESS_TOKEN
 ```
 
-**Key Split Points** (find these in your dump):
-- Line ~25: `INSERT INTO "auth"."audit_log_entries"`
-- Line ~1970: `INSERT INTO "auth"."users"`
-- Line ~2708: `INSERT INTO "public"."drafted_teams"`
-- Line ~3530: `INSERT INTO "public"."drafted_players"`
-- Line ~4442: `INSERT INTO "public"."player_statistics"`
+If you already have a recent dump (`supabase/seed.sql`):
 
-### Step 2: Create Clear Script
-
-Create `temp/clear.sql` to safely remove existing data:
-
-```sql
--- CLEAR SCRIPT: Run this FIRST to clear all existing data in dev database
-SET session_replication_role = replica;
-
--- Clear auth tables (in reverse dependency order)
-TRUNCATE TABLE auth.mfa_amr_claims CASCADE;
-TRUNCATE TABLE auth.refresh_tokens CASCADE;
-TRUNCATE TABLE auth.sessions CASCADE;
-TRUNCATE TABLE auth.users CASCADE;
-TRUNCATE TABLE auth.audit_log_entries CASCADE;
-
--- Clear public tables (in reverse dependency order)
-TRUNCATE TABLE public.weekly_statistics CASCADE;
-TRUNCATE TABLE public.player_statistics CASCADE;
-TRUNCATE TABLE public.drafted_transfers CASCADE;
-TRUNCATE TABLE public.drafted_players CASCADE;
-TRUNCATE TABLE public.profiles CASCADE;
-TRUNCATE TABLE public.fixtures CASCADE;
-TRUNCATE TABLE public.players CASCADE;
-TRUNCATE TABLE public.teams CASCADE;
-TRUNCATE TABLE public.drafted_teams CASCADE;
-
--- Reset sequences (only public schema - auth sequences are protected)
-ALTER SEQUENCE public.drafted_players_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.drafted_teams_team_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.drafted_transfers_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.fixtures_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.player_statistics_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.weekly_statistics_id_seq RESTART WITH 1;
-
--- Note: auth.refresh_tokens_id_seq cannot be reset due to permissions
-
-SET session_replication_role = DEFAULT;
-
--- Verification: Check that tables are empty
-SELECT 'auth.audit_log_entries' as table_name, count(*) as row_count FROM auth.audit_log_entries
-UNION ALL
-SELECT 'auth.users', count(*) FROM auth.users
-UNION ALL
-SELECT 'public.drafted_teams', count(*) FROM public.drafted_teams
-UNION ALL
-SELECT 'public.players', count(*) FROM public.players;
+```bash
+./scripts/db-restore-local.sh --skip-dump
 ```
 
-### Step 3: Add Headers to Part Files
+**What happens:**
+1. Dumps production data via Supabase management API (read-only, bypasses IPv6)
+2. Clears all local tables
+3. Restores dump via `psql` to `127.0.0.1:54322` (IPv4, no connectivity issues)
+4. Verifies row counts
 
-Add proper SQL headers to each part file:
+## Workflow 2: Refresh Staging from Live
 
-```sql
--- PART X: Description
-SET session_replication_role = replica;
+Refresh data on an existing staging environment. The staging project must already have migrations applied (via CI/CD — merge to the `staging` branch).
 
--- (existing INSERT statements follow)
+**When to use:** Staging data is stale or corrupted and needs refreshing.
+
+```bash
+./scripts/db-restore-staging.sh \
+  --prod-project-id YOUR_PROD_PROJECT_ID \
+  --access-token YOUR_SUPABASE_ACCESS_TOKEN \
+  --staging-project-id YOUR_STAGING_PROJECT_ID \
+  --staging-db-password YOUR_STAGING_DB_PASSWORD
 ```
 
-### Step 4: Execute via SQL Editor
+**What happens:**
+1. Dumps production data (read-only)
+2. Safety check: verifies staging ID does not match production ID
+3. Connects to staging (pooler first, falls back to direct IPv4)
+4. Clears staging tables and restores dump
+5. Verifies row counts
 
-1. **Access Dev Database**: Go to development Supabase project → SQL Editor
+## Workflow 3: Full Staging Rebuild
 
-2. **Pre-Execution Check**: Before running part5, search the file for the storage.buckets section and **remove it** to avoid duplicate key errors (see "Storage Bucket Duplicate Key Errors" in Common Issues section)
+Full rebuild when the staging Supabase project has been deleted and recreated (e.g. after a 90-day free-tier pause).
 
-3. **Execute in Order**:
-   - `clear.sql` (verify tables show 0 rows)
-   - `part1_auth_audit.sql`
-   - `part2_auth_users.sql`
-   - `part3_teams_players.sql`
-   - `part4_drafted_data.sql`
-   - `part5_profiles_fixtures_stats.sql` ⚠️ (after removing storage.buckets INSERT)
-   - `part6_sequences.sql`
+**When to use:** New staging project with no schema or data.
 
-### Step 5: Verify Success
-
-Run verification query in SQL Editor:
-
-```sql
-SELECT
-    'auth.users' as table_name, count(*) as rows FROM auth.users
-UNION ALL
-SELECT 'public.drafted_teams', count(*) FROM public.drafted_teams
-UNION ALL
-SELECT 'public.players', count(*) FROM public.players
-UNION ALL
-SELECT 'public.fixtures', count(*) FROM public.fixtures
-UNION ALL
-SELECT 'public.player_statistics', count(*) FROM public.player_statistics
-ORDER BY table_name;
+```bash
+./scripts/db-rebuild-staging.sh \
+  --prod-project-id YOUR_PROD_PROJECT_ID \
+  --access-token YOUR_SUPABASE_ACCESS_TOKEN \
+  --staging-project-id YOUR_STAGING_PROJECT_ID \
+  --staging-db-password YOUR_STAGING_DB_PASSWORD
 ```
 
-## Common Issues and Solutions
+**What happens:**
+1. Dumps production data (read-only)
+2. Temporarily links Supabase CLI to staging (never production)
+3. Applies all migrations via `supabase db push`
+4. Unlinks CLI from staging (cleans up `.temp` files)
+5. Clears staging tables and restores dump
+6. Verifies row counts
 
-### Permission Errors on Sequences
+**After rebuild, update GitHub Secrets:**
+- `STAGING_PROJECT_ID` — new staging project ID
+- `STAGING_DB_PASSWORD` — new staging database password
 
-**Error**: `must be owner of sequence refresh_tokens_id_seq`
+## WSL2 / IPv6 Connectivity
 
-**Solution**: Skip auth schema sequence resets - they're protected by Supabase. Only reset public schema sequences.
+All three scripts handle the IPv6 connectivity issues common in WSL2 environments:
 
-### SQL Editor Timeouts
+| Operation | Connection method | IPv6 issue? |
+|-----------|------------------|-------------|
+| Production dump | Supabase management API | No |
+| Local restore | `psql` to `127.0.0.1` (IPv4) | No |
+| Staging write | Connection pooler, fallback to direct IPv4 | Handled |
 
-**Solution**: Split large files further if needed. Most files under 1000 lines execute successfully.
+### Manual Fallback (SQL Editor)
 
-### IPv6 Network Issues
+If staging connectivity fails completely from WSL2, you can restore data manually via the Supabase SQL Editor:
 
-**Solution**: This method completely bypasses network connectivity by using the web interface.
-
-### Storage Bucket Duplicate Key Errors
-
-**Error**: `ERROR: 23505: duplicate key value violates unique constraint "buckets_pkey" DETAIL: Key (id)=(avatars) already exists.`
-
-**Root Cause**: The `storage.buckets` table in your dev database already contains infrastructure buckets (like 'avatars') that were created during initial Supabase project setup. The seed.sql dump includes these buckets, causing conflicts when restoring.
-
-**Solution**: Remove the storage bucket INSERT statements from the restoration files before execution:
-
-1. **Locate the storage section** in your part file containing statistics data (typically part5):
-   ```sql
-   --
-   -- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
-   --
-
-   INSERT INTO "storage"."buckets" ("id", "name", "owner", "created_at", "updated_at", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types", "owner_id", "type") VALUES
-   	('avatars', 'avatars', NULL, '2023-07-30 17:46:08.561788+00', '2023-07-30 17:46:08.561788+00', false, false, NULL, NULL, NULL, 'STANDARD');
-   ```
-
-2. **Delete these lines entirely** - from the comment block through the INSERT statement and blank lines
-
-3. **Keep the footer**: Make sure `SET session_replication_role = DEFAULT;` remains at the end of the file
-
-**Why this is safe**: Storage buckets are infrastructure that persist across environments. They don't need to be restored from live database dumps - your dev database buckets are appropriate for development.
-
-## File Organization
-
-```
-temp/
-├── clear.sql                          # Data clearing script (42 lines)
-├── part1_auth_audit.sql               # Auth audit logs (2,459 lines)
-├── part2_auth_users.sql               # Users, sessions & tokens (1,046 lines)
-├── part3_teams_players.sql            # Teams & players (842 lines)
-├── part4_drafted_data.sql             # Drafted players & transfers (543 lines)
-├── part5_profiles_fixtures_stats.sql  # Profiles, fixtures & statistics (1,681 lines)
-│   └── ⚠️ Remove storage.buckets INSERT before execution
-├── part6_sequences.sql                # Sequence resets (62 lines)
-├── README.md                          # File documentation
-└── EXECUTION_GUIDE.md                 # Step-by-step instructions
-```
+1. Generate the dump: `./scripts/db-restore-local.sh` creates `supabase/seed.sql`
+2. Split the file into chunks: `mkdir temp && sed -n '1,2000p' supabase/seed.sql > temp/part1.sql` (etc.)
+3. Execute each chunk via the staging project's SQL Editor in the Supabase dashboard
+4. See the original detailed guide in git history for specific split points and troubleshooting
 
 ## Safety Guarantees
 
-✅ **Live database never modified** - only read from during dump creation
-✅ **Development database clearly targeted** - different hostnames prevent confusion
-✅ **Reversible operations** - can clear and restore again anytime
-✅ **Network-independent** - uses web interface instead of direct connections
+- Production database is **never modified** — read-only dump operations only
+- All scripts require **explicit typed confirmation** before proceeding
+- Staging scripts verify the staging project ID **does not match** production
+- **No credentials are stored** in any file — all provided as CLI arguments
+- Scripts clean up temporary CLI links after use
+- `.gitignore` blocks all `.env` variants (except `.env.example`)
 
 ---
 
-**Last Updated**: September 2025
-**Verified Working**: Supabase projects with 5000+ line database dumps
-**Environment**: WSL2 with IPv6 connectivity issues
+**Last Updated**: March 2026

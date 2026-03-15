@@ -6,6 +6,8 @@ node-compile-cache/
 .cache
 .output
 .env
+.env.*
+!.env.example
 dist
 
 # Working docs and private directories

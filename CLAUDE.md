@@ -4,6 +4,54 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 
 > **For general development practices** (TDD, TypeScript guidelines, code style, testing philosophy), see `~/.claude/CLAUDE.md` and the linked documentation.
 
+## Database Safety Rules
+
+### Absolute Rules (zero exceptions)
+
+1. **Never write to production from a local environment.**
+   No CLI command, script, migration, or query may target the production database. Production schema changes happen exclusively via the CI/CD pipeline (`supabase db push` in GitHub Actions).
+
+2. **Never store production credentials locally.**
+   No production database URL, password, connection string, or project ID may exist in any file in this project. The `.env` file contains **only local Supabase credentials** (127.0.0.1). Production and staging credentials are managed exclusively via GitHub Secrets.
+
+3. **Never run `supabase` CLI commands that target remote databases.**
+   Do not run `supabase link`, `supabase db push`, `supabase db pull`, or any CLI subcommand that connects to a remote database. If a Supabase CLI command is needed, tell the user what to run and let them execute it. The only safe local commands are `supabase start`, `supabase stop`, `supabase db reset`, `supabase migration new`, and `supabase gen types --local`.
+
+4. **Never run write operations against any remote database.**
+   This includes INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, or any other mutating SQL against production or staging. The restore scripts in `scripts/` are the only approved mechanism for writing to staging, and they include safety checks to prevent targeting production.
+
+### Schema Change Workflow
+
+All schema changes follow this exact flow:
+
+1. Create migration locally: `npx supabase migration new <name>`
+2. Write SQL in `supabase/migrations/<timestamp>_<name>.sql`
+3. Test locally: `supabase db reset` (applies migrations + seed to local Docker instance)
+4. Commit migration file and push to branch
+5. CI validates migrations apply cleanly (`supabase db start`)
+6. Merge to `staging` branch triggers CI/CD to apply migrations to staging
+7. Merge to `main` branch triggers CI/CD to apply migrations to production
+
+### Data Restore Scripts
+
+Three bash scripts exist in `scripts/` for data restoration. All are **read-only against production** (dump only). All require credentials as CLI arguments (never stored in files).
+
+| Script | Purpose | Writes to |
+|--------|---------|-----------|
+| `db-restore-local.sh` | Pull live data into local Supabase Docker instance | Local only (127.0.0.1) |
+| `db-restore-staging.sh` | Refresh existing staging environment from live | Staging only |
+| `db-rebuild-staging.sh` | Full rebuild of new staging from live (migrations + data) | Staging only |
+
+Run `./scripts/<script>.sh --help` for usage details.
+
+### What CI/CD Handles (never local)
+
+- `supabase db push` to production (`.github/workflows/deploy-production.yml`)
+- `supabase db push` to staging (`.github/workflows/deploy-staging.yml`)
+- Migration validation via `supabase db start` (`.github/workflows/ci.yml`)
+
+---
+
 ## Quick Reference
 
 **Key Commands**:

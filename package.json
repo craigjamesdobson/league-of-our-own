@@ -13,10 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts",
-    "db:restore-local": "./scripts/db-restore-local.sh",
-    "db:restore-staging": "./scripts/db-restore-staging.sh",
-    "db:rebuild-staging": "./scripts/db-rebuild-staging.sh"
+    "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.3",

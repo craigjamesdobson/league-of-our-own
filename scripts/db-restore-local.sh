@@ -8,7 +8,10 @@ set -euo pipefail
 # Docker instance. Production is never written to.
 #
 # Usage:
-#   ./scripts/db-restore-local.sh --project-id <PROD_PROJECT_ID> --db-password <PROD_DB_PASSWORD>
+#   ./scripts/db-restore-local.sh --project-id <PROD_PROJECT_ID> --dump-password <DUMP_USER_PASSWORD>
+#
+# The dump uses the read-only `dump_user` role — it cannot write to production.
+# The postgres superuser password must never be used locally.
 #
 # Prerequisites:
 #   - Local Supabase running (supabase start)
@@ -38,13 +41,14 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 # -----------------------------------------------------------------------------
 usage() {
   cat <<EOF
-Usage: $0 --project-id <PROD_PROJECT_ID> --db-password <PROD_DB_PASSWORD>
+Usage: $0 --project-id <PROD_PROJECT_ID> --dump-password <DUMP_USER_PASSWORD>
 
 Dumps production data (read-only) and restores it into the local Supabase instance.
+Uses the read-only 'dump_user' role — cannot write to production under any circumstances.
 
 Options:
   --project-id     Production Supabase project ID (read-only dump)
-  --db-password    Production database password
+  --dump-password  Password for the read-only 'dump_user' role
   --skip-dump      Skip the dump step and use existing supabase/seed.sql
   -h, --help       Show this help message
 EOF
@@ -55,13 +59,25 @@ EOF
 # Parse arguments
 # -----------------------------------------------------------------------------
 PROJECT_ID=""
-PROD_DB_PASSWORD=""
+DUMP_PASSWORD=""
 SKIP_DUMP=false
+
+# No arguments — likely triggered via VSCode play button
+if [[ $# -eq 0 ]]; then
+  echo ""
+  echo "This script requires credentials and must be run from the terminal:"
+  echo ""
+  echo "  pnpm db:restore-local --project-id <PROD_PROJECT_ID> --dump-password <DUMP_USER_PASSWORD>"
+  echo ""
+  echo "See scripts/README.md for full usage."
+  echo ""
+  exit 1
+fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --project-id)     PROJECT_ID="$2"; shift 2 ;;
-    --db-password)    PROD_DB_PASSWORD="$2"; shift 2 ;;
+    --dump-password)  DUMP_PASSWORD="$2"; shift 2 ;;
     --skip-dump)      SKIP_DUMP=true; shift ;;
     -h|--help)        usage ;;
     *)                error "Unknown option: $1"; usage ;;
@@ -74,8 +90,8 @@ if [[ "$SKIP_DUMP" == false ]]; then
     error "Missing required argument: --project-id"
     usage
   fi
-  if [[ -z "$PROD_DB_PASSWORD" ]]; then
-    error "Missing required argument: --db-password"
+  if [[ -z "$DUMP_PASSWORD" ]]; then
+    error "Missing required argument: --dump-password"
     usage
   fi
 fi
@@ -133,9 +149,11 @@ fi
 # Step 1: Dump production data (read-only)
 # -----------------------------------------------------------------------------
 if [[ "$SKIP_DUMP" == false ]]; then
-  info "Dumping production data (read-only)..."
-  # Build the production DB URL using the connection pooler (works around WSL2 IPv6 issues)
-  PROD_DB_URL="postgresql://postgres.${PROJECT_ID}:${PROD_DB_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
+  info "Dumping production data (read-only via dump_user)..."
+  # Use the read-only dump_user role — structurally cannot write to production.
+  # Password is percent-encoded to handle special characters in the URL.
+  ENCODED_DUMP_PASSWORD=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$DUMP_PASSWORD")
+  PROD_DB_URL="postgresql://dump_user.${PROJECT_ID}:${ENCODED_DUMP_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
   npx supabase db dump \
     --db-url "$PROD_DB_URL" \
     --data-only \

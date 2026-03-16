@@ -17,9 +17,13 @@ set -euo pipefail
 # Usage:
 #   ./scripts/db-rebuild-staging.sh \
 #     --prod-project-id <PROD_ID> \
-#     --prod-db-password <PROD_DB_PASSWORD> \
+#     --prod-dump-password <DUMP_USER_PASSWORD> \
 #     --staging-project-id <STAGING_ID> \
-#     --staging-db-password <PASSWORD>
+#     --staging-db-password <PASSWORD> \
+#     --staging-pooler-host <HOST>
+#
+# The dump uses the read-only `dump_user` role — it cannot write to production.
+# The postgres superuser password must never be used locally.
 #
 # Prerequisites:
 #   - psql installed
@@ -47,16 +51,19 @@ error()   { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 # -----------------------------------------------------------------------------
 usage() {
   cat <<EOF
-Usage: $0 --prod-project-id <ID> --prod-db-password <PASSWORD> --staging-project-id <ID> --staging-db-password <PASSWORD>
+Usage: $0 --prod-project-id <ID> --prod-dump-password <PASSWORD> --staging-project-id <ID> --staging-db-password <PASSWORD> --staging-pooler-host <HOST>
 
 Full rebuild of a staging environment from a fresh Supabase project.
+Uses the read-only 'dump_user' role for the production dump — cannot write to production under any circumstances.
 Applies all migrations, then restores production data.
 
 Options:
   --prod-project-id       Production Supabase project ID (read-only dump)
-  --prod-db-password      Production database password
+  --prod-dump-password    Password for the read-only 'dump_user' role
   --staging-project-id    Staging Supabase project ID (write target)
   --staging-db-password   Staging database password
+  --staging-pooler-host   Staging connection pooler host (e.g. aws-1-eu-west-1.pooler.supabase.com)
+                          Find this in: Supabase dashboard → Settings → Database → Connection pooling
   --skip-dump             Skip the dump step and use existing supabase/seed.sql
   -h, --help              Show this help message
 EOF
@@ -67,17 +74,31 @@ EOF
 # Parse arguments
 # -----------------------------------------------------------------------------
 PROD_PROJECT_ID=""
-PROD_DB_PASSWORD=""
+PROD_DUMP_PASSWORD=""
 STAGING_PROJECT_ID=""
 STAGING_DB_PASSWORD=""
+STAGING_POOLER_HOST=""
 SKIP_DUMP=false
+
+# No arguments — likely triggered via VSCode play button
+if [[ $# -eq 0 ]]; then
+  echo ""
+  echo "This script requires credentials and must be run from the terminal:"
+  echo ""
+  echo "  pnpm db:rebuild-staging --prod-project-id <ID> --prod-dump-password <PASSWORD> --staging-project-id <ID> --staging-db-password <PASSWORD> --staging-pooler-host <HOST>"
+  echo ""
+  echo "See scripts/README.md for full usage."
+  echo ""
+  exit 1
+fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --prod-project-id)      PROD_PROJECT_ID="$2"; shift 2 ;;
-    --prod-db-password)     PROD_DB_PASSWORD="$2"; shift 2 ;;
+    --prod-dump-password)   PROD_DUMP_PASSWORD="$2"; shift 2 ;;
     --staging-project-id)   STAGING_PROJECT_ID="$2"; shift 2 ;;
     --staging-db-password)  STAGING_DB_PASSWORD="$2"; shift 2 ;;
+    --staging-pooler-host)  STAGING_POOLER_HOST="$2"; shift 2 ;;
     --skip-dump)            SKIP_DUMP=true; shift ;;
     -h|--help)              usage ;;
     *)                      error "Unknown option: $1"; usage ;;
@@ -86,11 +107,12 @@ done
 
 # Validate required arguments
 if [[ "$SKIP_DUMP" == false ]]; then
-  [[ -z "$PROD_PROJECT_ID" ]]   && { error "Missing: --prod-project-id"; usage; }
-  [[ -z "$PROD_DB_PASSWORD" ]]  && { error "Missing: --prod-db-password"; usage; }
+  [[ -z "$PROD_PROJECT_ID" ]]    && { error "Missing: --prod-project-id"; usage; }
+  [[ -z "$PROD_DUMP_PASSWORD" ]] && { error "Missing: --prod-dump-password"; usage; }
 fi
-[[ -z "$STAGING_PROJECT_ID" ]]    && { error "Missing: --staging-project-id"; usage; }
-[[ -z "$STAGING_DB_PASSWORD" ]]   && { error "Missing: --staging-db-password"; usage; }
+[[ -z "$STAGING_PROJECT_ID" ]]   && { error "Missing: --staging-project-id"; usage; }
+[[ -z "$STAGING_DB_PASSWORD" ]]  && { error "Missing: --staging-db-password"; usage; }
+[[ -z "$STAGING_POOLER_HOST" ]]  && { error "Missing: --staging-pooler-host (e.g. aws-1-eu-west-1.pooler.supabase.com)"; usage; }
 
 # Safety: ensure staging and production are different projects
 if [[ "$SKIP_DUMP" == false && "$STAGING_PROJECT_ID" == "$PROD_PROJECT_ID" ]]; then
@@ -103,7 +125,7 @@ fi
 # Build staging connection URL
 # -----------------------------------------------------------------------------
 STAGING_HOST="db.${STAGING_PROJECT_ID}.supabase.co"
-STAGING_DB_URL="postgresql://postgres.${STAGING_PROJECT_ID}:${STAGING_DB_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:6543/postgres"
+STAGING_DB_URL="postgresql://postgres.${STAGING_PROJECT_ID}:${STAGING_DB_PASSWORD}@${STAGING_POOLER_HOST}:5432/postgres"
 
 # -----------------------------------------------------------------------------
 # Preflight checks
@@ -161,9 +183,10 @@ echo "  STAGING FULL REBUILD"
 echo "============================================="
 echo ""
 if [[ "$SKIP_DUMP" == false ]]; then
-  info "Source:      Production project ${PROD_PROJECT_ID} (READ-ONLY dump)"
+  info "Source:      Production project ${PROD_PROJECT_ID} (READ-ONLY via dump_user)"
 fi
 info "Destination: Staging project ${STAGING_PROJECT_ID} (FRESH rebuild)"
+info "Pooler:      ${STAGING_POOLER_HOST}"
 info "Migrations:  ${MIGRATION_COUNT} files to apply"
 info "Dump file:   ${DUMP_FILE}"
 echo ""
@@ -185,8 +208,10 @@ fi
 # Step 1: Dump production data (read-only)
 # -----------------------------------------------------------------------------
 if [[ "$SKIP_DUMP" == false ]]; then
-  info "Dumping production data (read-only)..."
-  PROD_DB_URL="postgresql://postgres.${PROD_PROJECT_ID}:${PROD_DB_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
+  info "Dumping production data (read-only via dump_user)..."
+  # Use the read-only dump_user role — structurally cannot write to production.
+  ENCODED_DUMP_PASSWORD=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$PROD_DUMP_PASSWORD")
+  PROD_DB_URL="postgresql://dump_user.${PROD_PROJECT_ID}:${ENCODED_DUMP_PASSWORD}@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
   npx supabase db dump \
     --db-url "$PROD_DB_URL" \
     --data-only \

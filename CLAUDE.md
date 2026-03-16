@@ -15,14 +15,21 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 1. **Never write to production from a local environment.**
    No CLI command, script, migration, or query may target the production database. Production schema changes happen exclusively via the CI/CD pipeline (`supabase db push` in GitHub Actions).
 
-2. **Never store production credentials locally.**
-   No production database URL, password, connection string, or project ID may exist in any file in this project. The `.env` file contains **only local Supabase credentials** (127.0.0.1). Production and staging credentials are managed exclusively via GitHub Secrets.
+2. **Never store production superuser credentials locally.**
+   The `postgres` superuser password must never exist in any local file, `.env`, or script. It lives exclusively in GitHub/Cloudflare secrets and is only used by CI/CD. The only production credential permitted locally is the `dump_user` password (read-only role — see below).
 
 3. **Never run `supabase` CLI commands that target remote databases.**
    Do not run `supabase link`, `supabase db push`, `supabase db pull`, or any CLI subcommand that connects to a remote database. If a Supabase CLI command is needed, tell the user what to run and let them execute it. The only safe local commands are `supabase start`, `supabase stop`, `supabase db reset`, `supabase migration new`, and `supabase gen types --local`.
 
 4. **Never run write operations against any remote database.**
    This includes INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, or any other mutating SQL against production or staging. The restore scripts in `scripts/` are the only approved mechanism for writing to staging, and they include safety checks to prevent targeting production.
+
+### Production Read-Only Access
+
+Production dumps use a dedicated **`dump_user` PostgreSQL role** with `SELECT`-only privileges on `public` and `auth` schemas. This role is enforced at the PostgreSQL level — even if misused in a write command, the database will reject it.
+
+- `dump_user` password → safe to use locally, share with team members who need to run restore scripts
+- `postgres` superuser password → GitHub/CF secrets only, never locally
 
 ### Schema Change Workflow
 
@@ -38,7 +45,7 @@ All schema changes follow this exact flow:
 
 ### Data Restore Scripts
 
-Three bash scripts exist in `scripts/` for data restoration. All are **read-only against production** (dump only). All require credentials as CLI arguments (never stored in files).
+Three bash scripts exist in `scripts/` for data restoration. All are **read-only against production** (dump only via `dump_user`). All require credentials as CLI arguments (never stored in files).
 
 | Script | Purpose | Writes to |
 |--------|---------|-----------|
@@ -46,7 +53,7 @@ Three bash scripts exist in `scripts/` for data restoration. All are **read-only
 | `db-restore-staging.sh` | Refresh existing staging environment from live | Staging only |
 | `db-rebuild-staging.sh` | Full rebuild of new staging from live (migrations + data) | Staging only |
 
-Run `./scripts/<script>.sh --help` for usage details.
+Run `pnpm <script> --help` for usage details.
 
 ### What CI/CD Handles (never local)
 

@@ -116,6 +116,12 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-12-17',
 
+  nitro: {
+    externals: {
+      inline: ['resend'],
+    },
+  },
+
   hotjar: {
     hotjarId: 5090647,
   },

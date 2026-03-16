@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Web Application
 
-*Last updated: 2025-07-24*
+*Last updated: 2025-11-15*
 
 ## Overview
 
@@ -20,11 +20,12 @@ This is a sophisticated fantasy football web application built with modern web t
 ### Frontend Architecture
 
 #### Core Framework
-- **Nuxt 3** (v3.17.6) - Vue.js framework configured as SPA
+- **Nuxt 4** (v4.1.2) - Vue.js framework configured as SPA
   - SSR disabled (`ssr: false`)
-  - File-based routing with `/pages/` directory
+  - File-based routing with `/app/pages/` directory
   - Auto-imports for components and composables
   - Built-in TypeScript support
+  - `/app/` directory for all application code (Nuxt 4 convention)
 
 #### UI Framework & Styling
 - **PrimeVue** (v4.2.5) - Component library
@@ -59,7 +60,7 @@ This is a sophisticated fantasy football web application built with modern web t
   - Auto-generated TypeScript types
 
 #### Server-Side Functionality
-- **Nitro** - Nuxt 3's server engine
+- **Nitro** - Nuxt 4's server engine
   - API routes in `/server/api/`
   - Email functionality via Resend service
   - Admin notifications and user confirmations
@@ -85,24 +86,28 @@ This is a sophisticated fantasy football web application built with modern web t
 
 ```
 league-of-our-own/
-├── assets/                 # Static assets (styles, images)
-├── components/            # Vue components (feature-organised)
-├── composables/          # Reusable business logic
-├── docs/                 # Documentation
-├── logic/                # Domain-specific business rules
-├── pages/                # File-based routing
-├── server/               # Nitro API endpoints
-├── stores/               # Pinia state management
-├── supabase/             # Database configuration
-├── types/                # TypeScript type definitions
-└── utils/                # Utility functions
+├── app/                   # Application code (Nuxt 4 convention)
+│   ├── assets/            # Static assets (styles, images)
+│   ├── components/        # Vue components (feature-organised)
+│   ├── composables/       # Reusable business logic
+│   ├── layouts/           # Layout components
+│   ├── logic/             # Domain-specific business rules
+│   ├── middleware/        # Route middleware
+│   ├── pages/             # File-based routing
+│   ├── stores/            # Pinia state management
+│   ├── tests/             # Vitest test suites
+│   ├── types/             # TypeScript type definitions
+│   └── utils/             # Utility functions
+├── docs/                  # Documentation
+├── server/                # Nitro API endpoints
+└── supabase/              # Database configuration
 ```
 
 ### Component Architecture
 
 #### Component Organisation Pattern
 ```
-components/
+app/components/
 ├── Common/               # Reusable UI components
 │   ├── FormField.vue    # Form input wrapper
 │   ├── Modal.vue        # Centralised modal system
@@ -125,7 +130,7 @@ components/
 
 #### Store Structure
 ```
-stores/
+app/stores/
 ├── account.ts           # User authentication & session
 ├── draftedTeams.ts      # Fantasy team management
 ├── fixtures.ts          # Match fixtures & statistics
@@ -165,7 +170,7 @@ User Action → Component → Store/Composable → Database
 
 #### Type System Structure
 ```
-types/
+app/types/
 ├── database-generated.types.ts  # Auto-generated Supabase types
 ├── database.types.ts           # Custom type overrides
 ├── DraftedPlayer.ts           # Fantasy team types
@@ -340,7 +345,7 @@ pnpm generate-types  # Supabase type generation
 
 #### **Important Decisions**
 - **PrimeVue UI Library**: Chosen for comprehensive component set
-- **File-based Routing**: Leveraged Nuxt 3's convention over configuration
+- **File-based Routing**: Leveraged Nuxt 4's convention over configuration
 - **Composable Architecture**: Adopted for reusable business logic
 - **Two-stage Verification**: Implemented for data integrity
 

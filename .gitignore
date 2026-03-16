@@ -1,10 +1,13 @@
 node_modules
+node-compile-cache/
 *.log*
 .nuxt
 .nitro
 .cache
 .output
 .env
+.env.*
+!.env.example
 dist
 
 # Working docs and private directories

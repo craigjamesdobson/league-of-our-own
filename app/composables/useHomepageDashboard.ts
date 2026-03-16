@@ -231,33 +231,77 @@ export function useHomepageDashboard() {
         return;
       }
 
-      const results = await Promise.all(transfers.map(async (transfer) => {
-        const { data: draftedPlayer } = await supabase
-          .from('drafted_players')
-          .select(`
-            drafted_player,
-            drafted_teams(team_name, team_owner),
-            players_view(web_name, image, team_short_name, cost)
-          `)
-          .eq('drafted_player_id', transfer.drafted_player)
-          .single();
+      const draftedPlayerIds = transfers.map(t => t.drafted_player);
+      const newPlayerIds = transfers.map(t => t.player_id);
 
-        const { data: newPlayer } = await supabase
+      // Batch-fetch all required data in parallel to avoid N+1 queries
+      const [
+        { data: draftedPlayersData, error: draftedPlayersError },
+        { data: newPlayersData, error: newPlayersError },
+        { data: allPriorTransfers, error: priorTransfersError },
+      ] = await Promise.all([
+        supabase
+          .from('drafted_players')
+          .select('drafted_player_id, drafted_player, drafted_teams(team_name, team_owner), players_view(web_name, image, team_short_name, cost)')
+          .in('drafted_player_id', draftedPlayerIds),
+        supabase
           .from('players_view')
-          .select('web_name, team_short_name, position, image, cost')
-          .eq('player_id', transfer.player_id)
-          .single();
+          .select('player_id, web_name, team_short_name, position, image, cost')
+          .in('player_id', newPlayerIds),
+        supabase
+          .from('drafted_transfers')
+          .select('drafted_player, player_id, transfer_week')
+          .in('drafted_player', draftedPlayerIds)
+          .lt('transfer_week', week)
+          .order('transfer_week', { ascending: false }),
+      ]);
+
+      if (draftedPlayersError) console.error('Error fetching drafted players:', draftedPlayersError);
+      if (newPlayersError) console.error('Error fetching new players:', newPlayersError);
+      if (priorTransfersError) console.error('Error fetching prior transfers:', priorTransfersError);
+
+      // Find the most recent prior transfer per slot in-memory (results are already ordered desc)
+      const mostRecentPriorPerSlot = new Map<number, number>();
+      for (const pt of (allPriorTransfers ?? [])) {
+        if (!mostRecentPriorPerSlot.has(pt.drafted_player)) {
+          mostRecentPriorPerSlot.set(pt.drafted_player, pt.player_id);
+        }
+      }
+
+      // Batch-fetch prior players if any slots had a prior transfer
+      const priorPlayerIds = [...new Set(mostRecentPriorPerSlot.values())];
+      let priorPlayersData: Array<{ player_id: number; web_name: string; image: string | null; team_short_name: string; cost: number }> | null = null;
+      if (priorPlayerIds.length > 0) {
+        const { data, error: priorPlayersError } = await supabase
+          .from('players_view')
+          .select('player_id, web_name, image, team_short_name, cost')
+          .in('player_id', priorPlayerIds);
+        if (priorPlayersError) console.error('Error fetching prior players:', priorPlayersError);
+        priorPlayersData = data;
+      }
+
+      // Index everything for O(1) lookups
+      const draftedPlayerMap = new Map((draftedPlayersData ?? []).map(p => [p.drafted_player_id, p]));
+      const newPlayerMap = new Map((newPlayersData ?? []).map(p => [p.player_id, p]));
+      const priorPlayerMap = new Map((priorPlayersData ?? []).map(p => [p.player_id, p]));
+
+      const results = transfers.map((transfer) => {
+        const draftedPlayer = draftedPlayerMap.get(transfer.drafted_player);
+        const newPlayer = newPlayerMap.get(transfer.player_id);
+        const priorPlayerId = mostRecentPriorPerSlot.get(transfer.drafted_player);
+        const priorPlayer = priorPlayerId !== undefined ? priorPlayerMap.get(priorPlayerId) : undefined;
+        const playerOut = priorPlayer ?? draftedPlayer?.players_view;
 
         return {
           drafted_transfer_id: transfer.drafted_transfer_id,
           transfer_week: transfer.transfer_week || 0,
           team_name: draftedPlayer?.drafted_teams?.team_name || 'Unknown Team',
           team_owner: draftedPlayer?.drafted_teams?.team_owner || 'Unknown Owner',
-          player_out: draftedPlayer?.players_view?.web_name || 'Unknown Player',
-          player_out_image: draftedPlayer?.players_view?.image || '',
-          player_out_team: draftedPlayer?.players_view?.team_short_name || 'Unknown',
-          player_out_team_short: draftedPlayer?.players_view?.team_short_name || 'Unknown',
-          player_out_cost: draftedPlayer?.players_view?.cost || 0,
+          player_out: playerOut?.web_name || 'Unknown Player',
+          player_out_image: playerOut?.image || '',
+          player_out_team: playerOut?.team_short_name || 'Unknown',
+          player_out_team_short: playerOut?.team_short_name || 'Unknown',
+          player_out_cost: playerOut?.cost || 0,
           player_in: newPlayer?.web_name || 'Unknown Player',
           player_in_image: newPlayer?.image || '',
           player_in_team: newPlayer?.team_short_name || 'Unknown',
@@ -265,7 +309,7 @@ export function useHomepageDashboard() {
           player_in_cost: newPlayer?.cost || 0,
           player_in_position: getPositionName(newPlayer?.position || 0),
         };
-      }));
+      });
 
       weeklyTransfers.value = results;
     }

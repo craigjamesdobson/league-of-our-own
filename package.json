@@ -13,18 +13,18 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
-    "generate-types:local": "npx supabase gen types typescript --local > types/database-generated.types.ts"
+    "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.3",
     "@primevue/core": "^4.3.9",
+    "@react-email/render": "^2.0.0",
     "@supabase/supabase-js": "^2.57.4",
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
     "pinia": "^3.0.3",
     "primevue": "^4.3.9",
-    "resend": "^6.1.1",
+    "resend": "^6.4.2",
     "vue": "^3.5.13"
   },
   "devDependencies": {

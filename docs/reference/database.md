@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2025-07-19*
+*Last updated: 2025-11-15*
 
 ## Overview
 
@@ -697,4 +697,4 @@ WHERE dp.drafted_team = :team_id;
 
 ---
 
-*This database documentation provides comprehensive coverage of the League of our own database schema, patterns, and best practices. For implementation details, refer to the type definitions in `/types/` and the Supabase configuration in `/supabase/`.*
+*This database documentation provides comprehensive coverage of the League of our own database schema, patterns, and best practices. For implementation details, refer to the type definitions in `/app/types/` and the Supabase configuration in `/supabase/`.*

@@ -4,6 +4,10 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 
 > **For general development practices** (TDD, TypeScript guidelines, code style, testing philosophy), see `~/.claude/CLAUDE.md` and the linked documentation.
 
+## Git Rules
+
+- **Always get explicit user approval before committing.** Show the proposed commit message and files to be committed, then wait for confirmation before running `git commit`.
+
 ## Database Safety Rules
 
 ### Absolute Rules (zero exceptions)

@@ -25,6 +25,22 @@ export const useTableStore = defineStore('table-store', () => {
     weeklyData.value = data;
   };
 
+  const fetchFinalStandings = async (week: number): Promise<WeeklyData[]> => {
+    const { data, error } = await supabase.rpc(
+      'get_weekly_stats_for_gameweek',
+      {
+        target_week: week,
+        active_season_param: config.public.ACTIVE_SEASON,
+      },
+    );
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  };
+
   const fetchWeeklyWinners = async () => {
     const { data, error } = await supabase.rpc('get_weekly_winners');
 
@@ -36,5 +52,5 @@ export const useTableStore = defineStore('table-store', () => {
     weeklyWinners.value = data;
   };
 
-  return { fetchWeeklyStats, weeklyData, weeklyWinners, fetchWeeklyWinners };
+  return { fetchWeeklyStats, fetchFinalStandings, weeklyData, weeklyWinners, fetchWeeklyWinners };
 });

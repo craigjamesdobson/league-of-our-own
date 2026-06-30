@@ -148,13 +148,13 @@ Use Zod with Nuxt UI forms.
 
 ### Phase 2: Hard Surface Validation
 
-- [ ] Convert one representative read-heavy table: `app/components/Table/Data.vue`.
-- [ ] Convert the fixture stats entry experience: `app/components/Fixture/StatsInput.vue`.
-- [ ] Decide whether fixture stat entry uses `UTable` or custom markup.
-- [ ] Convert one dialog-heavy flow: `app/components/Drafted/DraftedPlayerEditDialog.vue`.
-- [ ] Convert the validation in that flow to Zod.
-- [ ] Add or update focused behavior tests for changed validation/table interactions.
-- [ ] Run lint, typecheck, tests, and build.
+- [x] Convert one representative read-heavy table: `app/components/Table/Data.vue`.
+- [x] Convert the fixture stats entry experience: `app/components/Fixture/StatsInput.vue`.
+- [x] Decide whether fixture stat entry uses `UTable` or custom markup. Use custom Nuxt UI-powered table markup for this row-editing workflow.
+- [x] Convert one dialog-heavy flow: `app/components/Drafted/DraftedPlayerEditDialog.vue`.
+- [x] Convert the validation in that flow to Zod.
+- [x] Add or update focused behavior tests for changed validation/table interactions.
+- [x] Run lint, typecheck, tests, and build.
 
 ### Phase 3: Forms And Admin Flows
 

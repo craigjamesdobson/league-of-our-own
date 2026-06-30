@@ -36,12 +36,12 @@ const handleEditPlayer = (playerID: number) => {
 <template>
   <div
     v-if="props.draftedTeam"
-    class="rounded-sm bg-white p-5"
+    class="rounded-sm border border-transparent bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
   >
     <div
-      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
+      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0 dark:border-slate-700"
       :class="{
-        'bg-red-200': props.draftedTeam?.is_invalid_team,
+        'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
       }"
     >
       <div class="flex flex-col uppercase">
@@ -67,15 +67,15 @@ const handleEditPlayer = (playerID: number) => {
       :key="player.drafted_player_id"
       class="relative text-sm"
       :class="{
-        'bg-yellow-200 hover:bg-yellow-300':
+        'bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-950/70 dark:hover:bg-yellow-900/80':
           !!player.transfers.length
           && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-        'bg-green-200 transition-all hover:bg-green-300':
+        'bg-green-200 transition-all hover:bg-green-300 dark:bg-green-950/70 dark:hover:bg-green-900/80':
           !!player.transfers.length
           && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
       }"
     >
-      <div class="flex w-full items-center border-b border-gray-100">
+      <div class="flex w-full items-center border-b border-gray-100 dark:border-slate-800">
         <DraftedPlayer
           v-if="!player.transfers.length"
           :drafted-player="player"

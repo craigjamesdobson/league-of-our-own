@@ -32,7 +32,7 @@ const props = defineProps({
           <div
             v-if="transferCount > 1"
             title="View transfer details"
-            class="flex items-center justify-center text-[8px] border border-black rounded-full w-4 h-4 -mt-2"
+            class="flex items-center justify-center text-[8px] border border-black rounded-full w-4 h-4 -mt-2 dark:border-slate-300"
           >
             {{ props.transferCount }}
           </div>
@@ -44,7 +44,7 @@ const props = defineProps({
           v-tooltip.top="pluralise(draftedPlayer.week_goals!, 'goal')"
         >
           <Icon
-            class="text-surface-600 flex items-center justify-center"
+            class="text-surface-600 flex items-center justify-center dark:text-slate-300"
             size="16"
             name="mage:goals"
           />
@@ -54,7 +54,7 @@ const props = defineProps({
           v-tooltip.top="pluralise(draftedPlayer.week_assists!, 'assist')"
         >
           <Icon
-            class="text-surface-600 flex items-center justify-center"
+            class="text-surface-600 flex items-center justify-center dark:text-slate-300"
             size="16"
             name="icon-park-outline:soccer-one"
           />
@@ -65,7 +65,7 @@ const props = defineProps({
         >
           <Icon
             title="Goals"
-            class="text-surface-600"
+            class="text-surface-600 dark:text-slate-300"
             size="16"
             name="oi:shield"
           />
@@ -76,7 +76,7 @@ const props = defineProps({
         >
           <Icon
             title="Goals"
-            class="text-surface-600"
+            class="text-surface-600 dark:text-slate-300"
             size="18"
             name="gravity-ui:square-exclamation"
           />

@@ -24,3 +24,34 @@
 .main-heading {
   @apply text-2xl tracking-wider font-black uppercase mb-4;
 }
+
+/* Temporary bridge while PrimeVue dialogs coexist with Nuxt UI. */
+.dark .p-dialog {
+  background-color: var(--color-slate-900) !important;
+  color: var(--color-slate-100) !important;
+  border-color: var(--color-slate-700) !important;
+}
+
+.dark .p-dialog-header,
+.dark .p-dialog-content,
+.dark .p-dialog-footer {
+  background-color: var(--color-slate-900) !important;
+  color: var(--color-slate-100) !important;
+}
+
+.dark .p-dialog-title {
+  color: var(--color-slate-100) !important;
+}
+
+.dark .p-dialog-close-button {
+  color: var(--color-slate-300) !important;
+}
+
+.dark .p-dialog-close-button:hover {
+  color: var(--color-white) !important;
+  background-color: var(--color-slate-700) !important;
+}
+
+.dark .p-dialog-mask {
+  background-color: rgb(2 6 23 / 75%) !important;
+}

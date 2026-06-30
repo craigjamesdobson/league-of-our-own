@@ -87,10 +87,10 @@ const visible = ref(false);
     </div>
     <Dialog
       v-model:visible="visible"
-      class="w-[90%] sm:w-[500px]"
-      pt:header:class="!pb-0"
-      pt:title:class="uppercase !mb-0"
-      pt:content:class="!p-0 !pb-2"
+      class="w-[90%] sm:w-[500px] dark:!border-slate-700 dark:!bg-slate-900 dark:!text-slate-100"
+      pt:header:class="!pb-0 dark:!bg-slate-900 dark:!text-slate-100"
+      pt:title:class="uppercase !mb-0 dark:!text-slate-100"
+      pt:content:class="!p-0 !pb-2 dark:!bg-slate-900 dark:!text-slate-100"
       dismissable-mask
       modal
       :header="`Week ${selectedWeek} score`"

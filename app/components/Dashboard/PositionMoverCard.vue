@@ -48,6 +48,8 @@ defineProps({
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .position-mover-card {
   @apply flex items-center justify-between p-4 rounded-lg border;
 }

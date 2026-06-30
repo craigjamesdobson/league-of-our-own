@@ -92,6 +92,8 @@ const routes = reactive([
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .router-link-active:not(.logo) {
   @apply bg-neutral-200 text-primary;
 }

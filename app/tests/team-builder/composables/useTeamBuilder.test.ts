@@ -32,6 +32,8 @@ mockNuxtImport('useRoute', () => {
 
 mockNuxtImport('useRouter', () => {
   return () => ({
+    afterEach: vi.fn(),
+    beforeResolve: vi.fn(),
     push: vi.fn(),
   });
 });

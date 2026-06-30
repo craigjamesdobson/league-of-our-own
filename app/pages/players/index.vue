@@ -36,6 +36,8 @@ const visible = ref(false);
 </script>
 
 <style>
+@reference "@/assets/styles/base.css";
+
 .players-container {
   @apply grid grid-cols-1 gap-4;
 

@@ -65,6 +65,8 @@ const handleUserLogin = async () => {
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 input {
   @apply focus:outline-none;
 }

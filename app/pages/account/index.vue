@@ -400,6 +400,8 @@ const copyApiUrl = async () => {
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .dashboard-settings-card {
   @apply shadow-sm border border-slate-200;
 }

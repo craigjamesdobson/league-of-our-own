@@ -51,6 +51,7 @@
 ### 🔧 **Migrations** - Version Upgrades
 **Time-bound procedures for major upgrades**
 
+- [Nuxt UI Migration](migrations/nuxt-ui-migration.md) - Replace PrimeVue with Nuxt UI
 - [Nuxt 4 Migration](migrations/nuxt-4-migration.md) - Upgrade from Nuxt 3 to Nuxt 4
 
 → **Full migrations index:** [Migrations](migrations/)
@@ -99,7 +100,7 @@
 
 ### **Technology Stack**
 - **Framework:** Nuxt 4 (Vue 3, TypeScript)
-- **Styling:** Tailwind CSS + PrimeVue
+- **Styling:** Tailwind CSS + PrimeVue, with Nuxt UI migration planned
 - **Backend:** Supabase (PostgreSQL)
 - **Testing:** Vitest + Vue Test Utils
 - **Deployment:** SPA mode (static hosting)

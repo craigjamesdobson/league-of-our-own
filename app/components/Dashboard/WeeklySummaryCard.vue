@@ -41,6 +41,8 @@ defineProps({
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .dashboard-card {
   @apply flex flex-col;
 }

@@ -33,10 +33,8 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
 
     // UI and styling modules
-    '@nuxtjs/tailwindcss',
+    '@nuxt/ui',
     '@primevue/nuxt-module',
-    '@nuxt/icon',
-    '@nuxtjs/color-mode',
 
     // Analytics and tracking
     '@nuxt/scripts',
@@ -96,8 +94,8 @@ export default defineNuxtConfig({
   css: ['@/assets/styles/base.css'],
 
   colorMode: {
-    preference: 'system', // Respects user's system preference
-    fallback: 'light', // Fallback when system preference can't be determined
+    preference: 'system',
+    fallback: 'light',
   },
 
   runtimeConfig: {
@@ -119,6 +117,16 @@ export default defineNuxtConfig({
   nitro: {
     externals: {
       inline: ['resend'],
+    },
+  },
+
+  fonts: {
+    providers: {
+      bunny: false,
+      fontshare: false,
+      fontsource: false,
+      google: false,
+      googleicons: false,
     },
   },
 

@@ -264,9 +264,9 @@ onMounted(async () => {
             <p class="text-slate-600 mb-4">
               Unable to load current gameweek information. Please try refreshing the page.
             </p>
-            <Button
+            <UButton
               label="Refresh Page"
-              icon="pi pi-refresh"
+              icon="i-lucide-refresh-cw"
               @click="refreshPage"
             />
           </div>

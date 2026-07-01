@@ -23,10 +23,10 @@ defineProps({
       </p>
 
       <div class="space-y-2 mb-6">
-        <Tag
-          value="Results pending..."
-          severity="info"
-          class="text-sm"
+        <UBadge
+          label="Results pending..."
+          color="info"
+          variant="soft"
         />
       </div>
 

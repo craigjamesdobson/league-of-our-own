@@ -32,15 +32,16 @@ const handleRetry = () => clearError();
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
+          <UButton
             label="Try Again"
-            icon="pi pi-refresh"
+            icon="i-lucide-refresh-cw"
             @click="handleRetry"
           />
-          <Button
+          <UButton
             label="Go Home"
-            severity="secondary"
-            icon="pi pi-home"
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-home"
             @click="handleClearError"
           />
         </div>

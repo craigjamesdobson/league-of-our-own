@@ -18,15 +18,9 @@
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",
-    "@primeuix/themes": "^2.0.3",
-    "@primevue/core": "^4.5.5",
-    "@primevue/nuxt-module": "^4.5.5",
     "@react-email/render": "^2.0.0",
     "@supabase/supabase-js": "^2.57.4",
-    "@vuelidate/core": "^2.0.3",
-    "@vuelidate/validators": "^2.0.4",
     "pinia": "^3.0.4",
-    "primevue": "^4.5.5",
     "resend": "^6.4.2",
     "vue": "^3.5.39",
     "zod": "^4.4.3"

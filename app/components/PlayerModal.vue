@@ -19,27 +19,30 @@ const modelValue = defineModel<boolean>();
 
 <template>
   <div>
-    <Dialog
+    <UModal
       v-if="selectedPlayer"
-      v-model:visible="modelValue"
-      class="m-5 rounded-lg relative overflow-hidden w-[90%] lg:w-1/2 2xl:w-1/3 bg-white"
-      pt:header:class="!justify-end"
-      :pt="{
-        root: selectedPlayer.unavailable_for_season
-          ? '!border-2 !border-red-500'
-          : selectedPlayer.is_unavailable
-            ? '!border-2 !border-yellow-300'
-            : 'default-class',
+      v-model:open="modelValue"
+      :dismissible="true"
+      :ui="{
+        overlay: 'bg-slate-950/75',
+        content: [
+          'm-5 w-[90%] overflow-hidden bg-white text-slate-900 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 lg:w-1/2 2xl:w-1/3',
+          selectedPlayer.unavailable_for_season
+            ? 'ring-2 ring-red-500'
+            : selectedPlayer.is_unavailable
+              ? 'ring-2 ring-yellow-300'
+              : '',
+        ].join(' '),
+        header: 'justify-end',
+        body: 'pt-0',
       }"
-      modal
-      :dismissable-mask="true"
-      @hide="clearPlayerQueryParam"
+      @update:open="(open) => !open && clearPlayerQueryParam()"
     >
-      <div
-        v-if="selectedPlayer"
-        class="px-4"
-      >
-        <div class="">
+      <template #body>
+        <div
+          v-if="selectedPlayer"
+          class="px-4"
+        >
           <img
             class="modal__badge"
             :src="getImageUrl(selectedPlayer.team_short_name?.toLowerCase())"
@@ -146,8 +149,8 @@ const modelValue = defineModel<boolean>();
             </div>
           </div>
         </div>
-      </div>
-    </Dialog>
+      </template>
+    </UModal>
   </div>
 </template>
 

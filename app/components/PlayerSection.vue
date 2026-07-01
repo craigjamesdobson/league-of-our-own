@@ -13,6 +13,11 @@ const props = defineProps<{
   position: PlayerPosition;
 }>();
 
+type DropdownPlayer = Player & {
+  disabled: boolean;
+  selected: boolean;
+};
+
 const getCorrectColSpanClass = (position: PlayerPosition) => {
   switch (position) {
     case PlayerPosition.GOALKEEPER:
@@ -24,7 +29,7 @@ const getCorrectColSpanClass = (position: PlayerPosition) => {
   }
 };
 
-const dropdownPlayerData = computed(() =>
+const dropdownPlayerData = computed<DropdownPlayer[]>(() =>
   playerStore.players
     .map((p) => {
       return {
@@ -38,6 +43,13 @@ const dropdownPlayerData = computed(() =>
     .filter(x => x.position === props.position)
     .sort((a, b) => a.team - b.team),
 );
+
+const selectedPlayer = computed({
+  get: () => dropdownPlayerData.value.find(option => option.player_id === player.value?.player_id),
+  set: (value: DropdownPlayer | undefined) => {
+    player.value = value ?? null;
+  },
+});
 </script>
 
 <template>
@@ -46,17 +58,16 @@ const dropdownPlayerData = computed(() =>
     :class="getCorrectColSpanClass(props.position)"
   >
     <div class="flex flex-row items-center justify-center gap-5">
-      <Button
+      <UButton
         v-if="player"
-        severity="danger"
+        color="error"
+        variant="outline"
+        icon="akar-icons:cross"
         aria-label="Clear player"
-        rounded
-        outlined
-        class="!h-8 !w-8 !p-0"
+        square
+        class="h-8 w-8 rounded-full"
         @click="player = null"
-      >
-        <Icon name="akar-icons:cross" />
-      </Button>
+      />
       <img
         v-if="player"
         class="h-24 w-24 rounded-full bg-white p-2 drop-shadow-lg object-cover object-top aspect-square"
@@ -109,41 +120,39 @@ const dropdownPlayerData = computed(() =>
         <p>{{ player!.cost.toFixed(1) }}</p>
       </div>
     </div>
-    <Select
-      v-model="player"
-      filter
-      class="mt-auto !min-w-[300px]"
-      :options="dropdownPlayerData"
-      :virtual-scroller-options="{ itemSize: 60 }"
+    <USelectMenu
+      v-model="selectedPlayer"
+      class="mt-auto min-w-[300px]"
+      :items="dropdownPlayerData"
       :placeholder="`Select a ${PlayerPosition[props.position].toLowerCase()}`"
-      option-disabled="disabled"
-      option-label="web_name"
+      label-key="web_name"
+      :search-input="{ placeholder: 'Search players...' }"
     >
-      <template #value="slotProps">
-        {{ slotProps.value?.web_name || slotProps.placeholder }}
+      <template #default="{ modelValue }">
+        {{ modelValue?.web_name || `Select a ${PlayerPosition[props.position].toLowerCase()}` }}
       </template>
-      <template #option="slotProps">
+      <template #item-label="{ item }">
         <div class="flex h-full w-full flex-col justify-center gap-2.5">
           <div class="flex gap-2.5">
-            <span class="w-1/6">{{ slotProps.option.player_id }}</span>
-            <span class="w-1/6">{{ slotProps.option.team_short_name }}</span>
-            <span class="w-3/6">{{ slotProps.option.web_name }}</span>
-            <span class="w-1/6">{{ slotProps.option.cost.toFixed(1) }}</span>
+            <span class="w-1/6">{{ item.player_id }}</span>
+            <span class="w-1/6">{{ item.team_short_name }}</span>
+            <span class="w-3/6">{{ item.web_name }}</span>
+            <span class="w-1/6">{{ item.cost.toFixed(1) }}</span>
           </div>
           <div
-            v-if="slotProps.option?.unavailable_for_season"
+            v-if="item?.unavailable_for_season"
             class="flex whitespace-pre-wrap text-[10px]"
           >
-            {{ slotProps.option.news }}
+            {{ item.news }}
           </div>
           <div
-            v-if="slotProps.option.selected"
+            v-if="item.selected"
             class="flex whitespace-pre-wrap text-[10px]"
           >
             Player has already been selected
           </div>
         </div>
       </template>
-    </Select>
+    </USelectMenu>
   </div>
 </template>

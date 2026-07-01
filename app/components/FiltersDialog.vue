@@ -1,18 +1,22 @@
 <template>
-  <Dialog
-    v-model:visible="modelValue"
-    :dismissable-mask="true"
-    modal
-    header="FILTERS"
-    class="m-5"
+  <UModal
+    v-model:open="modelValue"
+    title="Filters"
+    :dismissible="true"
+    :ui="{
+      overlay: 'bg-slate-950/75',
+      content: 'm-5 bg-white text-slate-900 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700',
+    }"
   >
-    <Filters />
-    <Button
-      class="w-full"
-      label="Apply"
-      @click="modelValue = false"
-    />
-  </Dialog>
+    <template #body>
+      <Filters />
+      <UButton
+        block
+        label="Apply"
+        @click="modelValue = false"
+      />
+    </template>
+  </UModal>
 </template>
 
 <script setup lang="ts">

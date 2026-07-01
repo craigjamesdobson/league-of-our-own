@@ -58,24 +58,14 @@ const positionsData = computed(() => {
           <div class="flex-shrink-0 text-center">
             <!-- Player Image -->
             <div class="mb-3">
-              <Skeleton
-                shape="circle"
-                size="4rem"
-                class="border-2 border-slate-300 shadow-md mx-auto"
-              />
+              <USkeleton class="mx-auto h-16 w-16 rounded-full border-2 border-slate-300 shadow-md" />
             </div>
             <!-- Player Names -->
             <div class="space-y-1 mb-2">
-              <Skeleton
-                width="5rem"
-                height="1.125rem"
-              />
+              <USkeleton class="h-5 w-20" />
             </div>
             <!-- Points -->
-            <Skeleton
-              width="3rem"
-              height="0.875rem"
-            />
+            <USkeleton class="h-3.5 w-12" />
           </div>
 
           <!-- Flexible space -->
@@ -83,14 +73,8 @@ const positionsData = computed(() => {
 
           <!-- Position Title with icon -->
           <div class="flex-shrink-0 flex flex-col items-center gap-2">
-            <Skeleton
-              shape="circle"
-              size="1.5rem"
-            />
-            <Skeleton
-              width="4rem"
-              height="0.875rem"
-            />
+            <USkeleton class="h-6 w-6 rounded-full" />
+            <USkeleton class="h-3.5 w-16" />
           </div>
         </div>
       </div>
@@ -121,11 +105,10 @@ const positionsData = computed(() => {
                     :alt="position.firstPlayer?.web_name"
                     @error="loadPlayerFallbackImage"
                   >
-                  <Avatar
+                  <UAvatar
                     v-else
-                    :label="position.firstPlayer?.web_name?.charAt(0) || '?'"
-                    shape="circle"
-                    size="xlarge"
+                    :text="position.firstPlayer?.web_name?.charAt(0) || '?'"
+                    size="3xl"
                     class="bg-slate-100 text-slate-700 border-2 border-slate-300 mx-auto"
                   />
                 </template>
@@ -218,9 +201,10 @@ const positionsData = computed(() => {
       <p class="text-slate-500 mb-2">
         Top performing players will appear here
       </p>
-      <Tag
-        severity="secondary"
-        value="Awaiting player data..."
+      <UBadge
+        color="neutral"
+        variant="soft"
+        label="Awaiting player data..."
       />
     </div>
   </WeeklySummaryCard>

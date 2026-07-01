@@ -38,9 +38,9 @@ defineProps({
         />
         {{ team.currentPosition }}
       </div>
-      <Badge
-        :value="variant === 'riser' ? `+${team.positionChange}` : team.positionChange.toString()"
-        :severity="variant === 'riser' ? 'success' : 'danger'"
+      <UBadge
+        :label="variant === 'riser' ? `+${team.positionChange}` : team.positionChange.toString()"
+        :color="variant === 'riser' ? 'success' : 'error'"
         class="font-bold"
       />
     </div>

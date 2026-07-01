@@ -4,17 +4,13 @@
       v-if="isSmallDevice"
       class="fixed right-5 top-5 z-10 opacity-75"
     >
-      <Button
-        class="w-12 h-12 !p-2"
-        rounded
+      <UButton
+        class="h-12 w-12 rounded-full"
+        icon="fluent:filter-32-filled"
         aria-label="Player Filters"
+        square
         @click="visible = true"
-      >
-        <Icon
-          size="24"
-          name="fluent:filter-32-filled"
-        />
-      </Button>
+      />
     </div>
     <Players />
     <FiltersDialog

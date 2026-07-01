@@ -94,10 +94,10 @@ const getBadgeClasses = (isWinner: boolean) => [
           </div>
         </div>
         <div class="text-right flex flex-col items-end space-y-1">
-          <Badge
-            :value="team.week_points.toString()"
-            severity="success"
-            size="large"
+          <UBadge
+            :label="team.week_points.toString()"
+            color="success"
+            size="lg"
             :class="getBadgeClasses(team.isWinner)"
           />
           <div class="text-xs text-slate-500 font-medium uppercase tracking-wide">
@@ -124,15 +124,17 @@ const getBadgeClasses = (isWinner: boolean) => [
           Gameweek in progress
         </p>
       </div>
-      <Tag
+      <UBadge
         v-if="hasResults"
-        severity="secondary"
-        value="Waiting for results..."
+        color="neutral"
+        variant="soft"
+        label="Waiting for results..."
       />
-      <Tag
+      <UBadge
         v-else
-        severity="secondary"
-        value="Awaiting final results..."
+        color="neutral"
+        variant="soft"
+        label="Awaiting final results..."
       />
     </div>
   </WeeklySummaryCard>

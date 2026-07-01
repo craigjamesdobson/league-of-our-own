@@ -167,12 +167,12 @@ Use Zod with Nuxt UI forms.
 
 ### Phase 4: General Component Sweep
 
-- [ ] Convert remaining buttons, selects, inputs, checkboxes, cards, dialogs, messages, skeletons, and date/number inputs.
-- [ ] Convert dashboard cards and stat summaries to the refreshed design language.
-- [ ] Convert filters and player/team selector patterns.
-- [ ] Remove all PrimeVue imports and component usage.
-- [ ] Remove PrimeVue module configuration, dependencies, and lockfile references.
-- [ ] Remove Vuelidate dependencies and lockfile references once all forms use Zod.
+- [x] Convert remaining buttons, selects, inputs, checkboxes, cards, dialogs, messages, skeletons, and date/number inputs.
+- [x] Convert dashboard cards and stat summaries to the refreshed design language.
+- [x] Convert filters and player/team selector patterns.
+- [x] Remove all PrimeVue imports and component usage.
+- [x] Remove PrimeVue module configuration, dependencies, and lockfile references.
+- [x] Remove Vuelidate dependencies and lockfile references once all forms use Zod.
 
 ### Phase 5: Light/Dark Polish
 

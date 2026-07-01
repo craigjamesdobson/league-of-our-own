@@ -56,15 +56,17 @@ defineProps({
         <span v-if="hasResults">No significant position changes</span>
         <span v-else>Gameweek in progress</span>
       </p>
-      <Tag
+      <UBadge
         v-if="hasResults"
-        severity="secondary"
-        value="Positions stable"
+        color="neutral"
+        variant="soft"
+        label="Positions stable"
       />
-      <Tag
+      <UBadge
         v-else
-        severity="secondary"
-        value="Awaiting final results..."
+        color="neutral"
+        variant="soft"
+        label="Awaiting final results..."
       />
     </div>
   </WeeklySummaryCard>

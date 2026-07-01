@@ -82,12 +82,15 @@ const routes = reactive([
       </ul>
     </div>
 
-    <nuxt-link
-      to="/account"
-      class="hover:text-primary flex h-8 w-8 flex-col items-center justify-center rounded-full border border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-white lg:h-10 lg:w-10"
-    >
-      <Icon name="uil:setting" />
-    </nuxt-link>
+    <div class="flex items-center gap-2 xl:flex-col">
+      <ColorModeControl />
+      <nuxt-link
+        to="/account"
+        class="hover:text-primary flex h-8 w-8 flex-col items-center justify-center rounded-full border border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-white lg:h-10 lg:w-10"
+      >
+        <Icon name="uil:setting" />
+      </nuxt-link>
+    </div>
   </nav>
 </template>
 

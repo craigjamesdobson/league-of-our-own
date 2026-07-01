@@ -33,7 +33,7 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
             />
           </div>
           <div>
-            <p class="text-xs font-black uppercase text-slate-500">
+            <p class="text-xs font-black uppercase text-slate-500 dark:text-slate-400">
               Season complete
             </p>
             <h2 class="text-xl font-black uppercase text-slate-900 dark:text-slate-100 md:text-2xl">
@@ -62,20 +62,20 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
         </div>
 
         <div class="relative z-10 space-y-6">
-          <section class="rounded-3xl border border-yellow-300 bg-gradient-to-br from-yellow-50/95 via-white/95 to-slate-50/95 p-6 text-center shadow-sm backdrop-blur-sm">
+          <section class="rounded-3xl border border-yellow-300 bg-gradient-to-br from-yellow-50/95 via-white/95 to-slate-50/95 p-6 text-center shadow-sm backdrop-blur-sm dark:border-yellow-500/50 dark:from-yellow-950/60 dark:via-slate-900/95 dark:to-slate-800/95">
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-400 text-slate-950 shadow-sm">
               <Icon
                 name="ph:crown-simple-fill"
                 size="38"
               />
             </div>
-            <p class="mb-2 text-sm font-black uppercase tracking-[0.2em] text-yellow-700">
+            <p class="mb-2 text-sm font-black uppercase tracking-[0.2em] text-yellow-700 dark:text-yellow-300">
               League champion
             </p>
-            <h3 class="text-3xl font-black uppercase text-slate-950 md:text-4xl">
+            <h3 class="text-3xl font-black uppercase text-slate-950 dark:text-slate-100 md:text-4xl">
               {{ champion.team_name }}
             </h3>
-            <p class="mt-2 text-sm font-bold uppercase text-slate-500">
+            <p class="mt-2 text-sm font-bold uppercase text-slate-500 dark:text-slate-400">
               {{ champion.team_owner }}
             </p>
             <div class="mt-5 inline-flex items-end gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-white">
@@ -86,35 +86,35 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
 
           <section
             v-if="runnersUp.length"
-            class="rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur-sm"
+            class="rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/80"
           >
-            <h3 class="mb-4 text-sm font-black uppercase tracking-[0.18em] text-slate-500">
+            <h3 class="mb-4 text-sm font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Top 5 overall
             </h3>
             <div class="space-y-3">
               <div
                 v-for="(team, index) in runnersUp"
                 :key="team.drafted_team_id"
-                class="flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3"
+                class="flex items-center justify-between gap-4 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-900"
               >
                 <div class="flex min-w-0 items-center gap-3">
-                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-black text-slate-700">
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-black text-slate-700 dark:bg-slate-700 dark:text-slate-100">
                     {{ index + 2 }}
                   </div>
                   <div class="min-w-0">
-                    <p class="truncate font-black uppercase text-slate-900">
+                    <p class="truncate font-black uppercase text-slate-900 dark:text-slate-100">
                       {{ team.team_name }}
                     </p>
-                    <p class="truncate text-xs font-bold uppercase text-slate-500">
+                    <p class="truncate text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
                       {{ team.team_owner }}
                     </p>
                   </div>
                 </div>
                 <div class="shrink-0 text-right">
-                  <p class="text-lg font-black text-slate-900">
+                  <p class="text-lg font-black text-slate-900 dark:text-slate-100">
                     {{ team.total_points }}
                   </p>
-                  <p class="text-[0.65rem] font-bold uppercase tracking-wide text-slate-500">
+                  <p class="text-[0.65rem] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     points
                   </p>
                 </div>

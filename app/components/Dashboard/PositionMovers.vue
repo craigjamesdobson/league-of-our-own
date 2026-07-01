@@ -50,9 +50,9 @@ defineProps({
       <Icon
         name="carbon:arrows-vertical"
         size="48"
-        class="mx-auto text-slate-400 mb-2"
+        class="mx-auto text-slate-400 mb-2 dark:text-slate-500"
       />
-      <p class="text-slate-500 mb-2">
+      <p class="text-slate-500 mb-2 dark:text-slate-400">
         <span v-if="hasResults">No significant position changes</span>
         <span v-else>Gameweek in progress</span>
       </p>

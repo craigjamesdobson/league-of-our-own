@@ -43,8 +43,8 @@ const topPerformersWithWinnerStatus = computed((): EnhancedTeamData[] => {
 });
 
 const getTeamContainerClasses = (isWinner: boolean) => ({
-  'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm': isWinner,
-  'bg-gray-50 border border-gray-200': !isWinner,
+  'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm dark:from-yellow-950/70 dark:to-slate-900 dark:border-yellow-700': isWinner,
+  'bg-gray-50 border border-gray-200 dark:bg-slate-800/70 dark:border-slate-700': !isWinner,
 });
 
 const getPositionIconClasses = (isWinner: boolean) => ({
@@ -85,10 +85,10 @@ const getBadgeClasses = (isWinner: boolean) => [
             <span v-else>{{ index + 1 }}</span>
           </div>
           <div class="text-left">
-            <div class="font-bold text-lg text-slate-800 uppercase">
+            <div class="font-bold text-lg text-slate-800 uppercase dark:text-slate-100">
               {{ team.team_name }}
             </div>
-            <div class="text-sm text-slate-600 uppercase">
+            <div class="text-sm text-slate-600 uppercase dark:text-slate-300">
               {{ team.team_owner }}
             </div>
           </div>
@@ -100,7 +100,7 @@ const getBadgeClasses = (isWinner: boolean) => [
             size="lg"
             :class="getBadgeClasses(team.isWinner)"
           />
-          <div class="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          <div class="text-xs text-slate-500 font-medium uppercase tracking-wide dark:text-slate-400">
             Points
           </div>
         </div>
@@ -111,11 +111,11 @@ const getBadgeClasses = (isWinner: boolean) => [
       v-else
       class="text-center py-8"
     >
-      <div class="text-slate-500 mb-2">
+      <div class="text-slate-500 mb-2 dark:text-slate-400">
         <Icon
           name="carbon:trophy"
           size="48"
-          class="mx-auto text-slate-400 mb-2"
+          class="mx-auto text-slate-400 mb-2 dark:text-slate-500"
         />
         <p v-if="hasResults">
           No performance data available yet

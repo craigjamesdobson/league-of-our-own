@@ -66,9 +66,18 @@ const mountStatsInput = () => mount(StatsInput, {
             :disabled="disabled"
             @click="$emit('click')"
           >
-            {{ label }}
+          {{ label }}
           </button>
         `,
+      }),
+      UTooltip: defineComponent({
+        props: {
+          text: {
+            type: String,
+            default: '',
+          },
+        },
+        template: '<span><slot /></span>',
       }),
       UInputNumber: defineComponent({
         props: {

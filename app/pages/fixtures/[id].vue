@@ -164,7 +164,7 @@ const canVerify = computed(() => {
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <div>
           <div
-            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+            class="mx-auto my-10 flex w-full max-w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <img
               class="aspect-square h-32 w-32"
@@ -194,7 +194,7 @@ const canVerify = computed(() => {
         </div>
         <div>
           <div
-            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+            class="mx-auto my-10 flex w-full max-w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <div class="flex flex-col items-center gap-2.5">
               <p class="text-xl font-black uppercase">
@@ -296,7 +296,10 @@ const canVerify = computed(() => {
         />
       </div>
     </div>
-    <div v-else>
+    <div
+      v-else
+      class="text-slate-600 dark:text-slate-300"
+    >
       Loading...
     </div>
   </div>

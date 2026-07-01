@@ -36,10 +36,10 @@ const handleEditPlayer = (playerID: number) => {
 <template>
   <div
     v-if="props.draftedTeam"
-    class="rounded-sm border border-transparent bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+    class="rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
   >
     <div
-      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0 dark:border-slate-700"
+      class="mb-2 flex items-center justify-between border-b border-slate-800 p-2 pt-0 dark:border-slate-700"
       :class="{
         'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
       }"
@@ -52,15 +52,15 @@ const handleEditPlayer = (playerID: number) => {
           props.draftedTeam?.team_owner
         }}</span>
       </div>
-      <span
+      <UTooltip
         v-if="props.draftedTeam?.allowed_transfers"
-        v-tooltip.top="'Transfers allowed'"
+        text="Transfers allowed"
       >
         <Icon
           size="24"
           name="ic:round-swap-horiz"
         />
-      </span>
+      </UTooltip>
     </div>
     <div
       v-for="player in props.draftedTeam.players"
@@ -75,7 +75,7 @@ const handleEditPlayer = (playerID: number) => {
           && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
       }"
     >
-      <div class="flex w-full items-center border-b border-gray-100 dark:border-slate-800">
+      <div class="flex w-full items-center border-b border-slate-100 dark:border-slate-800">
         <DraftedPlayer
           v-if="!player.transfers.length"
           :drafted-player="player"

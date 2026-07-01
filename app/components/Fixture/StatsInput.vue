@@ -8,7 +8,7 @@
         placeholder="Player Search"
       />
       <div class="flex flex-wrap items-center gap-2.5">
-        <span class="mr-2 text-sm">Filter by position:</span>
+        <span class="mr-2 text-sm text-slate-600 dark:text-slate-300">Filter by position:</span>
         <UButton
           v-for="position in playerPositions"
           :key="position.value"
@@ -31,19 +31,29 @@
               Player
             </th>
             <th class="w-[15%] px-3 py-2">
-              Goals
+              <UTooltip text="Goals scored by this player in the fixture">
+                <span>Goals</span>
+              </UTooltip>
             </th>
             <th class="w-[15%] px-3 py-2">
-              Assists
+              <UTooltip text="Assists made by this player in the fixture">
+                <span>Assists</span>
+              </UTooltip>
             </th>
             <th class="w-[15%] px-3 py-2">
-              Clean sheet
+              <UTooltip text="Clean sheet applies to goalkeepers and defenders when their team concedes no goals">
+                <span>Clean sheet</span>
+              </UTooltip>
             </th>
             <th class="w-[15%] px-3 py-2">
-              Red card
+              <UTooltip text="Player was sent off">
+                <span>Red card</span>
+              </UTooltip>
             </th>
             <th class="w-[15%] px-3 py-2">
-              Points
+              <UTooltip text="Calculated fantasy points for this fixture">
+                <span>Points</span>
+              </UTooltip>
             </th>
           </tr>
         </thead>
@@ -53,7 +63,7 @@
             :key="player.player_id"
             class="even:bg-slate-50/70 dark:even:bg-slate-800/50"
           >
-            <td class="px-3 py-2 font-medium">
+            <td class="px-3 py-2 font-medium text-slate-900 dark:text-slate-100">
               {{ player.web_name }}
             </td>
             <td class="px-3 py-2">
@@ -88,7 +98,7 @@
                 @update:model-value="calculatePlayerPoints(player)"
               />
             </td>
-            <td class="px-3 py-2 font-semibold">
+            <td class="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100">
               {{ player.week_points }}
             </td>
           </tr>
@@ -118,7 +128,7 @@
           aria-label="Previous page"
           @click="currentPage--"
         />
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <span class="text-slate-600 dark:text-slate-300">Page {{ currentPage }} of {{ totalPages }}</span>
         <UButton
           icon="lucide:chevron-right"
           color="neutral"

@@ -39,48 +39,46 @@ const props = defineProps({
         </div>
       </div>
       <div class="flex gap-1">
-        <div
+        <UTooltip
           v-if="props.draftedPlayer?.week_goals && props.draftedPlayer.week_goals > 0"
-          v-tooltip.top="pluralise(draftedPlayer.week_goals!, 'goal')"
+          :text="pluralise(draftedPlayer.week_goals!, 'goal')"
         >
           <Icon
             class="text-surface-600 flex items-center justify-center dark:text-slate-300"
             size="16"
             name="mage:goals"
           />
-        </div>
-        <div
+        </UTooltip>
+        <UTooltip
           v-if="props.draftedPlayer?.week_assists && props.draftedPlayer.week_assists > 0"
-          v-tooltip.top="pluralise(draftedPlayer.week_assists!, 'assist')"
+          :text="pluralise(draftedPlayer.week_assists!, 'assist')"
         >
           <Icon
             class="text-surface-600 flex items-center justify-center dark:text-slate-300"
             size="16"
             name="icon-park-outline:soccer-one"
           />
-        </div>
-        <div
+        </UTooltip>
+        <UTooltip
           v-if="props.draftedPlayer?.week_cleansheets"
-          v-tooltip.top="'Clean sheet'"
+          text="Clean sheet"
         >
           <Icon
-            title="Goals"
             class="text-surface-600 dark:text-slate-300"
             size="16"
             name="oi:shield"
           />
-        </div>
-        <div
+        </UTooltip>
+        <UTooltip
           v-if="props.draftedPlayer?.week_redcards"
-          v-tooltip.top="'Sent off'"
+          text="Sent off"
         >
           <Icon
-            title="Goals"
             class="text-surface-600 dark:text-slate-300"
             size="18"
             name="gravity-ui:square-exclamation"
           />
-        </div>
+        </UTooltip>
       </div>
     </span>
     <span

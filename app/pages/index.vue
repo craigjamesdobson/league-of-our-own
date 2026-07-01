@@ -42,10 +42,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-full">
+  <div class="min-h-full text-slate-900 dark:text-slate-100">
     <!-- Header Section -->
     <div class="text-center mb-8">
-      <div class="inline-flex flex-col gap-5 justify-center text-slate-800">
+      <div class="inline-flex flex-col gap-5 justify-center text-slate-900 dark:text-slate-100">
         <h1 class="text-4xl uppercase font-black">
           Summary Dashboard
         </h1>
@@ -62,9 +62,9 @@ onMounted(async () => {
             <Icon
               name="carbon:analytics"
               size="28"
-              class="text-slate-600"
+              class="text-slate-600 dark:text-slate-300"
             />
-            <h2 class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide">
+            <h2 class="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-wide dark:text-slate-100">
               Overall Season Summary
             </h2>
           </div>
@@ -72,7 +72,7 @@ onMounted(async () => {
           <div class="space-y-8">
             <!-- Overall League Statistics -->
             <div class="w-full">
-              <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+              <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                 LEAGUE STATISTICS
               </h2>
               <WeeklyStats
@@ -83,7 +83,7 @@ onMounted(async () => {
 
             <!-- Top Performing Players -->
             <div class="w-full">
-              <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+              <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                 TOP PERFORMING PLAYERS
               </h2>
               <TopPerformingPlayers
@@ -94,7 +94,7 @@ onMounted(async () => {
           </div>
         </div>
 
-        <hr class="border-slate-300">
+        <hr class="border-slate-300 dark:border-slate-800">
 
         <!-- GAMEWEEK SPECIFIC SUMMARY SECTION -->
         <div>
@@ -108,19 +108,19 @@ onMounted(async () => {
                 />
                 <h2
                   v-if="isLoading"
-                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                  class="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-wide dark:text-slate-100"
                 >
                   Loading Gameweek Data...
                 </h2>
                 <h2
                   v-else-if="!hasGameweekData"
-                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                  class="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-wide dark:text-slate-100"
                 >
                   Gameweek Data Unavailable
                 </h2>
                 <h2
                   v-else
-                  class="text-xl md:text-2xl font-black uppercase text-slate-800 tracking-wide"
+                  class="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-wide dark:text-slate-100"
                 >
                   Gameweek {{ currentGameweek }} Summary
                 </h2>
@@ -129,27 +129,27 @@ onMounted(async () => {
               <!-- Status Message - Inline on desktop -->
               <div
                 v-if="hasResults"
-                class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 border border-green-600 self-start"
+                class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 border border-green-600 self-start dark:bg-green-950/70 dark:border-green-700"
               >
                 <Icon
                   name="carbon:checkmark"
                   size="16"
                   class="mr-1 text-green-600"
                 />
-                <span class="text-sm text-green-700 font-medium">
+                <span class="text-sm text-green-700 font-medium dark:text-green-200">
                   Results available
                 </span>
               </div>
               <div
                 v-else
-                class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 border border-amber-600 self-start"
+                class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 border border-amber-600 self-start dark:bg-amber-950/70 dark:border-amber-700"
               >
                 <Icon
                   name="carbon:time"
                   size="16"
                   class="mr-1 text-amber-600"
                 />
-                <span class="text-sm text-amber-700 font-medium">
+                <span class="text-sm text-amber-700 font-medium dark:text-amber-200">
                   In progress
                 </span>
               </div>
@@ -163,7 +163,7 @@ onMounted(async () => {
           >
             <!-- Weekly Transfers -->
             <div class="w-full">
-              <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+              <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                 WEEKLY TRANSFERS
               </h2>
               <WeeklyTransfers
@@ -178,7 +178,7 @@ onMounted(async () => {
             <div class="flex flex-col space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:auto-rows-fr md:gap-8">
               <!-- Top Performers -->
               <div class="flex flex-col">
-                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                   TOP PERFORMERS
                 </h2>
                 <TopPerformers
@@ -190,7 +190,7 @@ onMounted(async () => {
 
               <!-- Position Movers -->
               <div class="flex flex-col">
-                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                   POSITION MOVERS
                 </h2>
                 <div class="flex-1">
@@ -211,7 +211,7 @@ onMounted(async () => {
           >
             <!-- Show skeleton loading for gameweek content -->
             <div class="w-full">
-              <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+              <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                 WEEKLY TRANSFERS
               </h2>
               <WeeklyTransfers
@@ -224,7 +224,7 @@ onMounted(async () => {
 
             <div class="flex flex-col space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:auto-rows-fr md:gap-8">
               <div class="flex flex-col">
-                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                   TOP PERFORMERS
                 </h2>
                 <TopPerformers
@@ -234,7 +234,7 @@ onMounted(async () => {
                 />
               </div>
               <div class="flex flex-col">
-                <h2 class="text-base md:text-lg font-black uppercase text-slate-800 tracking-wide mb-4">
+                <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
                   POSITION MOVERS
                 </h2>
                 <div class="flex-1">
@@ -258,10 +258,10 @@ onMounted(async () => {
               size="48"
               class="text-amber-500 mb-4"
             />
-            <h3 class="text-lg font-semibold text-slate-800 mb-2">
+            <h3 class="text-lg font-semibold text-slate-900 mb-2 dark:text-slate-100">
               Gameweek Data Unavailable
             </h3>
-            <p class="text-slate-600 mb-4">
+            <p class="text-slate-600 mb-4 dark:text-slate-300">
               Unable to load current gameweek information. Please try refreshing the page.
             </p>
             <UButton

@@ -37,16 +37,16 @@ onMounted(async () => {
       v-for="(data, index) in playerData"
       :key="index"
     >
-      <h1 class="main-heading">
+      <h1 class="main-heading text-slate-900 dark:text-slate-100">
         {{ data.position }}
       </h1>
       <div class="mb-4 flex justify-between rounded-sm">
-        <div class="w-full border-r border-gray-100">
+        <div class="w-full border-r border-slate-100 dark:border-slate-800">
           <div class="grid grid-cols-1 gap-1 md:grid-cols-2">
             <div
               v-for="player in data.players"
               :key="player.player_id"
-              class="relative flex w-full cursor-pointer flex-col items-center justify-around border-b border-gray-100 bg-white text-sm"
+              class="relative flex w-full cursor-pointer flex-col items-center justify-around border-b border-slate-100 bg-white text-sm text-slate-900 transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               @click="setSelectedPlayerAndQueryParam(player.player_id)"
             >
               <Player :player="player" />

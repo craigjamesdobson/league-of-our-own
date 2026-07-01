@@ -99,21 +99,21 @@ const modelValue = defineModel<boolean>();
                 </h4>
                 <ul class="flex w-full flex-col text-xs">
                   <li class="flex w-full justify-between">
-                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
+                    <span class="w-3/4 border-b border-r border-slate-100 py-1 dark:border-slate-800">
                       Goals:
                     </span>
                     <strong
-                      class="w-1/4 border-b border-gray-100 py-1 text-center"
+                      class="w-1/4 border-b border-slate-100 py-1 text-center dark:border-slate-800"
                     >
                       {{ selectedPlayer.goals_scored }}
                     </strong>
                   </li>
                   <li class="flex w-full justify-between">
-                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
+                    <span class="w-3/4 border-b border-r border-slate-100 py-1 dark:border-slate-800">
                       Assists:
                     </span>
                     <strong
-                      class="w-1/4 border-b border-gray-100 py-1 text-center"
+                      class="w-1/4 border-b border-slate-100 py-1 text-center dark:border-slate-800"
                     >
                       {{ selectedPlayer.assists }}
                     </strong>
@@ -125,21 +125,21 @@ const modelValue = defineModel<boolean>();
                     "
                     class="flex w-full justify-between"
                   >
-                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
+                    <span class="w-3/4 border-b border-r border-slate-100 py-1 dark:border-slate-800">
                       Clean Sheets:
                     </span>
                     <strong
-                      class="w-1/4 border-b border-gray-100 py-1 text-center"
+                      class="w-1/4 border-b border-slate-100 py-1 text-center dark:border-slate-800"
                     >
                       {{ selectedPlayer.clean_sheets }}
                     </strong>
                   </li>
                   <li class="flex w-full justify-between">
-                    <span class="w-3/4 border-b border-r border-gray-100 py-1">
+                    <span class="w-3/4 border-b border-r border-slate-100 py-1 dark:border-slate-800">
                       Red Cards:
                     </span>
                     <strong
-                      class="w-1/4 border-b border-gray-100 py-1 text-center"
+                      class="w-1/4 border-b border-slate-100 py-1 text-center dark:border-slate-800"
                     >
                       {{ selectedPlayer.red_cards }}
                     </strong>

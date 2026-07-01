@@ -176,10 +176,12 @@ Use Zod with Nuxt UI forms.
 
 ### Phase 5: Light/Dark Polish
 
-- [ ] Add sidebar color mode control.
-- [ ] Review every route for hard-coded light-only styling.
-- [ ] Tune Nuxt UI theme tokens for both modes.
-- [ ] Verify focus, hover, loading, empty, success, warning, and error states in both modes.
+- [x] Add sidebar color mode control.
+- [x] Review every route for hard-coded light-only styling.
+- [x] Tune Nuxt UI theme tokens for both modes.
+- [x] Verify focus, hover, loading, empty, success, warning, and error states in both modes.
+
+Phase 5 scope note: dashboard, fixture, drafted-team, modal, skeleton, error, season-finale, and current players-list surfaces now have paired light/dark treatments. The full `/players` rebuild to `UTable` remains a follow-up UI rebuild slice in this branch rather than part of the color-mode polish checkpoint.
 
 ### Phase 6: Final Verification
 

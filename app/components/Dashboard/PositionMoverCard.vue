@@ -21,16 +21,16 @@ defineProps({
   >
     <div class="flex items-center space-x-3">
       <div class="text-left">
-        <div class="font-bold text-sm text-slate-800 uppercase">
+        <div class="font-bold text-sm text-slate-800 uppercase dark:text-slate-100">
           {{ team.team_name }}
         </div>
-        <div class="text-xs text-slate-600 uppercase">
+        <div class="text-xs text-slate-600 uppercase dark:text-slate-300">
           {{ team.team_owner }}
         </div>
       </div>
     </div>
     <div class="flex items-center space-x-3">
-      <div class="text-sm text-slate-600 font-medium flex items-center gap-1">
+      <div class="text-sm text-slate-600 font-medium flex items-center gap-1 dark:text-slate-300">
         {{ team.prev_week_position }}
         <Icon
           name="lucide:arrow-right"
@@ -55,10 +55,10 @@ defineProps({
 }
 
 .position-mover-card--riser {
-  @apply bg-gradient-to-r from-green-50 to-emerald-50 border-green-200;
+  @apply bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 dark:from-green-950/70 dark:to-slate-900 dark:border-green-800;
 }
 
 .position-mover-card--faller {
-  @apply bg-gradient-to-r from-red-50 to-rose-50 border-red-200;
+  @apply bg-gradient-to-r from-red-50 to-rose-50 border-red-200 dark:from-red-950/70 dark:to-slate-900 dark:border-red-800;
 }
 </style>

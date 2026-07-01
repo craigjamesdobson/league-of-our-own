@@ -45,6 +45,6 @@ defineProps({
 @reference "@/assets/styles/base.css";
 
 .dashboard-card {
-  @apply flex flex-col border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900;
+  @apply flex flex-col border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none;
 }
 </style>

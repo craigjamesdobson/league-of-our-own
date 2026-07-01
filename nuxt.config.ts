@@ -91,6 +91,12 @@ export default defineNuxtConfig({
     },
   },
 
+  vite: {
+    optimizeDeps: {
+      include: ['zod'],
+    },
+  },
+
   fonts: {
     providers: {
       bunny: false,

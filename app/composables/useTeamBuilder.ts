@@ -1,4 +1,4 @@
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
 import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert, Tables } from '~/types/database.types';
@@ -39,8 +39,21 @@ export const useTeamBuilder = () => {
   const supabase = useSupabaseClient<Database>();
   const route = useRoute();
   const router = useRouter();
-  const toast = useToast();
+  const toast = useNuxtToast();
   const draftedTeamsStore = useDraftedTeamsStore();
+
+  const addToast = (
+    color: 'error' | 'success',
+    title: string,
+    description: string,
+  ) => {
+    toast.add({
+      color,
+      title,
+      description,
+      duration: 3000,
+    });
+  };
 
   const loading = ref<LoadingState>({
     fetchingTeam: false,
@@ -84,12 +97,7 @@ export const useTeamBuilder = () => {
     const id = teamId || route.query.id;
     if (!id || typeof id !== 'string') {
       error.value = 'Invalid team ID';
-      toast.add({
-        severity: 'error',
-        summary: 'Invalid team ID',
-        detail: 'No valid team ID provided',
-        life: 3000,
-      });
+      addToast('error', 'Invalid team ID', 'No valid team ID provided');
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
       return;
     }
@@ -114,12 +122,7 @@ export const useTeamBuilder = () => {
 
       if (fetchError) {
         error.value = 'No team found';
-        toast.add({
-          severity: 'error',
-          summary: 'No team found',
-          detail: 'No team was found using that id',
-          life: 3000,
-        });
+        addToast('error', 'No team found', 'No team was found using that id');
         setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
         return;
       }
@@ -129,12 +132,7 @@ export const useTeamBuilder = () => {
     }
     catch {
       error.value = 'Failed to fetch team data';
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to fetch team data',
-        life: 3000,
-      });
+      addToast('error', 'Error', 'Failed to fetch team data');
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     }
     finally {
@@ -227,12 +225,7 @@ export const useTeamBuilder = () => {
       });
 
       if (!turnstileVerification.success) {
-        toast.add({
-          severity: 'error',
-          summary: 'Security Check Failed',
-          detail: 'Security verification failed. Please try again.',
-          life: 3000,
-        });
+        addToast('error', 'Security Check Failed', 'Security verification failed. Please try again.');
         return;
       }
 
@@ -266,21 +259,11 @@ export const useTeamBuilder = () => {
 
       await fetchDraftedTeamData(teamData.key);
 
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Your team has been submitted, thank you!',
-        life: 3000,
-      });
+      addToast('success', 'Success', 'Your team has been submitted, thank you!');
     }
     catch {
       error.value = 'Failed to submit team';
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to submit team. Please try again.',
-        life: 3000,
-      });
+      addToast('error', 'Error', 'Failed to submit team. Please try again.');
     }
     finally {
       loading.value.submittingForm = false;
@@ -299,32 +282,17 @@ export const useTeamBuilder = () => {
         draftedTeamPlayer => draftedTeamPlayer.selectedPlayer === null,
       )
     ) {
-      toast.add({
-        severity: 'error',
-        summary: 'Form errors',
-        detail: 'Please select all players before submitting team',
-        life: 3000,
-      });
+      addToast('error', 'Form errors', 'Please select all players before submitting team');
       return false;
     }
 
     if (isOverBudget.value) {
-      toast.add({
-        severity: 'error',
-        summary: 'Form errors',
-        detail: 'Your team is overbudget, please adjust your players',
-        life: 3000,
-      });
+      addToast('error', 'Form errors', 'Your team is overbudget, please adjust your players');
       return false;
     }
 
     if (!turnstileToken.value) {
-      toast.add({
-        severity: 'error',
-        summary: 'Security Check Required',
-        detail: 'Please complete the security check before submitting',
-        life: 3000,
-      });
+      addToast('error', 'Security Check Required', 'Please complete the security check before submitting');
       return false;
     }
 

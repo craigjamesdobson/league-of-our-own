@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useFixtureStore } from '~/stores/fixtures';
 import type { Fixture } from '~/types/Fixture';
 import type { PlayerWithStats } from '~/types/Player';
@@ -13,7 +13,7 @@ definePageMeta({
 
 const route = useRoute();
 const fixtureStore = useFixtureStore();
-const toast = useToast();
+const toast = useNuxtToast();
 
 const fixture: Ref<Fixture | null> = ref(null);
 
@@ -157,7 +157,6 @@ const canVerify = computed(() => {
 
 <template>
   <div>
-    <Toast />
     <div
       v-if="!!fixture"
       class="flex flex-col"
@@ -165,7 +164,7 @@ const canVerify = computed(() => {
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <div>
           <div
-            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border bg-white p-5"
+            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
             <img
               class="aspect-square h-32 w-32"
@@ -175,12 +174,13 @@ const canVerify = computed(() => {
               <p class="text-xl font-black uppercase">
                 {{ fixture?.home_team.name }}
               </p>
-              <input
+              <UInputNumber
                 v-model="fixture.home_team_score"
-                class="h-10 w-20 rounded border p-2 text-lg"
-                type="number"
-                min="0"
-              >
+                class="w-24"
+                :min="0"
+                :increment="{ variant: 'ghost' }"
+                :decrement="{ variant: 'ghost' }"
+              />
             </div>
           </div>
           <FixtureStatsInput
@@ -194,18 +194,19 @@ const canVerify = computed(() => {
         </div>
         <div>
           <div
-            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border bg-white p-5"
+            class="mx-auto my-10 flex w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
             <div class="flex flex-col items-center gap-2.5">
               <p class="text-xl font-black uppercase">
                 {{ fixture?.away_team.name }}
               </p>
-              <input
+              <UInputNumber
                 v-model="fixture.away_team_score"
-                class="h-10 w-20 rounded border p-2 text-lg"
-                type="number"
-                min="0"
-              >
+                class="w-24"
+                :min="0"
+                :increment="{ variant: 'ghost' }"
+                :decrement="{ variant: 'ghost' }"
+              />
             </div>
             <img
               class="aspect-square h-32 w-32"
@@ -223,75 +224,76 @@ const canVerify = computed(() => {
         </div>
       </div>
       <div class="flex justify-center gap-4 my-5">
-        <Button
+        <UButton
           label="Save Fixture"
           @click="updateFixture"
         />
-        <Button
+        <UButton
           :label="isVerified ? 'Unverify Fixture' : 'Verify Fixture'"
-          :severity="isVerified ? 'secondary' : 'success'"
+          :color="isVerified ? 'neutral' : 'success'"
+          :variant="isVerified ? 'outline' : 'solid'"
           :disabled="!isVerified && !canVerify"
           @click="toggleVerification"
         />
-        <Button
+        <UButton
           v-if="nextUnverifiedFixture"
           label="Next Unverified"
-          severity="secondary"
-          icon="pi pi-arrow-right"
+          color="neutral"
+          variant="outline"
+          icon="lucide:arrow-right"
           @click="goToNextUnverified"
         />
-        <Button
+        <UButton
           label="Back to Fixtures"
-          severity="secondary"
+          color="neutral"
+          variant="outline"
           @click="navigateTo({ path: '/fixtures', query: { week: fixture.game_week } })"
         />
       </div>
       <div class="flex flex-col justify-center items-center gap-5">
-        <Message
+        <UAlert
           v-if="fixture.populated_by"
-          class="!m-0 inline-flex"
-          :closable="false"
-          severity="info"
+          color="info"
+          variant="soft"
         >
-          <strong>Populated by:</strong> {{ fixtureStore.getUserFullName(fixture.populated_profile) }}
-          <span
-            v-if="fixture.populated_at"
-          >
-            on {{ new Date(fixture.populated_at).toLocaleString() }}
-          </span>
-        </Message>
+          <template #description>
+            <strong>Populated by:</strong> {{ fixtureStore.getUserFullName(fixture.populated_profile) }}
+            <span
+              v-if="fixture.populated_at"
+            >
+              on {{ new Date(fixture.populated_at).toLocaleString() }}
+            </span>
+          </template>
+        </UAlert>
 
-        <Message
+        <UAlert
           v-if="fixture.verified_by"
-          class="!m-0 inline-flex"
-          :closable="false"
-          severity="success"
+          color="success"
+          variant="soft"
         >
-          <strong>Verified by:</strong> {{ fixtureStore.getUserFullName(fixture.verified_profile) }}
-          <span
-            v-if="fixture.verified_at"
-          >
-            on {{ new Date(fixture.verified_at).toLocaleString() }}
-          </span>
-        </Message>
+          <template #description>
+            <strong>Verified by:</strong> {{ fixtureStore.getUserFullName(fixture.verified_profile) }}
+            <span
+              v-if="fixture.verified_at"
+            >
+              on {{ new Date(fixture.verified_at).toLocaleString() }}
+            </span>
+          </template>
+        </UAlert>
 
-        <Message
+        <UAlert
           v-if="!canVerify && fixture.populated_by === currentUser?.id"
-          class="!m-0 inline-flex"
-          :closable="false"
-          severity="warn"
-        >
-          You cannot verify a fixture you populated. Please ask another admin to verify.
-        </Message>
+          color="warning"
+          variant="soft"
+          description="You cannot verify a fixture you populated. Please ask another admin to verify."
+        />
 
-        <Message
+        <UAlert
           v-if="!canVerify && !isPopulated"
-          class="!m-0 inline-flex"
-          :closable="false"
-          severity="info"
-        >
-          Fixture must be populated before it can be verified.
-        </Message>
+          color="info"
+          variant="soft"
+          description="Fixture must be populated before it can be verified."
+        />
       </div>
     </div>
     <div v-else>

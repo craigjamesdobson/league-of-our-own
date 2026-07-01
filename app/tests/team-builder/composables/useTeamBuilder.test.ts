@@ -46,7 +46,7 @@ vi.mock('@/stores/draftedTeams', () => ({
   }),
 }));
 
-vi.mock('primevue/usetoast', () => ({
+vi.mock('@nuxt/ui/composables', () => ({
   useToast: () => ({
     add: vi.fn(),
   }),

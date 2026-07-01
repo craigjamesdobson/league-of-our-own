@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 import { useAppSettings } from '~/composables/useAppSettings';
@@ -7,7 +7,7 @@ import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/da
 import { calculateWeeklyStats } from '~/composables/useWeeklyStats';
 
 const supabase = useSupabaseClient<Database>();
-const toast = useToast();
+const toast = useNuxtToast();
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
@@ -161,7 +161,6 @@ const updateWeeklyStats = async () => {
 
 <template>
   <div>
-    <Toast />
     <div class="flex flex-col md:flex-row gap-5 md:justify-between mb-2.5">
       <div class="flex flex-col gap-2.5">
         <h1 class="text-2xl font-black uppercase">
@@ -169,29 +168,33 @@ const updateWeeklyStats = async () => {
         </h1>
 
         <div class="flex gap-2.5">
-          <Message
+          <UAlert
             v-if="fixtureStore.fixtures && weekIsInComplete"
-            class="!m-0"
-            :closable="false"
+            color="info"
+            variant="soft"
           >
-            This week is currently incomplete ({{ (progressStats?.total || 0) - (progressStats?.populated || 0) }} fixtures remaining)
-          </Message>
-          <Message
+            <template #description>
+              This week is currently incomplete ({{ (progressStats?.total || 0) - (progressStats?.populated || 0) }} fixtures remaining)
+            </template>
+          </UAlert>
+          <UAlert
             v-else-if="fixtureStore.fixtures && !weekIsVerified"
-            class="!m-0"
-            :closable="false"
-            severity="warn"
+            color="warning"
+            variant="soft"
           >
-            {{ progressStats?.needsVerification || 0 }} fixture{{ (progressStats?.needsVerification || 0) === 1 ? '' : 's' }} need{{ (progressStats?.needsVerification || 0) === 1 ? 's' : '' }} verification before saving
-          </Message>
-          <Message
+            <template #description>
+              {{ progressStats?.needsVerification || 0 }} fixture{{ (progressStats?.needsVerification || 0) === 1 ? '' : 's' }} need{{ (progressStats?.needsVerification || 0) === 1 ? 's' : '' }} verification before saving
+            </template>
+          </UAlert>
+          <UAlert
             v-else-if="fixtureStore.fixtures"
-            class="!m-0"
-            :closable="false"
-            severity="success"
+            color="success"
+            variant="soft"
           >
-            All fixtures for this week have been verified ✓
-          </Message>
+            <template #description>
+              All fixtures for this week have been verified
+            </template>
+          </UAlert>
         </div>
       </div>
       <div class="mb-5 flex flex-col md:items-end gap-2.5">
@@ -200,24 +203,23 @@ const updateWeeklyStats = async () => {
           for="gameweeks"
         >Select a game week</label>
         <div class="flex gap-2.5">
-          <Select
+          <USelectMenu
             v-model="selectedWeek"
-            :options="weeks"
+            :items="weeks"
             placeholder="Select a gameweek"
-            scroll-height="25rem"
           >
-            <template #value="slotProps">
+            <template #default="{ modelValue }">
               <div class="flex items-center">
-                <div>WEEK {{ slotProps.value }}</div>
+                <div>WEEK {{ modelValue }}</div>
               </div>
             </template>
-            <template #option="slotProps">
+            <template #item-label="{ item }">
               <div class="flex items-center">
-                <div>WEEK {{ slotProps.option }}</div>
+                <div>WEEK {{ item }}</div>
               </div>
             </template>
-          </Select>
-          <Button
+          </USelectMenu>
+          <UButton
             label="Save week"
             :disabled="weekIsInComplete || !weekIsVerified"
             @click="updateWeeklyStats"

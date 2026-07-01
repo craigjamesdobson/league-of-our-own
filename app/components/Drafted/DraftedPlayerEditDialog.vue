@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@nuxt/ui';
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { z } from 'zod';
 import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
@@ -17,7 +17,7 @@ interface TransferData {
 
 const { getCurrentGameweek } = useAppSettings();
 
-const toast = useToast();
+const toast = useNuxtToast();
 
 const toInputDate = (date: Date) => date.toISOString().slice(0, 10);
 

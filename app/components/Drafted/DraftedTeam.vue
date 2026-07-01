@@ -86,23 +86,17 @@ const handleEditPlayer = (playerID: number) => {
           class="w-full cursor-pointer"
           @click="handleEditPlayer(player.data.player_id!)"
         />
-        <Button
+        <UButton
           v-if="props.editable"
+          icon="tabler:switch-3"
+          color="primary"
+          size="xs"
+          square
           aria-label="Edit Player"
           title="Edit Player"
           class="mr-2"
-          :pt="{
-            root: { class: 'w-6 h-6 text-white !p-1' },
-          }"
-          :pt-options="{ mergeProps: true }"
           @click="handleEditPlayer(player.data.player_id!)"
-        >
-          <Icon
-            class="text-white"
-            size="20"
-            name="tabler:switch-3"
-          />
-        </Button>
+        />
       </div>
     </div>
     <div class="flex justify-between px-2.5 pt-2.5">

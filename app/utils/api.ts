@@ -1,29 +1,54 @@
+import type { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import type { ToastServiceMethods } from 'primevue/toastservice';
 
-const handleApiError = (error: unknown, toast: ToastServiceMethods) => {
-  if (error instanceof Error) {
+type NuxtToast = ReturnType<typeof useNuxtToast>;
+type AppToast = NuxtToast | ToastServiceMethods;
+
+const isNuxtToast = (toast: AppToast): toast is NuxtToast => 'toasts' in toast;
+
+const addErrorToast = (toast: AppToast, title: string, description: string) => {
+  if (isNuxtToast(toast)) {
     toast.add({
-      severity: 'error',
-      summary: 'An error occurred',
-      detail: error.message,
-      life: 3000,
+      color: 'error',
+      title,
+      description,
+      duration: 3000,
     });
+    return;
+  }
+
+  toast.add({
+    severity: 'error',
+    summary: title,
+    detail: description,
+    life: 3000,
+  });
+};
+
+const handleApiError = (error: unknown, toast: AppToast) => {
+  if (error instanceof Error) {
+    addErrorToast(toast, 'An error occurred', error.message);
   }
   else {
-    toast.add({
-      severity: 'error',
-      detail: 'An unknown error occurred',
-      summary: 'Please review error logs for more information',
-      life: 3000,
-    });
+    addErrorToast(toast, 'Please review error logs for more information', 'An unknown error occurred');
     console.error('API Error:', error);
   }
 };
 
 const handleApiSuccess = (
   successMesage: string,
-  toast: ToastServiceMethods,
+  toast: AppToast,
 ) => {
+  if (isNuxtToast(toast)) {
+    toast.add({
+      color: 'success',
+      title: 'Success',
+      description: successMesage,
+      duration: 3000,
+    });
+    return;
+  }
+
   toast.add({
     severity: 'success',
     summary: 'Success',

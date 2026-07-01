@@ -158,12 +158,12 @@ Use Zod with Nuxt UI forms.
 
 ### Phase 3: Forms And Admin Flows
 
-- [ ] Convert login to Nuxt UI form components and Zod validation.
-- [ ] Convert team builder form to Nuxt UI form components and Zod validation.
-- [ ] Convert account/admin settings forms.
-- [ ] Convert transfer management forms.
-- [ ] Replace PrimeVue toasts/messages with Nuxt UI toast/alert patterns.
-- [ ] Add or update focused tests for validation behavior.
+- [x] Convert login to Nuxt UI form components and Zod validation.
+- [x] Convert team builder form to Nuxt UI form components and Zod validation.
+- [x] Convert account/admin settings forms.
+- [x] Convert transfer management forms.
+- [x] Replace PrimeVue toasts/messages with Nuxt UI toast/alert patterns.
+- [x] Add or update focused tests for validation behavior.
 
 ### Phase 4: General Component Sweep
 

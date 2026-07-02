@@ -41,7 +41,7 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
 <template>
   <div
     v-if="props.draftedTeam"
-    class="rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+    class="w-full max-w-full overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
   >
     <div class="flex flex-col uppercase">
       <span class="text-lg font-black">{{
@@ -76,9 +76,9 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
         />
       </div>
     </div>
-    <div class="flex justify-between py-2.5 pl-2.5 bg-slate-50 dark:bg-slate-800/80">
+    <div class="grid grid-cols-[1fr_3rem] py-2.5 pl-2.5 bg-slate-50 dark:bg-slate-800/80">
       <span>Total</span>
-      <strong class="w-2/12 text-center">
+      <strong class="text-center">
         {{ calculatedWeeklyStats.points }}
       </strong>
     </div>

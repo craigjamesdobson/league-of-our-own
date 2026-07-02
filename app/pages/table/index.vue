@@ -47,16 +47,17 @@ const visible = ref(false);
           <div class="flex gap-2.5">
             <USelectMenu
               v-model="selectedWeek"
+              class="w-28"
               :items="weeks"
               placeholder="Select a gameweek"
             >
               <template #default="{ modelValue }">
-                <div class="flex items-center">
+                <div class="flex min-w-0 items-center">
                   <div>WEEK {{ modelValue }}</div>
                 </div>
               </template>
               <template #item-label="{ item }">
-                <div class="flex items-center">
+                <div class="flex min-w-0 items-center">
                   <div>WEEK {{ item }}</div>
                 </div>
               </template>
@@ -93,8 +94,8 @@ const visible = ref(false);
       :dismissible="true"
       :ui="{
         overlay: 'bg-slate-950/75',
-        content: 'w-[90%] bg-white text-slate-900 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 sm:max-w-[500px]',
-        body: 'p-0 pb-2',
+        content: 'w-[calc(100vw-2rem)] max-w-[500px] overflow-hidden bg-white text-slate-900 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700',
+        body: 'overflow-x-hidden p-0 pb-2',
         title: 'uppercase',
       }"
     >

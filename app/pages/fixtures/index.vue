@@ -205,16 +205,17 @@ const updateWeeklyStats = async () => {
         <div class="flex gap-2.5">
           <USelectMenu
             v-model="selectedWeek"
+            class="w-28"
             :items="weeks"
             placeholder="Select a gameweek"
           >
             <template #default="{ modelValue }">
-              <div class="flex items-center">
+              <div class="flex min-w-0 items-center">
                 <div>WEEK {{ modelValue }}</div>
               </div>
             </template>
             <template #item-label="{ item }">
-              <div class="flex items-center">
+              <div class="flex min-w-0 items-center">
                 <div>WEEK {{ item }}</div>
               </div>
             </template>

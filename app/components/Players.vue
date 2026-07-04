@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { TableColumn, TableRow } from '@nuxt/ui';
 import { usePlayerStore } from '@/stores/players';
+import { TEAM_DATA } from '@/logic/teams/constants';
+import { populateFilterPrices } from '@/utils/filters';
 import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
 import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
@@ -10,18 +12,75 @@ const route = useRoute();
 const playerStore = usePlayerStore();
 const selectedPlayer: Ref<Player | null> = ref(null);
 const showDialog = ref(false);
+
+type AvailabilityFilter = 'all' | 'available' | 'unavailable' | 'season';
+type ColumnFiltersState = { id: string; value: unknown }[];
+type PlayerFilterRow = { original: Player };
+type PlayerFilterFn = (row: PlayerFilterRow, columnId: string, filterValue: unknown) => boolean;
+type PlayerTable = {
+  tableApi: {
+    getFilteredRowModel: () => {
+      rows: unknown[];
+    };
+  };
+};
+
+const table = useTemplateRef<PlayerTable>('table');
+const globalFilter = ref('');
+const columnFilters = ref<ColumnFiltersState>([]);
+const selectedTeam = ref(0);
+const selectedPrice = ref(0);
 const selectedPosition = ref<PlayerPosition | null>(null);
-const selectedAvailability = ref<'all' | 'available' | 'unavailable' | 'season'>('all');
-const currentPage = ref(1);
-const rowsPerPage = 25;
+const selectedAvailability = ref<AvailabilityFilter>('all');
+
+const normalizeFilterValue = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036F]/g, '')
+    .toLowerCase();
+
+const playerGlobalFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  const search = normalizeFilterValue(String(filterValue ?? '').trim());
+
+  if (!search) {
+    return true;
+  }
+
+  return normalizeFilterValue(row.original.web_name ?? '').includes(search);
+};
+
+const positionFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  return filterValue === null || filterValue === undefined || row.original.position === filterValue;
+};
+
+const teamFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  return !filterValue || row.original.team === filterValue;
+};
+
+const priceFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  return !filterValue || row.original.cost === filterValue;
+};
+
+const availabilityFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  switch (filterValue as AvailabilityFilter) {
+    case 'available':
+      return !row.original.is_unavailable;
+    case 'unavailable':
+      return row.original.is_unavailable && !row.original.unavailable_for_season;
+    case 'season':
+      return row.original.unavailable_for_season;
+    default:
+      return true;
+  }
+};
 
 const columns: TableColumn<Player>[] = [
   { accessorKey: 'player_id', header: 'ID', meta: { class: { th: 'w-20' } } },
   { accessorKey: 'web_name', id: 'player', header: 'Player', meta: { class: { th: 'min-w-56' } } },
-  { accessorKey: 'position', id: 'position', header: 'Pos.', meta: { class: { th: 'w-32' } } },
-  { accessorKey: 'team_short_name', id: 'team', header: 'Team', meta: { class: { th: 'w-32' } } },
-  { accessorKey: 'cost', id: 'cost', header: 'Cost', meta: { class: { th: 'w-24 text-right' } } },
-  { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', meta: { class: { th: 'w-44' } } },
+  { accessorKey: 'position', id: 'position', header: 'Pos.', filterFn: positionFilter, meta: { class: { th: 'w-32' } } },
+  { accessorKey: 'team_short_name', id: 'team', header: 'Team', filterFn: teamFilter, meta: { class: { th: 'w-32' } } },
+  { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-24 text-right' } } },
+  { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', filterFn: availabilityFilter, meta: { class: { th: 'w-44' } } },
   { accessorKey: 'minutes', header: 'Minutes', meta: { class: { th: 'w-28 text-right' } } },
 ];
 
@@ -38,37 +97,48 @@ const availabilityFilters = [
   { label: 'Available', value: 'available' },
   { label: 'Flagged', value: 'unavailable' },
   { label: 'Season out', value: 'season' },
-] satisfies { label: string; value: typeof selectedAvailability.value }[];
+] satisfies { label: string; value: AvailabilityFilter }[];
 
-const filteredPlayers = computed(() => {
-  return [...playerStore.filteredPlayers]
-    .filter((player) => {
-      const matchesPosition = selectedPosition.value === null || player.position === selectedPosition.value;
-      const matchesAvailability = selectedAvailability.value === 'all'
-        || (selectedAvailability.value === 'available' && !player.is_unavailable)
-        || (selectedAvailability.value === 'unavailable' && player.is_unavailable && !player.unavailable_for_season)
-        || (selectedAvailability.value === 'season' && player.unavailable_for_season);
+const teamFilters = computed(() => [
+  { name: 'All teams', value: 0 },
+  ...TEAM_DATA.map(team => ({
+    name: team.name,
+    value: team.id,
+  })),
+]);
 
-      return matchesPosition && matchesAvailability;
-    })
-    .sort((a, b) => a.position - b.position || a.team - b.team || a.web_name.localeCompare(b.web_name));
-});
+const priceFilters = populateFilterPrices();
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredPlayers.value.length / rowsPerPage)));
+const sortedPlayers = computed(() =>
+  [...playerStore.getPlayers]
+    .sort((a, b) => a.position - b.position || a.team - b.team || a.web_name.localeCompare(b.web_name)),
+);
 
-const paginatedPlayers = computed(() => {
-  const start = (currentPage.value - 1) * rowsPerPage;
-  return filteredPlayers.value.slice(start, start + rowsPerPage);
+const filterSnapshot = computed(() => ({
+  globalFilter: globalFilter.value,
+  columnFilters: columnFilters.value,
+  playerCount: sortedPlayers.value.length,
+}));
+
+const filteredRowCount = ref(0);
+
+const updateFilteredRowCount = async () => {
+  await nextTick();
+  filteredRowCount.value = table.value?.tableApi.getFilteredRowModel().rows.length ?? sortedPlayers.value.length;
+};
+
+const activeFilterCount = computed(() => {
+  return [
+    globalFilter.value.trim(),
+    selectedTeam.value,
+    selectedPrice.value,
+    selectedPosition.value,
+    selectedAvailability.value !== 'all',
+  ].filter(Boolean).length;
 });
 
 const visibleRange = computed(() => {
-  if (!filteredPlayers.value.length) {
-    return '0 players';
-  }
-
-  const start = (currentPage.value - 1) * rowsPerPage + 1;
-  const end = Math.min(currentPage.value * rowsPerPage, filteredPlayers.value.length);
-  return `${start}-${end} of ${filteredPlayers.value.length} players`;
+  return `${filteredRowCount.value} players`;
 });
 
 const setSelectedPlayerAndQueryParam = (playerID: number) => {
@@ -129,6 +199,21 @@ const getToggleButtonClass = (isSelected: boolean) => {
     : 'dark:!text-slate-100 dark:hover:!bg-slate-800';
 };
 
+const setColumnFilter = (id: string, value: unknown, isActive: boolean) => {
+  columnFilters.value = [
+    ...columnFilters.value.filter(filter => filter.id !== id),
+    ...(isActive ? [{ id, value }] : []),
+  ];
+};
+
+const resetFilters = () => {
+  globalFilter.value = '';
+  selectedTeam.value = 0;
+  selectedPrice.value = 0;
+  selectedPosition.value = null;
+  selectedAvailability.value = 'all';
+};
+
 onMounted(async () => {
   if (route.query.id) {
     selectedPlayer.value = playerStore.getPlayerByID(+route.query.id) as Player;
@@ -136,15 +221,23 @@ onMounted(async () => {
   }
 });
 
-watch([selectedPosition, selectedAvailability], () => {
-  currentPage.value = 1;
+watch(selectedPosition, (position) => {
+  setColumnFilter('position', position, position !== null);
 });
 
-watch(filteredPlayers, () => {
-  if (currentPage.value > totalPages.value) {
-    currentPage.value = totalPages.value;
-  }
+watch(selectedTeam, (team) => {
+  setColumnFilter('team', team, team !== 0);
 });
+
+watch(selectedPrice, (price) => {
+  setColumnFilter('cost', price, price !== 0);
+});
+
+watch(selectedAvailability, (availability) => {
+  setColumnFilter('availability', availability, availability !== 'all');
+});
+
+watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flush: 'post' });
 </script>
 
 <template>
@@ -167,6 +260,45 @@ watch(filteredPlayers, () => {
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <UButton
+              icon="lucide:rotate-ccw"
+              label="Reset"
+              color="neutral"
+              variant="ghost"
+              size="sm"
+              :disabled="activeFilterCount === 0"
+              class="dark:!text-slate-100 dark:hover:!bg-slate-800"
+              @click="resetFilters"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <UInput
+            v-model="globalFilter"
+            class="w-full"
+            icon="tabler:search"
+            placeholder="Search players..."
+          />
+          <USelectMenu
+            v-model="selectedTeam"
+            class="w-full"
+            label-key="name"
+            value-key="value"
+            :items="teamFilters"
+            placeholder="All teams"
+          />
+          <USelectMenu
+            v-model="selectedPrice"
+            class="w-full"
+            label-key="name"
+            value-key="value"
+            :items="priceFilters"
+            placeholder="All prices"
+          />
+        </div>
+        <div class="flex flex-col justify-between gap-3 xl:flex-row xl:items-center">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm text-slate-600 dark:text-slate-300">Position:</span>
+            <UButton
               v-for="position in positionFilters"
               :key="position.label"
               :label="position.label"
@@ -178,27 +310,31 @@ watch(filteredPlayers, () => {
               @click="selectedPosition = position.value"
             />
           </div>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-sm text-slate-600 dark:text-slate-300">Availability:</span>
-          <UButton
-            v-for="availability in availabilityFilters"
-            :key="availability.value"
-            :label="availability.label"
-            :variant="selectedAvailability === availability.value ? 'solid' : 'soft'"
-            color="neutral"
-            size="sm"
-            :class="getToggleButtonClass(selectedAvailability === availability.value)"
-            @click="selectedAvailability = availability.value"
-          />
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-sm text-slate-600 dark:text-slate-300">Availability:</span>
+            <UButton
+              v-for="availability in availabilityFilters"
+              :key="availability.value"
+              :label="availability.label"
+              :variant="selectedAvailability === availability.value ? 'solid' : 'soft'"
+              color="neutral"
+              size="sm"
+              :class="getToggleButtonClass(selectedAvailability === availability.value)"
+              @click="selectedAvailability = availability.value"
+            />
+          </div>
         </div>
       </div>
 
       <div class="overflow-x-auto">
         <UTable
-          :data="paginatedPlayers"
+          ref="table"
+          v-model:global-filter="globalFilter"
+          v-model:column-filters="columnFilters"
+          :data="sortedPlayers"
           :columns="columns"
           empty="No players found"
+          :global-filter-options="{ globalFilterFn: playerGlobalFilter }"
           :ui="{
             root: 'min-w-full',
             base: 'min-w-[760px] text-sm',
@@ -281,29 +417,9 @@ watch(filteredPlayers, () => {
         <span class="text-slate-600 dark:text-slate-300">
           {{ visibleRange }}
         </span>
-        <div class="flex items-center gap-2">
-          <UButton
-            icon="lucide:chevron-left"
-            color="neutral"
-            variant="outline"
-            size="xs"
-            :disabled="currentPage === 1"
-            aria-label="Previous page"
-            @click="currentPage--"
-          />
-          <span class="text-slate-600 dark:text-slate-300">
-            Page {{ currentPage }} of {{ totalPages }}
-          </span>
-          <UButton
-            icon="lucide:chevron-right"
-            color="neutral"
-            variant="outline"
-            size="xs"
-            :disabled="currentPage === totalPages"
-            aria-label="Next page"
-            @click="currentPage++"
-          />
-        </div>
+        <span class="text-slate-600 dark:text-slate-300">
+          {{ activeFilterCount }} active filters
+        </span>
       </div>
     </div>
   </div>

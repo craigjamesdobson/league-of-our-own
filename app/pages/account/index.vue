@@ -18,9 +18,11 @@ definePageMeta({
 
 await draftedTeamStore.fetchDraftedTeams();
 
-const selectedDraftedTeamID = ref(0);
+const selectedDraftedTeamID = ref<number | undefined>();
 const selectedDraftedTeam = computed(() =>
-  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value),
+  selectedDraftedTeamID.value
+    ? draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
+    : undefined,
 );
 const transferDraftedTeams = computed(() =>
   draftedTeamStore.getDraftedTeams?.filter(team => team.allowed_transfers) || [],
@@ -32,6 +34,11 @@ const updating = ref(false);
 
 const currentGameweek = ref<number>(4);
 const isUpdatingGameweek = ref(false);
+const stepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
 
 const handleUpsertPlayerData = async () => {
   try {
@@ -111,18 +118,17 @@ const copyApiUrl = async () => {
 
 <template>
   <div class="flex h-full flex-col items-center justify-center">
-    <h1 class="main-heading flex items-center">
-      <span>Admin Dashboard</span>
+    <div class="mb-4 flex w-full justify-end">
       <UButton
         icon="la:sign-out-alt"
         color="neutral"
         variant="ghost"
-        square
+        label="Sign out"
         title="Sign out"
         aria-label="Sign out"
         @click.prevent="handleUserLogout"
       />
-    </h1>
+    </div>
     <div v-if="accountStore.userIsLoggedIn">
       <p class="m-4 text-center underline">
         Hello {{ accountStore.user?.email }}
@@ -171,8 +177,8 @@ const copyApiUrl = async () => {
                     :max="38"
                     :disabled="isUpdatingGameweek"
                     class="w-28"
-                    :increment="{ variant: 'ghost' }"
-                    :decrement="{ variant: 'ghost' }"
+                    :increment="stepperButton"
+                    :decrement="stepperButton"
                   />
                   <UButton
                     label="Update"
@@ -308,6 +314,10 @@ const copyApiUrl = async () => {
                 value-key="drafted_team_id"
                 placeholder="Select a team to manage..."
                 :search-input="{ placeholder: 'Search teams...' }"
+                :ui="{
+                  content: 'max-h-[28rem]',
+                  viewport: 'max-h-[24rem]',
+                }"
               >
                 <template #item-label="{ item }">
                   <div class="flex items-center justify-between w-full p-1">

@@ -7,6 +7,11 @@ import { handleApiError, handleApiSuccess } from '~/utils/api';
 import { getImageUrl } from '~/utils/images';
 import { navigateTo } from '#app';
 
+type PageHeaderState = {
+  title?: string;
+  subtitle?: string;
+};
+
 definePageMeta({
   keepalive: true,
 });
@@ -16,6 +21,18 @@ const fixtureStore = useFixtureStore();
 const toast = useNuxtToast();
 
 const fixture: Ref<Fixture | null> = ref(null);
+const pageHeader = useState<PageHeaderState>('page-header', () => ({}));
+
+const setFixturePageHeader = () => {
+  if (!fixture.value) {
+    return;
+  }
+
+  pageHeader.value = {
+    title: `${fixture.value.home_team.name} vs ${fixture.value.away_team.name}`,
+    subtitle: `Fixture ${fixture.value.id}`,
+  };
+};
 
 const fixtureId = route.params.id;
 if (!fixtureId) {
@@ -23,6 +40,9 @@ if (!fixtureId) {
 }
 
 fixture.value = await fixtureStore.fetchFixtureByID(+fixtureId);
+
+await nextTick();
+setFixturePageHeader();
 
 if (!fixtureStore.fixtures && fixture.value?.game_week) {
   fixtureStore.fetchFixtures(fixture.value.game_week);
@@ -153,6 +173,12 @@ const canVerify = computed(() => {
 
   return true;
 });
+
+const scoreStepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
 </script>
 
 <template>
@@ -178,8 +204,8 @@ const canVerify = computed(() => {
                 v-model="fixture.home_team_score"
                 class="w-24"
                 :min="0"
-                :increment="{ variant: 'ghost' }"
-                :decrement="{ variant: 'ghost' }"
+                :increment="scoreStepperButton"
+                :decrement="scoreStepperButton"
               />
             </div>
           </div>
@@ -204,8 +230,8 @@ const canVerify = computed(() => {
                 v-model="fixture.away_team_score"
                 class="w-24"
                 :min="0"
-                :increment="{ variant: 'ghost' }"
-                :decrement="{ variant: 'ghost' }"
+                :increment="scoreStepperButton"
+                :decrement="scoreStepperButton"
               />
             </div>
             <img

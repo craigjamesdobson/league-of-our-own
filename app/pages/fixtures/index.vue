@@ -163,10 +163,6 @@ const updateWeeklyStats = async () => {
   <div>
     <div class="flex flex-col md:flex-row gap-5 md:justify-between mb-2.5">
       <div class="flex flex-col gap-2.5">
-        <h1 class="text-2xl font-black uppercase text-slate-900 dark:text-slate-100">
-          Fixtures
-        </h1>
-
         <div class="flex gap-2.5">
           <UAlert
             v-if="fixtureStore.fixtures && weekIsInComplete"

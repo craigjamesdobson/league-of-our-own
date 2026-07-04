@@ -28,9 +28,6 @@ const handleUserLogin = async (event: FormSubmitEvent<LoginSchema>) => {
 
 <template>
   <div class="flex h-full flex-col items-center justify-center">
-    <h1 class="main-heading flex items-center">
-      <span>Admin Dashboard</span>
-    </h1>
     <div
       class="mb-4 flex w-full max-w-96 flex-col justify-center rounded-md border border-slate-200 bg-white p-10 shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >

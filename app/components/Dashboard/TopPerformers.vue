@@ -43,7 +43,7 @@ const topPerformersWithWinnerStatus = computed((): EnhancedTeamData[] => {
 });
 
 const getTeamContainerClasses = (isWinner: boolean) => ({
-  'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm dark:from-yellow-950/70 dark:to-slate-900 dark:border-yellow-700': isWinner,
+  'bg-gradient-to-r from-yellow-50 via-yellow-100/80 to-amber-50 border-2 border-yellow-300 shadow-sm dark:from-yellow-900/45 dark:via-yellow-950/35 dark:to-slate-900 dark:border-yellow-600/80': isWinner,
   'bg-gray-50 border border-gray-200 dark:bg-slate-800/70 dark:border-slate-700': !isWinner,
 });
 

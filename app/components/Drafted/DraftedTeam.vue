@@ -34,9 +34,13 @@ const handleEditPlayer = (playerID: number) => {
 </script>
 
 <template>
-  <div
+  <UCard
     v-if="props.draftedTeam"
-    class="rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+    class="text-slate-900 dark:text-slate-100"
+    :ui="{
+      root: 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none',
+      body: 'p-5 sm:p-5',
+    }"
   >
     <div
       class="mb-2 flex items-center justify-between border-b border-slate-800 p-2 pt-0 dark:border-slate-700"
@@ -90,6 +94,7 @@ const handleEditPlayer = (playerID: number) => {
           v-if="props.editable"
           icon="tabler:switch-3"
           color="primary"
+          variant="subtle"
           size="xs"
           square
           aria-label="Edit Player"
@@ -105,7 +110,7 @@ const handleEditPlayer = (playerID: number) => {
         {{ props.draftedTeam?.total_team_value }}
       </strong>
     </div>
-  </div>
+  </UCard>
   <DraftedPlayerEditDialog
     v-if="selectedDraftedPlayer"
     v-model:drafted-player="selectedDraftedPlayer"

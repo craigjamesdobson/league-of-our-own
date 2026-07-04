@@ -1,103 +1,145 @@
-<script setup>
+<script setup lang="ts">
 import { useAccountStore } from '@/stores/account';
 
 const accountStore = useAccountStore();
 
-const routes = reactive([
+const open = defineModel<boolean>('open', { default: true });
+
+const routes = [
   {
-    title: 'Players',
+    label: 'Players',
     icon: 'material-symbols:list-alt-outline-rounded',
-    path: '/players',
-    admin: false,
+    to: '/players',
   },
   {
-    title: 'Teams',
+    label: 'Teams',
     icon: 'fluent:people-team-20-regular',
-    path: '/teams',
-    admin: false,
+    to: '/teams',
   },
   {
-    title: 'Rules',
+    label: 'Rules',
     icon: 'ic:outline-rule',
-    path: '/rules',
-    admin: false,
+    to: '/rules',
   },
   {
-    title: 'Table',
+    label: 'Table',
     icon: 'gravity-ui:list-ol',
-    path: '/table',
-    admin: false,
+    to: '/table',
   },
-]);
+];
+
+const fixturesRoute = {
+  label: 'Fixtures',
+  icon: 'fluent:text-bullet-list-square-edit-20-regular',
+  to: '/fixtures',
+};
+
+const navigationItems = computed(() =>
+  accountStore.userIsLoggedIn
+    ? [...routes, fixturesRoute]
+    : routes,
+);
+
+const sidebarUi = {
+  root: '[--sidebar-width:18rem] [--sidebar-width-icon:5rem]',
+  container: 'h-svh',
+  inner: 'bg-brand text-slate-100 divide-white/10',
+  header: 'min-h-20 px-4',
+  body: 'justify-center gap-4 p-4',
+  footer: 'p-4',
+  rail: 'hover:after:bg-white/30',
+};
+
+const mobileMenu = {
+  direction: 'bottom' as const,
+  handle: false,
+  ui: {
+    overlay: 'bg-slate-950/60',
+    content: 'max-h-[85vh] flex-col bg-brand text-slate-100 ring-0',
+  },
+};
+
+const navigationUi = {
+  root: 'gap-2',
+  list: 'gap-2',
+  link: 'min-h-13 overflow-hidden rounded-lg px-3 text-[15px] font-semibold text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-13 data-[collapsed=true]:w-13 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
+  linkLeadingIcon: 'size-7 text-current',
+  linkLabel: 'text-current',
+  linkTrailing: 'text-slate-300',
+};
+
+const brandButtonUi = {
+  base: 'min-h-12 w-full justify-start overflow-hidden px-3',
+  leadingIcon: 'size-8 text-slate-100',
+  label: 'truncate text-base font-bold text-slate-100',
+};
+
+const footerButtonUi = {
+  base: 'min-h-12 w-full justify-start overflow-hidden px-3',
+  leadingIcon: 'size-7 text-current',
+  label: 'truncate text-[15px] font-semibold',
+};
 </script>
 
 <template>
-  <nav
-    class="bg-primary w-full fixed bottom-0 z-10 flex items-center justify-between p-4 xl:sticky xl:top-0 xl:h-screen xl:flex-col"
+  <USidebar
+    v-model:open="open"
+    collapsible="icon"
+    rail
+    mode="drawer"
+    close
+    :menu="mobileMenu"
+    :ui="sidebarUi"
   >
-    <!-- SideNavBar -->
-
-    <nuxt-link
-      to="/"
-      class="logo flex items-center rounded-full"
-    >
-      <!-- Header -->
-      <Icon
-        class="text-slate-100"
-        size="32"
-        name="carbon:soccer"
+    <template #header="{ state, close }">
+      <UButton
+        to="/"
+        icon="carbon:soccer"
+        :label="state === 'expanded' ? 'League of Our Own' : undefined"
+        aria-label="Home"
+        color="neutral"
+        variant="ghost"
+        class="hover:bg-white/10 hover:text-white"
+        :ui="brandButtonUi"
       />
-    </nuxt-link>
+      <UButton
+        icon="i-lucide-x"
+        aria-label="Close navigation"
+        color="neutral"
+        variant="ghost"
+        square
+        class="text-slate-200 hover:bg-white/10 hover:text-white lg:hidden"
+        @click="close"
+      />
+    </template>
 
-    <div>
-      <ul class="flex gap-4 xl:flex-col">
-        <!-- Links -->
-        <li
-          v-for="route in routes"
-          :key="route.title"
-        >
-          <nuxt-link
-            :to="route.path"
-            class="hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-slate-100 lg:border xl:mb-8"
-          >
-            <Icon
-              size="24"
-              :name="route.icon"
-            />
-            <span class="ml-4 hidden capitalize">{{ route.name }}</span>
-          </nuxt-link>
-        </li>
-        <li v-if="accountStore.userIsLoggedIn">
-          <nuxt-link
-            to="/fixtures"
-            class="hover:text-primary flex h-10 w-10 flex-col items-center justify-center rounded-xl text-base text-slate-100 transition duration-300 ease-in-out hover:bg-slate-100 lg:border lg:border-slate-100 xl:mb-8"
-          >
-            <Icon
-              size="24"
-              name="fluent:text-bullet-list-square-edit-20-regular"
-            />
-            <span class="ml-4 hidden capitalize">Fixtures</span>
-          </nuxt-link>
-        </li>
-      </ul>
-    </div>
+    <template #default="{ state }">
+      <UNavigationMenu
+        :key="state"
+        :items="navigationItems"
+        orientation="vertical"
+        :collapsed="state === 'collapsed'"
+        color="neutral"
+        variant="pill"
+        :tooltip="{ content: { side: 'right' } }"
+        :ui="navigationUi"
+      />
+    </template>
 
-    <div class="flex items-center gap-2 xl:flex-col">
-      <ColorModeControl />
-      <nuxt-link
-        to="/account"
-        class="hover:text-primary flex h-8 w-8 flex-col items-center justify-center rounded-full border border-slate-100 text-base text-slate-100 transition duration-300 ease-in-out hover:bg-white lg:h-10 lg:w-10"
-      >
-        <Icon name="uil:setting" />
-      </nuxt-link>
-    </div>
-  </nav>
+    <template #footer="{ state }">
+      <div class="flex flex-col gap-2">
+        <ColorModeControl :collapsed="state === 'collapsed'" />
+        <UButton
+          to="/account"
+          icon="uil:setting"
+          :label="state === 'expanded' ? 'Account' : undefined"
+          aria-label="Account settings"
+          color="neutral"
+          variant="ghost"
+          class="text-slate-200 hover:bg-white/10 hover:text-white"
+          :ui="footerButtonUi"
+        />
+      </div>
+    </template>
+  </USidebar>
 </template>
-
-<style scoped>
-@reference "@/assets/styles/base.css";
-
-.router-link-active:not(.logo) {
-  @apply bg-neutral-200 text-primary;
-}
-</style>

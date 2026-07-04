@@ -9,14 +9,11 @@
         :key="i"
         class="mb-2 flex flex-row gap-5"
       >
-        <SkeletonLoader class="h-5 w-1/12" />
-        <SkeletonLoader
-          type="circle"
-          class="h-5 w-5"
-        />
-        <SkeletonLoader class="h-5 w-2/12" />
-        <SkeletonLoader class="h-5 w-5/12" />
-        <SkeletonLoader class="h-5 w-2/12" />
+        <USkeleton class="h-5 w-1/12" />
+        <USkeleton class="h-5 w-5 rounded-full" />
+        <USkeleton class="h-5 w-2/12" />
+        <USkeleton class="h-5 w-5/12" />
+        <USkeleton class="h-5 w-2/12" />
       </div>
     </div>
   </div>

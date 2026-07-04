@@ -43,15 +43,6 @@ onMounted(async () => {
 
 <template>
   <div class="min-h-full text-slate-900 dark:text-slate-100">
-    <!-- Header Section -->
-    <div class="text-center mb-8">
-      <div class="inline-flex flex-col gap-5 justify-center text-slate-900 dark:text-slate-100">
-        <h1 class="text-4xl uppercase font-black">
-          Summary Dashboard
-        </h1>
-      </div>
-    </div>
-
     <!-- Dashboard Content -->
     <div class="mx-auto">
       <!-- Dashboard Layout -->

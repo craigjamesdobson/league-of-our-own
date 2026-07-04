@@ -42,6 +42,11 @@ const newTransferData = reactive<TransferData>({
   activeExpiryDate: toInputDate(new Date()),
   transferWeek: await getCurrentGameweek() || 1,
 });
+const stepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
 
 const visible = defineModel<boolean>('visible');
 const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
@@ -158,6 +163,19 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     handleApiError(err, toast);
   }
 };
+
+const modalUi = computed(() => ({
+  overlay: 'bg-slate-950/75',
+  content: [
+    'w-[calc(100vw-2rem)] bg-white text-slate-900 ring-slate-200 divide-slate-200',
+    'dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 dark:divide-slate-700',
+    props.editable ? 'sm:max-w-5xl' : 'sm:max-w-3xl',
+  ].join(' '),
+  header: 'bg-white dark:bg-slate-900',
+  body: 'bg-white dark:bg-slate-900',
+  title: 'text-slate-900 dark:text-slate-100',
+  close: 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100',
+}));
 </script>
 
 <template>
@@ -165,14 +183,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     v-model:open="visible"
     title="Player transfers"
     :dismissible="true"
-    :ui="{
-      overlay: 'bg-slate-950/75',
-      content: 'sm:max-w-5xl bg-white text-slate-900 ring-slate-200 divide-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 dark:divide-slate-700',
-      header: 'bg-white dark:bg-slate-900',
-      body: 'bg-white dark:bg-slate-900',
-      title: 'text-slate-900 dark:text-slate-100',
-      close: 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100',
-    }"
+    :ui="modalUi"
   >
     <template #body>
       <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
@@ -203,7 +214,7 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
               :key="playerTransfer.drafted_transfer_id"
               class="mb-5 flex flex-col"
             >
-              <h3 class="flex self-start text-sm font-bold uppercase">
+              <h3 class="mb-1.5 flex self-start text-sm font-bold uppercase">
                 gameweek {{ playerTransfer.transfer_week }}
               </h3>
               <div class="flex items-center gap-2.5 rounded border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
@@ -275,8 +286,8 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
                 :min="1"
                 :max="38"
                 class="w-full"
-                :increment="{ variant: 'ghost' }"
-                :decrement="{ variant: 'ghost' }"
+                :increment="stepperButton"
+                :decrement="stepperButton"
               />
             </UFormField>
             <UFormField

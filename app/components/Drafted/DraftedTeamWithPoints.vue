@@ -39,9 +39,13 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
 </script>
 
 <template>
-  <div
+  <UCard
     v-if="props.draftedTeam"
-    class="w-full max-w-full overflow-hidden rounded-sm border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+    class="w-full max-w-full overflow-hidden text-slate-900 dark:text-slate-100"
+    :ui="{
+      root: 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none',
+      body: 'p-5 sm:p-5',
+    }"
   >
     <div class="flex flex-col uppercase">
       <span class="text-lg font-black">{{
@@ -82,5 +86,5 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
         {{ calculatedWeeklyStats.points }}
       </strong>
     </div>
-  </div>
+  </UCard>
 </template>

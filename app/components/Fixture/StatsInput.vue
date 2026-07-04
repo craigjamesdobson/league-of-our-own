@@ -15,103 +15,103 @@
           :title="position.key"
           :label="position.key"
           :icon="position.icon"
-          :variant="selectedPosition === position.value ? 'solid' : 'outline'"
-          color="primary"
+          :variant="selectedPosition === position.value ? 'solid' : 'soft'"
+          color="neutral"
           size="sm"
+          :class="getPositionButtonClass(selectedPosition === position.value)"
           @click="filterByPosition(position.value)"
         />
       </div>
     </div>
 
     <div class="max-h-[320px] overflow-auto">
-      <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-        <thead class="sticky top-0 z-10 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200">
-          <tr>
-            <th class="w-[25%] px-3 py-2">
-              Player
-            </th>
-            <th class="w-[15%] px-3 py-2">
-              <UTooltip text="Goals scored by this player in the fixture">
-                <span>Goals</span>
-              </UTooltip>
-            </th>
-            <th class="w-[15%] px-3 py-2">
-              <UTooltip text="Assists made by this player in the fixture">
-                <span>Assists</span>
-              </UTooltip>
-            </th>
-            <th class="w-[15%] px-3 py-2">
-              <UTooltip text="Clean sheet applies to goalkeepers and defenders when their team concedes no goals">
-                <span>Clean sheet</span>
-              </UTooltip>
-            </th>
-            <th class="w-[15%] px-3 py-2">
-              <UTooltip text="Player was sent off">
-                <span>Red card</span>
-              </UTooltip>
-            </th>
-            <th class="w-[15%] px-3 py-2">
-              <UTooltip text="Calculated fantasy points for this fixture">
-                <span>Points</span>
-              </UTooltip>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-          <tr
-            v-for="player in paginatedPlayers"
-            :key="player.player_id"
-            class="even:bg-slate-50/70 dark:even:bg-slate-800/50"
-          >
-            <td class="px-3 py-2 font-medium text-slate-900 dark:text-slate-100">
-              {{ player.web_name }}
-            </td>
-            <td class="px-3 py-2">
-              <UInputNumber
-                v-model="player.week_goals"
-                class="w-20"
-                :min="0"
-                :highlight="player.week_goals > 0"
-                @update:model-value="calculatePlayerPoints(player)"
-              />
-            </td>
-            <td class="px-3 py-2">
-              <UInputNumber
-                v-model="player.week_assists"
-                class="w-20"
-                :min="0"
-                :highlight="player.week_assists > 0"
-                @update:model-value="calculatePlayerPoints(player)"
-              />
-            </td>
-            <td class="px-3 py-2">
-              <UCheckbox
-                v-model="player.week_cleansheet"
-                :disabled="disableCleansheet || player.position > 2"
-                @update:model-value="calculatePlayerPoints(player)"
-              />
-            </td>
-            <td class="px-3 py-2">
-              <UCheckbox
-                v-model="player.week_redcard"
-                color="error"
-                @update:model-value="calculatePlayerPoints(player)"
-              />
-            </td>
-            <td class="px-3 py-2 font-semibold text-slate-900 dark:text-slate-100">
-              {{ player.week_points }}
-            </td>
-          </tr>
-          <tr v-if="!paginatedPlayers.length">
-            <td
-              colspan="6"
-              class="px-3 py-8 text-center text-slate-500 dark:text-slate-400"
-            >
-              No players found
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <UTable
+        :data="paginatedPlayers"
+        :columns="columns"
+        empty="No players found"
+        sticky
+        :ui="{
+          root: 'min-w-full',
+          base: 'min-w-full text-sm',
+          th: 'bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200',
+          td: 'align-middle',
+          tr: 'even:bg-slate-50/70 dark:even:bg-slate-800/50',
+          empty: 'py-8 text-center text-slate-500 dark:text-slate-400',
+        }"
+      >
+        <template #goals-header>
+          <UTooltip text="Goals scored by this player in the fixture">
+            <span>Goals</span>
+          </UTooltip>
+        </template>
+        <template #assists-header>
+          <UTooltip text="Assists made by this player in the fixture">
+            <span>Assists</span>
+          </UTooltip>
+        </template>
+        <template #clean_sheet-header>
+          <UTooltip text="Clean sheet applies to goalkeepers and defenders when their team concedes no goals">
+            <span>Clean sheet</span>
+          </UTooltip>
+        </template>
+        <template #red_card-header>
+          <UTooltip text="Player was sent off">
+            <span>Red card</span>
+          </UTooltip>
+        </template>
+        <template #points-header>
+          <UTooltip text="Calculated fantasy points for this fixture">
+            <span>Points</span>
+          </UTooltip>
+        </template>
+
+        <template #player-cell="{ row }">
+          <span class="font-medium text-slate-900 dark:text-slate-100">
+            {{ row.original.web_name }}
+          </span>
+        </template>
+        <template #goals-cell="{ row }">
+          <UInputNumber
+            v-model="row.original.week_goals"
+            class="w-20"
+            :min="0"
+            :increment="stepperButton"
+            :decrement="stepperButton"
+            :highlight="row.original.week_goals > 0"
+            @update:model-value="calculatePlayerPoints(row.original)"
+          />
+        </template>
+        <template #assists-cell="{ row }">
+          <UInputNumber
+            v-model="row.original.week_assists"
+            class="w-20"
+            :min="0"
+            :increment="stepperButton"
+            :decrement="stepperButton"
+            :highlight="row.original.week_assists > 0"
+            @update:model-value="calculatePlayerPoints(row.original)"
+          />
+        </template>
+        <template #clean_sheet-cell="{ row }">
+          <UCheckbox
+            v-model="row.original.week_cleansheet"
+            :disabled="disableCleansheet || row.original.position > 2"
+            @update:model-value="calculatePlayerPoints(row.original)"
+          />
+        </template>
+        <template #red_card-cell="{ row }">
+          <UCheckbox
+            v-model="row.original.week_redcard"
+            color="error"
+            @update:model-value="calculatePlayerPoints(row.original)"
+          />
+        </template>
+        <template #points-cell="{ row }">
+          <span class="font-semibold text-slate-900 dark:text-slate-100">
+            {{ row.original.week_points }}
+          </span>
+        </template>
+      </UTable>
     </div>
 
     <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 p-2.5 text-sm dark:border-slate-700 dark:bg-slate-800">
@@ -144,6 +144,7 @@
 </template>
 
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui';
 import { calculatePlayerPoints } from '~/logic/fixtures';
 import type { PlayerWithStats } from '~/types/Player';
 
@@ -153,6 +154,45 @@ const searchTerm = ref('');
 const selectedPosition = ref<number | null>(null);
 const currentPage = ref(1);
 const rowsPerPage = 5;
+const stepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
+
+const columns: TableColumn<PlayerWithStats>[] = [
+  {
+    accessorKey: 'web_name',
+    id: 'player',
+    header: 'Player',
+    meta: { class: { th: 'w-[25%]' } },
+  },
+  {
+    accessorKey: 'week_goals',
+    id: 'goals',
+    meta: { class: { th: 'w-[15%]' } },
+  },
+  {
+    accessorKey: 'week_assists',
+    id: 'assists',
+    meta: { class: { th: 'w-[15%]' } },
+  },
+  {
+    accessorKey: 'week_cleansheet',
+    id: 'clean_sheet',
+    meta: { class: { th: 'w-[15%]' } },
+  },
+  {
+    accessorKey: 'week_redcard',
+    id: 'red_card',
+    meta: { class: { th: 'w-[15%]' } },
+  },
+  {
+    accessorKey: 'week_points',
+    id: 'points',
+    meta: { class: { th: 'w-[15%]' } },
+  },
+];
 
 const sortedPlayers = computed(() => {
   return [...(players.value || [])].sort((a, b) => a.position - b.position);
@@ -178,6 +218,12 @@ const paginatedPlayers = computed(() => {
 
 const filterByPosition = (position: number) => {
   selectedPosition.value = selectedPosition.value === position ? null : position;
+};
+
+const getPositionButtonClass = (isSelected: boolean) => {
+  return isSelected
+    ? 'dark:!text-slate-50'
+    : 'dark:!text-slate-100 dark:hover:!bg-slate-800';
 };
 
 const { disableCleansheet } = defineProps<{

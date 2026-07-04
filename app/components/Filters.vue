@@ -19,7 +19,7 @@ const {
         Filters
       </h2>
     </div>
-    <div class="mb-4 justify-between rounded-sm bg-white dark:bg-slate-900 lg:bg-transparent lg:dark:bg-transparent xl:block">
+    <div class="mb-4 justify-between rounded-md border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:border-0 lg:bg-transparent lg:shadow-none lg:dark:bg-transparent xl:block">
       <div class="bg-white dark:bg-slate-900 md:p-4 xl:mb-4">
         <div class="mb-3 border-b border-gray-100 pb-3 dark:border-slate-800">
           <div class="flex flex-col gap-2">
@@ -61,33 +61,39 @@ const {
         </div>
         <div class="border-gray-100 max-xl:border-b max-xl:pb-3 dark:border-slate-800">
           <label
-            class="mb-4 flex w-full justify-between text-xs text-slate-600 dark:text-slate-300"
+            class="mb-4 flex w-full items-center justify-between text-xs text-slate-600 dark:text-slate-300"
             for="filter_name"
           >
             Filter by team
-            <button
+            <UButton
+              icon="carbon:reset"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              square
               title="reset team selection"
+              aria-label="Reset team selection"
               @click="resetFilteredTeams"
-            >
-              <Icon
-                size="20"
-                name="carbon:reset"
-              />
-            </button>
+            />
           </label>
           <div class="grid cursor-pointer grid-cols-10 flex-wrap gap-2.5">
-            <button
+            <UButton
               v-for="team in TEAM_DATA"
               :key="team.id"
               :data-teamID="team.id"
-              class="icon-container"
+              color="neutral"
+              variant="ghost"
+              square
+              :aria-label="`Filter by ${team.name}`"
+              class="icon-container p-1 hover:bg-slate-100 dark:hover:bg-slate-800"
               @click.prevent="selectfilteredTeam($event)"
             >
               <img
                 class="h-full w-full"
                 :src="getImageUrl(team.short_name.toLowerCase())"
+                :alt="team.name"
               >
-            </button>
+            </UButton>
           </div>
         </div>
       </div>

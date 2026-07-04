@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{
+  collapsed?: boolean;
+}>(), {
+  collapsed: false,
+});
+
 type ColorModePreference = 'system' | 'light' | 'dark';
 
 const colorMode = useColorMode();
@@ -8,36 +14,52 @@ const modes: Array<{
   value: ColorModePreference;
   icon: string;
 }> = [
-  { label: 'System theme', value: 'system', icon: 'i-lucide-monitor' },
-  { label: 'Light theme', value: 'light', icon: 'i-lucide-sun' },
-  { label: 'Dark theme', value: 'dark', icon: 'i-lucide-moon' },
+  { label: 'System', value: 'system', icon: 'i-lucide-monitor' },
+  { label: 'Light', value: 'light', icon: 'i-lucide-sun' },
+  { label: 'Dark', value: 'dark', icon: 'i-lucide-moon' },
 ];
 
-const setMode = (mode: ColorModePreference) => {
-  colorMode.preference = mode;
-};
+const fallbackMode = modes[0]!;
+const activeMode = computed(() => modes.find(mode => mode.value === colorMode.preference) ?? fallbackMode);
+
+const modeItems = computed(() =>
+  modes.map(mode => ({
+    label: mode.label,
+    icon: mode.icon,
+    type: 'checkbox' as const,
+    checked: colorMode.preference === mode.value,
+    onSelect: () => {
+      colorMode.preference = mode.value;
+    },
+  })),
+);
+
+const buttonUi = computed(() => ({
+  base: props.collapsed
+    ? 'grid h-13 w-13 place-items-center p-0'
+    : 'min-h-12 w-full justify-start overflow-hidden px-3',
+  leadingIcon: 'size-7 text-current',
+  label: 'truncate text-[15px] font-semibold',
+}));
 </script>
 
 <template>
-  <div class="flex items-center gap-1 rounded-full border border-white/20 bg-white/10 p-1 xl:flex-col xl:rounded-2xl">
-    <UTooltip
-      v-for="mode in modes"
-      :key="mode.value"
-      :text="mode.label"
+  <UTooltip :text="`Theme: ${activeMode.label}`">
+    <UDropdownMenu
+      :items="modeItems"
+      :content="{ side: 'top', align: 'center', sideOffset: 8 }"
+      :ui="{ content: 'min-w-36' }"
     >
       <UButton
-        :icon="mode.icon"
-        :aria-label="mode.label"
-        :color="colorMode.preference === mode.value ? 'neutral' : 'primary'"
-        :variant="colorMode.preference === mode.value ? 'solid' : 'ghost'"
-        size="xs"
-        square
-        class="text-white hover:bg-white hover:text-primary"
-        :class="{
-          '!bg-white !text-primary': colorMode.preference === mode.value,
-        }"
-        @click="setMode(mode.value)"
+        :icon="activeMode.icon"
+        :label="collapsed ? undefined : `Theme: ${activeMode.label}`"
+        :aria-label="`Theme: ${activeMode.label}`"
+        color="neutral"
+        variant="ghost"
+        :square="collapsed"
+        class="rounded-lg text-slate-200 hover:bg-white/10 hover:text-white"
+        :ui="buttonUi"
       />
-    </UTooltip>
-  </div>
+    </UDropdownMenu>
+  </UTooltip>
 </template>

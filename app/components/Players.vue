@@ -15,8 +15,15 @@ const showDialog = ref(false);
 
 type AvailabilityFilter = 'all' | 'available' | 'unavailable' | 'season';
 type ColumnFiltersState = { id: string; value: unknown }[];
+type SortingState = { id: string; desc: boolean }[];
 type PlayerFilterRow = { original: Player };
 type PlayerFilterFn = (row: PlayerFilterRow, columnId: string, filterValue: unknown) => boolean;
+type TableColumnApi = {
+  getCanSort: () => boolean;
+  getIsSorted: () => false | 'asc' | 'desc';
+  toggleSorting: (desc?: boolean) => void;
+  setFilterValue: (value?: unknown) => void;
+};
 type PlayerTable = {
   tableApi: {
     getFilteredRowModel: () => {
@@ -26,12 +33,8 @@ type PlayerTable = {
 };
 
 const table = useTemplateRef<PlayerTable>('table');
-const globalFilter = ref('');
 const columnFilters = ref<ColumnFiltersState>([]);
-const selectedTeam = ref(0);
-const selectedPrice = ref(0);
-const selectedPosition = ref<PlayerPosition | null>(null);
-const selectedAvailability = ref<AvailabilityFilter>('all');
+const sorting = ref<SortingState>([]);
 
 const normalizeFilterValue = (value: string) =>
   value
@@ -39,7 +42,7 @@ const normalizeFilterValue = (value: string) =>
     .replace(/[\u0300-\u036F]/g, '')
     .toLowerCase();
 
-const playerGlobalFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+const playerNameFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
   const search = normalizeFilterValue(String(filterValue ?? '').trim());
 
   if (!search) {
@@ -75,22 +78,22 @@ const availabilityFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
 };
 
 const columns: TableColumn<Player>[] = [
-  { accessorKey: 'player_id', header: 'ID', meta: { class: { th: 'w-20' } } },
-  { accessorKey: 'web_name', id: 'player', header: 'Player', meta: { class: { th: 'min-w-56' } } },
-  { accessorKey: 'position', id: 'position', header: 'Pos.', filterFn: positionFilter, meta: { class: { th: 'w-32' } } },
+  { accessorKey: 'player_id', header: 'ID', meta: { class: { th: 'w-20 align-top' } } },
+  { accessorKey: 'web_name', id: 'player', header: 'Player', filterFn: playerNameFilter, meta: { class: { th: 'min-w-64 align-top' } } },
+  { accessorKey: 'position', id: 'position', header: 'Pos.', filterFn: positionFilter, meta: { class: { th: 'w-32 align-top' } } },
   { accessorKey: 'team_short_name', id: 'team', header: 'Team', filterFn: teamFilter, meta: { class: { th: 'w-32' } } },
-  { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-24 text-right' } } },
-  { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', filterFn: availabilityFilter, meta: { class: { th: 'w-44' } } },
-  { accessorKey: 'minutes', header: 'Minutes', meta: { class: { th: 'w-28 text-right' } } },
+  { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-28 align-top text-right' } } },
+  { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', filterFn: availabilityFilter, enableSorting: false, meta: { class: { th: 'w-44 align-top' } } },
+  { accessorKey: 'minutes', header: 'Minutes', meta: { class: { th: 'w-28 align-top text-right' } } },
 ];
 
 const positionFilters = [
-  { label: 'All', value: null, icon: 'lucide:list-filter' },
-  { label: 'GKP', value: PlayerPosition.GOALKEEPER, icon: 'tabler:hand-stop' },
-  { label: 'DEF', value: PlayerPosition.DEFENDER, icon: 'tabler:shield' },
-  { label: 'MID', value: PlayerPosition.MIDFIELDER, icon: 'ph:brain-duotone' },
-  { label: 'FWD', value: PlayerPosition.FORWARD, icon: 'mage:goals' },
-] satisfies { label: string; value: PlayerPosition | null; icon: string }[];
+  { label: 'All positions', value: null },
+  { label: 'GKP', value: PlayerPosition.GOALKEEPER },
+  { label: 'DEF', value: PlayerPosition.DEFENDER },
+  { label: 'MID', value: PlayerPosition.MIDFIELDER },
+  { label: 'FWD', value: PlayerPosition.FORWARD },
+] satisfies { label: string; value: PlayerPosition | null }[];
 
 const availabilityFilters = [
   { label: 'All', value: 'all' },
@@ -115,7 +118,6 @@ const sortedPlayers = computed(() =>
 );
 
 const filterSnapshot = computed(() => ({
-  globalFilter: globalFilter.value,
   columnFilters: columnFilters.value,
   playerCount: sortedPlayers.value.length,
 }));
@@ -128,13 +130,7 @@ const updateFilteredRowCount = async () => {
 };
 
 const activeFilterCount = computed(() => {
-  return [
-    globalFilter.value.trim(),
-    selectedTeam.value,
-    selectedPrice.value,
-    selectedPosition.value,
-    selectedAvailability.value !== 'all',
-  ].filter(Boolean).length;
+  return columnFilters.value.length;
 });
 
 const visibleRange = computed(() => {
@@ -193,25 +189,50 @@ const getAvailability = (player: Player) => {
   };
 };
 
-const getToggleButtonClass = (isSelected: boolean) => {
-  return isSelected
-    ? 'dark:!text-slate-50'
-    : 'dark:!text-slate-100 dark:hover:!bg-slate-800';
-};
-
-const setColumnFilter = (id: string, value: unknown, isActive: boolean) => {
-  columnFilters.value = [
-    ...columnFilters.value.filter(filter => filter.id !== id),
-    ...(isActive ? [{ id, value }] : []),
-  ];
-};
-
 const resetFilters = () => {
-  globalFilter.value = '';
-  selectedTeam.value = 0;
-  selectedPrice.value = 0;
-  selectedPosition.value = null;
-  selectedAvailability.value = 'all';
+  columnFilters.value = [];
+  sorting.value = [];
+};
+
+const getColumnFilterValue = (id: string) => {
+  return columnFilters.value.find(filter => filter.id === id)?.value;
+};
+
+const getColumnFilterString = (id: string) => String(getColumnFilterValue(id) ?? '');
+
+const getColumnFilterNumber = (id: string) => Number(getColumnFilterValue(id) ?? 0);
+
+const getColumnFilterAvailability = () => (getColumnFilterValue('availability') ?? 'all') as AvailabilityFilter;
+
+const setColumnFilter = (column: TableColumnApi, value: unknown, emptyValue: unknown) => {
+  column.setFilterValue(value === emptyValue ? undefined : value);
+};
+
+const cycleSorting = (column: TableColumnApi) => {
+  const direction = column.getIsSorted();
+
+  if (direction === 'asc') {
+    column.toggleSorting(true);
+    return;
+  }
+
+  if (direction === 'desc') {
+    sorting.value = [];
+    return;
+  }
+
+  column.toggleSorting(false);
+};
+
+const getSortIcon = (column: TableColumnApi) => {
+  switch (column.getIsSorted()) {
+    case 'asc':
+      return 'lucide:arrow-up';
+    case 'desc':
+      return 'lucide:arrow-down';
+    default:
+      return 'lucide:arrow-up-down';
+  }
 };
 
 onMounted(async () => {
@@ -219,22 +240,6 @@ onMounted(async () => {
     selectedPlayer.value = playerStore.getPlayerByID(+route.query.id) as Player;
     showDialog.value = true;
   }
-});
-
-watch(selectedPosition, (position) => {
-  setColumnFilter('position', position, position !== null);
-});
-
-watch(selectedTeam, (team) => {
-  setColumnFilter('team', team, team !== 0);
-});
-
-watch(selectedPrice, (price) => {
-  setColumnFilter('cost', price, price !== 0);
-});
-
-watch(selectedAvailability, (availability) => {
-  setColumnFilter('availability', availability, availability !== 'all');
 });
 
 watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flush: 'post' });
@@ -271,80 +276,156 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
             />
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <UInput
-            v-model="globalFilter"
-            class="w-full"
-            icon="tabler:search"
-            placeholder="Search players..."
-          />
-          <USelectMenu
-            v-model="selectedTeam"
-            class="w-full"
-            label-key="name"
-            value-key="value"
-            :items="teamFilters"
-            placeholder="All teams"
-          />
-          <USelectMenu
-            v-model="selectedPrice"
-            class="w-full"
-            label-key="name"
-            value-key="value"
-            :items="priceFilters"
-            placeholder="All prices"
-          />
-        </div>
-        <div class="flex flex-col justify-between gap-3 xl:flex-row xl:items-center">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm text-slate-600 dark:text-slate-300">Position:</span>
-            <UButton
-              v-for="position in positionFilters"
-              :key="position.label"
-              :label="position.label"
-              :icon="position.icon"
-              :variant="selectedPosition === position.value ? 'solid' : 'soft'"
-              color="neutral"
-              size="sm"
-              :class="getToggleButtonClass(selectedPosition === position.value)"
-              @click="selectedPosition = position.value"
-            />
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm text-slate-600 dark:text-slate-300">Availability:</span>
-            <UButton
-              v-for="availability in availabilityFilters"
-              :key="availability.value"
-              :label="availability.label"
-              :variant="selectedAvailability === availability.value ? 'solid' : 'soft'"
-              color="neutral"
-              size="sm"
-              :class="getToggleButtonClass(selectedAvailability === availability.value)"
-              @click="selectedAvailability = availability.value"
-            />
-          </div>
-        </div>
       </div>
 
       <div class="overflow-x-auto">
         <UTable
           ref="table"
-          v-model:global-filter="globalFilter"
           v-model:column-filters="columnFilters"
+          v-model:sorting="sorting"
           :data="sortedPlayers"
           :columns="columns"
           empty="No players found"
-          :global-filter-options="{ globalFilterFn: playerGlobalFilter }"
           :ui="{
             root: 'min-w-full',
-            base: 'min-w-[760px] text-sm',
-            th: 'bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200',
+            base: 'min-w-[920px] text-sm',
+            th: 'bg-slate-50 text-left text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-200',
             td: 'align-middle',
             tr: 'cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800',
             empty: 'py-10 text-center text-slate-500 dark:text-slate-400',
           }"
           :on-select="selectPlayerRow"
         >
+          <template #player_id-header="{ column }">
+            <UButton
+              label="ID"
+              :icon="getSortIcon(column)"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              class="px-0 font-semibold uppercase dark:!text-slate-100"
+              @click="cycleSorting(column)"
+            />
+          </template>
+
+          <template #player-header="{ column }">
+            <div class="flex min-w-56 flex-col gap-2">
+              <UButton
+                label="Player"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+              <UInput
+                :model-value="getColumnFilterString('player')"
+                class="w-full normal-case"
+                icon="tabler:search"
+                size="xs"
+                placeholder="Search"
+                @update:model-value="column.setFilterValue($event || undefined)"
+              />
+            </div>
+          </template>
+
+          <template #position-header="{ column }">
+            <div class="flex w-28 flex-col gap-2">
+              <UButton
+                label="Pos."
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+              <USelectMenu
+                :model-value="getColumnFilterNumber('position') || null"
+                class="w-full normal-case"
+                label-key="label"
+                value-key="value"
+                :items="positionFilters"
+                size="xs"
+                @update:model-value="setColumnFilter(column, $event, null)"
+              />
+            </div>
+          </template>
+
+          <template #team-header="{ column }">
+            <div class="flex w-32 flex-col gap-2">
+              <UButton
+                label="Team"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+              <USelectMenu
+                :model-value="getColumnFilterNumber('team')"
+                class="w-full normal-case"
+                label-key="name"
+                value-key="value"
+                :items="teamFilters"
+                size="xs"
+                @update:model-value="setColumnFilter(column, $event, 0)"
+              />
+            </div>
+          </template>
+
+          <template #cost-header="{ column }">
+            <div class="ml-auto flex w-24 flex-col gap-2">
+              <UButton
+                label="Cost"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="justify-end px-0 font-semibold uppercase dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+              <USelectMenu
+                :model-value="getColumnFilterNumber('cost')"
+                class="w-full normal-case"
+                label-key="name"
+                value-key="value"
+                :items="priceFilters"
+                size="xs"
+                @update:model-value="setColumnFilter(column, $event, 0)"
+              />
+            </div>
+          </template>
+
+          <template #availability-header="{ column }">
+            <div class="flex w-40 flex-col gap-2">
+              <span class="px-0 py-1.5 font-semibold uppercase">Availability</span>
+              <USelectMenu
+                :model-value="getColumnFilterAvailability()"
+                class="w-full normal-case"
+                label-key="label"
+                value-key="value"
+                :items="availabilityFilters"
+                size="xs"
+                @update:model-value="setColumnFilter(column, $event, 'all')"
+              />
+            </div>
+          </template>
+
+          <template #minutes-header="{ column }">
+            <UButton
+              label="Minutes"
+              :icon="getSortIcon(column)"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              class="ml-auto px-0 font-semibold uppercase dark:!text-slate-100"
+              @click="cycleSorting(column)"
+            />
+          </template>
+
           <template #player-cell="{ row }">
             <div class="flex items-center gap-3">
               <img

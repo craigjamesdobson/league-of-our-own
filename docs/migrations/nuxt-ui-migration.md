@@ -181,7 +181,7 @@ Use Zod with Nuxt UI forms.
 - [x] Tune Nuxt UI theme tokens for both modes.
 - [x] Verify focus, hover, loading, empty, success, warning, and error states in both modes.
 
-Phase 5 scope note: dashboard, fixture, drafted-team, modal, skeleton, error, season-finale, and players-list surfaces now have paired light/dark treatments. The `/players` route now uses a `UTable`-first player browser with table-owned name, team, price, position, and availability filters.
+Phase 5 scope note: dashboard, fixture, drafted-team, modal, skeleton, error, season-finale, and players-list surfaces now have paired light/dark treatments. The `/players` route now uses a `UTable`-first player browser with header-owned sorting and name, team, price, position, and availability filters.
 
 ### Phase 6: Final Verification
 

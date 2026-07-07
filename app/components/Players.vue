@@ -190,6 +190,8 @@ const getColumnFilterNumber = (id: string) => Number(getColumnFilterValue(id) ??
 
 const getColumnFilterAvailability = () => (getColumnFilterValue('availability') ?? 'all') as AvailabilityFilter;
 
+const isColumnFiltered = (id: string) => columnFilters.value.some(filter => filter.id === id);
+
 const setColumnFilter = (column: TableColumnApi, value: unknown, emptyValue: unknown) => {
   column.setFilterValue(value === emptyValue ? undefined : value);
 };
@@ -278,7 +280,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           :ui="{
             root: 'w-full min-w-full',
             base: 'w-full min-w-[920px] text-sm',
-            th: 'bg-slate-50 text-left text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-200',
+            th: 'bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200',
             td: 'align-middle',
             tr: 'cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800',
             empty: 'py-10 text-center text-slate-500 dark:text-slate-400',
@@ -292,114 +294,230 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
               color="neutral"
               variant="ghost"
               size="xs"
-              class="px-0 font-semibold uppercase dark:!text-slate-100"
+              class="px-0 font-semibold dark:!text-slate-100"
               @click="cycleSorting(column)"
             />
           </template>
 
           <template #player-header="{ column }">
-            <div class="flex min-w-56 flex-col gap-2">
+            <div class="flex min-w-56 items-center justify-between gap-2">
               <UButton
                 label="Player"
                 :icon="getSortIcon(column)"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                class="justify-start px-0 font-semibold dark:!text-slate-100"
                 @click="cycleSorting(column)"
               />
-              <UInput
-                :model-value="getColumnFilterString('player')"
-                class="w-full normal-case"
-                icon="tabler:search"
-                size="xs"
-                placeholder="Search"
-                @update:model-value="column.setFilterValue($event || undefined)"
-              />
+              <UPopover :content="{ align: 'start' }">
+                <UButton
+                  icon="lucide:funnel"
+                  :color="isColumnFiltered('player') ? 'primary' : 'neutral'"
+                  :variant="isColumnFiltered('player') ? 'soft' : 'ghost'"
+                  size="xs"
+                  square
+                  aria-label="Filter players"
+                />
+                <template #content>
+                  <div class="w-64 space-y-3 p-3">
+                    <UInput
+                      :model-value="getColumnFilterString('player')"
+                      class="w-full normal-case"
+                      icon="tabler:search"
+                      size="sm"
+                      placeholder="Search players"
+                      autofocus
+                      @update:model-value="column.setFilterValue($event || undefined)"
+                    />
+                    <UButton
+                      label="Clear"
+                      icon="lucide:x"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :disabled="!isColumnFiltered('player')"
+                      @click="column.setFilterValue(undefined)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </template>
 
           <template #position-header="{ column }">
-            <div class="flex w-28 flex-col gap-2">
+            <div class="flex w-28 items-center justify-between gap-2">
               <UButton
                 label="Pos."
                 :icon="getSortIcon(column)"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                class="justify-start px-0 font-semibold dark:!text-slate-100"
                 @click="cycleSorting(column)"
               />
-              <USelectMenu
-                :model-value="getColumnFilterNumber('position') || null"
-                class="w-full normal-case"
-                label-key="label"
-                value-key="value"
-                :items="positionFilters"
-                size="xs"
-                @update:model-value="setColumnFilter(column, $event, null)"
-              />
+              <UPopover :content="{ align: 'start' }">
+                <UButton
+                  icon="lucide:funnel"
+                  :color="isColumnFiltered('position') ? 'primary' : 'neutral'"
+                  :variant="isColumnFiltered('position') ? 'soft' : 'ghost'"
+                  size="xs"
+                  square
+                  aria-label="Filter positions"
+                />
+                <template #content>
+                  <div class="w-48 space-y-3 p-3">
+                    <USelectMenu
+                      :model-value="getColumnFilterNumber('position') || null"
+                      class="w-full normal-case"
+                      label-key="label"
+                      value-key="value"
+                      :items="positionFilters"
+                      size="sm"
+                      @update:model-value="setColumnFilter(column, $event, null)"
+                    />
+                    <UButton
+                      label="Clear"
+                      icon="lucide:x"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :disabled="!isColumnFiltered('position')"
+                      @click="column.setFilterValue(undefined)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </template>
 
           <template #team-header="{ column }">
-            <div class="flex w-32 flex-col gap-2">
+            <div class="flex w-32 items-center justify-between gap-2">
               <UButton
                 label="Team"
                 :icon="getSortIcon(column)"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                class="justify-start px-0 font-semibold uppercase dark:!text-slate-100"
+                class="justify-start px-0 font-semibold dark:!text-slate-100"
                 @click="cycleSorting(column)"
               />
-              <USelectMenu
-                :model-value="getColumnFilterNumber('team')"
-                class="w-full normal-case"
-                label-key="name"
-                value-key="value"
-                :items="teamFilters"
-                size="xs"
-                @update:model-value="setColumnFilter(column, $event, 0)"
-              />
+              <UPopover :content="{ align: 'start' }">
+                <UButton
+                  icon="lucide:funnel"
+                  :color="isColumnFiltered('team') ? 'primary' : 'neutral'"
+                  :variant="isColumnFiltered('team') ? 'soft' : 'ghost'"
+                  size="xs"
+                  square
+                  aria-label="Filter teams"
+                />
+                <template #content>
+                  <div class="w-56 space-y-3 p-3">
+                    <USelectMenu
+                      :model-value="getColumnFilterNumber('team')"
+                      class="w-full normal-case"
+                      label-key="name"
+                      value-key="value"
+                      :items="teamFilters"
+                      size="sm"
+                      @update:model-value="setColumnFilter(column, $event, 0)"
+                    />
+                    <UButton
+                      label="Clear"
+                      icon="lucide:x"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :disabled="!isColumnFiltered('team')"
+                      @click="column.setFilterValue(undefined)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </template>
 
           <template #cost-header="{ column }">
-            <div class="ml-auto flex w-24 flex-col gap-2">
+            <div class="ml-auto flex w-28 items-center justify-end gap-2">
+              <UPopover :content="{ align: 'end' }">
+                <UButton
+                  icon="lucide:funnel"
+                  :color="isColumnFiltered('cost') ? 'primary' : 'neutral'"
+                  :variant="isColumnFiltered('cost') ? 'soft' : 'ghost'"
+                  size="xs"
+                  square
+                  aria-label="Filter costs"
+                />
+                <template #content>
+                  <div class="w-44 space-y-3 p-3">
+                    <USelectMenu
+                      :model-value="getColumnFilterNumber('cost')"
+                      class="w-full normal-case"
+                      label-key="name"
+                      value-key="value"
+                      :items="priceFilters"
+                      size="sm"
+                      @update:model-value="setColumnFilter(column, $event, 0)"
+                    />
+                    <UButton
+                      label="Clear"
+                      icon="lucide:x"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :disabled="!isColumnFiltered('cost')"
+                      @click="column.setFilterValue(undefined)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
               <UButton
                 label="Cost"
                 :icon="getSortIcon(column)"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                class="justify-end px-0 font-semibold uppercase dark:!text-slate-100"
+                class="justify-end px-0 font-semibold dark:!text-slate-100"
                 @click="cycleSorting(column)"
-              />
-              <USelectMenu
-                :model-value="getColumnFilterNumber('cost')"
-                class="w-full normal-case"
-                label-key="name"
-                value-key="value"
-                :items="priceFilters"
-                size="xs"
-                @update:model-value="setColumnFilter(column, $event, 0)"
               />
             </div>
           </template>
 
           <template #availability-header="{ column }">
-            <div class="flex w-40 flex-col gap-2">
-              <span class="px-0 py-1.5 font-semibold uppercase">Availability</span>
-              <USelectMenu
-                :model-value="getColumnFilterAvailability()"
-                class="w-full normal-case"
-                label-key="label"
-                value-key="value"
-                :items="availabilityFilters"
-                size="xs"
-                @update:model-value="setColumnFilter(column, $event, 'all')"
-              />
+            <div class="flex w-40 items-center justify-between gap-2">
+              <span class="font-semibold">Availability</span>
+              <UPopover :content="{ align: 'start' }">
+                <UButton
+                  icon="lucide:funnel"
+                  :color="isColumnFiltered('availability') ? 'primary' : 'neutral'"
+                  :variant="isColumnFiltered('availability') ? 'soft' : 'ghost'"
+                  size="xs"
+                  square
+                  aria-label="Filter availability"
+                />
+                <template #content>
+                  <div class="w-52 space-y-3 p-3">
+                    <USelectMenu
+                      :model-value="getColumnFilterAvailability()"
+                      class="w-full normal-case"
+                      label-key="label"
+                      value-key="value"
+                      :items="availabilityFilters"
+                      size="sm"
+                      @update:model-value="setColumnFilter(column, $event, 'all')"
+                    />
+                    <UButton
+                      label="Clear"
+                      icon="lucide:x"
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      :disabled="!isColumnFiltered('availability')"
+                      @click="column.setFilterValue(undefined)"
+                    />
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </template>
 
@@ -410,7 +528,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
               color="neutral"
               variant="ghost"
               size="xs"
-              class="ml-auto px-0 font-semibold uppercase dark:!text-slate-100"
+              class="ml-auto px-0 font-semibold dark:!text-slate-100"
               @click="cycleSorting(column)"
             />
           </template>

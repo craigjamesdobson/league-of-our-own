@@ -247,12 +247,15 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
 
 <template>
   <SkeletonPlayers v-if="!playerStore.isLoaded" />
-  <div v-else>
+  <div
+    v-else
+    class="w-full"
+  >
     <PlayerModal
       v-model="showDialog"
       :selected-player="selectedPlayer"
     />
-    <div class="rounded-md border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="w-full rounded-md border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div class="flex flex-col gap-4 border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
         <div class="flex flex-col justify-between gap-3 md:flex-row md:items-center">
           <div>
@@ -287,8 +290,8 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           :columns="columns"
           empty="No players found"
           :ui="{
-            root: 'min-w-full',
-            base: 'min-w-[920px] text-sm',
+            root: 'w-full min-w-full',
+            base: 'w-full min-w-[920px] text-sm',
             th: 'bg-slate-50 text-left text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-200',
             td: 'align-middle',
             tr: 'cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800',

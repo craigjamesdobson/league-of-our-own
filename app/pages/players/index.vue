@@ -1,3 +1,5 @@
 <template>
-  <Players />
+  <div class="w-full">
+    <Players />
+  </div>
 </template>

@@ -85,7 +85,6 @@ const columns: TableColumn<Player>[] = [
   { accessorKey: 'team_short_name', id: 'team', header: 'Team', filterFn: teamFilter, meta: { class: { th: 'w-32' } } },
   { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-28 align-top text-right' } } },
   { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', filterFn: availabilityFilter, enableSorting: false, meta: { class: { th: 'w-44 align-top' } } },
-  { accessorKey: 'minutes', header: 'Minutes', meta: { class: { th: 'w-28 align-top text-right' } } },
 ];
 
 const positionFilters = [
@@ -115,7 +114,7 @@ const priceFilters = populateFilterPrices();
 
 const sortedPlayers = computed(() =>
   [...playerStore.getPlayers]
-    .sort((a, b) => a.position - b.position || a.team - b.team || a.web_name.localeCompare(b.web_name)),
+    .sort((a, b) => (b.minutes ?? 0) - (a.minutes ?? 0) || a.player_id - b.player_id),
 );
 
 const filterSnapshot = computed(() => ({
@@ -521,18 +520,6 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
             </div>
           </template>
 
-          <template #minutes-header="{ column }">
-            <UButton
-              label="Minutes"
-              :icon="getSortIcon(column)"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              class="ml-auto px-0 font-semibold dark:!text-slate-100"
-              @click="cycleSorting(column)"
-            />
-          </template>
-
           <template #player-cell="{ row }">
             <div class="flex items-center gap-3">
               <img
@@ -591,12 +578,6 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
                 :label="getAvailability(row.original).label"
               />
             </UTooltip>
-          </template>
-
-          <template #minutes-cell="{ row }">
-            <div class="text-right text-slate-700 dark:text-slate-200">
-              {{ row.original.minutes?.toLocaleString('en-GB') ?? 'N/A' }}
-            </div>
           </template>
         </UTable>
       </div>

@@ -81,6 +81,10 @@ const availabilityFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
 const columns: TableColumn<Player>[] = [
   { accessorKey: 'player_id', header: 'ID', meta: { class: { th: 'w-20 align-top' } } },
   { accessorKey: 'web_name', id: 'player', header: 'Player', filterFn: playerNameFilter, meta: { class: { th: 'min-w-64 align-top' } } },
+  { accessorKey: 'goals_scored', id: 'goals', header: 'G', meta: { class: { th: 'w-20 align-top text-right' } } },
+  { accessorKey: 'assists', id: 'assists', header: 'A', meta: { class: { th: 'w-20 align-top text-right' } } },
+  { accessorKey: 'clean_sheets', id: 'clean_sheets', header: 'CS', meta: { class: { th: 'w-20 align-top text-right' } } },
+  { accessorKey: 'red_cards', id: 'red_cards', header: 'RC', meta: { class: { th: 'w-20 align-top text-right' } } },
   { accessorKey: 'position', id: 'position', header: 'Pos.', filterFn: positionFilter, meta: { class: { th: 'w-32 align-top' } } },
   { accessorKey: 'team_short_name', id: 'team', header: 'Team', filterFn: teamFilter, meta: { class: { th: 'w-32' } } },
   { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-28 align-top text-right' } } },
@@ -278,7 +282,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           empty="No players found"
           :ui="{
             root: 'w-full min-w-full',
-            base: 'w-full min-w-[920px] text-sm',
+            base: 'w-full min-w-[1180px] text-sm',
             th: 'bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200',
             td: 'align-middle',
             tr: 'cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800',
@@ -299,7 +303,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           </template>
 
           <template #player-header="{ column }">
-            <div class="flex min-w-56 items-center justify-between gap-2">
+            <div class="flex min-w-56 items-center gap-1.5">
               <UButton
                 label="Player"
                 :icon="getSortIcon(column)"
@@ -344,8 +348,64 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
             </div>
           </template>
 
+          <template #goals-header="{ column }">
+            <UTooltip text="Goals scored">
+              <UButton
+                label="G"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="ml-auto px-0 font-semibold dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+            </UTooltip>
+          </template>
+
+          <template #assists-header="{ column }">
+            <UTooltip text="Assists">
+              <UButton
+                label="A"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="ml-auto px-0 font-semibold dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+            </UTooltip>
+          </template>
+
+          <template #clean_sheets-header="{ column }">
+            <UTooltip text="Clean sheets">
+              <UButton
+                label="CS"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="ml-auto px-0 font-semibold dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+            </UTooltip>
+          </template>
+
+          <template #red_cards-header="{ column }">
+            <UTooltip text="Red cards">
+              <UButton
+                label="RC"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="ml-auto px-0 font-semibold dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
+            </UTooltip>
+          </template>
+
           <template #position-header="{ column }">
-            <div class="flex w-28 items-center justify-between gap-2">
+            <div class="flex w-28 items-center gap-1.5">
               <UButton
                 label="Pos."
                 :icon="getSortIcon(column)"
@@ -391,7 +451,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           </template>
 
           <template #team-header="{ column }">
-            <div class="flex w-32 items-center justify-between gap-2">
+            <div class="flex w-32 items-center gap-1.5">
               <UButton
                 label="Team"
                 :icon="getSortIcon(column)"
@@ -437,7 +497,16 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
           </template>
 
           <template #cost-header="{ column }">
-            <div class="ml-auto flex w-28 items-center justify-end gap-2">
+            <div class="ml-auto flex w-28 items-center justify-end gap-1.5">
+              <UButton
+                label="Cost"
+                :icon="getSortIcon(column)"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                class="justify-end px-0 font-semibold dark:!text-slate-100"
+                @click="cycleSorting(column)"
+              />
               <UPopover :content="{ align: 'end' }">
                 <UButton
                   icon="lucide:funnel"
@@ -470,20 +539,11 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
                   </div>
                 </template>
               </UPopover>
-              <UButton
-                label="Cost"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="justify-end px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
             </div>
           </template>
 
           <template #availability-header="{ column }">
-            <div class="flex w-40 items-center justify-between gap-2">
+            <div class="flex w-40 items-center gap-1.5">
               <span class="font-semibold">Availability</span>
               <UPopover :content="{ align: 'start' }">
                 <UButton
@@ -539,6 +599,30 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
                   {{ row.original.news }}
                 </div>
               </div>
+            </div>
+          </template>
+
+          <template #goals-cell="{ row }">
+            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
+              {{ row.original.goals_scored }}
+            </div>
+          </template>
+
+          <template #assists-cell="{ row }">
+            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
+              {{ row.original.assists }}
+            </div>
+          </template>
+
+          <template #clean_sheets-cell="{ row }">
+            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
+              {{ row.original.clean_sheets }}
+            </div>
+          </template>
+
+          <template #red_cards-cell="{ row }">
+            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
+              {{ row.original.red_cards }}
             </div>
           </template>
 

@@ -4,6 +4,7 @@ import { usePlayerStore } from '@/stores/players';
 import { TEAM_DATA } from '@/logic/teams/constants';
 import { populateFilterPrices } from '@/utils/filters';
 import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
+import { getPositionName } from '@/utils/playerPosition';
 import type { Player } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
 
@@ -89,10 +90,10 @@ const columns: TableColumn<Player>[] = [
 
 const positionFilters = [
   { label: 'All positions', value: null },
-  { label: 'GKP', value: PlayerPosition.GOALKEEPER },
-  { label: 'DEF', value: PlayerPosition.DEFENDER },
-  { label: 'MID', value: PlayerPosition.MIDFIELDER },
-  { label: 'FWD', value: PlayerPosition.FORWARD },
+  { label: getPositionName(PlayerPosition.GOALKEEPER), value: PlayerPosition.GOALKEEPER },
+  { label: getPositionName(PlayerPosition.DEFENDER), value: PlayerPosition.DEFENDER },
+  { label: getPositionName(PlayerPosition.MIDFIELDER), value: PlayerPosition.MIDFIELDER },
+  { label: getPositionName(PlayerPosition.FORWARD), value: PlayerPosition.FORWARD },
 ] satisfies { label: string; value: PlayerPosition | null }[];
 
 const availabilityFilters = [
@@ -148,21 +149,6 @@ const setSelectedPlayerAndQueryParam = (playerID: number) => {
 
 const selectPlayerRow = (_event: Event, row: TableRow<Player>) => {
   setSelectedPlayerAndQueryParam(row.original.player_id);
-};
-
-const getPositionLabel = (position: number) => {
-  switch (position) {
-    case PlayerPosition.GOALKEEPER:
-      return 'GKP';
-    case PlayerPosition.DEFENDER:
-      return 'DEF';
-    case PlayerPosition.MIDFIELDER:
-      return 'MID';
-    case PlayerPosition.FORWARD:
-      return 'FWD';
-    default:
-      return 'N/A';
-  }
 };
 
 const getAvailability = (player: Player) => {
@@ -455,7 +441,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
             <UBadge
               color="neutral"
               variant="soft"
-              :label="getPositionLabel(row.original.position)"
+              :label="getPositionName(row.original.position)"
             />
           </template>
 

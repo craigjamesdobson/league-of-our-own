@@ -1,7 +1,11 @@
 <template>
   <div class="flex justify-center items-center min-h-full">
-    <Message>
+    <UAlert
+      color="info"
+      variant="soft"
+      class="max-w-xl"
+    >
       Team entries are now closed. Teams will be available once the season starts.
-    </Message>
+    </UAlert>
   </div>
 </template>

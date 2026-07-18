@@ -32,6 +32,8 @@ mockNuxtImport('useRoute', () => {
 
 mockNuxtImport('useRouter', () => {
   return () => ({
+    afterEach: vi.fn(),
+    beforeResolve: vi.fn(),
     push: vi.fn(),
   });
 });
@@ -44,7 +46,7 @@ vi.mock('@/stores/draftedTeams', () => ({
   }),
 }));
 
-vi.mock('primevue/usetoast', () => ({
+vi.mock('@nuxt/ui/composables', () => ({
   useToast: () => ({
     add: vi.fn(),
   }),

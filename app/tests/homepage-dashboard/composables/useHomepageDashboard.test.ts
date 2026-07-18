@@ -23,6 +23,9 @@ vi.mock('@/stores/table', () => ({
 // Mock Nuxt runtime config
 mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
+    app: {
+      baseURL: '/',
+    },
     public: {
       ACTIVE_SEASON: '2024/25',
     },

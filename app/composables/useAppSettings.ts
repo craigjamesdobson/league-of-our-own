@@ -75,8 +75,31 @@ export function useAppSettings() {
     }
   };
 
+  const getSeasonComplete = async (): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('setting_value')
+      .eq('setting_key', 'season_complete')
+      .single();
+
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Database Configuration Required',
+        data: {
+          message: 'Season complete setting not found. Please complete database setup.',
+          type: 'database_error',
+          details: error.message,
+        },
+      });
+    }
+
+    return data.setting_value === 'true';
+  };
+
   return {
     getCurrentGameweek,
+    getSeasonComplete,
     updateCurrentGameweek,
   };
 }

@@ -15,23 +15,25 @@ defineModel<Fixture | undefined>('fixture');
         class="aspect-square w-10"
         :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
       >
-      <p class="text-md font-black uppercase">
+      <p class="text-md font-black uppercase text-slate-800 dark:text-slate-100">
         {{ fixture.home_team.short_name }}
       </p>
-      <span class="text-lg font-bold">{{
+      <span class="text-lg font-bold text-slate-900 dark:text-slate-100">{{
         fixture.home_team_score ?? '-'
       }}</span>
     </div>
-    <div>VS</div>
+    <div class="text-xs font-black uppercase text-slate-500 dark:text-slate-400">
+      VS
+    </div>
     <div class="flex flex-col items-center gap-2.5">
       <img
         class="aspect-square w-10"
         :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
       >
-      <p class="text-md font-black uppercase">
+      <p class="text-md font-black uppercase text-slate-800 dark:text-slate-100">
         {{ fixture.away_team.short_name }}
       </p>
-      <span class="text-lg font-bold">{{
+      <span class="text-lg font-bold text-slate-900 dark:text-slate-100">{{
         fixture.away_team_score ?? '-'
       }}</span>
     </div>

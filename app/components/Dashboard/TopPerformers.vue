@@ -43,8 +43,8 @@ const topPerformersWithWinnerStatus = computed((): EnhancedTeamData[] => {
 });
 
 const getTeamContainerClasses = (isWinner: boolean) => ({
-  'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-sm': isWinner,
-  'bg-gray-50 border border-gray-200': !isWinner,
+  'bg-gradient-to-r from-yellow-50 via-yellow-100/80 to-amber-50 border-2 border-yellow-300 shadow-sm dark:from-yellow-900/45 dark:via-yellow-950/35 dark:to-slate-900 dark:border-yellow-600/80': isWinner,
+  'bg-gray-50 border border-gray-200 dark:bg-slate-800/70 dark:border-slate-700': !isWinner,
 });
 
 const getPositionIconClasses = (isWinner: boolean) => ({
@@ -85,22 +85,22 @@ const getBadgeClasses = (isWinner: boolean) => [
             <span v-else>{{ index + 1 }}</span>
           </div>
           <div class="text-left">
-            <div class="font-bold text-lg text-slate-800 uppercase">
+            <div class="font-bold text-lg text-slate-800 uppercase dark:text-slate-100">
               {{ team.team_name }}
             </div>
-            <div class="text-sm text-slate-600 uppercase">
+            <div class="text-sm text-slate-600 uppercase dark:text-slate-300">
               {{ team.team_owner }}
             </div>
           </div>
         </div>
         <div class="text-right flex flex-col items-end space-y-1">
-          <Badge
-            :value="team.week_points.toString()"
-            severity="success"
-            size="large"
+          <UBadge
+            :label="team.week_points.toString()"
+            color="success"
+            size="lg"
             :class="getBadgeClasses(team.isWinner)"
           />
-          <div class="text-xs text-slate-500 font-medium uppercase tracking-wide">
+          <div class="text-xs text-slate-500 font-medium uppercase tracking-wide dark:text-slate-400">
             Points
           </div>
         </div>
@@ -111,11 +111,11 @@ const getBadgeClasses = (isWinner: boolean) => [
       v-else
       class="text-center py-8"
     >
-      <div class="text-slate-500 mb-2">
+      <div class="text-slate-500 mb-2 dark:text-slate-400">
         <Icon
           name="carbon:trophy"
           size="48"
-          class="mx-auto text-slate-400 mb-2"
+          class="mx-auto text-slate-400 mb-2 dark:text-slate-500"
         />
         <p v-if="hasResults">
           No performance data available yet
@@ -124,15 +124,17 @@ const getBadgeClasses = (isWinner: boolean) => [
           Gameweek in progress
         </p>
       </div>
-      <Tag
+      <UBadge
         v-if="hasResults"
-        severity="secondary"
-        value="Waiting for results..."
+        color="neutral"
+        variant="soft"
+        label="Waiting for results..."
       />
-      <Tag
+      <UBadge
         v-else
-        severity="secondary"
-        value="Awaiting final results..."
+        color="neutral"
+        variant="soft"
+        label="Awaiting final results..."
       />
     </div>
   </WeeklySummaryCard>

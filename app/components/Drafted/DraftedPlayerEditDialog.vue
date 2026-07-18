@@ -6,11 +6,11 @@ import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
-import type { Player } from '~/types/Player';
+import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { useAppSettings } from '@/composables/useAppSettings';
 
 interface TransferData {
-  player: Player | undefined;
+  player: PlayerWithSeasonStatistics | undefined;
   activeExpiryDate: string;
   transferWeek: number;
 }
@@ -27,7 +27,7 @@ const toDateFromInput = (value: string) => {
 };
 
 const transferSchema = z.object({
-  player: z.custom<Player>(
+  player: z.custom<PlayerWithSeasonStatistics>(
     value => !!value && typeof value === 'object' && 'player_id' in value,
     { message: 'Select a player' },
   ),

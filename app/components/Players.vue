@@ -1,41 +1,67 @@
 <script lang="ts" setup>
-import type { TableColumn, TableRow } from '@nuxt/ui';
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  ExpandedState,
+  PaginationState,
+  Row,
+  SortingState,
+  Updater,
+  VisibilityState,
+} from '@tanstack/vue-table';
+import {
+  FlexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useVueTable,
+} from '@tanstack/vue-table';
+import { h, resolveComponent } from 'vue';
 import { usePlayerStore } from '@/stores/players';
 import { TEAM_DATA } from '@/logic/teams/constants';
 import { populateFilterPrices } from '@/utils/filters';
 import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
 import { getPositionName } from '@/utils/playerPosition';
-import type { Player } from '~/types/Player';
+import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
 
-const router = useRouter();
-const route = useRoute();
 const playerStore = usePlayerStore();
-const selectedPlayer: Ref<Player | null> = ref(null);
-const showDialog = ref(false);
 
+type PlayerTableRow = PlayerWithSeasonStatistics;
 type AvailabilityFilter = 'all' | 'available' | 'unavailable' | 'season';
-type ColumnFiltersState = { id: string; value: unknown }[];
-type SortingState = { id: string; desc: boolean }[];
-type PlayerFilterRow = { original: Player };
-type PlayerFilterFn = (row: PlayerFilterRow, columnId: string, filterValue: unknown) => boolean;
+type SortOptionId = 'points' | 'goals' | 'assists' | 'clean_sheets' | 'red_cards' | 'cost' | 'player';
+type PlayerFilterFn = (row: Row<PlayerTableRow>, columnId: string, filterValue: unknown) => boolean;
 type TableColumnApi = {
-  getCanSort: () => boolean;
   getIsSorted: () => false | 'asc' | 'desc';
-  toggleSorting: (desc?: boolean) => void;
+  getSortIndex: () => number;
+  toggleSorting: (desc?: boolean, isMulti?: boolean) => void;
   setFilterValue: (value?: unknown) => void;
 };
-type PlayerTable = {
-  tableApi: {
-    getFilteredRowModel: () => {
-      rows: unknown[];
-    };
-  };
-};
 
-const table = useTemplateRef<PlayerTable>('table');
 const columnFilters = ref<ColumnFiltersState>([]);
-const sorting = ref<SortingState>([]);
+const columnVisibility = ref<VisibilityState>({
+  minutes: false,
+});
+const expanded = ref<ExpandedState>({});
+const defaultSorting: SortingState = [
+  { id: 'points', desc: true },
+  { id: 'minutes', desc: true },
+  { id: 'player_id', desc: false },
+];
+const sorting = ref<SortingState>([...defaultSorting]);
+const pagination = ref<PaginationState>({
+  pageIndex: 0,
+  pageSize: 50,
+});
+const mobileFiltersOpen = ref(false);
+const UBadge = resolveComponent('UBadge');
+const UButton = resolveComponent('UButton');
+const UInput = resolveComponent('UInput');
+const UPopover = resolveComponent('UPopover');
+const USelectMenu = resolveComponent('USelectMenu');
+const UTooltip = resolveComponent('UTooltip');
 
 const normalizeFilterValue = (value: string) =>
   value
@@ -58,6 +84,10 @@ const positionFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
 };
 
 const teamFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
+  if (Array.isArray(filterValue)) {
+    return filterValue.length === 0 || filterValue.includes(row.original.team);
+  }
+
   return !filterValue || row.original.team === filterValue;
 };
 
@@ -78,19 +108,6 @@ const availabilityFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
   }
 };
 
-const columns: TableColumn<Player>[] = [
-  { accessorKey: 'player_id', header: 'ID', meta: { class: { th: 'w-20 align-top' } } },
-  { accessorKey: 'web_name', id: 'player', header: 'Player', filterFn: playerNameFilter, meta: { class: { th: 'min-w-64 align-top' } } },
-  { accessorKey: 'goals_scored', id: 'goals', header: 'G', meta: { class: { th: 'w-20 align-top text-right' } } },
-  { accessorKey: 'assists', id: 'assists', header: 'A', meta: { class: { th: 'w-20 align-top text-right' } } },
-  { accessorKey: 'clean_sheets', id: 'clean_sheets', header: 'CS', meta: { class: { th: 'w-20 align-top text-right' } } },
-  { accessorKey: 'red_cards', id: 'red_cards', header: 'RC', meta: { class: { th: 'w-20 align-top text-right' } } },
-  { accessorKey: 'position', id: 'position', header: 'Pos.', filterFn: positionFilter, meta: { class: { th: 'w-32 align-top' } } },
-  { accessorKey: 'team_short_name', id: 'team', header: 'Team', filterFn: teamFilter, meta: { class: { th: 'w-32' } } },
-  { accessorKey: 'cost', id: 'cost', header: 'Cost', filterFn: priceFilter, meta: { class: { th: 'w-28 align-top text-right' } } },
-  { accessorKey: 'is_unavailable', id: 'availability', header: 'Availability', filterFn: availabilityFilter, enableSorting: false, meta: { class: { th: 'w-44 align-top' } } },
-];
-
 const positionFilters = [
   { label: 'All positions', value: null },
   { label: getPositionName(PlayerPosition.GOALKEEPER), value: PlayerPosition.GOALKEEPER },
@@ -106,55 +123,66 @@ const availabilityFilters = [
   { label: 'Season out', value: 'season' },
 ] satisfies { label: string; value: AvailabilityFilter }[];
 
-const teamFilters = computed(() => [
-  { name: 'All teams', value: 0 },
-  ...TEAM_DATA.map(team => ({
+const teamFilters = computed(() =>
+  TEAM_DATA.map(team => ({
     name: team.name,
     value: team.id,
   })),
-]);
-
-const priceFilters = populateFilterPrices();
-
-const sortedPlayers = computed(() =>
-  [...playerStore.getPlayers]
-    .sort((a, b) => (b.minutes ?? 0) - (a.minutes ?? 0) || a.player_id - b.player_id),
 );
 
-const filterSnapshot = computed(() => ({
-  columnFilters: columnFilters.value,
-  playerCount: sortedPlayers.value.length,
-}));
+const priceFilters = populateFilterPrices();
+const pageSizeOptions = [
+  { label: '25', value: 25 },
+  { label: '50', value: 50 },
+  { label: '100', value: 100 },
+];
+const mobileSortOptions = [
+  { label: 'Points', value: 'points' },
+  { label: 'Goals', value: 'goals' },
+  { label: 'Assists', value: 'assists' },
+  { label: 'Clean sheets', value: 'clean_sheets' },
+  { label: 'Red cards', value: 'red_cards' },
+  { label: 'Cost', value: 'cost' },
+  { label: 'Player', value: 'player' },
+] satisfies { label: string; value: SortOptionId }[];
 
-const filteredRowCount = ref(0);
-
-const updateFilteredRowCount = async () => {
-  await nextTick();
-  filteredRowCount.value = table.value?.tableApi.getFilteredRowModel().rows.length ?? sortedPlayers.value.length;
-};
+const players = computed(() => playerStore.getPlayers);
 
 const activeFilterCount = computed(() => {
   return columnFilters.value.length;
 });
 
-const visibleRange = computed(() => {
-  return `${filteredRowCount.value} players`;
-});
+const isDefaultSorting = computed(() =>
+  sorting.value.length === defaultSorting.length
+  && sorting.value.every((sort, index) => sort.id === defaultSorting[index]?.id && sort.desc === defaultSorting[index]?.desc),
+);
 
-const setSelectedPlayerAndQueryParam = (playerID: number) => {
-  selectedPlayer.value = playerStore.getPlayerByID(playerID) as Player;
-  router.push({
-    path: '/players',
-    query: { id: playerID },
-  });
-  showDialog.value = true;
+const canResetTable = computed(() =>
+  activeFilterCount.value > 0
+  || !isDefaultSorting.value
+  || pagination.value.pageIndex > 0
+  || (expanded.value !== true && Object.keys(expanded.value).length > 0),
+);
+
+const getPlayerRowId = (player: PlayerTableRow) => String(player.player_id);
+
+const getPlayerStats = (player: PlayerTableRow) => [
+  { label: 'Goals', value: player.season_goals },
+  { label: 'Assists', value: player.season_assists },
+  { label: 'Clean sheets', value: player.season_clean_sheets },
+  { label: 'Red cards', value: player.season_red_cards },
+  { label: 'Points', value: player.season_points },
+];
+
+const togglePlayerRow = (row: Row<PlayerTableRow>) => {
+  expanded.value = row.getIsExpanded() ? {} : { [row.id]: true };
 };
 
-const selectPlayerRow = (_event: Event, row: TableRow<Player>) => {
-  setSelectedPlayerAndQueryParam(row.original.player_id);
+const selectPlayerRow = (_event: Event, row: Row<PlayerTableRow>) => {
+  togglePlayerRow(row);
 };
 
-const getAvailability = (player: Player) => {
+const getAvailability = (player: PlayerTableRow) => {
   if (player.unavailable_for_season) {
     return {
       label: 'Season out',
@@ -180,7 +208,9 @@ const getAvailability = (player: Player) => {
 
 const resetFilters = () => {
   columnFilters.value = [];
-  sorting.value = [];
+  expanded.value = {};
+  sorting.value = [...defaultSorting];
+  pagination.value = { ...pagination.value, pageIndex: 0 };
 };
 
 const getColumnFilterValue = (id: string) => {
@@ -191,28 +221,47 @@ const getColumnFilterString = (id: string) => String(getColumnFilterValue(id) ??
 
 const getColumnFilterNumber = (id: string) => Number(getColumnFilterValue(id) ?? 0);
 
+const getColumnFilterNumbers = (id: string) => {
+  const filterValue = getColumnFilterValue(id);
+
+  return Array.isArray(filterValue) ? filterValue : [];
+};
+
 const getColumnFilterAvailability = () => (getColumnFilterValue('availability') ?? 'all') as AvailabilityFilter;
 
 const isColumnFiltered = (id: string) => columnFilters.value.some(filter => filter.id === id);
 
-const setColumnFilter = (column: TableColumnApi, value: unknown, emptyValue: unknown) => {
-  column.setFilterValue(value === emptyValue ? undefined : value);
+const isEmptyFilterValue = (value: unknown, emptyValue: unknown) => {
+  if (Array.isArray(value) && Array.isArray(emptyValue)) {
+    return value.length === emptyValue.length;
+  }
+
+  return value === emptyValue;
 };
 
-const cycleSorting = (column: TableColumnApi) => {
-  const direction = column.getIsSorted();
+const setColumnFilterValue = (id: string, value: unknown, emptyValue: unknown) => {
+  const nextFilters = columnFilters.value.filter(filter => filter.id !== id);
 
-  if (direction === 'asc') {
-    column.toggleSorting(true);
-    return;
+  if (!isEmptyFilterValue(value, emptyValue)) {
+    nextFilters.push({ id, value });
   }
 
-  if (direction === 'desc') {
-    sorting.value = [];
-    return;
-  }
+  columnFilters.value = nextFilters;
+  expanded.value = {};
+  pagination.value = { ...pagination.value, pageIndex: 0 };
+};
 
-  column.toggleSorting(false);
+const setColumnFilter = (column: TableColumnApi, value: unknown, emptyValue: unknown) => {
+  column.setFilterValue(isEmptyFilterValue(value, emptyValue) ? undefined : value);
+  expanded.value = {};
+  pagination.value = { ...pagination.value, pageIndex: 0 };
+};
+
+const setPageSize = (pageSize: number) => {
+  pagination.value = {
+    pageIndex: 0,
+    pageSize,
+  };
 };
 
 const getSortIcon = (column: TableColumnApi) => {
@@ -226,14 +275,431 @@ const getSortIcon = (column: TableColumnApi) => {
   }
 };
 
-onMounted(async () => {
-  if (route.query.id) {
-    selectedPlayer.value = playerStore.getPlayerByID(+route.query.id) as Player;
-    showDialog.value = true;
-  }
+const getSortPriority = (column: TableColumnApi) => {
+  const sortIndex = column.getSortIndex();
+
+  return sorting.value.length > 1 && sortIndex > -1 ? String(sortIndex + 1) : undefined;
+};
+
+const sortColumn = (column: TableColumnApi, event: MouseEvent) => {
+  column.toggleSorting(column.getIsSorted() === 'asc', event.shiftKey);
+};
+
+const buildSorting = (primaryId: SortOptionId, desc: boolean): SortingState => [
+  { id: primaryId, desc },
+  ...defaultSorting.filter(sort => sort.id !== primaryId),
+];
+
+const mobileSortId = computed<SortOptionId>({
+  get: () => {
+    const primarySort = sorting.value.find(sort => mobileSortOptions.some(option => option.value === sort.id));
+
+    return (primarySort?.id as SortOptionId | undefined) ?? 'points';
+  },
+  set: (value) => {
+    sorting.value = buildSorting(value, mobileSortDirection.value === 'desc');
+    expanded.value = {};
+    pagination.value = { ...pagination.value, pageIndex: 0 };
+  },
 });
 
-watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flush: 'post' });
+const mobileSortDirection = computed<'asc' | 'desc'>({
+  get: () => (sorting.value[0]?.desc === false ? 'asc' : 'desc'),
+  set: (value) => {
+    sorting.value = buildSorting(mobileSortId.value, value === 'desc');
+    expanded.value = {};
+    pagination.value = { ...pagination.value, pageIndex: 0 };
+  },
+});
+
+const renderSortButton = (
+  column: TableColumnApi,
+  label: string,
+  className = 'justify-start px-0 font-semibold dark:!text-slate-100',
+) => h('div', { class: 'flex items-center gap-1' }, [
+  h(UButton, {
+    label,
+    icon: getSortIcon(column),
+    color: 'neutral',
+    variant: 'ghost',
+    size: 'xs',
+    class: className,
+    onClick: (event: MouseEvent) => sortColumn(column, event),
+  }),
+  getSortPriority(column)
+    ? h(UBadge, {
+        label: getSortPriority(column),
+        color: 'neutral',
+        variant: 'soft',
+        size: 'sm',
+        class: 'normal-case',
+      })
+    : null,
+]);
+
+const renderFilterButton = (id: string, label: string) =>
+  h(UButton, {
+    'icon': 'lucide:funnel',
+    'color': isColumnFiltered(id) ? 'primary' : 'neutral',
+    'variant': isColumnFiltered(id) ? 'soft' : 'ghost',
+    'size': 'xs',
+    'square': true,
+    'aria-label': label,
+  });
+
+const renderClearFilterButton = (column: TableColumnApi, id: string) =>
+  h(UButton, {
+    label: 'Clear',
+    icon: 'lucide:x',
+    color: 'neutral',
+    variant: 'ghost',
+    size: 'xs',
+    disabled: !isColumnFiltered(id),
+    onClick: () => column.setFilterValue(undefined),
+  });
+
+const renderPlayerHeader = (column: TableColumnApi) =>
+  h('div', { class: 'flex min-w-56 items-center gap-1.5' }, [
+    renderSortButton(column, 'Player'),
+    h(UPopover, { content: { align: 'start' } }, {
+      default: () => renderFilterButton('player', 'Filter players'),
+      content: () => h('div', { class: 'w-64 space-y-3 p-3' }, [
+        h(UInput, {
+          'modelValue': getColumnFilterString('player'),
+          'class': 'w-full normal-case',
+          'icon': 'tabler:search',
+          'size': 'sm',
+          'placeholder': 'Search players',
+          'autofocus': true,
+          'onUpdate:modelValue': (value: string) => column.setFilterValue(value || undefined),
+        }),
+        renderClearFilterButton(column, 'player'),
+      ]),
+    }),
+  ]);
+
+const renderSelectFilterHeader = ({
+  column,
+  id,
+  label,
+  widthClass,
+  items,
+  modelValue,
+  labelKey,
+  valueKey,
+  emptyValue,
+  multiple = false,
+  align = 'start',
+  popoverWidthClass,
+  sortButtonClass = 'justify-start px-0 font-semibold dark:!text-slate-100',
+}: {
+  column: TableColumnApi;
+  id: string;
+  label: string;
+  widthClass: string;
+  items: unknown[];
+  modelValue: unknown;
+  labelKey: string;
+  valueKey: string;
+  emptyValue: unknown;
+  multiple?: boolean;
+  align?: 'start' | 'end';
+  popoverWidthClass: string;
+  sortButtonClass?: string;
+}) =>
+  h('div', { class: `flex items-center gap-1.5 ${widthClass}` }, [
+    renderSortButton(column, label, sortButtonClass),
+    h(UPopover, { content: { align } }, {
+      default: () => renderFilterButton(id, `Filter ${label.toLowerCase()}`),
+      content: () => h('div', { class: `${popoverWidthClass} space-y-3 p-3` }, [
+        h(USelectMenu, {
+          'modelValue': modelValue,
+          'class': 'w-full normal-case',
+          'labelKey': labelKey,
+          'valueKey': valueKey,
+          'items': items,
+          'multiple': multiple,
+          'size': 'sm',
+          'onUpdate:modelValue': (value: unknown) => setColumnFilter(column, value, emptyValue),
+        }),
+        renderClearFilterButton(column, id),
+      ]),
+    }),
+  ]);
+
+const renderStatHeader = (column: TableColumnApi, label: string, tooltip: string) =>
+  h(UTooltip, { text: tooltip }, {
+    default: () => renderSortButton(column, label, 'ml-auto px-0 font-semibold dark:!text-slate-100'),
+  });
+
+const renderNumericCell = (value: unknown, className = 'font-medium text-slate-700 dark:text-slate-200') =>
+  h('div', { class: `text-right ${className}` }, String(value ?? 0));
+
+const renderExpandedButton = (row: Row<PlayerTableRow>) =>
+  h(UButton, {
+    'icon': row.getIsExpanded() ? 'lucide:chevron-down' : 'lucide:chevron-right',
+    'color': 'neutral',
+    'variant': 'ghost',
+    'size': 'xs',
+    'square': true,
+    'aria-label': row.getIsExpanded() ? 'Collapse player details' : 'Expand player details',
+    'class': 'dark:!text-slate-100',
+    'onClick': (event: MouseEvent) => {
+      event.stopPropagation();
+      togglePlayerRow(row);
+    },
+  });
+
+const renderPlayerCell = (player: PlayerTableRow) =>
+  h('div', { class: 'flex items-center gap-3' }, [
+    h('img', {
+      class: 'h-9 w-9 rounded-full bg-white object-cover object-top shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700',
+      src: player.image,
+      alt: player.web_name,
+      onError: loadPlayerFallbackImage,
+    }),
+    h('div', { class: 'min-w-0' }, [
+      h('div', { class: 'truncate font-semibold text-slate-900 dark:text-slate-100' }, player.web_name),
+      player.news
+        ? h('div', { class: 'max-w-72 truncate text-xs text-slate-500 dark:text-slate-400' }, player.news)
+        : null,
+    ]),
+  ]);
+
+const renderTeamCell = (player: PlayerTableRow) =>
+  h('div', { class: 'flex items-center gap-2' }, [
+    h('img', {
+      class: 'h-6 w-6',
+      src: getImageUrl(player.team_short_name.toLowerCase()),
+      alt: player.team_short_name,
+    }),
+    h('span', { class: 'font-medium text-slate-700 dark:text-slate-200' }, player.team_short_name),
+  ]);
+
+const renderAvailabilityCell = (player: PlayerTableRow) =>
+  h(UTooltip, { text: player.news || getAvailability(player).label }, {
+    default: () => h(UBadge, {
+      color: getAvailability(player).color,
+      variant: 'soft',
+      icon: getAvailability(player).icon,
+      label: getAvailability(player).label,
+    }),
+  });
+
+type ColumnClassMeta = { class?: { th?: string; td?: string } };
+
+const getHeaderClass = (header: { column: { columnDef: { meta?: unknown } } }) =>
+  (header.column.columnDef.meta as ColumnClassMeta | undefined)?.class?.th;
+
+const getCellClass = (cell: { column: { columnDef: { meta?: unknown } } }) =>
+  (cell.column.columnDef.meta as ColumnClassMeta | undefined)?.class?.td;
+
+const columns: ColumnDef<PlayerTableRow>[] = [
+  {
+    id: 'expand',
+    header: '',
+    enableSorting: false,
+    cell: ({ row }) => renderExpandedButton(row),
+    meta: { class: { th: 'w-10 align-top', td: 'w-10' } },
+  },
+  {
+    accessorKey: 'player_id',
+    header: ({ column }) => renderSortButton(column as TableColumnApi, 'ID', 'px-0 font-semibold dark:!text-slate-100'),
+    cell: ({ getValue }) => String(getValue()),
+    meta: { class: { th: 'w-20 align-top' } },
+  },
+  {
+    accessorKey: 'web_name',
+    id: 'player',
+    header: ({ column }) => renderPlayerHeader(column as TableColumnApi),
+    cell: ({ row }) => renderPlayerCell(row.original),
+    filterFn: playerNameFilter,
+    meta: { class: { th: 'min-w-64 align-top' } },
+  },
+  {
+    accessorKey: 'season_points',
+    id: 'points',
+    header: ({ column }) => renderStatHeader(column as TableColumnApi, 'Pts', 'Points'),
+    cell: ({ getValue }) => renderNumericCell(getValue()),
+    meta: { class: { th: 'w-20 align-top text-right' } },
+  },
+  {
+    accessorKey: 'season_goals',
+    id: 'goals',
+    header: ({ column }) => renderStatHeader(column as TableColumnApi, 'G', 'Goals scored'),
+    cell: ({ getValue }) => renderNumericCell(getValue()),
+    meta: { class: { th: 'w-20 align-top text-right' } },
+  },
+  {
+    accessorKey: 'season_assists',
+    id: 'assists',
+    header: ({ column }) => renderStatHeader(column as TableColumnApi, 'A', 'Assists'),
+    cell: ({ getValue }) => renderNumericCell(getValue()),
+    meta: { class: { th: 'w-20 align-top text-right' } },
+  },
+  {
+    accessorKey: 'season_clean_sheets',
+    id: 'clean_sheets',
+    header: ({ column }) => renderStatHeader(column as TableColumnApi, 'CS', 'Clean sheets'),
+    cell: ({ getValue }) => renderNumericCell(getValue()),
+    meta: { class: { th: 'w-20 align-top text-right' } },
+  },
+  {
+    accessorKey: 'season_red_cards',
+    id: 'red_cards',
+    header: ({ column }) => renderStatHeader(column as TableColumnApi, 'RC', 'Red cards'),
+    cell: ({ getValue }) => renderNumericCell(getValue()),
+    meta: { class: { th: 'w-20 align-top text-right' } },
+  },
+  { accessorKey: 'minutes', id: 'minutes' },
+  {
+    accessorKey: 'position',
+    id: 'position',
+    header: ({ column }) => renderSelectFilterHeader({
+      column: column as TableColumnApi,
+      id: 'position',
+      label: 'Pos.',
+      widthClass: 'w-28',
+      items: positionFilters,
+      modelValue: getColumnFilterNumber('position') || null,
+      labelKey: 'label',
+      valueKey: 'value',
+      emptyValue: null,
+      popoverWidthClass: 'w-48',
+    }),
+    filterFn: positionFilter,
+    cell: ({ row }) =>
+      h(UBadge, {
+        color: 'neutral',
+        variant: 'soft',
+        label: getPositionName(row.original.position),
+      }),
+    meta: { class: { th: 'w-32 align-top' } },
+  },
+  {
+    accessorKey: 'team_short_name',
+    id: 'team',
+    header: ({ column }) => renderSelectFilterHeader({
+      column: column as TableColumnApi,
+      id: 'team',
+      label: 'Team',
+      widthClass: 'w-32',
+      items: teamFilters.value,
+      modelValue: getColumnFilterNumbers('team'),
+      labelKey: 'name',
+      valueKey: 'value',
+      emptyValue: [],
+      multiple: true,
+      popoverWidthClass: 'w-64',
+    }),
+    filterFn: teamFilter,
+    cell: ({ row }) => renderTeamCell(row.original),
+    meta: { class: { th: 'w-32' } },
+  },
+  {
+    accessorKey: 'cost',
+    id: 'cost',
+    header: ({ column }) => renderSelectFilterHeader({
+      column: column as TableColumnApi,
+      id: 'cost',
+      label: 'Cost',
+      widthClass: 'ml-auto w-28 justify-end',
+      items: priceFilters,
+      modelValue: getColumnFilterNumber('cost'),
+      labelKey: 'name',
+      valueKey: 'value',
+      emptyValue: 0,
+      align: 'end',
+      popoverWidthClass: 'w-44',
+      sortButtonClass: 'justify-end px-0 font-semibold dark:!text-slate-100',
+    }),
+    filterFn: priceFilter,
+    cell: ({ row }) => renderNumericCell(row.original.cost.toFixed(1), 'font-semibold text-slate-900 dark:text-slate-100'),
+    meta: { class: { th: 'w-28 align-top text-right' } },
+  },
+  {
+    accessorKey: 'is_unavailable',
+    id: 'availability',
+    header: ({ column }) =>
+      h('div', { class: 'flex w-40 items-center gap-1.5' }, [
+        h('span', { class: 'font-semibold' }, 'Availability'),
+        h(UPopover, { content: { align: 'start' } }, {
+          default: () => renderFilterButton('availability', 'Filter availability'),
+          content: () => h('div', { class: 'w-52 space-y-3 p-3' }, [
+            h(USelectMenu, {
+              'modelValue': getColumnFilterAvailability(),
+              'class': 'w-full normal-case',
+              'labelKey': 'label',
+              'valueKey': 'value',
+              'items': availabilityFilters,
+              'size': 'sm',
+              'onUpdate:modelValue': (value: unknown) => setColumnFilter(column as TableColumnApi, value, 'all'),
+            }),
+            renderClearFilterButton(column as TableColumnApi, 'availability'),
+          ]),
+        }),
+      ]),
+    filterFn: availabilityFilter,
+    enableSorting: false,
+    cell: ({ row }) => renderAvailabilityCell(row.original),
+    meta: { class: { th: 'w-44 align-top' } },
+  },
+];
+
+function valueUpdater<T>(updaterOrValue: Updater<T>, target: { value: T }) {
+  target.value = typeof updaterOrValue === 'function'
+    ? (updaterOrValue as (old: T) => T)(target.value)
+    : updaterOrValue;
+}
+
+const table = useVueTable({
+  get data() {
+    return players.value;
+  },
+  columns,
+  getRowId: getPlayerRowId,
+  getCoreRowModel: getCoreRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getExpandedRowModel: getExpandedRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
+  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
+  onExpandedChange: updaterOrValue => valueUpdater(updaterOrValue, expanded),
+  onPaginationChange: updaterOrValue => valueUpdater(updaterOrValue, pagination),
+  onSortingChange: updaterOrValue => valueUpdater(updaterOrValue, sorting),
+  state: {
+    get columnFilters() {
+      return columnFilters.value;
+    },
+    get columnVisibility() {
+      return columnVisibility.value;
+    },
+    get expanded() {
+      return expanded.value;
+    },
+    get pagination() {
+      return pagination.value;
+    },
+    get sorting() {
+      return sorting.value;
+    },
+  },
+});
+
+const filteredRowCount = computed(() => table.getFilteredRowModel().rows.length);
+const currentRows = computed(() => table.getRowModel().rows);
+
+const visibleRange = computed(() => {
+  if (filteredRowCount.value === 0) {
+    return '0 players';
+  }
+
+  const start = pagination.value.pageIndex * pagination.value.pageSize + 1;
+  const end = Math.min(start + pagination.value.pageSize - 1, filteredRowCount.value);
+
+  return `${start}-${end} of ${filteredRowCount.value} players`;
+});
 </script>
 
 <template>
@@ -242,10 +708,6 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
     v-else
     class="w-full"
   >
-    <PlayerModal
-      v-model="showDialog"
-      :selected-player="selectedPlayer"
-    />
     <div class="w-full rounded-md border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
       <div class="flex flex-col gap-4 border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
         <div class="flex flex-col justify-between gap-3 md:flex-row md:items-center">
@@ -264,7 +726,7 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
               color="neutral"
               variant="ghost"
               size="sm"
-              :disabled="activeFilterCount === 0"
+              :disabled="!canResetTable"
               class="dark:!text-slate-100 dark:hover:!bg-slate-800"
               @click="resetFilters"
             />
@@ -272,407 +734,425 @@ watch(filterSnapshot, updateFilteredRowCount, { deep: true, immediate: true, flu
         </div>
       </div>
 
-      <div class="overflow-x-auto">
-        <UTable
-          ref="table"
-          v-model:column-filters="columnFilters"
-          v-model:sorting="sorting"
-          :data="sortedPlayers"
-          :columns="columns"
-          empty="No players found"
-          :ui="{
-            root: 'w-full min-w-full',
-            base: 'w-full min-w-[1180px] text-sm',
-            th: 'bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200',
-            td: 'align-middle',
-            tr: 'cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800',
-            empty: 'py-10 text-center text-slate-500 dark:text-slate-400',
-          }"
-          :on-select="selectPlayerRow"
-        >
-          <template #player_id-header="{ column }">
+      <div class="grid gap-3 border-b border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900 md:hidden">
+        <UInput
+          :model-value="getColumnFilterString('player')"
+          icon="tabler:search"
+          placeholder="Search players"
+          size="sm"
+          class="w-full"
+          @update:model-value="setColumnFilterValue('player', $event || '', '')"
+        />
+
+        <div class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2">
+          <USelect
+            v-model="mobileSortId"
+            :items="mobileSortOptions"
+            value-key="value"
+            label-key="label"
+            size="sm"
+            class="min-w-0"
+          />
+          <UButton
+            :icon="mobileSortDirection === 'desc' ? 'lucide:arrow-down' : 'lucide:arrow-up'"
+            :label="mobileSortDirection === 'desc' ? 'Desc' : 'Asc'"
+            color="neutral"
+            variant="soft"
+            size="sm"
+            class="shrink-0"
+            @click="mobileSortDirection = mobileSortDirection === 'desc' ? 'asc' : 'desc'"
+          />
+          <UDrawer
+            v-model:open="mobileFiltersOpen"
+            title="Filters"
+            description="Refine the player list"
+          >
             <UButton
-              label="ID"
-              :icon="getSortIcon(column)"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              class="px-0 font-semibold dark:!text-slate-100"
-              @click="cycleSorting(column)"
+              icon="lucide:funnel"
+              :label="activeFilterCount ? `${activeFilterCount}` : 'Filters'"
+              :color="activeFilterCount ? 'primary' : 'neutral'"
+              :variant="activeFilterCount ? 'soft' : 'outline'"
+              size="sm"
+              class="shrink-0"
             />
-          </template>
 
-          <template #player-header="{ column }">
-            <div class="flex min-w-56 items-center gap-1.5">
-              <UButton
-                label="Player"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="justify-start px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-              <UPopover :content="{ align: 'start' }">
-                <UButton
-                  icon="lucide:funnel"
-                  :color="isColumnFiltered('player') ? 'primary' : 'neutral'"
-                  :variant="isColumnFiltered('player') ? 'soft' : 'ghost'"
-                  size="xs"
-                  square
-                  aria-label="Filter players"
-                />
-                <template #content>
-                  <div class="w-64 space-y-3 p-3">
-                    <UInput
-                      :model-value="getColumnFilterString('player')"
-                      class="w-full normal-case"
-                      icon="tabler:search"
-                      size="sm"
-                      placeholder="Search players"
-                      autofocus
-                      @update:model-value="column.setFilterValue($event || undefined)"
-                    />
-                    <UButton
-                      label="Clear"
-                      icon="lucide:x"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :disabled="!isColumnFiltered('player')"
-                      @click="column.setFilterValue(undefined)"
-                    />
-                  </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
+            <template #body>
+              <div class="space-y-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                    Position
+                  </label>
+                  <USelectMenu
+                    :model-value="getColumnFilterNumber('position') || null"
+                    :items="positionFilters"
+                    label-key="label"
+                    value-key="value"
+                    size="sm"
+                    class="w-full"
+                    @update:model-value="setColumnFilterValue('position', $event, null)"
+                  />
+                </div>
 
-          <template #goals-header="{ column }">
-            <UTooltip text="Goals scored">
-              <UButton
-                label="G"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="ml-auto px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-            </UTooltip>
-          </template>
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                    Teams
+                  </label>
+                  <USelectMenu
+                    :model-value="getColumnFilterNumbers('team')"
+                    :items="teamFilters"
+                    label-key="name"
+                    value-key="value"
+                    multiple
+                    size="sm"
+                    class="w-full"
+                    @update:model-value="setColumnFilterValue('team', $event, [])"
+                  />
+                </div>
 
-          <template #assists-header="{ column }">
-            <UTooltip text="Assists">
-              <UButton
-                label="A"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="ml-auto px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-            </UTooltip>
-          </template>
-
-          <template #clean_sheets-header="{ column }">
-            <UTooltip text="Clean sheets">
-              <UButton
-                label="CS"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="ml-auto px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-            </UTooltip>
-          </template>
-
-          <template #red_cards-header="{ column }">
-            <UTooltip text="Red cards">
-              <UButton
-                label="RC"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="ml-auto px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-            </UTooltip>
-          </template>
-
-          <template #position-header="{ column }">
-            <div class="flex w-28 items-center gap-1.5">
-              <UButton
-                label="Pos."
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="justify-start px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-              <UPopover :content="{ align: 'start' }">
-                <UButton
-                  icon="lucide:funnel"
-                  :color="isColumnFiltered('position') ? 'primary' : 'neutral'"
-                  :variant="isColumnFiltered('position') ? 'soft' : 'ghost'"
-                  size="xs"
-                  square
-                  aria-label="Filter positions"
-                />
-                <template #content>
-                  <div class="w-48 space-y-3 p-3">
-                    <USelectMenu
-                      :model-value="getColumnFilterNumber('position') || null"
-                      class="w-full normal-case"
-                      label-key="label"
-                      value-key="value"
-                      :items="positionFilters"
-                      size="sm"
-                      @update:model-value="setColumnFilter(column, $event, null)"
-                    />
-                    <UButton
-                      label="Clear"
-                      icon="lucide:x"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :disabled="!isColumnFiltered('position')"
-                      @click="column.setFilterValue(undefined)"
-                    />
-                  </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
-
-          <template #team-header="{ column }">
-            <div class="flex w-32 items-center gap-1.5">
-              <UButton
-                label="Team"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="justify-start px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-              <UPopover :content="{ align: 'start' }">
-                <UButton
-                  icon="lucide:funnel"
-                  :color="isColumnFiltered('team') ? 'primary' : 'neutral'"
-                  :variant="isColumnFiltered('team') ? 'soft' : 'ghost'"
-                  size="xs"
-                  square
-                  aria-label="Filter teams"
-                />
-                <template #content>
-                  <div class="w-56 space-y-3 p-3">
-                    <USelectMenu
-                      :model-value="getColumnFilterNumber('team')"
-                      class="w-full normal-case"
-                      label-key="name"
-                      value-key="value"
-                      :items="teamFilters"
-                      size="sm"
-                      @update:model-value="setColumnFilter(column, $event, 0)"
-                    />
-                    <UButton
-                      label="Clear"
-                      icon="lucide:x"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :disabled="!isColumnFiltered('team')"
-                      @click="column.setFilterValue(undefined)"
-                    />
-                  </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
-
-          <template #cost-header="{ column }">
-            <div class="ml-auto flex w-28 items-center justify-end gap-1.5">
-              <UButton
-                label="Cost"
-                :icon="getSortIcon(column)"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                class="justify-end px-0 font-semibold dark:!text-slate-100"
-                @click="cycleSorting(column)"
-              />
-              <UPopover :content="{ align: 'end' }">
-                <UButton
-                  icon="lucide:funnel"
-                  :color="isColumnFiltered('cost') ? 'primary' : 'neutral'"
-                  :variant="isColumnFiltered('cost') ? 'soft' : 'ghost'"
-                  size="xs"
-                  square
-                  aria-label="Filter costs"
-                />
-                <template #content>
-                  <div class="w-44 space-y-3 p-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1.5">
+                    <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                      Cost
+                    </label>
                     <USelectMenu
                       :model-value="getColumnFilterNumber('cost')"
-                      class="w-full normal-case"
+                      :items="priceFilters"
                       label-key="name"
                       value-key="value"
-                      :items="priceFilters"
                       size="sm"
-                      @update:model-value="setColumnFilter(column, $event, 0)"
-                    />
-                    <UButton
-                      label="Clear"
-                      icon="lucide:x"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :disabled="!isColumnFiltered('cost')"
-                      @click="column.setFilterValue(undefined)"
+                      class="w-full"
+                      @update:model-value="setColumnFilterValue('cost', $event, 0)"
                     />
                   </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
 
-          <template #availability-header="{ column }">
-            <div class="flex w-40 items-center gap-1.5">
-              <span class="font-semibold">Availability</span>
-              <UPopover :content="{ align: 'start' }">
-                <UButton
-                  icon="lucide:funnel"
-                  :color="isColumnFiltered('availability') ? 'primary' : 'neutral'"
-                  :variant="isColumnFiltered('availability') ? 'soft' : 'ghost'"
-                  size="xs"
-                  square
-                  aria-label="Filter availability"
-                />
-                <template #content>
-                  <div class="w-52 space-y-3 p-3">
+                  <div class="space-y-1.5">
+                    <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                      Availability
+                    </label>
                     <USelectMenu
                       :model-value="getColumnFilterAvailability()"
-                      class="w-full normal-case"
+                      :items="availabilityFilters"
                       label-key="label"
                       value-key="value"
-                      :items="availabilityFilters"
                       size="sm"
-                      @update:model-value="setColumnFilter(column, $event, 'all')"
-                    />
-                    <UButton
-                      label="Clear"
-                      icon="lucide:x"
-                      color="neutral"
-                      variant="ghost"
-                      size="xs"
-                      :disabled="!isColumnFiltered('availability')"
-                      @click="column.setFilterValue(undefined)"
+                      class="w-full"
+                      @update:model-value="setColumnFilterValue('availability', $event, 'all')"
                     />
                   </div>
-                </template>
-              </UPopover>
-            </div>
-          </template>
-
-          <template #player-cell="{ row }">
-            <div class="flex items-center gap-3">
-              <img
-                class="h-9 w-9 rounded-full bg-white object-cover object-top shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
-                :src="row.original.image"
-                :alt="row.original.web_name"
-                @error="loadPlayerFallbackImage"
-              >
-              <div class="min-w-0">
-                <div class="truncate font-semibold text-slate-900 dark:text-slate-100">
-                  {{ row.original.web_name }}
-                </div>
-                <div
-                  v-if="row.original.news"
-                  class="max-w-72 truncate text-xs text-slate-500 dark:text-slate-400"
-                >
-                  {{ row.original.news }}
                 </div>
               </div>
+            </template>
+
+            <template #footer>
+              <div class="flex w-full items-center justify-between gap-3">
+                <UButton
+                  icon="lucide:rotate-ccw"
+                  label="Reset"
+                  color="neutral"
+                  variant="ghost"
+                  size="sm"
+                  :disabled="!canResetTable"
+                  @click="resetFilters"
+                />
+                <UButton
+                  label="Done"
+                  color="primary"
+                  size="sm"
+                  @click="mobileFiltersOpen = false"
+                />
+              </div>
+            </template>
+          </UDrawer>
+        </div>
+      </div>
+
+      <div class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900 md:hidden">
+        <div
+          v-if="currentRows.length === 0"
+          class="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400"
+        >
+          No players found
+        </div>
+
+        <article
+          v-for="row in currentRows"
+          :key="row.id"
+          class="bg-white dark:bg-slate-900"
+        >
+          <button
+            type="button"
+            class="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-3 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
+            :aria-expanded="row.getIsExpanded()"
+            @click="togglePlayerRow(row)"
+          >
+            <img
+              class="h-11 w-11 rounded-full bg-white object-cover object-top shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
+              :src="row.original.image"
+              :alt="row.original.web_name"
+              @error="loadPlayerFallbackImage"
+            >
+
+            <div class="min-w-0">
+              <div class="flex min-w-0 items-center gap-2">
+                <span class="truncate text-sm font-semibold text-slate-950 dark:text-slate-50">
+                  {{ row.original.web_name }}
+                </span>
+                <UBadge
+                  color="neutral"
+                  variant="soft"
+                  size="sm"
+                  :label="getPositionName(row.original.position)"
+                />
+              </div>
+              <div class="mt-1 flex min-w-0 items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <img
+                  class="h-4 w-4"
+                  :src="getImageUrl(row.original.team_short_name.toLowerCase())"
+                  :alt="row.original.team_short_name"
+                >
+                <span class="truncate">{{ row.original.team_short_name }}</span>
+                <span>{{ row.original.cost.toFixed(1) }}m</span>
+              </div>
             </div>
-          </template>
 
-          <template #goals-cell="{ row }">
-            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
-              {{ row.original.goals_scored }}
-            </div>
-          </template>
-
-          <template #assists-cell="{ row }">
-            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
-              {{ row.original.assists }}
-            </div>
-          </template>
-
-          <template #clean_sheets-cell="{ row }">
-            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
-              {{ row.original.clean_sheets }}
-            </div>
-          </template>
-
-          <template #red_cards-cell="{ row }">
-            <div class="text-right font-medium text-slate-700 dark:text-slate-200">
-              {{ row.original.red_cards }}
-            </div>
-          </template>
-
-          <template #position-cell="{ row }">
-            <UBadge
-              color="neutral"
-              variant="soft"
-              :label="getPositionName(row.original.position)"
-            />
-          </template>
-
-          <template #team-cell="{ row }">
             <div class="flex items-center gap-2">
-              <img
-                class="h-6 w-6"
-                :src="getImageUrl(row.original.team_short_name.toLowerCase())"
-                :alt="row.original.team_short_name"
+              <div class="text-right">
+                <div class="font-mono text-lg font-semibold leading-5 text-slate-950 dark:text-slate-50">
+                  {{ row.original.season_points }}
+                </div>
+                <div class="text-[0.65rem] font-semibold uppercase leading-4 text-slate-500 dark:text-slate-400">
+                  Points
+                </div>
+              </div>
+              <UIcon
+                :name="row.getIsExpanded() ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+                class="h-4 w-4 text-slate-400"
+              />
+            </div>
+          </button>
+
+          <div
+            v-if="row.getIsExpanded()"
+            class="space-y-3 px-3 pb-4"
+          >
+            <dl class="grid grid-cols-5 divide-x divide-slate-200 rounded-md bg-slate-50 py-2 text-center dark:divide-slate-700 dark:bg-slate-800/70">
+              <div
+                v-for="stat in getPlayerStats(row.original)"
+                :key="stat.label"
+                class="px-1.5"
               >
-              <span class="font-medium text-slate-700 dark:text-slate-200">
-                {{ row.original.team_short_name }}
-              </span>
-            </div>
-          </template>
+                <dt class="text-[0.6rem] font-semibold uppercase leading-4 text-slate-500 dark:text-slate-400">
+                  {{ stat.label }}
+                </dt>
+                <dd class="font-mono text-sm font-semibold text-slate-950 dark:text-slate-50">
+                  {{ stat.value }}
+                </dd>
+              </div>
+            </dl>
 
-          <template #cost-cell="{ row }">
-            <div class="text-right font-semibold text-slate-900 dark:text-slate-100">
-              {{ row.original.cost.toFixed(1) }}
-            </div>
-          </template>
-
-          <template #availability-cell="{ row }">
-            <UTooltip :text="row.original.news || getAvailability(row.original).label">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
               <UBadge
                 :color="getAvailability(row.original).color"
                 variant="soft"
                 :icon="getAvailability(row.original).icon"
                 :label="getAvailability(row.original).label"
               />
-            </UTooltip>
-          </template>
-        </UTable>
+              <span class="font-mono font-semibold text-slate-800 dark:text-slate-100">
+                {{ row.original.cost.toFixed(1) }}m
+              </span>
+              <span class="text-slate-500 dark:text-slate-400">
+                {{ row.original.minutes ?? 0 }} mins
+              </span>
+              <span class="text-slate-500 dark:text-slate-400">
+                #{{ row.original.player_id }}
+              </span>
+            </div>
+
+            <p
+              v-if="row.original.news"
+              class="text-sm text-slate-600 dark:text-slate-300"
+            >
+              {{ row.original.news }}
+            </p>
+          </div>
+        </article>
       </div>
 
-      <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:items-center sm:justify-between">
-        <span class="text-slate-600 dark:text-slate-300">
-          {{ visibleRange }}
-        </span>
-        <span class="text-slate-600 dark:text-slate-300">
-          {{ activeFilterCount }} active filters
-        </span>
+      <div class="hidden w-full md:block">
+        <div class="w-full overflow-x-auto">
+          <table class="w-full min-w-[1180px] text-sm">
+            <thead>
+              <tr
+                v-for="headerGroup in table.getHeaderGroups()"
+                :key="headerGroup.id"
+              >
+                <th
+                  v-for="header in headerGroup.headers"
+                  :key="header.id"
+                  :colspan="header.colSpan"
+                  class="bg-slate-50 px-4 py-3 text-left text-xs uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                  :class="getHeaderClass(header)"
+                >
+                  <FlexRender
+                    v-if="!header.isPlaceholder"
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-if="currentRows.length">
+                <template
+                  v-for="row in currentRows"
+                  :key="row.id"
+                >
+                  <tr
+                    class="cursor-pointer even:bg-slate-50/70 hover:bg-slate-100 dark:even:bg-slate-800/50 dark:hover:bg-slate-800"
+                    :data-expanded="row.getIsExpanded()"
+                    @click="selectPlayerRow($event, row)"
+                  >
+                    <td
+                      v-for="cell in row.getVisibleCells()"
+                      :key="cell.id"
+                      class="px-4 py-3 align-middle"
+                      :class="getCellClass(cell)"
+                    >
+                      <FlexRender
+                        :render="cell.column.columnDef.cell"
+                        :props="cell.getContext()"
+                      />
+                    </td>
+                  </tr>
+
+                  <tr
+                    v-if="row.getIsExpanded()"
+                    class="even:bg-slate-50/70 dark:even:bg-slate-800/50"
+                  >
+                    <td
+                      :colspan="row.getVisibleCells().length"
+                      class="p-0 align-middle"
+                    >
+                      <div class="border-y border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900">
+                        <div class="grid items-center gap-5 xl:grid-cols-[minmax(22rem,28rem)_minmax(24rem,1fr)_minmax(16rem,22rem)]">
+                          <div class="flex min-w-0 items-center gap-4">
+                            <img
+                              class="h-16 w-16 shrink-0 rounded-full bg-white object-cover object-top shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700"
+                              :src="row.original.image_large"
+                              :alt="row.original.web_name"
+                              @error="loadPlayerFallbackImage"
+                            >
+                            <div class="min-w-0">
+                              <div class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
+                                #{{ row.original.player_id }}
+                              </div>
+                              <div class="truncate text-xl font-semibold text-slate-950 dark:text-slate-50">
+                                {{ row.original.first_name }} {{ row.original.second_name }}
+                              </div>
+                              <div class="mt-2 flex flex-wrap items-center gap-2">
+                                <UBadge
+                                  color="neutral"
+                                  variant="soft"
+                                  :label="getPositionName(row.original.position)"
+                                />
+                                <span class="flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
+                                  <img
+                                    class="h-5 w-5"
+                                    :src="getImageUrl(row.original.team_short_name.toLowerCase())"
+                                    :alt="row.original.team_short_name"
+                                  >
+                                  {{ row.original.team_name }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <dl class="grid grid-cols-5 divide-x divide-slate-200 text-sm dark:divide-slate-700">
+                            <div
+                              v-for="stat in getPlayerStats(row.original)"
+                              :key="stat.label"
+                              class="px-2 text-center"
+                            >
+                              <dt class="text-[0.625rem] font-semibold uppercase leading-4 text-slate-500 dark:text-slate-400">
+                                {{ stat.label }}
+                              </dt>
+                              <dd class="font-mono text-base font-semibold leading-5 text-slate-950 dark:text-slate-50">
+                                {{ stat.value }}
+                              </dd>
+                            </div>
+                          </dl>
+
+                          <div class="min-w-0 space-y-2 text-sm">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                              <UBadge
+                                :color="getAvailability(row.original).color"
+                                variant="soft"
+                                :icon="getAvailability(row.original).icon"
+                                :label="getAvailability(row.original).label"
+                              />
+                              <span class="font-mono font-semibold text-slate-800 dark:text-slate-100">
+                                {{ row.original.cost.toFixed(1) }}m
+                              </span>
+                              <span class="text-slate-500 dark:text-slate-400">
+                                {{ row.original.minutes ?? 0 }} mins
+                              </span>
+                            </div>
+                            <p
+                              v-if="row.original.news"
+                              class="line-clamp-2 text-slate-600 dark:text-slate-300"
+                            >
+                              {{ row.original.news }}
+                            </p>
+                            <p
+                              v-else
+                              class="text-slate-500 dark:text-slate-400"
+                            >
+                              No current player news.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </template>
+              <tr v-else>
+                <td
+                  :colspan="table.getVisibleLeafColumns().length"
+                  class="px-4 py-10 text-center text-slate-500 dark:text-slate-400"
+                >
+                  No players found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800 lg:flex-row lg:items-center lg:justify-between">
+        <div class="flex flex-wrap items-center gap-3 text-slate-600 dark:text-slate-300">
+          <span>{{ visibleRange }}</span>
+          <span>{{ activeFilterCount }} active filters</span>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <USelect
+            :model-value="pagination.pageSize"
+            :items="pageSizeOptions"
+            value-key="value"
+            label-key="label"
+            size="sm"
+            class="w-24"
+            @update:model-value="setPageSize(Number($event))"
+          />
+          <UPagination
+            :page="pagination.pageIndex + 1"
+            :items-per-page="pagination.pageSize"
+            :total="filteredRowCount"
+            size="sm"
+            show-edges
+            @update:page="pagination.pageIndex = $event - 1"
+          />
+        </div>
       </div>
     </div>
   </div>

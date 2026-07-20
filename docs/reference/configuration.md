@@ -180,24 +180,34 @@ import type { DraftedTeam } from '~/types/DraftedTeam'
 
 **Nuxt 4 Convention:** All application code lives in `/app/` directory.
 
-### PrimeVue Configuration
+### Nuxt UI Configuration
 
 ```typescript
-modules: ['@primevue/nuxt-module'],
-primevue: {
-  options: {
-    unstyled: false,  // Use included styles
-    ripple: true,     // Ripple effect on components
-  },
-  components: {
-    exclude: ['Form', 'FormField', 'Editor', 'Chart'],  // Don't auto-import these
-  }
+modules: ['@nuxt/ui'],
+colorMode: {
+  preference: 'system',
+  fallback: 'light'
 }
 ```
 
-**Theme:** Aura preset with custom primary color palette
+Semantic component colors are configured in `app.config.ts`:
 
-**Styling:** Tailwind CSS integration via `tailwindcss-primeui`
+```typescript
+export default defineAppConfig({
+  ui: {
+    colors: {
+      primary: 'primary',
+      neutral: 'slate',
+      success: 'green',
+      warning: 'amber',
+      error: 'red',
+      info: 'sky'
+    }
+  }
+})
+```
+
+`app.vue` wraps the application in `UApp`, which provides overlays and toasts. Generic controls use Nuxt UI directly; forms use `UForm`, `UFormField`, and Zod schemas.
 
 ### Supabase Configuration
 
@@ -333,20 +343,21 @@ const subscription = supabase
 
 ## Tailwind CSS Configuration
 
-### tailwind.config.ts
+### app/assets/styles/base.css
 
-```typescript
-module.exports = {
-  content: [
-    './app/components/**/*.{vue,js,ts}',
-    './app/pages/**/*.vue',
-    './app/layouts/**/*.vue'
-  ],
-  plugins: [
-    require('tailwindcss-primeui')  // PrimeVue integration
-  ]
+```css
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-display: "Rubik", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --color-brand: #0b0c3d;
+  --color-primary-500: #4f46e5;
 }
 ```
+
+Tailwind CSS v4 discovers utility usage automatically, so this project does not use a `tailwind.config.ts` content list. Shared brand, typography, and spacing tokens are defined with `@theme` in the CSS entry point.
 
 ### Usage
 
@@ -356,7 +367,7 @@ module.exports = {
 </button>
 ```
 
-Tailwind utility classes combined with PrimeVue components.
+Tailwind utilities can be combined with Nuxt UI's semantic color utilities and component `ui` props.
 
 ## ESLint & Prettier Configuration
 
@@ -432,4 +443,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2025-11-15
+**Last updated:** 2026-07-20

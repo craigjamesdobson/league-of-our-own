@@ -44,7 +44,7 @@ const sidebarUi = {
   root: '[--sidebar-width:16.25rem] [--sidebar-width-icon:5rem]',
   container: 'h-svh',
   inner: 'bg-brand text-slate-100 divide-white/10',
-  header: 'min-h-20 px-4',
+  header: 'min-h-20 p-4',
   body: 'justify-center gap-4 p-4',
   footer: 'p-4',
   rail: 'hover:after:bg-white/30',

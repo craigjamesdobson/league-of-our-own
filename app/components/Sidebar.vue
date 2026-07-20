@@ -41,7 +41,7 @@ const navigationItems = computed(() =>
 );
 
 const sidebarUi = {
-  root: '[--sidebar-width:18rem] [--sidebar-width-icon:5rem]',
+  root: '[--sidebar-width:16.25rem] [--sidebar-width-icon:5rem]',
   container: 'h-svh',
   inner: 'bg-brand text-slate-100 divide-white/10',
   header: 'min-h-20 px-4',
@@ -60,10 +60,10 @@ const mobileMenu = {
 };
 
 const navigationUi = {
-  root: 'gap-2',
-  list: 'gap-2',
-  link: 'min-h-13 overflow-hidden rounded-lg px-3 text-[15px] font-semibold text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-13 data-[collapsed=true]:w-13 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
-  linkLeadingIcon: 'size-7 text-current',
+  root: 'gap-0.5',
+  list: 'flex flex-col gap-0.5',
+  link: 'min-h-12 overflow-hidden rounded-lg px-3 text-sm font-medium text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-12 data-[collapsed=true]:w-12 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
+  linkLeadingIcon: 'size-5 text-current',
   linkLabel: 'text-current',
   linkTrailing: 'text-slate-300',
 };
@@ -76,8 +76,8 @@ const brandButtonUi = {
 
 const footerButtonUi = {
   base: 'min-h-12 w-full justify-start overflow-hidden px-3',
-  leadingIcon: 'size-7 text-current',
-  label: 'truncate text-[15px] font-semibold',
+  leadingIcon: 'size-5 text-current',
+  label: 'truncate text-sm font-medium',
 };
 </script>
 

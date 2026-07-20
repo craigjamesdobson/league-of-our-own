@@ -36,10 +36,10 @@ const modeItems = computed(() =>
 
 const buttonUi = computed(() => ({
   base: props.collapsed
-    ? 'grid h-13 w-13 place-items-center p-0'
+    ? 'grid h-12 w-12 place-items-center p-0'
     : 'min-h-12 w-full justify-start overflow-hidden px-3',
-  leadingIcon: 'size-7 text-current',
-  label: 'truncate text-[15px] font-semibold',
+  leadingIcon: 'size-5 text-current',
+  label: 'truncate text-sm font-medium',
 }));
 </script>
 

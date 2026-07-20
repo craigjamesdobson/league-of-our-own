@@ -44,8 +44,12 @@ const buttonUi = computed(() => ({
 </script>
 
 <template>
-  <UTooltip :text="`Theme: ${activeMode.label}`">
+  <UTooltip
+    class="w-full"
+    :text="`Theme: ${activeMode.label}`"
+  >
     <UDropdownMenu
+      class="w-full"
       :items="modeItems"
       :content="{ side: 'top', align: 'center', sideOffset: 8 }"
       :ui="{ content: 'min-w-36' }"

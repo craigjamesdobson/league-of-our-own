@@ -100,7 +100,12 @@ const footerButtonUi = {
         color="neutral"
         variant="ghost"
         class="hover:bg-white/10 hover:text-white"
-        :ui="brandButtonUi"
+        :ui="{
+          ...brandButtonUi,
+          base: state === 'collapsed'
+            ? 'h-12 w-12 justify-center p-0'
+            : brandButtonUi.base,
+        }"
       />
       <UButton
         icon="i-lucide-x"

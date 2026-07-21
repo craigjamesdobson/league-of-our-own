@@ -63,7 +63,7 @@ const navigationUi = {
   root: 'gap-0.5',
   list: 'flex flex-col gap-0.5',
   link: 'min-h-12 overflow-hidden rounded-lg px-3 text-sm font-medium text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-12 data-[collapsed=true]:w-12 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
-  linkLeadingIcon: 'size-5 text-current',
+  linkLeadingIcon: 'size-5 text-slate-200 group-hover:text-white group-data-[active]:text-white',
   linkLabel: 'text-current',
   linkTrailing: 'text-slate-300',
 };

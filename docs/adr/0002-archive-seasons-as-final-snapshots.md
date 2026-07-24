@@ -1,0 +1,3 @@
+# Archive seasons as final snapshots
+
+Completed seasons will be retained as immutable snapshots of final standings, final squads, and lightweight replacement-style transfer history rather than as complete copies of operational players, fixtures, and statistics. Archival is an explicit annual operation that snapshots data transactionally and never runs merely because a migration was deployed or a season-complete flag changed. This preserves the history the application intends to show, avoids coupling archived results to season-local FPL identifiers, and keeps the active-season data model simple; a full pre-cutover database backup remains the recovery source for detailed legacy records.

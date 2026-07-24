@@ -301,6 +301,20 @@ expect(result.computedValue.value).toBe(expected);
 
 ---
 
+## Agent skills
+
+### Issue tracker
+
+Matt skill artifacts are stored as Markdown under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Local issues use the default Matt triage vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository using root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
 ## GitHub Workflow
 
 This project uses GitHub Issues for all work tracking.

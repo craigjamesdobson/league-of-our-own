@@ -35,6 +35,23 @@ Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all ne
 committed fictional development fixture; local resets load
 `supabase/fixtures/development.sql` as configured in `supabase/config.toml`.
 
+## Refresh New-Season FPL Reference Data
+
+After clearing the active-season data, refresh the Premier League reference data
+through the application endpoints in this order:
+
+1. Call `POST /api/sync-teams` with the `x-api-key` header. This imports exactly
+   20 clubs and stores only each club's FPL ID, name, and short name.
+2. Call `POST /api/sync-players` with the same header. Players must be imported
+   after clubs because each player references a club ID.
+3. Seed development-only drafted teams and squads from the imported players if
+   application scenarios need test league data.
+
+Both endpoints fetch the current FPL `bootstrap-static` payload and require the
+server's `SYNC_API_KEY`. The teams endpoint is a manual reset/re-seeding tool and
+is not called by the player-sync cron. Run these calls only against the intended
+environment, and verify the hostname before sending them.
+
 ### Step 1: Split the Database Dump
 
 Split the large seed.sql file into manageable chunks for SQL Editor execution:
@@ -215,6 +232,5 @@ temp/
 
 ---
 
-**Last Updated**: September 2025
 **Verified Working**: Supabase projects with 5000+ line database dumps
 **Environment**: WSL2 with IPv6 connectivity issues

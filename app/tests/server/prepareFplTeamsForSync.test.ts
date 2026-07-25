@@ -1,18 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { createMockFplTeams } from '~/tests/factories';
 import { prepareFplTeamsForSync } from '../../../server/utils/fplTeams';
-
-const createFplTeams = () =>
-  Array.from({ length: 20 }, (_, index) => ({
-    id: index + 1,
-    name: `Club ${index + 1}`,
-    short_name: `C${String(index + 1).padStart(2, '0')}`,
-    code: 100 + index,
-    strength: index + 1,
-  }));
 
 describe('prepareFplTeamsForSync', () => {
   it('returns only the club fields stored by League of Our Own', () => {
-    const teams = prepareFplTeamsForSync({ teams: createFplTeams() });
+    const teams = prepareFplTeamsForSync({ teams: createMockFplTeams() });
 
     expect(teams).toHaveLength(20);
     expect(teams[0]).toEqual({
@@ -24,7 +16,7 @@ describe('prepareFplTeamsForSync', () => {
   });
 
   it('rejects a payload that does not contain exactly 20 clubs', () => {
-    const teams = createFplTeams().slice(0, 19);
+    const teams = createMockFplTeams().slice(0, 19);
 
     expect(() => prepareFplTeamsForSync({ teams })).toThrow(
       'FPL bootstrap payload must contain exactly 20 clubs; received 19',
@@ -32,13 +24,13 @@ describe('prepareFplTeamsForSync', () => {
   });
 
   it('rejects duplicate club identifiers, names, and short names', () => {
-    const duplicateId = createFplTeams();
+    const duplicateId = createMockFplTeams();
     duplicateId[1]!.id = duplicateId[0]!.id;
 
-    const duplicateName = createFplTeams();
+    const duplicateName = createMockFplTeams();
     duplicateName[1]!.name = duplicateName[0]!.name;
 
-    const duplicateShortName = createFplTeams();
+    const duplicateShortName = createMockFplTeams();
     duplicateShortName[1]!.short_name = duplicateShortName[0]!.short_name;
 
     expect(() => prepareFplTeamsForSync({ teams: duplicateId })).toThrow(
@@ -59,13 +51,13 @@ describe('prepareFplTeamsForSync', () => {
   });
 
   it('rejects malformed club fields', () => {
-    const invalidId = createFplTeams();
+    const invalidId = createMockFplTeams();
     invalidId[0]!.id = 0;
 
-    const blankName = createFplTeams();
+    const blankName = createMockFplTeams();
     blankName[0]!.name = ' ';
 
-    const blankShortName = createFplTeams();
+    const blankShortName = createMockFplTeams();
     blankShortName[0]!.short_name = '';
 
     expect(() => prepareFplTeamsForSync({ teams: invalidId })).toThrow(

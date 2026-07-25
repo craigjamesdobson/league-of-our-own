@@ -19,3 +19,5 @@ export {
   createMockPlayerWithStats,
   createMockTransferWithStats,
 } from './players';
+
+export { createMockFplTeams } from './fplTeams';

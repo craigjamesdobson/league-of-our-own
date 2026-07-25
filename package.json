@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs",
     "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
     "generate-types:local": "npx supabase gen types typescript --local > types/database-generated.types.ts"
   },

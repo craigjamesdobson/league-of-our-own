@@ -1,5 +1,7 @@
 # Database Restoration Guide: Live to Development
 
+**Last updated:** 2026-07-25
+
 This guide documents the proven method for safely restoring live database data to development database when network connectivity issues prevent direct database connections.
 
 ## Problem Statement
@@ -28,6 +30,10 @@ Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all ne
 1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only`)
 2. **Development database** access via Supabase web dashboard
 3. **Working directory**: Create `temp/` folder for split files
+
+`supabase/seed.sql` is an ignored, temporary live-data artifact. It is not the
+committed fictional development fixture; local resets load
+`supabase/fixtures/development.sql` as configured in `supabase/config.toml`.
 
 ### Step 1: Split the Database Dump
 

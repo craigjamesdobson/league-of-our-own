@@ -24,35 +24,72 @@ values
   (7, 'Harbour Town', 'HBR'),
   (8, 'Hillcrest Wanderers', 'HLW');
 
-with generated_players as (
-  select
-    player_number,
-    names.first_names[((player_number - 1) % 8) + 1] as first_name,
-    names.last_names[((player_number - 1) / 8) + 1] as last_name
-  from generate_series(1, 64) as player_number
-  cross join (
-    select
-      array[
-        'Aaron',
-        'Ben',
-        'Callum',
-        'Dylan',
-        'Elliot',
-        'Finley',
-        'George',
-        'Harvey'
-      ] as first_names,
-      array[
-        'Adams',
-        'Bennett',
-        'Carter',
-        'Davies',
-        'Evans',
-        'Foster',
-        'Green',
-        'Hughes'
-      ] as last_names
-  ) names
+with generated_players (player_number, first_name, last_name) as (
+  values
+    (1, 'Oliver', 'Smith'),
+    (2, 'Mateo', 'García'),
+    (3, 'Liam', 'O''Connor'),
+    (4, 'Noah', 'Williams'),
+    (5, 'Ethan', 'Brown'),
+    (6, 'Lucas', 'Martin'),
+    (7, 'Leo', 'Müller'),
+    (8, 'Hugo', 'Dubois'),
+    (9, 'Aarav', 'Sharma'),
+    (10, 'Vihaan', 'Patel'),
+    (11, 'Arjun', 'Mehta'),
+    (12, 'Rohan', 'Gupta'),
+    (13, 'Wei', 'Chen'),
+    (14, 'Jun', 'Park'),
+    (15, 'Haruto', 'Sato'),
+    (16, 'Ren', 'Tanaka'),
+    (17, 'Min-jun', 'Kim'),
+    (18, 'Dae-hyun', 'Lee'),
+    (19, 'Amir', 'Haddad'),
+    (20, 'Omar', 'Mansour'),
+    (21, 'Zayd', 'Rahman'),
+    (22, 'Karim', 'El-Sayed'),
+    (23, 'Kwame', 'Mensah'),
+    (24, 'Kofi', 'Boateng'),
+    (25, 'Chidi', 'Okafor'),
+    (26, 'Tunde', 'Adebayo'),
+    (27, 'Sipho', 'Dlamini'),
+    (28, 'Themba', 'Ndlovu'),
+    (29, 'João', 'Silva'),
+    (30, 'Rafael', 'Costa'),
+    (31, 'Diego', 'Fernández'),
+    (32, 'Santiago', 'Romero'),
+    (33, 'Thiago', 'Oliveira'),
+    (34, 'Gabriel', 'Santos'),
+    (35, 'Nicolás', 'Álvarez'),
+    (36, 'Martín', 'Pereira'),
+    (37, 'Ivan', 'Petrov'),
+    (38, 'Luka', 'Kovač'),
+    (39, 'Marek', 'Nowak'),
+    (40, 'Andrei', 'Ionescu'),
+    (41, 'Elias', 'Papadopoulos'),
+    (42, 'Niko', 'Virtanen'),
+    (43, 'Erik', 'Johansson'),
+    (44, 'Lars', 'Andersen'),
+    (45, 'Finn', 'de Vries'),
+    (46, 'Milan', 'Jansen'),
+    (47, 'Yusuf', 'Demir'),
+    (48, 'Emre', 'Kaya'),
+    (49, 'Samir', 'Benali'),
+    (50, 'Yassine', 'Amrani'),
+    (51, 'Idris', 'Diallo'),
+    (52, 'Moussa', 'Traoré'),
+    (53, 'Mamadou', 'Ndiaye'),
+    (54, 'Abebe', 'Bekele'),
+    (55, 'Dawit', 'Tesfaye'),
+    (56, 'Sibusiso', 'Khumalo'),
+    (57, 'Jackson', 'Mwangi'),
+    (58, 'Daniel', 'Okeke'),
+    (59, 'Kenji', 'Nakamura'),
+    (60, 'Arif', 'Pratama'),
+    (61, 'Minh', 'Nguyen'),
+    (62, 'Somchai', 'Chaiyaporn'),
+    (63, 'Tane', 'Raukawa'),
+    (64, 'Ari', 'Levi')
 )
 insert into public.players (
   player_id,
@@ -126,7 +163,7 @@ values
     false,
     null,
     1,
-    63.5
+    0
   ),
   (
     2,
@@ -138,7 +175,7 @@ values
     false,
     null,
     0,
-    64.2
+    0
   ),
   (
     3,
@@ -150,7 +187,7 @@ values
     false,
     null,
     2,
-    61.8
+    0
   ),
   (
     4,
@@ -162,7 +199,7 @@ values
     false,
     null,
     1,
-    62.6
+    0
   );
 
 with squad_players (drafted_team_id, player_ids) as (
@@ -184,6 +221,19 @@ select
 from squad_players squad
 cross join lateral unnest(squad.player_ids)
   with ordinality as player_slot(player_id, ordinality);
+
+update public.drafted_teams drafted_team
+set total_team_value = squad_value.total_value
+from (
+  select
+    drafted_player.drafted_team,
+    sum(player.cost) as total_value
+  from public.drafted_players drafted_player
+  join public.players_view player
+    on player.player_id = drafted_player.drafted_player
+  group by drafted_player.drafted_team
+) squad_value
+where drafted_team.drafted_team_id = squad_value.drafted_team;
 
 insert into public.drafted_transfers (
   drafted_transfer_id,

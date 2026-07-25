@@ -31,14 +31,19 @@ Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all ne
 2. **Development database** access via Supabase web dashboard
 3. **Working directory**: Create `temp/` folder for split files
 
-`supabase/seed.sql` is an ignored, temporary live-data artifact. It is not the
-committed fictional development fixture; local resets load
-`supabase/fixtures/development.sql` as configured in `supabase/config.toml`.
+`supabase/seed.sql` is an ignored, temporary live-data artifact. Automatic SQL
+seeding is disabled in `supabase/config.toml`; local development uses the
+explicit clean or FPL-backed reset workflows documented in
+[Local Development](local-development.md#local-database-resets).
 
 ## Refresh New-Season FPL Reference Data
 
-After clearing the active-season data, refresh the Premier League reference data
-through the application endpoints in this order:
+For a local database, use `pnpm db:reset:fpl`. It resets the schema, imports the
+current clubs, players and fixtures, creates dummy league data, and creates the
+two local fixture-workflow users in one guarded command.
+
+For a deployed environment, refresh Premier League reference data through the
+application endpoints in this order:
 
 1. Call `POST /api/sync-teams` with the `x-api-key` header. This imports exactly
    20 clubs and stores only each club's FPL ID, name, and short name.

@@ -2,87 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import type { H3Event } from 'h3';
 import { handleEmailSending } from '../utils/email';
-import type { Database, TablesInsert } from '@/types/database.types';
-
-interface FPLPlayer {
-  id: number;
-  code: number;
-  cost_change_event: number;
-  cost_change_start_fall: number;
-  cost_change_start: number;
-  element_type: number;
-  first_name: string;
-  news: string;
-  news_added: string | null;
-  now_cost: number;
-  photo: string;
-  second_name: string;
-  status: string;
-  team: number;
-  team_code: number;
-  web_name: string;
-  minutes: number;
-  goals_scored: number;
-  assists: number;
-  clean_sheets: number;
-  red_cards: number;
-}
-
-type PlayerInsert = TablesInsert<'players'>;
-
-const transformFPLPlayer = (fplPlayer: FPLPlayer): PlayerInsert => {
-  const {
-    id,
-    code,
-    cost_change_event,
-    cost_change_start_fall,
-    cost_change_start,
-    element_type,
-    first_name,
-    news,
-    news_added,
-    now_cost,
-    photo,
-    second_name,
-    status,
-    team,
-    team_code,
-    web_name,
-    minutes,
-    goals_scored,
-    assists,
-    clean_sheets,
-    red_cards,
-  } = fplPlayer;
-
-  return {
-    player_id: id,
-    code,
-    cost_change_event,
-    cost_change_start_fall,
-    cost_change_start,
-    element_type,
-    first_name,
-    news,
-    news_added,
-    now_cost,
-    photo,
-    second_name,
-    status,
-    team,
-    team_code,
-    web_name,
-    minutes,
-    goals_scored,
-    assists,
-    clean_sheets,
-    red_cards,
-  };
-};
-
-interface FPLApiResponse {
-  elements: FPLPlayer[];
-}
+import { prepareFplPlayersForSync } from '../utils/fplPlayers';
+import type { Database } from '~/types/database.types';
 
 const sendSyncFailureEmail = async (errorMessage: string, event: H3Event) => {
   try {
@@ -149,12 +70,12 @@ export default defineEventHandler(async (event) => {
       throw new Error(`FPL API responded with status: ${response.status}`);
     }
 
-    const fplData: FPLApiResponse = await response.json();
+    const fplData = await response.json();
 
     if (!fplData.elements || !Array.isArray(fplData.elements)) {
       throw new Error('Invalid response format from FPL API - missing elements array');
     }
-    const formattedPlayerData = fplData.elements.map(transformFPLPlayer);
+    const formattedPlayerData = prepareFplPlayersForSync(fplData);
     const { error } = await supabase
       .from('players')
       .upsert(formattedPlayerData)

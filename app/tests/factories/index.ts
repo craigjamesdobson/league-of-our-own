@@ -21,3 +21,5 @@ export {
 } from './players';
 
 export { createMockFplTeams } from './fplTeams';
+export { createMockFplPlayers } from './fplPlayers';
+export { createMockFplFixtures } from './fplFixtures';

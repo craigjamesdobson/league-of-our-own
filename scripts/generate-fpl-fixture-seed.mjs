@@ -2,6 +2,7 @@ import { writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const FPL_FIXTURES_URL = 'https://fantasy.premierleague.com/api/fixtures/';
+const FPL_BOOTSTRAP_URL = 'https://fantasy.premierleague.com/api/bootstrap-static/';
 const OUTPUT_URL = new URL(
   '../supabase/fixtures/fpl-2026-27-fixtures.sql',
   import.meta.url,
@@ -13,15 +14,28 @@ const assertIntegerBetween = (value, minimum, maximum, description) => {
   }
 };
 
-export const validateFplFixtures = (fixtures) => {
+export const validateFplFixtures = (fixtures, clubIds) => {
   if (!Array.isArray(fixtures)) {
     throw new Error('FPL fixtures response must be an array');
   }
 
-  if (fixtures.length !== 380) {
-    throw new Error(`Expected 380 FPL fixtures; received ${fixtures.length}`);
+  if (
+    !Array.isArray(clubIds)
+    || clubIds.length !== 20
+    || new Set(clubIds).size !== 20
+    || clubIds.some(clubId => !Number.isInteger(clubId) || clubId <= 0)
+  ) {
+    throw new Error('FPL bootstrap response must contain 20 unique club ids');
   }
 
+  const expectedFixtureCount = clubIds.length * (clubIds.length - 1);
+  if (fixtures.length !== expectedFixtureCount) {
+    throw new Error(
+      `Expected ${expectedFixtureCount} FPL fixtures; received ${fixtures.length}`,
+    );
+  }
+
+  const validClubIds = new Set(clubIds);
   const fixtureIds = new Set();
   const eventCounts = new Map();
   const clubHomeCounts = new Map();
@@ -35,10 +49,13 @@ export const validateFplFixtures = (fixtures) => {
       throw new Error(`Fixture at index ${index} must be an object`);
     }
 
-    assertIntegerBetween(fixture.id, 1, 380, `Fixture at index ${index} id`);
+    if (!Number.isInteger(fixture.id) || fixture.id <= 0) {
+      throw new Error(`Fixture at index ${index} id must be a positive integer`);
+    }
     assertIntegerBetween(fixture.event, 1, 38, `Fixture ${fixture.id} event`);
-    assertIntegerBetween(fixture.team_h, 1, 20, `Fixture ${fixture.id} home team`);
-    assertIntegerBetween(fixture.team_a, 1, 20, `Fixture ${fixture.id} away team`);
+    if (!validClubIds.has(fixture.team_h) || !validClubIds.has(fixture.team_a)) {
+      throw new Error(`Fixture ${fixture.id} references an unknown FPL club id`);
+    }
 
     if (fixture.team_h === fixture.team_a) {
       throw new Error(`Fixture ${fixture.id} cannot have the same home and away club`);
@@ -78,34 +95,45 @@ export const validateFplFixtures = (fixtures) => {
   });
 
   for (let event = 1; event <= 38; event += 1) {
-    if (eventCounts.get(event) !== 10) {
-      throw new Error(`FPL event ${event} must contain exactly 10 fixtures`);
+    const expectedFixturesPerEvent = clubIds.length / 2;
+    if (eventCounts.get(event) !== expectedFixturesPerEvent) {
+      throw new Error(
+        `FPL event ${event} must contain exactly ${expectedFixturesPerEvent} fixtures`,
+      );
     }
-    if (eventClubs.get(event)?.size !== 20) {
+    if (eventClubs.get(event)?.size !== clubIds.length) {
       throw new Error(`Every FPL club must appear exactly once in event ${event}`);
     }
   }
 
-  for (let club = 1; club <= 20; club += 1) {
-    if (clubHomeCounts.get(club) !== 19 || clubAwayCounts.get(club) !== 19) {
-      throw new Error(`FPL club ${club} must have 19 home and 19 away fixtures`);
+  const expectedFixturesPerVenue = clubIds.length - 1;
+  clubIds.forEach((club) => {
+    if (
+      clubHomeCounts.get(club) !== expectedFixturesPerVenue
+      || clubAwayCounts.get(club) !== expectedFixturesPerVenue
+    ) {
+      throw new Error(
+        `FPL club ${club} must have ${expectedFixturesPerVenue} home and away fixtures`,
+      );
     }
-  }
+  });
 
-  if (pairings.size !== 190 || [...pairings.values()].some(count => count !== 2)) {
+  const expectedPairingCount = expectedFixtureCount / 2;
+  if (
+    pairings.size !== expectedPairingCount
+    || [...pairings.values()].some(count => count !== 2)
+  ) {
     throw new Error('Every pair of FPL clubs must appear in exactly two fixtures');
   }
 };
 
-const sqlValue = value => value === null ? 'null' : String(value);
-
-export const renderFplFixtureSeed = (fixtures) => {
-  validateFplFixtures(fixtures);
+export const renderFplFixtureSeed = (fixtures, clubIds) => {
+  validateFplFixtures(fixtures, clubIds);
 
   const rows = [...fixtures]
     .sort((left, right) => left.id - right.id)
     .map(fixture =>
-      `  (${fixture.id}, ${fixture.event}, ${fixture.team_h}, ${fixture.team_a}, ${sqlValue(fixture.team_h_score)}, ${sqlValue(fixture.team_a_score)})`,
+      `  (${fixture.id}, ${fixture.event}, ${fixture.team_h}, ${fixture.team_a}, null, null)`,
     );
 
   return `-- Generated from ${FPL_FIXTURES_URL}
@@ -138,14 +166,28 @@ select setval(
 };
 
 const generateFixtureSeed = async () => {
-  const response = await fetch(FPL_FIXTURES_URL);
+  const [fixturesResponse, bootstrapResponse] = await Promise.all([
+    fetch(FPL_FIXTURES_URL),
+    fetch(FPL_BOOTSTRAP_URL),
+  ]);
 
-  if (!response.ok) {
-    throw new Error(`FPL fixtures request failed with status ${response.status}`);
+  if (!fixturesResponse.ok) {
+    throw new Error(
+      `FPL fixtures request failed with status ${fixturesResponse.status}`,
+    );
+  }
+  if (!bootstrapResponse.ok) {
+    throw new Error(
+      `FPL bootstrap request failed with status ${bootstrapResponse.status}`,
+    );
   }
 
-  const fixtures = await response.json();
-  const sql = renderFplFixtureSeed(fixtures);
+  const fixtures = await fixturesResponse.json();
+  const bootstrap = await bootstrapResponse.json();
+  const clubIds = Array.isArray(bootstrap?.teams)
+    ? bootstrap.teams.map(team => team?.id)
+    : [];
+  const sql = renderFplFixtureSeed(fixtures, clubIds);
   await writeFile(OUTPUT_URL, sql, 'utf8');
   console.log(`Generated ${fixtures.length} fixtures at ${fileURLToPath(OUTPUT_URL)}`);
 };

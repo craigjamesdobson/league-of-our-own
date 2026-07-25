@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(20);
+select plan(23);
 
 insert into public.teams (id, name, short_name)
 values
@@ -130,9 +130,21 @@ insert into public.drafted_teams (
   total_team_value
 )
 values
+  (6, 'Duplicate Player FC', 'Drew', 'drew@example.test', true, '21-22', 100),
   (3, 'Incomplete FC', 'Ivy', 'ivy@example.test', true, '22-23', 100),
   (4, 'No Score FC', 'Noah', 'noah@example.test', true, '23-24', 100),
   (5, 'Unnamed Player FC', 'Una', 'una@example.test', true, '24-25', 100);
+
+insert into public.drafted_players (
+  drafted_player_id,
+  drafted_team,
+  drafted_player
+)
+select
+  400 + squad_position,
+  6,
+  case when squad_position = 5 then 2 else squad_position end
+from generate_series(1, 11) as squad_position;
 
 insert into public.drafted_players (
   drafted_player_id,
@@ -184,8 +196,16 @@ insert into public.weekly_statistics (
   points
 )
 values
+  (6, 1, 0, 0, 0, 38, 10),
   (4, 1, 0, 0, 0, 37, 10),
   (5, 1, 0, 0, 0, 38, 10);
+
+select throws_ok(
+  $$select * from public.archive_completed_season('21-22', '2021/22', 38)$$,
+  'P0001',
+  'Every Final Squad in Season 21-22 must contain 11 distinct players in the 1/4/3/3 formation',
+  'preflight rejects the same player occupying two Final Squad slots'
+);
 
 select throws_ok(
   $$select * from public.archive_completed_season('22-23', '2022/23', 38)$$,
@@ -212,7 +232,7 @@ select is(
   (
     select count(*)::integer
     from public.seasons
-    where season_key in ('22-23', '23-24', '24-25')
+    where season_key in ('21-22', '22-23', '23-24', '24-25')
   ),
   0,
   'a failed preflight leaves no partial Season snapshot'
@@ -296,6 +316,29 @@ select ok(
 select results_eq(
   $$
     select
+      srp.player_display_name,
+      srp.position,
+      srp.club_name,
+      srp.club_short_name
+    from public.season_result_players srp
+    join public.season_results sr on sr.id = srp.season_result_id
+    where sr.team_name = 'Alpha FC'
+      and srp.player_display_name = 'Player 24'
+  $$,
+  $$
+    values (
+      'Player 24'::text,
+      'goalkeeper'::text,
+      'South United'::text,
+      'SOU'::text
+    )
+  $$,
+  'captures Final Squad position and club display data'
+);
+
+select results_eq(
+  $$
+    select
       srt.gameweek,
       srt.transfer_order,
       srt.outgoing_player_display_name,
@@ -345,6 +388,13 @@ select throws_ok(
   'P0001',
   'Archived Season snapshots are read-only',
   'completed Final Squads are immutable'
+);
+
+select throws_ok(
+  $$update public.season_result_transfers set gameweek = 1$$,
+  'P0001',
+  'Archived Season snapshots are read-only',
+  'completed Season Transfers are immutable'
 );
 
 select throws_ok(

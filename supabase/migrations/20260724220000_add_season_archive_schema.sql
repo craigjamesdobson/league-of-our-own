@@ -546,12 +546,13 @@ begin
     join public.players p on p.player_id = fs.final_player_id
     group by fs.drafted_team_id
     having
-      count(*) filter (where p.element_type = 1) <> 1
+      count(distinct fs.final_player_id) <> 11
+      or count(*) filter (where p.element_type = 1) <> 1
       or count(*) filter (where p.element_type = 2) <> 4
       or count(*) filter (where p.element_type = 3) <> 3
       or count(*) filter (where p.element_type = 4) <> 3
   ) then
-    raise exception 'Every Final Squad in Season % must use the 1/4/3/3 formation',
+    raise exception 'Every Final Squad in Season % must contain 11 distinct players in the 1/4/3/3 formation',
       source_season_key;
   end if;
 

@@ -41,25 +41,46 @@
 
       <aside class="grid gap-px bg-white/10 sm:grid-cols-3 lg:grid-cols-1">
         <div class="bg-white/5 p-8 lg:p-10">
-          <p class="text-4xl font-black">
-            20th Aug
-          </p>
+          <div class="flex items-center gap-3">
+            <Icon
+              name="tabler:calendar-event"
+              size="24"
+              class="text-white/40"
+            />
+            <p class="text-4xl font-black">
+              20th Aug
+            </p>
+          </div>
           <p class="mt-2 text-sm font-bold uppercase tracking-wide text-white/60">
             Submission deadline
           </p>
         </div>
         <div class="bg-white/5 p-8 lg:p-10">
-          <p class="text-4xl font-black">
-            £90m
-          </p>
+          <div class="flex items-center gap-3">
+            <Icon
+              name="tabler:coins"
+              size="24"
+              class="text-white/40"
+            />
+            <p class="text-4xl font-black">
+              £90m
+            </p>
+          </div>
           <p class="mt-2 text-sm font-bold uppercase tracking-wide text-white/60">
             Standard budget
           </p>
         </div>
         <div class="bg-white/5 p-8 lg:p-10">
-          <p class="text-4xl font-black">
-            £85m
-          </p>
+          <div class="flex items-center gap-3">
+            <Icon
+              name="tabler:arrows-exchange"
+              size="24"
+              class="text-white/40"
+            />
+            <p class="text-4xl font-black">
+              £85m
+            </p>
+          </div>
           <p class="mt-2 text-sm font-bold uppercase tracking-wide text-white/60">
             With transfers
           </p>

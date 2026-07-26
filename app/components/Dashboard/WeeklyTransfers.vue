@@ -51,20 +51,13 @@ const groupedTransfers = computed(() => {
         <div
           v-for="n in 2"
           :key="n"
-          class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm"
+          class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm dark:from-slate-800 dark:to-slate-900 dark:border-slate-700"
         >
           <!-- Team Header -->
           <div class="flex items-center justify-between mb-3">
             <div>
-              <Skeleton
-                width="8rem"
-                height="1rem"
-                class="mb-2"
-              />
-              <Skeleton
-                width="10rem"
-                height="0.875rem"
-              />
+              <USkeleton class="mb-2 h-4 w-32" />
+              <USkeleton class="h-3.5 w-40" />
             </div>
           </div>
 
@@ -73,70 +66,39 @@ const groupedTransfers = computed(() => {
             <div
               v-for="m in 1"
               :key="m"
-              class="flex items-center md:grid md:grid-cols-[auto_1fr_auto_1fr_auto] gap-3 md:gap-8 p-3 rounded bg-gradient-to-r from-red-50 via-slate-50 to-green-50 border border-slate-200"
+              class="flex items-center md:grid md:grid-cols-[auto_1fr_auto_1fr_auto] gap-3 md:gap-8 p-3 rounded bg-gradient-to-r from-red-50 via-slate-50 to-green-50 border border-slate-200 dark:from-red-950/50 dark:via-slate-900 dark:to-green-950/50 dark:border-slate-700"
             >
               <!-- Left Arrow (desktop only) -->
               <div class="hidden md:flex justify-start">
-                <Skeleton
-                  shape="circle"
-                  size="1.25rem"
-                />
+                <USkeleton class="h-5 w-5 rounded-full" />
               </div>
 
               <!-- Player Out Section -->
               <div class="flex flex-col items-center gap-2 flex-1 md:relative md:flex-none">
-                <Skeleton
-                  shape="circle"
-                  size="3rem"
-                  class="border border-red-500"
-                />
+                <USkeleton class="h-12 w-12 rounded-full border border-red-500" />
                 <div class="text-center text-sm">
-                  <Skeleton
-                    width="4rem"
-                    height="1rem"
-                    class="mb-1"
-                  />
-                  <Skeleton
-                    width="2.5rem"
-                    height="0.75rem"
-                  />
+                  <USkeleton class="mb-1 h-4 w-16" />
+                  <USkeleton class="h-3 w-10" />
                 </div>
               </div>
 
               <!-- Swap Icon -->
               <div class="flex justify-center flex-shrink-0 px-4 md:px-0">
-                <Skeleton
-                  shape="circle"
-                  size="1.5rem"
-                />
+                <USkeleton class="h-6 w-6 rounded-full" />
               </div>
 
               <!-- Player In Section -->
               <div class="flex flex-col items-center gap-2 flex-1 md:relative md:flex">
-                <Skeleton
-                  shape="circle"
-                  size="3rem"
-                  class="border border-green-500"
-                />
+                <USkeleton class="h-12 w-12 rounded-full border border-green-500" />
                 <div class="text-center text-sm">
-                  <Skeleton
-                    width="4rem"
-                    height="1rem"
-                    class="mb-1"
-                  />
-                  <Skeleton
-                    width="2.5rem"
-                    height="0.75rem"
-                  />
+                  <USkeleton class="mb-1 h-4 w-16" />
+                  <USkeleton class="h-3 w-10" />
                 </div>
               </div>
 
               <!-- Right Arrow (desktop only) -->
               <div class="hidden md:flex justify-end">
-                <Skeleton
-                  shape="circle"
-                  size="1.25rem"
-                />
+                <USkeleton class="h-5 w-5 rounded-full" />
               </div>
             </div>
           </div>
@@ -150,15 +112,15 @@ const groupedTransfers = computed(() => {
       <div
         v-for="teamGroup in groupedTransfers"
         :key="`${teamGroup.team_name}-${teamGroup.team_owner}`"
-        class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm"
+        class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm dark:from-slate-800 dark:to-slate-900 dark:border-slate-700"
       >
         <!-- Compact Team Header -->
         <div class="flex items-center justify-between mb-3">
           <div>
-            <div class="font-bold text-base text-slate-800 uppercase">
+            <div class="font-bold text-base text-slate-800 uppercase dark:text-slate-100">
               {{ teamGroup.team_name }}
             </div>
-            <div class="text-sm text-slate-600 uppercase">
+            <div class="text-sm text-slate-600 uppercase dark:text-slate-300">
               {{ teamGroup.team_owner }} | {{ teamGroup.transfers.length }} transfer{{ teamGroup.transfers.length > 1 ? 's' : '' }}
             </div>
           </div>
@@ -169,7 +131,7 @@ const groupedTransfers = computed(() => {
           <div
             v-for="transfer in teamGroup.transfers"
             :key="transfer.drafted_transfer_id"
-            class="flex items-center md:grid md:grid-cols-[auto_1fr_auto_1fr_auto] gap-3 md:gap-8 p-3 rounded bg-gradient-to-r from-red-50 via-slate-50 to-green-50 border border-slate-200"
+            class="flex items-center md:grid md:grid-cols-[auto_1fr_auto_1fr_auto] gap-3 md:gap-8 p-3 rounded bg-gradient-to-r from-red-50 via-slate-50 to-green-50 border border-slate-200 dark:from-red-950/50 dark:via-slate-900 dark:to-green-950/50 dark:border-slate-700"
           >
             <!-- Unified Layout with Responsive CSS -->
             <!-- Left Arrow (desktop only) -->
@@ -185,23 +147,21 @@ const groupedTransfers = computed(() => {
             <div class="flex flex-col items-center gap-2 flex-1 md:relative md:h-12 md:flex-none">
               <img
                 v-if="transfer.player_out_image"
-                class="h-12 w-12 rounded-full border border-red-500 bg-white object-cover object-top md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:aspect-square"
+                class="h-12 w-12 rounded-full border border-red-500 bg-white object-cover object-top md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:aspect-square dark:bg-slate-800"
                 :src="transfer.player_out_image"
                 :alt="transfer.player_out"
                 @error="loadPlayerFallbackImage"
               >
-              <Avatar
+              <UAvatar
                 v-else
-                :label="transfer.player_out.charAt(0)"
-                shape="circle"
-                size="normal"
-                class="bg-red-100 text-red-700 border border-red-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
+                :text="transfer.player_out.charAt(0)"
+                class="bg-red-100 text-red-700 border border-red-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 dark:bg-red-950 dark:text-red-200"
               />
               <div class="text-center text-sm md:absolute md:left-[calc(50%+40px)] md:top-1/2 md:-translate-y-1/2 md:whitespace-nowrap md:text-left">
-                <div class="font-semibold text-slate-800">
+                <div class="font-semibold text-slate-800 dark:text-slate-100">
                   {{ transfer.player_out }}
                 </div>
-                <div class="text-xs md:text-sm text-slate-500">
+                <div class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
                   £{{ transfer.player_out_cost.toFixed(1) }}m
                 </div>
               </div>
@@ -212,7 +172,7 @@ const groupedTransfers = computed(() => {
               <Icon
                 name="eva:swap-fill"
                 size="24"
-                class="text-slate-400"
+                class="text-slate-400 dark:text-slate-500"
               />
             </div>
 
@@ -220,23 +180,21 @@ const groupedTransfers = computed(() => {
             <div class="flex flex-col items-center gap-2 flex-1 md:relative md:h-12 md:flex-none">
               <img
                 v-if="transfer.player_in_image"
-                class="h-12 w-12 rounded-full border border-green-500 bg-white object-cover object-top md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:aspect-square"
+                class="h-12 w-12 rounded-full border border-green-500 bg-white object-cover object-top md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:aspect-square dark:bg-slate-800"
                 :src="transfer.player_in_image"
                 :alt="transfer.player_in"
                 @error="loadPlayerFallbackImage"
               >
-              <Avatar
+              <UAvatar
                 v-else
-                :label="transfer.player_in.charAt(0)"
-                shape="circle"
-                size="normal"
-                class="bg-green-100 text-green-700 border border-green-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
+                :text="transfer.player_in.charAt(0)"
+                class="bg-green-100 text-green-700 border border-green-500 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 dark:bg-green-950 dark:text-green-200"
               />
               <div class="text-center text-sm md:absolute md:right-[calc(50%+40px)] md:top-1/2 md:-translate-y-1/2 md:whitespace-nowrap md:text-right">
-                <div class="font-semibold text-slate-800">
+                <div class="font-semibold text-slate-800 dark:text-slate-100">
                   {{ transfer.player_in }}
                 </div>
-                <div class="text-xs md:text-sm text-slate-500">
+                <div class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
                   £{{ transfer.player_in_cost.toFixed(1) }}m
                 </div>
               </div>
@@ -262,9 +220,9 @@ const groupedTransfers = computed(() => {
       <Icon
         name="carbon:user-follow"
         size="48"
-        class="mx-auto text-slate-400 mb-2"
+        class="mx-auto text-slate-400 mb-2 dark:text-slate-500"
       />
-      <div class="text-slate-500 mb-4">
+      <div class="text-slate-500 mb-4 dark:text-slate-400">
         <p class="font-medium mb-1">
           No transfers made for Gameweek {{ currentGameweek }}
         </p>
@@ -273,15 +231,17 @@ const groupedTransfers = computed(() => {
           <span v-else>Transfer deadline has passed - awaiting results</span>
         </p>
       </div>
-      <Tag
+      <UBadge
         v-if="hasResults"
-        severity="success"
-        value="All teams keeping their squads"
+        color="success"
+        variant="soft"
+        label="All teams keeping their squads"
       />
-      <Tag
+      <UBadge
         v-else
-        severity="info"
-        value="No changes this gameweek"
+        color="info"
+        variant="soft"
+        label="No changes this gameweek"
       />
     </div>
   </WeeklySummaryCard>

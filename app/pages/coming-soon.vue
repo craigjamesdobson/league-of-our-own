@@ -15,7 +15,7 @@ useHead({
 </script>
 
 <template>
-  <main class="relative flex min-h-screen items-center justify-center overflow-hidden bg-primary px-6 py-16 text-white">
+  <main class="relative flex min-h-screen items-center justify-center overflow-hidden bg-brand px-6 py-16 text-white">
     <div class="absolute inset-0 opacity-20">
       <div class="absolute -left-24 -top-24 h-80 w-80 rounded-full border-[3rem] border-white" />
       <div class="absolute -bottom-32 -right-24 h-96 w-96 rounded-full border-[4rem] border-white" />

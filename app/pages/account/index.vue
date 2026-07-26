@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useAccountStore } from '~/stores/account';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { usePlayerStore } from '@/stores/players';
@@ -18,17 +18,27 @@ definePageMeta({
 
 await draftedTeamStore.fetchDraftedTeams();
 
-const selectedDraftedTeamID = ref(0);
+const selectedDraftedTeamID = ref<number | undefined>();
 const selectedDraftedTeam = computed(() =>
-  draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value),
+  selectedDraftedTeamID.value
+    ? draftedTeamStore.getDraftedTeamByID(selectedDraftedTeamID.value)
+    : undefined,
+);
+const transferDraftedTeams = computed(() =>
+  draftedTeamStore.getDraftedTeams?.filter(team => team.allowed_transfers) || [],
 );
 
-const toast = useToast();
+const toast = useNuxtToast();
 const playerData = ref();
 const updating = ref(false);
 
 const currentGameweek = ref<number>(4);
 const isUpdatingGameweek = ref(false);
+const stepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
 
 const handleUpsertPlayerData = async () => {
   try {
@@ -69,10 +79,10 @@ onMounted(async () => {
   catch (error) {
     console.error('Failed to load gameweek setting:', error);
     toast.add({
-      severity: 'error',
-      summary: 'Settings Error',
-      detail: 'Could not load current gameweek setting from database',
-      life: 3000,
+      color: 'error',
+      title: 'Settings Error',
+      description: 'Could not load current gameweek setting from database',
+      duration: 3000,
     });
   }
 });
@@ -82,10 +92,10 @@ const updateGameweek = async () => {
     isUpdatingGameweek.value = true;
     await updateCurrentGameweek(currentGameweek.value);
     toast.add({
-      severity: 'success',
-      summary: 'Dashboard Updated',
-      detail: `Current gameweek set to ${currentGameweek.value}`,
-      life: 3000,
+      color: 'success',
+      title: 'Dashboard Updated',
+      description: `Current gameweek set to ${currentGameweek.value}`,
+      duration: 3000,
     });
   }
   catch (error) {
@@ -108,19 +118,17 @@ const copyApiUrl = async () => {
 
 <template>
   <div class="flex h-full flex-col items-center justify-center">
-    <Toast />
-    <h1 class="main-heading flex items-center">
-      <span>Admin Dashboard</span>
-      <button
+    <div class="mb-4 flex w-full justify-end">
+      <UButton
+        icon="la:sign-out-alt"
+        color="neutral"
+        variant="ghost"
+        label="Sign out"
         title="Sign out"
+        aria-label="Sign out"
         @click.prevent="handleUserLogout"
-      >
-        <Icon
-          class="ml-2"
-          name="la:sign-out-alt"
-        />
-      </button>
-    </h1>
+      />
+    </div>
     <div v-if="accountStore.userIsLoggedIn">
       <p class="m-4 text-center underline">
         Hello {{ accountStore.user?.email }}
@@ -128,9 +136,9 @@ const copyApiUrl = async () => {
 
       <!-- Settings Section -->
       <div class="mb-8">
-        <Card class="dashboard-settings-card">
-          <template #title>
-            <div class="flex items-center gap-3 text-slate-800">
+        <UCard class="dashboard-settings-card">
+          <template #header>
+            <div class="flex items-center gap-3 text-slate-800 dark:text-slate-100">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100">
                 <Icon
                   name="carbon:settings"
@@ -142,56 +150,55 @@ const copyApiUrl = async () => {
             </div>
           </template>
 
-          <template #content>
+          <template #default>
             <!-- Current Gameweek Setting -->
-            <div class="p-4 rounded-lg border border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50">
+            <div class="p-4 rounded-lg border border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50 dark:border-slate-700 dark:from-blue-950/40 dark:to-slate-800">
               <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-2">
                     <Icon
                       name="carbon:calendar"
                       size="18"
-                      class="text-slate-600"
+                      class="text-slate-600 dark:text-slate-300"
                     />
-                    <label class="text-base font-bold text-slate-800 uppercase tracking-wide">
+                    <label class="text-base font-bold text-slate-800 uppercase tracking-wide dark:text-slate-100">
                       Current Gameweek
                     </label>
                   </div>
-                  <p class="text-sm text-slate-600">
+                  <p class="text-sm text-slate-600 dark:text-slate-300">
                     Controls which gameweek data is displayed on the homepage dashboard
                   </p>
                 </div>
 
-                <div class="lg:ml-6">
-                  <InputGroup>
-                    <InputNumber
-                      v-model="currentGameweek"
-                      :min="1"
-                      :max="38"
-                      show-buttons
-                      :disabled="isUpdatingGameweek"
-                      class="!w-24"
-                    />
-                    <Button
-                      label="Update"
-                      icon="pi pi-check"
-                      :loading="isUpdatingGameweek"
-                      @click="updateGameweek"
-                    />
-                  </InputGroup>
+                <div class="flex gap-2 lg:ml-6">
+                  <UInputNumber
+                    v-model="currentGameweek"
+                    :min="1"
+                    :max="38"
+                    :disabled="isUpdatingGameweek"
+                    class="w-28"
+                    :increment="stepperButton"
+                    :decrement="stepperButton"
+                  />
+                  <UButton
+                    label="Update"
+                    icon="lucide:check"
+                    :loading="isUpdatingGameweek"
+                    @click="updateGameweek"
+                  />
                 </div>
               </div>
             </div>
           </template>
-        </Card>
+        </UCard>
       </div>
 
       <!-- Management Sections (Side by Side) -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Player Data Management Section -->
-        <Card class="admin-section-card">
-          <template #title>
-            <div class="flex items-center gap-3 text-slate-800">
+        <UCard class="admin-section-card">
+          <template #header>
+            <div class="flex items-center gap-3 text-slate-800 dark:text-slate-100">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-green-100">
                 <Icon
                   name="carbon:user-multiple"
@@ -203,10 +210,10 @@ const copyApiUrl = async () => {
             </div>
           </template>
 
-          <template #content>
+          <template #default>
             <div class="space-y-4">
               <!-- Automated Update Status -->
-              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4 dark:border-green-800 dark:bg-green-950/60">
                 <div class="flex items-start gap-3">
                   <Icon
                     name="carbon:checkmark-filled"
@@ -214,10 +221,10 @@ const copyApiUrl = async () => {
                     class="text-green-600 mt-0.5"
                   />
                   <div class="flex-1">
-                    <h4 class="text-sm font-semibold text-green-800 mb-1">
+                    <h4 class="text-sm font-semibold text-green-800 mb-1 dark:text-green-200">
                       Automated Daily Updates
                     </h4>
-                    <p class="text-sm text-green-700">
+                    <p class="text-sm text-green-700 dark:text-green-300">
                       Player data is automatically updated daily from the Premier League API. No manual intervention required.
                     </p>
                   </div>
@@ -225,7 +232,7 @@ const copyApiUrl = async () => {
               </div>
 
               <!-- Manual Override Section -->
-              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 dark:border-amber-800 dark:bg-amber-950/60">
                 <div class="flex items-start gap-3">
                   <Icon
                     name="carbon:warning-alt"
@@ -233,60 +240,56 @@ const copyApiUrl = async () => {
                     class="text-amber-600 mt-0.5"
                   />
                   <div class="flex-1">
-                    <h4 class="text-sm font-semibold text-amber-800 mb-1">
+                    <h4 class="text-sm font-semibold text-amber-800 mb-1 dark:text-amber-200">
                       Manual Override
                     </h4>
-                    <p class="text-sm text-amber-700 mb-2">
+                    <p class="text-sm text-amber-700 mb-2 dark:text-amber-300">
                       Use this section only if the automated update fails or you need to force an immediate update. Get the latest data from the API below and paste the JSON response.
                     </p>
                     <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <code class="text-xs bg-white border rounded px-2 py-1 font-mono text-slate-800 break-all sm:break-normal">
+                      <code class="text-xs bg-white border rounded px-2 py-1 font-mono text-slate-800 break-all sm:break-normal dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
                         https://fantasy.premierleague.com/api/bootstrap-static
                       </code>
-                      <Button
-                        v-tooltip="'Copy API URL'"
-                        size="small"
-                        text
-                        severity="secondary"
-                        class="flex-shrink-0"
-                        @click="copyApiUrl"
-                      >
-                        <Icon
-                          name="carbon:copy"
-                          size="16"
+                      <UTooltip text="Copy API URL">
+                        <UButton
+                          icon="carbon:copy"
+                          color="neutral"
+                          variant="ghost"
+                          square
+                          aria-label="Copy API URL"
+                          @click="copyApiUrl"
                         />
-                      </Button>
+                      </UTooltip>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <Textarea
+              <UTextarea
                 v-model="playerData"
-                cols="75"
-                rows="20"
+                :rows="20"
                 placeholder="Paste player data here..."
                 class="w-full"
               />
               <div class="flex justify-end">
-                <Button
+                <UButton
                   label="Update Players"
-                  icon="pi pi-upload"
+                  icon="lucide:upload"
                   :loading="updating"
                   @click="handleUpsertPlayerData"
                 />
               </div>
             </div>
           </template>
-        </Card>
+        </UCard>
 
         <!-- Team Management Section -->
-        <Card
+        <UCard
           v-if="draftedTeamStore.draftedTeams"
           class="admin-section-card h-full flex flex-col"
         >
-          <template #title>
-            <div class="flex items-center gap-3 text-slate-800">
+          <template #header>
+            <div class="flex items-center gap-3 text-slate-800 dark:text-slate-100">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100">
                 <Icon
                   name="carbon:group"
@@ -298,54 +301,53 @@ const copyApiUrl = async () => {
             </div>
           </template>
 
-          <template #content>
+          <template #default>
             <div class="space-y-4 flex-1 flex flex-col">
-              <p class="text-sm text-slate-600">
+              <p class="text-sm text-slate-600 dark:text-slate-300">
                 Select a team below to view and manage transfers
               </p>
-              <Select
+              <USelectMenu
                 v-model="selectedDraftedTeamID"
-                class="!w-full"
-                :options="
-                  draftedTeamStore.getDraftedTeams?.filter(
-                    (x) => x.allowed_transfers,
-                  )
-                "
-                filter
-                option-label="team_name"
-                option-value="drafted_team_id"
+                class="w-full"
+                :items="transferDraftedTeams"
+                label-key="team_name"
+                value-key="drafted_team_id"
                 placeholder="Select a team to manage..."
-                scroll-height="400px"
+                :search-input="{ placeholder: 'Search teams...' }"
+                :ui="{
+                  content: 'max-h-[28rem]',
+                  viewport: 'max-h-[24rem]',
+                }"
               >
-                <template #option="slotProps">
+                <template #item-label="{ item }">
                   <div class="flex items-center justify-between w-full p-1">
                     <div class="flex flex-col gap-1">
-                      <div class="font-bold text-slate-800 uppercase">
-                        {{ slotProps.option.team_name }}
+                      <div class="font-bold text-slate-800 uppercase dark:text-slate-100">
+                        {{ item.team_name }}
                       </div>
-                      <div class="flex items-center gap-2 text-xs text-slate-600">
-                        <span class="uppercase">{{ slotProps.option.team_owner }}</span>
+                      <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                        <span class="uppercase">{{ item.team_owner }}</span>
                         <span class="text-slate-400">|</span>
                         <span class="font-medium">
-                          {{ transfersRemainingCount(slotProps.option) }}/4 transfers left
+                          {{ transfersRemainingCount(item) }}/4 transfers left
                         </span>
                       </div>
                     </div>
 
-                    <Tag
-                      v-tooltip="`${transfersRemainingCount(slotProps.option)} transfers remaining`"
-                      :severity="
-                        transfersRemainingCount(slotProps.option) > 2 ? 'success'
-                        : transfersRemainingCount(slotProps.option) > 0 ? 'warn'
-                          : 'danger'
+                    <UBadge
+                      :color="
+                        transfersRemainingCount(item) > 2 ? 'success'
+                        : transfersRemainingCount(item) > 0 ? 'warning'
+                          : 'error'
                       "
-                      class="h-6 w-6 text-xs font-bold"
-                      rounded
-                      :value="transfersRemainingCount(slotProps.option)"
-                    />
+                      variant="soft"
+                      class="h-6 w-6 justify-center rounded-full text-xs font-bold"
+                    >
+                      {{ transfersRemainingCount(item) }}
+                    </UBadge>
                   </div>
                 </template>
-              </Select>
+              </USelectMenu>
 
               <!-- Selected Team Display -->
               <div v-if="selectedDraftedTeam">
@@ -358,22 +360,22 @@ const copyApiUrl = async () => {
               <!-- Empty State / Guidance -->
               <div
                 v-else
-                class="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center flex-1 flex items-center justify-center"
+                class="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center flex-1 flex items-center justify-center dark:border-slate-700 dark:bg-slate-800"
               >
                 <div class="flex flex-col items-center gap-4">
                   <Icon
                     name="carbon:group"
                     size="48"
-                    class="text-slate-400"
+                    class="text-slate-400 dark:text-slate-500"
                   />
                   <div>
-                    <h3 class="text-xl font-semibold text-slate-700 mb-3">
+                    <h3 class="text-xl font-semibold text-slate-700 mb-3 dark:text-slate-200">
                       No Team Selected
                     </h3>
-                    <p class="text-base text-slate-600 mb-6">
+                    <p class="text-base text-slate-600 mb-6 dark:text-slate-300">
                       Choose a team from the dropdown above to view and manage their transfers, players, and settings.
                     </p>
-                    <div class="text-sm text-slate-500 space-y-2">
+                    <div class="text-sm text-slate-500 space-y-2 dark:text-slate-400">
                       <div class="flex items-center justify-center gap-3">
                         <div class="w-3 h-3 bg-green-500 rounded-full" />
                         <span>Green: 3+ transfers remaining</span>
@@ -392,7 +394,7 @@ const copyApiUrl = async () => {
               </div>
             </div>
           </template>
-        </Card>
+        </UCard>
       </div>
       <div class="update-log" />
     </div>
@@ -400,15 +402,9 @@ const copyApiUrl = async () => {
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .dashboard-settings-card {
   @apply shadow-sm border border-slate-200;
-}
-
-.dashboard-settings-card :deep(.p-card-title) {
-  @apply pb-4 border-b border-slate-200 mb-0;
-}
-
-.dashboard-settings-card :deep(.p-card-content) {
-  @apply pt-6;
 }
 </style>

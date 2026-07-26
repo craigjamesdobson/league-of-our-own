@@ -1,27 +1,52 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
+import type { FormSubmitEvent } from '@nuxt/ui';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
+import { z } from 'zod';
 import { usePlayerStore } from '~/stores/players';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
-import type { Player } from '~/types/Player';
+import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { useAppSettings } from '@/composables/useAppSettings';
 
 interface TransferData {
-  player: Player | null;
-  activeExpiryDate: Date;
+  player: PlayerWithSeasonStatistics | undefined;
+  activeExpiryDate: string;
   transferWeek: number;
 }
 
 const { getCurrentGameweek } = useAppSettings();
 
-const toast = useToast();
+const toast = useNuxtToast();
 
-const newTransferData: Ref<TransferData> = ref({
-  player: null,
-  activeExpiryDate: new Date(),
+const toInputDate = (date: Date) => date.toISOString().slice(0, 10);
+
+const toDateFromInput = (value: string) => {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year!, month! - 1, day!);
+};
+
+const transferSchema = z.object({
+  player: z.custom<PlayerWithSeasonStatistics>(
+    value => !!value && typeof value === 'object' && 'player_id' in value,
+    { message: 'Select a player' },
+  ),
+  transferWeek: z.number().int('Transfer week must be a whole number').min(1, 'Transfer week must be at least 1').max(38, 'Transfer week must be 38 or less'),
+  activeExpiryDate: z.string().min(1, 'Choose an active expiry date'),
+});
+
+type TransferSchema = z.output<typeof transferSchema>;
+
+const newTransferData = reactive<TransferData>({
+  player: undefined,
+  activeExpiryDate: toInputDate(new Date()),
   transferWeek: await getCurrentGameweek() || 1,
 });
+const stepperButton = {
+  color: 'neutral' as const,
+  variant: 'ghost' as const,
+  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+};
 
 const visible = defineModel<boolean>('visible');
 const draftedPlayer = defineModel<DraftedPlayer>('draftedPlayer');
@@ -40,6 +65,12 @@ const props = defineProps({
 const playerStore = usePlayerStore();
 const draftedTeamsStore = useDraftedTeamsStore();
 
+const availableTransferPlayers = computed(() => {
+  return playerStore.players.filter(
+    player => player.position === draftedPlayer.value?.data.position,
+  );
+});
+
 // Budget validation logic
 const budgetLimit = computed(() => {
   return props.team?.allowed_transfers ? 85 : 90;
@@ -57,40 +88,44 @@ const currentTeamValue = computed(() => {
 });
 
 const teamValueWithTransfer = computed(() => {
-  if (!newTransferData.value.player || !draftedPlayer.value) return currentTeamValue.value;
+  if (!newTransferData.player || !draftedPlayer.value) return currentTeamValue.value;
 
   const lastTransfer = draftedPlayer.value.transfers[draftedPlayer.value.transfers.length - 1];
   const originalPlayerCost = draftedPlayer.value.transfers.length && lastTransfer
     ? lastTransfer.data.cost
     : draftedPlayer.value.data.cost;
 
-  const newPlayerCost = newTransferData.value.player.cost;
+  const newPlayerCost = newTransferData.player.cost;
 
   return currentTeamValue.value - originalPlayerCost + newPlayerCost;
 });
 
 const transferWouldExceedBudget = computed(() => {
-  if (!newTransferData.value.player || !props.team) return false;
+  if (!newTransferData.player || !props.team) return false;
   return teamValueWithTransfer.value > budgetLimit.value;
 });
 
 const isSubmitDisabled = computed(() => {
-  return !newTransferData.value.player || transferWouldExceedBudget.value;
+  return !newTransferData.player || transferWouldExceedBudget.value;
 });
 
-const addNewTransfer = async () => {
+const addNewTransfer = async (event: FormSubmitEvent<TransferSchema>) => {
   try {
-    if (!draftedPlayer.value || !newTransferData.value.player) {
+    if (!draftedPlayer.value) {
       throw new Error('No player was found');
     }
+
+    const transferData = event.data;
+    const activeExpiryDate = toDateFromInput(transferData.activeExpiryDate);
+
     // Update the DB with the new transfer
     const newTransfer = await draftedTeamsStore.addNewTransfer([
       {
         drafted_player: draftedPlayer.value.drafted_player_id,
         active_transfer_expiry:
-          newTransferData.value.activeExpiryDate.toDateString(),
-        player_id: newTransferData.value.player.player_id!,
-        transfer_week: newTransferData.value.transferWeek,
+          activeExpiryDate.toDateString(),
+        player_id: transferData.player.player_id!,
+        transfer_week: transferData.transferWeek,
       },
     ]);
 
@@ -99,9 +134,9 @@ const addNewTransfer = async () => {
     if (draftedPlayer.value && newTransfer[0]) {
       draftedPlayer.value.transfers.push({
         drafted_transfer_id: newTransfer[0].drafted_transfer_id,
-        active_transfer_expiry: newTransferData.value.activeExpiryDate,
-        transfer_week: newTransferData.value.transferWeek,
-        data: newTransferData.value.player,
+        active_transfer_expiry: activeExpiryDate,
+        transfer_week: transferData.transferWeek,
+        data: transferData.player,
         selected: false,
       });
 
@@ -128,159 +163,182 @@ const handleDeleteTransfer = async (draftedTransferID: number) => {
     handleApiError(err, toast);
   }
 };
+
+const modalUi = computed(() => ({
+  overlay: 'bg-slate-950/75',
+  content: [
+    'w-[calc(100vw-2rem)] bg-white text-slate-900 ring-slate-200 divide-slate-200',
+    'dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700 dark:divide-slate-700',
+    props.editable ? 'sm:max-w-5xl' : 'sm:max-w-3xl',
+  ].join(' '),
+  header: 'bg-white dark:bg-slate-900',
+  body: 'bg-white dark:bg-slate-900',
+  title: 'text-slate-900 dark:text-slate-100',
+  close: 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100',
+}));
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="visible"
-    pt:header:class="!justify-end"
-    header=""
-    modal
-    :dismissable-mask="true"
+  <UModal
+    v-model:open="visible"
+    title="Player transfers"
+    :dismissible="true"
+    :ui="modalUi"
   >
-    <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
-      <div
-        class="lg:col-span-2"
-        :class="{ 'lg:col-span-3': !props.editable }"
-      >
-        <div class="mb-10">
-          <h2 class="pb-2.5 text-lg font-black uppercase">
-            Original Player
-          </h2>
-          <DraftedPlayer
-            v-if="draftedPlayer"
-            :drafted-player="draftedPlayer"
-          />
-        </div>
+    <template #body>
+      <div class="grid grid-cols-1 gap-10 lg:min-w-[30rem] lg:grid-cols-3">
         <div
-          v-if="draftedPlayer?.transfers.length"
-          class="mb-5"
+          class="lg:col-span-2"
+          :class="{ 'lg:col-span-3': !props.editable }"
         >
-          <h2 class="mb-2.5 text-lg font-black uppercase">
-            Transfers
-          </h2>
-          <div
-            v-for="playerTransfer in draftedPlayer.transfers"
-            :key="playerTransfer.drafted_transfer_id"
-            class="mb-5 flex flex-col"
-          >
-            <h3 class="flex self-start text-sm font-bold uppercase">
-              gameweek {{ playerTransfer.transfer_week }}
-            </h3>
-            <div class="flex items-center gap-2.5">
-              <Icon
-                class="h-6 w-6"
-                name="material-symbols:subdirectory-arrow-right-rounded"
+          <div class="mb-10">
+            <h2 class="pb-2.5 text-lg font-black uppercase">
+              Original Player
+            </h2>
+            <div class="rounded border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+              <DraftedPlayer
+                v-if="draftedPlayer"
+                :drafted-player="draftedPlayer"
               />
-              <DraftedPlayer :drafted-player="playerTransfer" />
-              <Button
-                v-if="props.editable"
-                severity="danger"
-                text
-                rounded
-                aria-label="Cancel"
-                @click="
-                  handleDeleteTransfer(playerTransfer.drafted_transfer_id)
-                "
-              >
+            </div>
+          </div>
+          <div
+            v-if="draftedPlayer?.transfers.length"
+            class="mb-5"
+          >
+            <h2 class="mb-2.5 text-lg font-black uppercase">
+              Transfers
+            </h2>
+            <div
+              v-for="playerTransfer in draftedPlayer.transfers"
+              :key="playerTransfer.drafted_transfer_id"
+              class="mb-5 flex flex-col"
+            >
+              <h3 class="mb-1.5 flex self-start text-sm font-bold uppercase">
+                gameweek {{ playerTransfer.transfer_week }}
+              </h3>
+              <div class="flex items-center gap-2.5 rounded border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
                 <Icon
-                  class="h-8 w-8"
-                  name="typcn:delete"
+                  class="h-6 w-6"
+                  name="material-symbols:subdirectory-arrow-right-rounded"
                 />
-              </Button>
+                <DraftedPlayer :drafted-player="playerTransfer" />
+                <UButton
+                  v-if="props.editable"
+                  icon="typcn:delete"
+                  color="error"
+                  variant="ghost"
+                  size="xl"
+                  square
+                  aria-label="Cancel"
+                  @click="
+                    handleDeleteTransfer(playerTransfer.drafted_transfer_id)
+                  "
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div v-if="props.editable">
-        <h2 class="mb-2.5 text-lg font-black uppercase">
-          Submit new transfer
-        </h2>
-        <form class="flex flex-col items-start gap-5">
-          <div class="flex w-full flex-col gap-2">
-            <label for="new-transfer-id">Player</label>
-            <Select
-              v-model="newTransferData.player"
-              class="!w-full"
-              filter
-              :options="
-                playerStore.players.filter(
-                  (x) => x.position === draftedPlayer?.data.position,
-                )
-              "
-              option-label="web_name"
-              placeholder="Select a Player"
-            >
-              <template #option="slotProps">
-                <div class="align-items-center flex w-full">
-                  <div class="w-1/5">
-                    {{ slotProps.option.player_id }}
-                  </div>
-                  <div class="w-4/5 text-center">
-                    {{ slotProps.option.web_name }}
-                  </div>
-                  <div class="w-1/5">
-                    {{ slotProps.option.cost }}
-                  </div>
-                </div>
-              </template>
-            </Select>
-          </div>
-          <div class="flex w-full flex-col gap-2">
-            <label for="new-transfer-week">Transfer Week</label>
-            <InputNumber
-              v-model="newTransferData.transferWeek"
-              :min="1"
-              :max="38"
-              class="!w-full"
-              show-buttons
-            />
-          </div>
-          <div class="flex flex-col gap-2">
-            <label for="new-transfer-expiry-date">Active expiry date</label>
-            <DatePicker
-              v-model="newTransferData.activeExpiryDate"
-              date-format="dd/mm/yy"
-              show-icon
-            />
-          </div>
-          <div
-            v-if="newTransferData.player"
-            class="flex w-full flex-col gap-2"
+
+        <div v-if="props.editable">
+          <h2 class="mb-2.5 text-lg font-black uppercase">
+            Submit new transfer
+          </h2>
+          <UForm
+            :schema="transferSchema"
+            :state="newTransferData"
+            class="flex flex-col items-start gap-5"
+            @submit="addNewTransfer"
           >
-            <div class="text-sm font-semibold">
-              Budget Status
-            </div>
-            <div
-              class="rounded border p-2 text-sm"
-              :class="transferWouldExceedBudget
-                ? 'border-red-300 bg-red-50 text-red-700'
-                : 'border-green-300 bg-green-50 text-green-700'"
+            <UFormField
+              class="w-full"
+              label="Player"
+              name="player"
             >
-              <div class="flex justify-between">
-                <span>Budget Limit:</span>
-                <span>£{{ budgetLimit }}m</span>
+              <USelectMenu
+                v-model="newTransferData.player"
+                class="w-full"
+                :items="availableTransferPlayers"
+                label-key="web_name"
+                placeholder="Select a Player"
+                :search-input="{ placeholder: 'Search players...' }"
+              >
+                <template #item-label="{ item }">
+                  <div class="grid w-full grid-cols-[3rem_1fr_3rem] items-center gap-2">
+                    <div>{{ item.player_id }}</div>
+                    <div class="truncate text-center">
+                      {{ item.web_name }}
+                    </div>
+                    <div class="text-right">
+                      {{ item.cost }}
+                    </div>
+                  </div>
+                </template>
+              </USelectMenu>
+            </UFormField>
+            <UFormField
+              class="w-full"
+              label="Transfer Week"
+              name="transferWeek"
+            >
+              <UInputNumber
+                v-model="newTransferData.transferWeek"
+                :min="1"
+                :max="38"
+                class="w-full"
+                :increment="stepperButton"
+                :decrement="stepperButton"
+              />
+            </UFormField>
+            <UFormField
+              class="w-full"
+              label="Active expiry date"
+              name="activeExpiryDate"
+            >
+              <UInput
+                v-model="newTransferData.activeExpiryDate"
+                type="date"
+                class="w-full"
+              />
+            </UFormField>
+            <div
+              v-if="newTransferData.player"
+              class="flex w-full flex-col gap-2"
+            >
+              <div class="text-sm font-semibold">
+                Budget Status
               </div>
-              <div class="flex justify-between">
-                <span>Current Team Value:</span>
-                <span>£{{ currentTeamValue.toFixed(1) }}m</span>
-              </div>
-              <div class="flex justify-between">
-                <span>With New Transfer:</span>
-                <span :class="transferWouldExceedBudget ? 'font-bold' : ''">
-                  £{{ teamValueWithTransfer.toFixed(1) }}m
-                </span>
+              <div
+                class="rounded border p-2 text-sm"
+                :class="transferWouldExceedBudget
+                  ? 'border-red-300 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-950/70 dark:text-red-200'
+                  : 'border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-950/70 dark:text-green-200'"
+              >
+                <div class="flex justify-between">
+                  <span>Budget Limit:</span>
+                  <span>£{{ budgetLimit }}m</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Current Team Value:</span>
+                  <span>£{{ currentTeamValue.toFixed(1) }}m</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>With New Transfer:</span>
+                  <span :class="transferWouldExceedBudget ? 'font-bold' : ''">
+                    £{{ teamValueWithTransfer.toFixed(1) }}m
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <Button
-            class="flex self-start"
-            label="Submit"
-            :disabled="isSubmitDisabled"
-            @click="addNewTransfer"
-          />
-        </form>
+            <UButton
+              class="flex self-start"
+              label="Submit"
+              type="submit"
+              :disabled="isSubmitDisabled"
+            />
+          </UForm>
+        </div>
       </div>
-    </div>
-  </Dialog>
+    </template>
+  </UModal>
 </template>

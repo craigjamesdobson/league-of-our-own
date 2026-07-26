@@ -24,25 +24,14 @@ mockNuxtImport('useSupabaseClient', () => {
   });
 });
 
-mockNuxtImport('useRoute', () => {
-  return () => ({
-    query: { id: '1' },
-  });
-});
-
-mockNuxtImport('useRouter', () => {
-  return () => ({
-    push: vi.fn(),
-  });
-});
-
 mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
+    app: { baseURL: '/' },
     public: { ACTIVE_SEASON: '26-27' },
   });
 });
 
-vi.mock('primevue/usetoast', () => ({
+vi.mock('@nuxt/ui/composables', () => ({
   useToast: () => ({
     add: vi.fn(),
   }),

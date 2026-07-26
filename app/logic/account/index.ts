@@ -1,5 +1,3 @@
-import { useVuelidate } from '@vuelidate/core';
-import { email, helpers, minLength, required } from '@vuelidate/validators';
 import { useAccountStore } from '@/stores/account';
 
 const useAccount = () => {
@@ -10,26 +8,7 @@ const useAccount = () => {
     password: '',
   });
 
-  const rules = computed(() => {
-    return {
-      email: {
-        required: helpers.withMessage('The email field is required', required),
-        email: helpers.withMessage('Invalid email format', email),
-      },
-      password: {
-        required: helpers.withMessage(
-          'The password field is required',
-          required,
-        ),
-        minLength: minLength(6),
-      },
-    };
-  });
-
-  const v$ = useVuelidate(rules, formData);
-
   return {
-    v$,
     formData,
     accountStore,
   };

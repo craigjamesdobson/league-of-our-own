@@ -34,14 +34,18 @@ const handleEditPlayer = (playerID: number) => {
 </script>
 
 <template>
-  <div
+  <UCard
     v-if="props.draftedTeam"
-    class="rounded-sm bg-white p-5"
+    class="text-slate-900 dark:text-slate-100"
+    :ui="{
+      root: 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none',
+      body: 'p-5 sm:p-5',
+    }"
   >
     <div
-      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
+      class="mb-2 flex items-center justify-between border-b border-slate-800 p-2 pt-0 dark:border-slate-700"
       :class="{
-        'bg-red-200': props.draftedTeam?.is_invalid_team,
+        'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
       }"
     >
       <div class="flex flex-col uppercase">
@@ -52,30 +56,30 @@ const handleEditPlayer = (playerID: number) => {
           props.draftedTeam?.team_owner
         }}</span>
       </div>
-      <span
+      <UTooltip
         v-if="props.draftedTeam?.allowed_transfers"
-        v-tooltip.top="'Transfers allowed'"
+        text="Transfers allowed"
       >
         <Icon
           size="24"
           name="ic:round-swap-horiz"
         />
-      </span>
+      </UTooltip>
     </div>
     <div
       v-for="player in props.draftedTeam.players"
       :key="player.drafted_player_id"
       class="relative text-sm"
       :class="{
-        'bg-yellow-200 hover:bg-yellow-300':
+        'bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-950/70 dark:hover:bg-yellow-900/80':
           !!player.transfers.length
           && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-        'bg-green-200 transition-all hover:bg-green-300':
+        'bg-green-200 transition-all hover:bg-green-300 dark:bg-green-950/70 dark:hover:bg-green-900/80':
           !!player.transfers.length
           && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
       }"
     >
-      <div class="flex w-full items-center border-b border-gray-100">
+      <div class="flex w-full items-center border-b border-slate-100 dark:border-slate-800">
         <DraftedPlayer
           v-if="!player.transfers.length"
           :drafted-player="player"
@@ -86,23 +90,18 @@ const handleEditPlayer = (playerID: number) => {
           class="w-full cursor-pointer"
           @click="handleEditPlayer(player.data.player_id!)"
         />
-        <Button
+        <UButton
           v-if="props.editable"
+          icon="tabler:switch-3"
+          color="primary"
+          variant="subtle"
+          size="xs"
+          square
           aria-label="Edit Player"
           title="Edit Player"
           class="mr-2"
-          :pt="{
-            root: { class: 'w-6 h-6 text-white !p-1' },
-          }"
-          :pt-options="{ mergeProps: true }"
           @click="handleEditPlayer(player.data.player_id!)"
-        >
-          <Icon
-            class="text-white"
-            size="20"
-            name="tabler:switch-3"
-          />
-        </Button>
+        />
       </div>
     </div>
     <div class="flex justify-between px-2.5 pt-2.5">
@@ -111,7 +110,7 @@ const handleEditPlayer = (playerID: number) => {
         {{ props.draftedTeam?.total_team_value }}
       </strong>
     </div>
-  </div>
+  </UCard>
   <DraftedPlayerEditDialog
     v-if="selectedDraftedPlayer"
     v-model:drafted-player="selectedDraftedPlayer"

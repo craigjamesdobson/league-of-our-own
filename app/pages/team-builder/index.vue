@@ -35,15 +35,18 @@ else if (registrationOpen.value) {
     v-if="!registrationOpen"
     class="flex min-h-full items-center justify-center"
   >
-    <Message :closable="false">
+    <UAlert
+      color="info"
+      variant="soft"
+      class="max-w-xl"
+    >
       Team entries are currently closed.
-    </Message>
+    </UAlert>
   </div>
   <div
     v-else
     class="flex flex-col-reverse gap-5 2xl:flex-row"
   >
-    <Toast position="top-right" />
     <div class="px-5 2xl:w-96">
       <h1 class="mb-2.5 text-center text-xl font-black uppercase 2xl:text-left">
         Team details
@@ -64,22 +67,22 @@ else if (registrationOpen.value) {
         Pick your team
       </h2>
       <div class="text-center 2xl:hidden">
-        <Message
+        <UAlert
           v-if="isExistingDraftedTeam"
-          severity="info"
-          :closable="false"
+          color="info"
+          variant="soft"
         >
           You are editing your existing team.
-        </Message>
+        </UAlert>
         <div
           v-else
           class="text-xs"
         >
-          <Divider />
+          <USeparator class="my-5" />
           <p class="mb-5">
             Pick your eleven players, complete your details, and submit your team.
           </p>
-          <Divider />
+          <USeparator class="my-5" />
         </div>
       </div>
       <div class="grid grid-cols-12 justify-center gap-5">
@@ -92,6 +95,5 @@ else if (registrationOpen.value) {
         />
       </div>
     </div>
-    <ScrollTop class="!bottom-40 !bg-primary" />
   </div>
 </template>

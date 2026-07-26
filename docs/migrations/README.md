@@ -4,6 +4,12 @@ This directory contains procedural documentation for major version upgrades and 
 
 ## Current Migrations
 
+### [Nuxt UI Migration](nuxt-ui-migration.md)
+
+Replacing PrimeVue with Nuxt UI, including Tailwind CSS v4, Zod validation, light/dark mode, and a restrained visual refresh.
+
+**Status**: 🔄 Final manual QA
+
 ### [Nuxt 4 Migration](nuxt-4-migration.md)
 
 Upgrading from Nuxt 3 to Nuxt 4, including breaking changes, migration steps, and lessons learned.
@@ -20,3 +26,7 @@ Migration documentation differs from architectural lessons:
 - **[Lessons Learned](/docs/lessons-learned/)** are timeless patterns and principles extracted from experience
 
 When a migration is complete, timeless insights should be extracted to the lessons-learned directory.
+
+---
+
+**Last updated:** 2026-07-20

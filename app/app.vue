@@ -10,10 +10,10 @@ initialize();
 </script>
 
 <template>
-  <div>
+  <UApp>
     <NuxtLayout>
       <NuxtPage keepalive />
     </NuxtLayout>
     <div id="modals" />
-  </div>
+  </UApp>
 </template>

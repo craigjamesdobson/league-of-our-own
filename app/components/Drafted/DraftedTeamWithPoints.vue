@@ -39,9 +39,13 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
 </script>
 
 <template>
-  <div
+  <UCard
     v-if="props.draftedTeam"
-    class="rounded-sm bg-white p-5"
+    class="w-full max-w-full overflow-hidden text-slate-900 dark:text-slate-100"
+    :ui="{
+      root: 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none',
+      body: 'p-5 sm:p-5',
+    }"
   >
     <div class="flex flex-col uppercase">
       <span class="text-lg font-black">{{
@@ -52,9 +56,9 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
       }}</span>
     </div>
     <div
-      class="mb-2 flex items-center justify-between border-b border-gray-800 p-2 pt-0"
+      class="mb-2 flex items-center justify-between border-b border-slate-800 p-2 pt-0 dark:border-slate-700"
       :class="{
-        'bg-red-200': props.draftedTeam?.is_invalid_team,
+        'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
       }"
     />
     <div
@@ -62,25 +66,25 @@ const getTransferWeek = (activePlayer: DraftedPlayerWithWeeklyStats | DraftedTra
       :key="player.drafted_player_id"
       class="relative text-sm"
       :class="{
-        'bg-yellow-200':
+        'bg-yellow-200 dark:bg-yellow-950/70':
           getTransferWeek(findActiveGameweekPlayer(player)) === props.activeWeek,
-        'bg-green-200':
+        'bg-green-200 dark:bg-green-950/70':
           getTransferWeek(findActiveGameweekPlayer(player)) !== null
           && getTransferWeek(findActiveGameweekPlayer(player))! < props.activeWeek,
       }"
     >
-      <div class="relative flex w-full items-center border-b border-gray-100">
+      <div class="relative flex w-full items-center border-b border-slate-100 dark:border-slate-800">
         <DraftedPlayerWithPoints
           :drafted-player="findActiveGameweekPlayer(player)"
           :transfer-count="player.transfers.filter((x: DraftedTransferWithWeeklyStats) => x.transfer_week <= props.activeWeek).length"
         />
       </div>
     </div>
-    <div class="flex justify-between py-2.5 pl-2.5 bg-surface-50">
+    <div class="grid grid-cols-[1fr_3rem] py-2.5 pl-2.5 bg-slate-50 dark:bg-slate-800/80">
       <span>Total</span>
-      <strong class="w-2/12 text-center">
+      <strong class="text-center">
         {{ calculatedWeeklyStats.points }}
       </strong>
     </div>
-  </div>
+  </UCard>
 </template>

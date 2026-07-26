@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import useVuelidate from '@vuelidate/core';
-import { email, helpers, required } from '@vuelidate/validators';
-import { useToast } from 'primevue/usetoast';
+import { z } from 'zod';
 import type { TablesInsert } from '~/types/database.types';
-
-const toast = useToast();
 
 // Use defineModel for two-way binding
 const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', {
@@ -45,36 +41,15 @@ onActivated(() => {
 // Use props instead of composable
 const { isExistingDraftedTeam } = toRefs(props);
 
-const rules = computed(() => {
-  return {
-    team_name: {
-      required: helpers.withMessage('The team name field is required', required),
-    },
-    team_owner: {
-      required: helpers.withMessage(
-        'The team owner field is required',
-        required,
-      ),
-    },
-    team_email: {
-      required: helpers.withMessage('The email field is required', required),
-      email: helpers.withMessage('Invalid email format', email),
-    },
-    contact_number: {
-      number: helpers.withMessage('Invalid phone number', helpers.regex(/^(07\d{9})$/)),
-    },
-  };
+const teamDetailsSchema = z.object({
+  team_name: z.string().min(1, 'The team name field is required'),
+  team_owner: z.string().min(1, 'The team owner field is required'),
+  team_email: z.string().min(1, 'The email field is required').email('Invalid email format'),
+  contact_number: z.preprocess(
+    value => value ?? '',
+    z.string().regex(/^(|07\d{9})$/, 'Invalid phone number'),
+  ),
 });
-
-// Create a reactive object for validation that only includes the fields we validate
-const validationData = computed(() => ({
-  team_name: draftedTeamData.value.team_name,
-  team_owner: draftedTeamData.value.team_owner,
-  team_email: draftedTeamData.value.team_email,
-  contact_number: draftedTeamData.value.contact_number,
-}));
-
-const v$ = useVuelidate(rules, validationData);
 
 const contactNumber = computed({
   get: () => draftedTeamData.value.contact_number || '',
@@ -84,19 +59,6 @@ const contactNumber = computed({
 });
 
 const handleTeamSubmit = async () => {
-  // Validate form fields first
-  if (v$.value.$invalid) {
-    v$.value.$touch();
-
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Team details are incorrect, please review validation errors',
-      life: 3000,
-    });
-    return;
-  }
-
   // Use the composable's submit function (which handles team/player validation)
   await props.submitTeam();
 };
@@ -104,26 +66,27 @@ const handleTeamSubmit = async () => {
 
 <template>
   <div class="hidden 2xl:flex flex-col">
-    <Message
+    <UAlert
       v-if="isExistingDraftedTeam"
-      severity="info"
-      :closable="false"
-      size="small"
+      color="info"
+      variant="soft"
       class="mb-5"
     >
-      You are editing your existing team. <br>It was last edited on <strong>{{
-        draftedTeamData.updated_at
-          ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
-          : draftedTeamData.created_at
-            ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
-            : 'Unknown'
-      }}</strong>
-    </Message>
+      <template #description>
+        You are editing your existing team. It was last edited on <strong>{{
+          draftedTeamData.updated_at
+            ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+            : draftedTeamData.created_at
+              ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+              : 'Unknown'
+        }}</strong>
+      </template>
+    </UAlert>
     <div
       v-else
       class="flex flex-col text-xs"
     >
-      <Divider />
+      <USeparator class="mb-5" />
       <p class="mb-5">
         Pick your team, fill in the form below, and then submit your team.
       </p>
@@ -131,7 +94,7 @@ const handleTeamSubmit = async () => {
         Once you submit your team, you will receive an email confirming your selection and a link to edit
         your team if you wish.
       </p>
-      <Divider />
+      <USeparator class="my-5" />
     </div>
     <p class="font-bold text-xs mb-5">
       If you do not receive an email when submitting or editing, your team submission has
@@ -141,69 +104,80 @@ const handleTeamSubmit = async () => {
       >leagueofourown.fpl@gmail.com</a>.
     </p>
   </div>
-  <div
-    class="mb-5 flex flex-col items-center gap-1 rounded-md border border-emerald-200 bg-emerald-100/70 p-2.5 text-emerald-700"
+  <UAlert
+    color="success"
+    variant="soft"
+    class="mb-5"
   >
-    <p class="uppercase font-black">
-      Team entry is now open
-    </p>
-  </div>
-  <form
+    <template #description>
+      <div class="flex flex-col items-center gap-1">
+        <p class="uppercase font-black">
+          Team entry is now open
+        </p>
+        <p>Submission deadline: 20th August 2026</p>
+      </div>
+    </template>
+  </UAlert>
+  <UForm
     v-if="draftedTeamData"
     :key="draftedTeamData.key || 'new-team'"
+    :schema="teamDetailsSchema"
+    :state="draftedTeamData"
     class="flex flex-col items-start gap-5"
+    @submit="handleTeamSubmit"
   >
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_name"
-      >Team name</label>
-      <CommonFormField
+    <UFormField
+      class="w-full"
+      label="Team name"
+      name="team_name"
+    >
+      <UInput
         v-model="draftedTeamData.team_name"
-        :validation="v$.team_name"
+        class="w-full"
         type="text"
       />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_owner"
-      >Team owner</label>
-      <CommonFormField
+    </UFormField>
+    <UFormField
+      class="w-full"
+      label="Team owner"
+      name="team_owner"
+    >
+      <UInput
         v-model="draftedTeamData.team_owner"
-        :validation="v$.team_owner"
+        class="w-full"
         type="text"
       />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_email"
-      >Team email</label>
-      <CommonFormField
+    </UFormField>
+    <UFormField
+      class="w-full"
+      label="Team email"
+      name="team_email"
+    >
+      <UInput
         v-model="draftedTeamData.team_email"
-        :validation="v$.team_email"
+        class="w-full"
         type="email"
       />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="contact_number"
-      >Contact number</label>
-      <CommonFormField
+    </UFormField>
+    <UFormField
+      class="w-full"
+      label="Contact number"
+      name="contact_number"
+    >
+      <UInput
         v-model="contactNumber"
-        :validation="v$.contact_number"
+        class="w-full"
         type="text"
       />
+    </UFormField>
+    <div class="flex w-full flex-col gap-1">
       <div
         v-if="draftedTeamData.contact_number"
         class="flex items-center gap-5 mt-2.5"
       >
-        <Checkbox
+        <UCheckbox
+          id="allow_communication"
           v-model="draftedTeamData.allow_communication"
-          input-id="allow_communication"
-          :binary="true"
         />
         <label
           for="allow_communication"
@@ -214,10 +188,9 @@ const handleTeamSubmit = async () => {
     </div>
     <div class="flex w-full flex-col gap-1">
       <div class="flex items-center gap-5">
-        <Checkbox
+        <UCheckbox
+          id="allowed_transfers"
           v-model="draftedTeamData.allowed_transfers"
-          input-id="allowed_transfers"
-          :binary="true"
         />
         <label
           for="allowed_transfers"
@@ -225,37 +198,33 @@ const handleTeamSubmit = async () => {
         >Transfers allowed</label>
       </div>
     </div>
-    <Message
-      :severity="props.isOverBudget ? 'error' : 'success'"
-      class="w-full !my-0"
-      :closable="false"
+    <UAlert
+      :color="props.isOverBudget ? 'error' : 'success'"
+      variant="soft"
+      class="w-full"
+      icon="tabler:pig-money"
     >
-      <template #icon>
-        <Icon
-          class="mr-2.5 self-start"
-          size="22"
-          name="tabler:pig-money"
-        />
-      </template>
-      <div class="flex flex-col items-center gap-2.5">
-        <div class="flex items-center gap-2.5">
-          Transfer Budget Remaining:
-          <span class="text-lg font-black">{{
-            props.remainingBudget.toFixed(1)
-          }}</span>
+      <template #description>
+        <div class="flex flex-col items-center gap-2.5">
+          <div class="flex items-center gap-2.5">
+            Transfer Budget Remaining:
+            <span class="text-lg font-black">{{
+              props.remainingBudget.toFixed(1)
+            }}</span>
+          </div>
         </div>
-      </div>
-    </Message>
+      </template>
+    </UAlert>
     <NuxtTurnstile
       ref="turnstileRef"
       v-model="turnstileToken"
       class="mx-auto"
     />
-    <Button
+    <UButton
       :loading="props.loading.submittingForm"
-      class="w-full"
+      class="w-full justify-center"
       label="Submit team"
-      @click="handleTeamSubmit"
+      type="submit"
     />
-  </form>
+  </UForm>
 </template>

@@ -12,44 +12,39 @@ defineProps({
 </script>
 
 <template>
-  <Card class="dashboard-card h-full">
+  <UCard class="dashboard-card h-full">
     <template
       v-if="title"
-      #title
+      #header
     >
-      <div class="flex items-center gap-2 text-slate-800">
-        <i class="pi pi-chart-line text-primary" />
+      <div class="flex items-center gap-2 text-slate-800 dark:text-slate-100">
+        <Icon
+          name="i-lucide-chart-line"
+          class="text-primary"
+        />
         <span class="font-bold text-lg">{{ title }}</span>
       </div>
     </template>
 
-    <template #content>
-      <div
-        v-if="isLoading"
-        class="h-full"
-      >
-        <slot name="skeleton" />
-      </div>
-      <div
-        v-else
-        class="h-full flex flex-col"
-      >
-        <slot />
-      </div>
-    </template>
-  </Card>
+    <div
+      v-if="isLoading"
+      class="h-full"
+    >
+      <slot name="skeleton" />
+    </div>
+    <div
+      v-else
+      class="h-full flex flex-col"
+    >
+      <slot />
+    </div>
+  </UCard>
 </template>
 
 <style scoped>
+@reference "@/assets/styles/base.css";
+
 .dashboard-card {
-  @apply flex flex-col;
-}
-
-.dashboard-card :deep(.p-card-body) {
-  @apply flex-1 flex flex-col;
-}
-
-.dashboard-card :deep(.p-card-content) {
-  @apply h-full flex flex-col;
+  @apply flex flex-col border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none;
 }
 </style>

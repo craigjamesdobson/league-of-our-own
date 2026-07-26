@@ -1,6 +1,6 @@
 <template>
   <div class="mx-auto flex min-h-full w-full max-w-6xl items-center py-6 lg:py-12">
-    <div class="grid w-full overflow-hidden rounded-3xl bg-primary text-white shadow-xl lg:grid-cols-[1.2fr_0.8fr]">
+    <div class="grid w-full overflow-hidden rounded-3xl bg-brand text-white shadow-xl lg:grid-cols-[1.2fr_0.8fr]">
       <section class="flex flex-col justify-center p-8 sm:p-12 lg:p-16">
         <div class="mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
           <Icon
@@ -21,14 +21,13 @@
         </p>
 
         <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Button
-            as="router-link"
+          <UButton
             to="/team-builder"
             label="Build your team"
-            icon="pi pi-arrow-right"
-            icon-pos="right"
-            size="large"
-            class="!border-white !bg-white !font-black !uppercase !text-primary"
+            trailing-icon="i-lucide-arrow-right"
+            color="neutral"
+            size="lg"
+            class="font-black uppercase text-brand"
           />
           <NuxtLink
             to="/rules"

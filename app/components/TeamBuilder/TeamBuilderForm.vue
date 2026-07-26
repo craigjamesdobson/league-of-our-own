@@ -142,11 +142,10 @@ const handleTeamSubmit = async () => {
     </p>
   </div>
   <div
-    class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5"
+    class="mb-5 flex flex-col items-center gap-1 rounded-md border border-emerald-200 bg-emerald-100/70 p-2.5 text-emerald-700"
   >
-    <p>Deadline for submissions is</p>
     <p class="uppercase font-black">
-      Wed 13th Aug 2025
+      Team entry is now open
     </p>
   </div>
   <form

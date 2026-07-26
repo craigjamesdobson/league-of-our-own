@@ -36,13 +36,11 @@ mockNuxtImport('useRouter', () => {
   });
 });
 
-// Mock the drafted teams store
-vi.mock('@/stores/draftedTeams', () => ({
-  useDraftedTeamsStore: () => ({
-    upsertDraftedTeam: vi.fn(),
-    upsertDraftedPlayers: vi.fn(),
-  }),
-}));
+mockNuxtImport('useRuntimeConfig', () => {
+  return () => ({
+    public: { ACTIVE_SEASON: '26-27' },
+  });
+});
 
 vi.mock('primevue/usetoast', () => ({
   useToast: () => ({

@@ -107,6 +107,7 @@ export default defineNuxtConfig({
     public: {
       SITE_URL: process.env.SITE_URL,
       ACTIVE_SEASON: process.env.ACTIVE_SEASON,
+      SITE_OPEN: process.env.SITE_OPEN === 'true',
       nodeEnv: process.env.NODE_ENV || 'development',
       turnstile: {
         siteKey: process.env.TURNSTILE_SITE_KEY,

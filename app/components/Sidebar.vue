@@ -2,6 +2,7 @@
 import { useAccountStore } from '@/stores/account';
 
 const accountStore = useAccountStore();
+const config = useRuntimeConfig();
 
 const open = defineModel<boolean>('open', { default: true });
 
@@ -34,11 +35,21 @@ const fixturesRoute = {
   to: '/fixtures',
 };
 
-const navigationItems = computed(() =>
-  accountStore.userIsLoggedIn
-    ? [...routes, fixturesRoute]
-    : routes,
-);
+const teamBuilderRoute = {
+  label: 'Team builder',
+  icon: 'i-lucide-shirt',
+  to: '/team-builder',
+};
+
+const navigationItems = computed(() => {
+  const publicRoutes = config.public.TEAM_REGISTRATION_OPEN
+    ? [teamBuilderRoute, ...routes]
+    : routes;
+
+  return accountStore.userIsLoggedIn
+    ? [...publicRoutes, fixturesRoute]
+    : publicRoutes;
+});
 
 const sidebarUi = {
   root: '[--sidebar-width:16.25rem] [--sidebar-width-icon:5rem]',

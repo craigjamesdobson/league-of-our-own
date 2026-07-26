@@ -42,10 +42,10 @@
       <aside class="grid gap-px bg-white/10 sm:grid-cols-3 lg:grid-cols-1">
         <div class="bg-white/5 p-8 lg:p-10">
           <p class="text-4xl font-black">
-            11
+            20th Aug
           </p>
           <p class="mt-2 text-sm font-bold uppercase tracking-wide text-white/60">
-            Players per squad
+            Submission deadline
           </p>
         </div>
         <div class="bg-white/5 p-8 lg:p-10">

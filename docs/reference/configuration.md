@@ -168,8 +168,9 @@ await refreshAppSettings();
 ```
 
 For a season release, update all related values in one SQL statement so clients
-never observe a partly switched Season. The `pnpm release:season` wizard provides
-the exact statement for staging and production.
+never observe a partly switched Season. The
+[Season rollover runbook](../runbooks/season-rollover.md) provides the exact
+statement and the staging-to-production procedure.
 
 ## Nuxt Configuration
 

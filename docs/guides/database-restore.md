@@ -61,28 +61,13 @@ feed. The teams and fixtures endpoints are manual reset/re-seeding tools and are
 not called by the player-sync cron. Run these calls only against the intended
 environment, and verify the hostname before sending them.
 
-## Guided Season Release
+## Season Release
 
-After deploying the season-preparation migrations and application endpoints,
-run the guarded release wizard against staging first:
-
-```bash
-pnpm release:season -- staging
-```
-
-After validating staging, run the same committed procedure against production:
-
-```bash
-pnpm release:season -- production
-```
-
-The wizard does not store secrets or directly execute owner-only SQL. It opens
-the correct Supabase dashboard, requires explicit confirmations for the backup,
-archive, clear, and database-settings steps, calls the three protected import
-endpoints, and validates their returned counts. The active Season and launch
-switches are updated in `public.settings`, so changing them does not require a
-frontend redeployment. Pause and resume the player-sync cron separately when
-you perform a production release.
+Follow the committed [Season rollover runbook](../runbooks/season-rollover.md)
+against staging first and production second. The backup, archive, clear,
+database-settings, cron, and smoke-test decisions remain explicit manual steps.
+The focused `pnpm season:import -- staging|production` command performs only the
+ordered reference-data imports and their machine-checkable validations.
 
 ### Step 1: Split the Database Dump
 

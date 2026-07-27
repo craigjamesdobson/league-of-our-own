@@ -39,7 +39,7 @@ Use **kebab-case** for all files:
 Use **ISO 8601 format** consistently: `YYYY-MM-DD`
 
 ```markdown
-**Last updated:** 2025-11-09
+**Last updated:** 2026-07-27
 
 ✅ CORRECT
 ❌ WRONG: Last updated: Nov 9, 2025

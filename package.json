@@ -15,6 +15,7 @@
     "test:ui": "vitest --ui",
     "db:reset:clean": "supabase db reset --no-seed",
     "db:reset:fpl": "supabase db reset --no-seed && TMPDIR=/tmp tsx scripts/seed-fpl-development.ts",
+    "release:season": "bash scripts/release-season.sh",
     "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs",
     "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
     "generate-types:local": "npx supabase gen types typescript --local > types/database-generated.types.ts"

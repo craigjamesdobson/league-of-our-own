@@ -121,4 +121,4 @@ The repository has no frontend deployment job. To close that gap:
 
 ---
 
-**Last updated:** 2026-07-18
+**Last updated:** 2026-07-27

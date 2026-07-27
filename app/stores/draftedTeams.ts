@@ -82,7 +82,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const bulkUpsertDraftedTeams = async (teamData: string) => {
     const activeSeason = await getActiveSeason();
     const parsedDraftedTeams: DraftedTeamWithPlayers[] = JSON.parse(teamData);
-    parsedDraftedTeams.map(async (team) => {
+    await Promise.all(parsedDraftedTeams.map(async (team) => {
       const { players, ...draftedTeamData } = team;
       const formattedDraftedPlayers = players.map((x: DraftedPlayer) => {
         return {
@@ -101,7 +101,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
         active_season: activeSeason,
       });
       await supabase.from('drafted_players').upsert(formattedDraftedPlayers);
-    });
+    }));
   };
 
   const addNewTransfer = async (

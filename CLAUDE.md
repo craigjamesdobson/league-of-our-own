@@ -363,4 +363,4 @@ pnpm test      # Run test suite
 
 ---
 
-**Last updated:** 2026-07-20
+**Last updated:** 2026-07-27

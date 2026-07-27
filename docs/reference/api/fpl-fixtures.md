@@ -1,6 +1,6 @@
 # FPL 2026/27 fixture source
 
-**Last updated:** 2026-07-25
+**Last updated:** 2026-07-27
 
 ## Finding
 

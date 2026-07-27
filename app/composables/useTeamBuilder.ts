@@ -4,7 +4,6 @@ import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, TablesInsert, Tables } from '~/types/database.types';
 import type { Database as DatabaseGenerated } from '~/types/database-generated.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
-import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { delay } from '@/utils/utility';
 
 interface LoadingState {
@@ -24,8 +23,8 @@ const DEFAULT_TEAM_STRUCTURE = [
   { position: PlayerPosition.FORWARD, count: 3 },
 ];
 
-const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
-  active_season: '25-26',
+const createEmptyTeamData = (activeSeason: string): TablesInsert<'drafted_teams'> => ({
+  active_season: activeSeason,
   team_name: '',
   team_owner: '',
   team_email: '',
@@ -36,11 +35,11 @@ const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
 });
 
 export const useTeamBuilder = () => {
+  const { activeSeason } = useAppSettings();
   const supabase = useSupabaseClient<Database>();
   const route = useRoute();
   const router = useRouter();
   const toast = useNuxtToast();
-  const draftedTeamsStore = useDraftedTeamsStore();
 
   const addToast = (
     color: 'error' | 'success',
@@ -61,7 +60,7 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
-  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData());
+  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason.value));
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
   const turnstileToken = ref<string | null>(null);
 
@@ -218,20 +217,21 @@ export const useTeamBuilder = () => {
         return;
       }
 
-      // Verify Turnstile token using built-in endpoint
-      const turnstileVerification = await $fetch('/_turnstile/validate', {
+      const wasEditing = isExistingDraftedTeam.value;
+      const teamData = await $fetch<Tables<'drafted_teams'>>('/api/team-submission', {
         method: 'POST',
-        body: { token: turnstileToken.value },
+        body: {
+          turnstileToken: turnstileToken.value,
+          editKey: wasEditing ? draftedTeamData.value.key : null,
+          teamName: draftedTeamData.value.team_name,
+          teamOwner: draftedTeamData.value.team_owner,
+          teamEmail: draftedTeamData.value.team_email,
+          contactNumber: draftedTeamData.value.contact_number,
+          allowCommunication: draftedTeamData.value.allow_communication,
+          allowedTransfers: draftedTeamData.value.allowed_transfers,
+          playerIds: draftedTeamPlayers.value.map(player => player.selectedPlayer!.player_id),
+        },
       });
-
-      if (!turnstileVerification.success) {
-        addToast('error', 'Security Check Failed', 'Security verification failed. Please try again.');
-        return;
-      }
-
-      const teamData = await upsertTeamData(isExistingDraftedTeam.value);
-
-      await upsertPlayerData(teamData.drafted_team_id, isExistingDraftedTeam.value);
 
       router.push({
         path: 'team-builder',
@@ -247,7 +247,7 @@ export const useTeamBuilder = () => {
         },
       });
 
-      if (!isExistingDraftedTeam.value) {
+      if (!wasEditing) {
         await useFetch('/api/admin-email', {
           method: 'post',
           body: {
@@ -271,7 +271,7 @@ export const useTeamBuilder = () => {
   };
 
   const resetForm = (): void => {
-    draftedTeamData.value = createEmptyTeamData();
+    draftedTeamData.value = createEmptyTeamData(activeSeason.value);
     setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     error.value = null;
   };
@@ -297,43 +297,6 @@ export const useTeamBuilder = () => {
     }
 
     return true;
-  };
-
-  const upsertTeamData = async (isEditing: boolean): Promise<Tables<'drafted_teams'>> => {
-    const draftedTeamUpsertData: TablesInsert<'drafted_teams'> = {
-      team_name: draftedTeamData.value.team_name,
-      team_owner: draftedTeamData.value.team_owner,
-      team_email: draftedTeamData.value.team_email,
-      contact_number: draftedTeamData.value.contact_number,
-      allow_communication: draftedTeamData.value.allow_communication,
-      allowed_transfers: draftedTeamData.value.allowed_transfers,
-      active_season: '25-26',
-      total_team_value: teamValue.value,
-    };
-
-    if (isEditing) {
-      draftedTeamUpsertData.drafted_team_id = draftedTeamData.value.drafted_team_id;
-      draftedTeamUpsertData.edited_count = (draftedTeamData.value.edited_count ?? 0) + 1;
-    }
-
-    return await draftedTeamsStore.upsertDraftedTeam(draftedTeamUpsertData);
-  };
-
-  const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean): Promise<void> => {
-    const draftedPlayersUpsertData = draftedTeamPlayers.value.map((x) => {
-      const data: TablesInsert<'drafted_players'> = {
-        drafted_player: x.selectedPlayer?.player_id,
-        drafted_team: draftedTeamID,
-      };
-
-      if (isEditing) {
-        data.drafted_player_id = x.draftedPlayerID;
-      }
-
-      return data;
-    });
-
-    await draftedTeamsStore.upsertDraftedPlayers(draftedPlayersUpsertData);
   };
 
   return {

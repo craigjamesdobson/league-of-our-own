@@ -85,9 +85,9 @@ Run `pnpm <script> --help` for usage details.
 - **Pinia**: State management with stores in `/app/stores/`
 
 ### UI & Styling
-- **PrimeVue**: UI component library with custom Aura theme preset (theme: 'none')
-- **Tailwind CSS**: Utility-first styling with PrimeVue integration
-- **tailwindcss-primeui**: PrimeVue-Tailwind integration plugin
+- **Nuxt UI**: UI component library, app provider, color mode, icons, overlays, toasts, and form components
+- **Tailwind CSS v4**: Utility-first styling configured from `/app/assets/styles/base.css`
+- **Zod**: Runtime form schemas integrated with Nuxt UI forms
 
 ### Backend & Data
 - **Supabase**: PostgreSQL database, authentication, real-time features
@@ -134,7 +134,6 @@ app/
 ├── assets/          # Styles, images, static assets
 │   ├── styles/
 │   ├── svg/
-│   └── styles/primevue/  # Custom PrimeVue theme
 └── utils/           # Utility functions
 
 server/
@@ -183,7 +182,7 @@ Stores in `/app/stores/`:
 
 Components in `/app/components/` organized by feature domain.
 
-**Modal Pattern**: Use centralized `Modal.vue` with content injection rather than creating individual modal components.
+**Overlay Pattern**: Use Nuxt UI modal and drawer components through the application-level `UApp` provider.
 
 ### Routing & Authentication
 
@@ -274,20 +273,13 @@ pnpm test app/tests/team-builder/ # Run specific test directory
 
 ---
 
-## PrimeVue Configuration
+## Nuxt UI Configuration
 
-**Custom Theme**: Uses Aura preset with custom primary color palette defined in `nuxt.config.ts`
-
-**Component Auto-Import**: PrimeVue components auto-imported EXCEPT:
-- Form, FormField (using custom form components)
-- Editor (not needed)
-- Chart (not needed)
-
-**Styling**:
-- Base PrimeVue theme via `@primeuix/themes`
-- Tailwind integration via `tailwindcss-primeui`
-- Custom styles in `/app/assets/styles/primevue/`
-- Global styles in `/app/assets/styles/base.css`
+- `@nuxt/ui` is registered in `nuxt.config.ts`, and `app.vue` wraps the application in `UApp`.
+- Semantic UI colors are configured in `app.config.ts`; the Tailwind v4 palette and fonts live in `/app/assets/styles/base.css`.
+- Color mode defaults to the system preference, falls back to light, and can be changed from the sidebar.
+- Use Nuxt UI components directly for generic controls. Keep local components for product-specific football workflows.
+- Forms use `UForm`, `UFormField`, and local Zod schemas.
 
 ---
 
@@ -299,7 +291,6 @@ pnpm test app/tests/team-builder/ # Run specific test directory
 runtimeConfig: {
   public: {
     SITE_URL: process.env.SITE_URL,           // Application base URL
-    ACTIVE_SEASON: process.env.ACTIVE_SEASON, // Current football season (e.g., "2024-25")
     nodeEnv: process.env.NODE_ENV,
     turnstile: {
       siteKey: process.env.TURNSTILE_SITE_KEY // Cloudflare Turnstile (bot protection)
@@ -311,8 +302,12 @@ runtimeConfig: {
 **Usage**:
 ```typescript
 const config = useRuntimeConfig();
-const activeSeason = config.public.ACTIVE_SEASON;
+const siteUrl = config.public.SITE_URL;
 ```
+
+Operational values such as the active Season and whether the site or team
+registration is open live in `public.settings`. Read them through
+`useAppSettings`; do not add them to runtime configuration.
 
 ---
 
@@ -359,6 +354,20 @@ expect(result.computedValue.value).toBe(expected);
 ```
 
 ---
+
+## Agent skills
+
+### Issue tracker
+
+Matt skill artifacts are stored as Markdown under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Local issues use the default Matt triage vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository using root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
 
 ## GitHub Workflow
 
@@ -410,3 +419,7 @@ pnpm lint      # Check for linting issues
 pnpm typecheck # TypeScript strict mode validation
 pnpm test      # Run test suite
 ```
+
+---
+
+**Last updated:** 2026-07-27

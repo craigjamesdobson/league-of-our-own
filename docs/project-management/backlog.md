@@ -1,6 +1,6 @@
 # Team Builder Backlog
 
-**Last Updated**: 2025-07-25
+**Last Updated**: 2026-07-25
 
 ## 📋 Prioritized Backlog
 
@@ -37,6 +37,16 @@
   - Header-based access token validation
   - RLS policy updates and schema migration
   - Prevents direct endpoint access bypass
+
+## ✨ Nice-to-have Features
+
+- **Feature: Star a team locally**
+  - Let a visitor select one team as their team without requiring an account
+  - Persist the selection in browser storage only
+  - Highlight the starred team across standings, fixtures, and other relevant views
+  - Show convenient additional details that are already publicly available elsewhere in the app
+  - Allow the visitor to change or clear the starred team at any time
+  - Treat this strictly as a personal display preference, not authentication or access control
 
 ## 📊 Backlog Management
 

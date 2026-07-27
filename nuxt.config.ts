@@ -75,7 +75,6 @@ export default defineNuxtConfig({
     },
     public: {
       SITE_URL: process.env.SITE_URL,
-      ACTIVE_SEASON: process.env.ACTIVE_SEASON,
       nodeEnv: process.env.NODE_ENV || 'development',
       turnstile: {
         siteKey: process.env.TURNSTILE_SITE_KEY,
@@ -123,7 +122,4 @@ export default defineNuxtConfig({
     redirect: false,
   },
 
-  turnstile: {
-    addValidateEndpoint: true,
-  },
 });

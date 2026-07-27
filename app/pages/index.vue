@@ -7,9 +7,12 @@ import PositionMovers from '@/components/Dashboard/PositionMovers.vue';
 import WeeklyStats from '@/components/Dashboard/WeeklyStats.vue';
 import WeeklyTransfers from '@/components/Dashboard/WeeklyTransfers.vue';
 import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vue';
+import WelcomeBack from '@/components/Home/WelcomeBack.vue';
 
+const { teamRegistrationOpen } = useAppSettings();
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
+const registrationOpen = teamRegistrationOpen;
 
 const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasGameweekData = computed(() => dashboard.hasGameweekData());
@@ -37,12 +40,18 @@ const refreshPage = () => {
 };
 
 onMounted(async () => {
-  await dashboard.loadDashboardData();
+  if (!registrationOpen.value) {
+    await dashboard.loadDashboardData();
+  }
 });
 </script>
 
 <template>
-  <div class="min-h-full text-slate-900 dark:text-slate-100">
+  <WelcomeBack v-if="registrationOpen" />
+  <div
+    v-else
+    class="min-h-full text-slate-900 dark:text-slate-100"
+  >
     <!-- Dashboard Content -->
     <div class="mx-auto">
       <!-- Dashboard Layout -->

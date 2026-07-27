@@ -39,7 +39,7 @@ Use **kebab-case** for all files:
 Use **ISO 8601 format** consistently: `YYYY-MM-DD`
 
 ```markdown
-**Last updated:** 2025-11-09
+**Last updated:** 2026-07-27
 
 ✅ CORRECT
 ❌ WRONG: Last updated: Nov 9, 2025
@@ -204,11 +204,11 @@ Configuration and environment setup for this project.
 
 ## Environment Variables
 
-### ACTIVE_SEASON
+### active_season
 
 **Type:** String
 **Format:** YYYY-YY
-**Example:** 2024-25
+**Example:** 26-27
 **Purpose:** Current fantasy season
 
 ...

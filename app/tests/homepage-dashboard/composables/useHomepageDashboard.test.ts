@@ -26,9 +26,7 @@ mockNuxtImport('useRuntimeConfig', () => {
     app: {
       baseURL: '/',
     },
-    public: {
-      ACTIVE_SEASON: '2024/25',
-    },
+    public: {},
   });
 });
 
@@ -96,7 +94,16 @@ describe('fetchWeeklyTransfers - player_out resolution', () => {
       { data: [], error: null },
       { data: [], error: null },
     ];
-    tableQueues['settings'] = [{ data: { setting_value: String(gameweek) }, error: null }];
+    tableQueues['settings'] = [{
+      data: [
+        { setting_key: 'active_season', setting_value: '26-27' },
+        { setting_key: 'current_gameweek', setting_value: String(gameweek) },
+        { setting_key: 'season_complete', setting_value: 'false' },
+        { setting_key: 'site_open', setting_value: 'true' },
+        { setting_key: 'team_registration_open', setting_value: 'true' },
+      ],
+      error: null,
+    }];
     tableQueues['weekly_statistics'] = [{ data: [], error: null }];
   };
 

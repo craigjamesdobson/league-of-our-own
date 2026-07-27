@@ -2,6 +2,7 @@
 import { useAccountStore } from '@/stores/account';
 
 const accountStore = useAccountStore();
+const { teamRegistrationOpen } = useAppSettings();
 
 const open = defineModel<boolean>('open', { default: true });
 
@@ -34,17 +35,27 @@ const fixturesRoute = {
   to: '/fixtures',
 };
 
-const navigationItems = computed(() =>
-  accountStore.userIsLoggedIn
-    ? [...routes, fixturesRoute]
-    : routes,
-);
+const teamBuilderRoute = {
+  label: 'Team builder',
+  icon: 'i-lucide-shirt',
+  to: '/team-builder',
+};
+
+const navigationItems = computed(() => {
+  const publicRoutes = teamRegistrationOpen.value
+    ? [teamBuilderRoute, ...routes]
+    : routes;
+
+  return accountStore.userIsLoggedIn
+    ? [...publicRoutes, fixturesRoute]
+    : publicRoutes;
+});
 
 const sidebarUi = {
-  root: '[--sidebar-width:18rem] [--sidebar-width-icon:5rem]',
+  root: '[--sidebar-width:16.25rem] [--sidebar-width-icon:5rem]',
   container: 'h-svh',
   inner: 'bg-brand text-slate-100 divide-white/10',
-  header: 'min-h-20 px-4',
+  header: 'min-h-20 p-4',
   body: 'justify-center gap-4 p-4',
   footer: 'p-4',
   rail: 'hover:after:bg-white/30',
@@ -60,10 +71,10 @@ const mobileMenu = {
 };
 
 const navigationUi = {
-  root: 'gap-2',
-  list: 'gap-2',
-  link: 'min-h-13 overflow-hidden rounded-lg px-3 text-[15px] font-semibold text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-13 data-[collapsed=true]:w-13 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
-  linkLeadingIcon: 'size-7 text-current',
+  root: 'gap-0.5',
+  list: 'flex flex-col gap-0.5',
+  link: 'min-h-12 overflow-hidden rounded-lg px-3 text-sm font-medium text-slate-200 before:inset-0 hover:text-white hover:before:bg-white/10 data-[active]:text-white data-[active]:before:bg-white/15 data-[collapsed=true]:h-12 data-[collapsed=true]:w-12 data-[collapsed=true]:justify-center data-[collapsed=true]:p-0',
+  linkLeadingIcon: 'size-5 text-slate-200 group-hover:text-white group-data-[active]:text-white',
   linkLabel: 'text-current',
   linkTrailing: 'text-slate-300',
 };
@@ -76,8 +87,8 @@ const brandButtonUi = {
 
 const footerButtonUi = {
   base: 'min-h-12 w-full justify-start overflow-hidden px-3',
-  leadingIcon: 'size-7 text-current',
-  label: 'truncate text-[15px] font-semibold',
+  leadingIcon: 'size-5 text-current',
+  label: 'truncate text-sm font-medium',
 };
 </script>
 
@@ -100,7 +111,12 @@ const footerButtonUi = {
         color="neutral"
         variant="ghost"
         class="hover:bg-white/10 hover:text-white"
-        :ui="brandButtonUi"
+        :ui="{
+          ...brandButtonUi,
+          base: state === 'collapsed'
+            ? 'h-12 w-12 justify-center p-0'
+            : brandButtonUi.base,
+        }"
       />
       <UButton
         icon="i-lucide-x"
@@ -127,7 +143,7 @@ const footerButtonUi = {
     </template>
 
     <template #footer="{ state }">
-      <div class="flex flex-col gap-2">
+      <div class="flex w-full flex-col gap-2">
         <ColorModeControl :collapsed="state === 'collapsed'" />
         <UButton
           to="/account"

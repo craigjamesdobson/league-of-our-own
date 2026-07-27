@@ -105,16 +105,16 @@ const handleTeamSubmit = async () => {
     </p>
   </div>
   <UAlert
-    color="warning"
+    color="success"
     variant="soft"
     class="mb-5"
   >
     <template #description>
       <div class="flex flex-col items-center gap-1">
-        <p>Deadline for submissions is</p>
         <p class="uppercase font-black">
-          Wed 13th Aug 2025
+          Team entry is now open
         </p>
+        <p>Submission deadline: 20th August 2026</p>
       </div>
     </template>
   </UAlert>

@@ -1,6 +1,6 @@
 # Nuxt UI Migration
 
-**Status:** 🔄 In Progress
+**Status:** 🔄 Final manual QA
 **Started**: 2026-06-30
 
 ## Overview
@@ -190,7 +190,7 @@ Phase 5 scope note: dashboard, fixture, drafted-team, modal, skeleton, error, se
 - [x] `pnpm test`
 - [x] `pnpm build`
 - [ ] Manual QA checklist complete.
-- [ ] Update docs that mention PrimeVue or Tailwind v3.
+- [x] Update current docs that mention PrimeVue or Tailwind v3 (historical migration records and the ADR retain those terms for context).
 
 ## Manual QA Checklist
 
@@ -223,4 +223,4 @@ The migration is done when PrimeVue and Vuelidate are removed, Nuxt UI and Zod a
 
 ---
 
-**Last updated:** 2026-07-18
+**Last updated:** 2026-07-20

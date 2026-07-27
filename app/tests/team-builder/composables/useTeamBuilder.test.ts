@@ -24,27 +24,12 @@ mockNuxtImport('useSupabaseClient', () => {
   });
 });
 
-mockNuxtImport('useRoute', () => {
+mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
-    query: { id: '1' },
+    app: { baseURL: '/' },
+    public: {},
   });
 });
-
-mockNuxtImport('useRouter', () => {
-  return () => ({
-    afterEach: vi.fn(),
-    beforeResolve: vi.fn(),
-    push: vi.fn(),
-  });
-});
-
-// Mock the drafted teams store
-vi.mock('@/stores/draftedTeams', () => ({
-  useDraftedTeamsStore: () => ({
-    upsertDraftedTeam: vi.fn(),
-    upsertDraftedPlayers: vi.fn(),
-  }),
-}));
 
 vi.mock('@nuxt/ui/composables', () => ({
   useToast: () => ({

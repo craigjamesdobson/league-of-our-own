@@ -16,7 +16,11 @@
     "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts",
     "db:restore-local": "./scripts/db-restore-local.sh",
     "db:restore-staging": "./scripts/db-restore-staging.sh",
-    "db:rebuild-staging": "./scripts/db-rebuild-staging.sh"
+    "db:rebuild-staging": "./scripts/db-rebuild-staging.sh",
+    "db:reset:clean": "supabase db reset --no-seed",
+    "db:reset:fpl": "supabase db reset --no-seed && TMPDIR=/tmp tsx scripts/seed-fpl-development.ts",
+    "season:import": "bash scripts/import-season-data.sh",
+    "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs"
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",
@@ -47,6 +51,7 @@
     "postcss-import": "^16.1.0",
     "supabase": "^2.45.5",
     "tailwindcss": "^4.3.2",
+    "tsx": "^4.23.1",
     "type-fest": "^4.41.0",
     "typescript": "^6.0.3",
     "vite": "^7.3.6",

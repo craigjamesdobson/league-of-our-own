@@ -191,7 +191,7 @@ finish() {
 # ──────────────────────────────────────────────────────────────────────────
 
 TOTAL_STAGES=11
-TOTAL_MINUTES=35
+TOTAL_MINUTES=32
 
 if [[ "${1:-}" == "--" ]]; then
   shift
@@ -260,15 +260,13 @@ if [[ "$RELEASE_TARGET_CONFIRMATION" != "$TARGET" ]]; then
 fi
 require_confirmation "Is this exact application commit deployed to $TARGET?"
 
-stage "Close writes and pause the cron" 4
+stage "Close team registration" 2
 open_url "https://supabase.com/dashboard/project/$RELEASE_SUPABASE_PROJECT_REF/sql/new"
 say "Run this command to close team registration without a deployment:"
 printf "\n  update public.settings\n"
 printf "  set setting_value = 'false', updated_at = now()\n"
 printf "  where setting_key = 'team_registration_open';\n\n"
-open_url "https://dash.cloudflare.com/"
-step "Disable the scheduled player-sync trigger for $TARGET."
-require_confirmation "Is registration closed and the player cron paused?"
+require_confirmation "Is team registration closed?"
 
 stage "Confirm the backup" 3
 open_url "https://supabase.com/dashboard/project/$RELEASE_SUPABASE_PROJECT_REF/database/backups"
@@ -367,10 +365,5 @@ curl --fail-with-body --silent --show-error "$RELEASE_APP_URL/team-builder" >/de
 say "The welcome page and team builder both responded successfully."
 step "Submit one test team and confirm the appropriate admin workflow manually."
 require_confirmation "Did the $TARGET smoke test pass?"
-
-stage "Resume scheduled updates" 1
-open_url "https://dash.cloudflare.com/"
-step "Re-enable the scheduled player-sync trigger for $TARGET."
-require_confirmation "Is the player cron enabled again?"
 
 finish

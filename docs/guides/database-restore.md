@@ -77,11 +77,12 @@ pnpm release:season -- production
 ```
 
 The wizard does not store secrets or directly execute owner-only SQL. It opens
-the correct Supabase and Cloudflare dashboards, requires explicit confirmations
-for the backup, archive, clear, database-settings and cron steps, calls the
-three protected import endpoints, and validates their returned counts. The
-active Season and launch switches are updated in `public.settings`, so changing
-them does not require a frontend redeployment.
+the correct Supabase dashboard, requires explicit confirmations for the backup,
+archive, clear, and database-settings steps, calls the three protected import
+endpoints, and validates their returned counts. The active Season and launch
+switches are updated in `public.settings`, so changing them does not require a
+frontend redeployment. Pause and resume the player-sync cron separately when
+you perform a production release.
 
 ### Step 1: Split the Database Dump
 

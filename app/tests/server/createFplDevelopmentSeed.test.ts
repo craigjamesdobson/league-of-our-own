@@ -161,8 +161,11 @@ describe('createFplDevelopmentSeed', () => {
     });
 
     expect(seed.settings).toEqual([
+      { setting_key: 'active_season', setting_value: '26-27' },
       { setting_key: 'current_gameweek', setting_value: '1' },
       { setting_key: 'season_complete', setting_value: 'false' },
+      { setting_key: 'site_open', setting_value: 'true' },
+      { setting_key: 'team_registration_open', setting_value: 'true' },
     ]);
     expect(seed.fixtures.every(fixture =>
       fixture.home_team_score === null && fixture.away_team_score === null,

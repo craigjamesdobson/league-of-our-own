@@ -2,7 +2,29 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(23);
+select plan(32);
+
+select is(
+  (
+    select jsonb_object_agg(setting_key, setting_value order by setting_key)
+    from public.settings
+    where setting_key in (
+      'active_season',
+      'current_gameweek',
+      'season_complete',
+      'site_open',
+      'team_registration_open'
+    )
+  ),
+  jsonb_build_object(
+    'active_season', '25-26',
+    'current_gameweek', '1',
+    'season_complete', 'false',
+    'site_open', 'false',
+    'team_registration_open', 'false'
+  ),
+  'clean migrations create every required application setting with safe defaults'
+);
 
 insert into public.teams (id, name, short_name)
 values
@@ -436,6 +458,78 @@ select ok(
     'EXECUTE'
   ),
   'the application service role cannot run the archive operation'
+);
+
+select throws_ok(
+  $$select * from public.clear_archived_season_operational_data('25-26')$$,
+  'P0001',
+  'Operational data contains fantasy teams outside Season 25-26',
+  'clear refuses to remove operational data when another Season is present'
+);
+
+delete from public.weekly_statistics
+where team in (3, 4, 5, 6);
+
+delete from public.drafted_players
+where drafted_team in (3, 4, 5, 6);
+
+delete from public.drafted_teams
+where drafted_team_id in (3, 4, 5, 6);
+
+create temporary table clear_call_result as
+select *
+from public.clear_archived_season_operational_data('25-26');
+
+select is(
+  (select drafted_team_count from clear_call_result),
+  2,
+  'clear reports the removed fantasy team count'
+);
+
+select is(
+  (select drafted_player_count from clear_call_result),
+  22,
+  'clear reports the removed drafted player count'
+);
+
+select is(
+  (select transfer_count from clear_call_result),
+  3,
+  'clear reports the removed transfer count'
+);
+
+select ok(
+  not exists (select 1 from public.drafted_teams)
+  and not exists (select 1 from public.drafted_players)
+  and not exists (select 1 from public.drafted_transfers)
+  and not exists (select 1 from public.weekly_statistics)
+  and not exists (select 1 from public.player_statistics)
+  and not exists (select 1 from public.fixtures)
+  and not exists (select 1 from public.players)
+  and not exists (select 1 from public.teams),
+  'clear removes all operational fantasy and FPL reference data'
+);
+
+select is(
+  (select count(*)::integer from public.season_results),
+  2,
+  'clear preserves the archived standings'
+);
+
+select throws_ok(
+  $$select * from public.clear_archived_season_operational_data('25-26')$$,
+  'P0001',
+  'Season 25-26 has no operational fantasy teams to clear',
+  'clear cannot be repeated after operational data has been removed'
+);
+
+select ok(
+  not has_function_privilege(
+    'service_role',
+    'public.clear_archived_season_operational_data(text)',
+    'EXECUTE'
+  ),
+  'the application service role cannot run the clear operation'
 );
 
 select * from finish();

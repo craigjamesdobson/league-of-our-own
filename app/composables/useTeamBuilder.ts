@@ -35,8 +35,7 @@ const createEmptyTeamData = (activeSeason: string): TablesInsert<'drafted_teams'
 });
 
 export const useTeamBuilder = () => {
-  const config = useRuntimeConfig();
-  const activeSeason = String(config.public.ACTIVE_SEASON);
+  const { activeSeason } = useAppSettings();
   const supabase = useSupabaseClient<Database>();
   const route = useRoute();
   const router = useRouter();
@@ -61,7 +60,7 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
-  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason));
+  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason.value));
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
   const turnstileToken = ref<string | null>(null);
 
@@ -272,7 +271,7 @@ export const useTeamBuilder = () => {
   };
 
   const resetForm = (): void => {
-    draftedTeamData.value = createEmptyTeamData(activeSeason);
+    draftedTeamData.value = createEmptyTeamData(activeSeason.value);
     setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     error.value = null;
   };

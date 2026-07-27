@@ -1,10 +1,23 @@
 const publicRoutes = new Set(['/coming-soon', '/account/login']);
 
-export default defineNuxtRouteMiddleware((to) => {
-  const config = useRuntimeConfig();
+export default defineNuxtRouteMiddleware(async (to) => {
   const user = useSupabaseUser();
+  const { refreshAppSettings, siteOpen } = useAppSettings();
 
-  if (config.public.SITE_OPEN) {
+  try {
+    await refreshAppSettings();
+  }
+  catch {
+    if (user.value) return;
+
+    if (to.path !== '/coming-soon') {
+      return navigateTo('/coming-soon');
+    }
+
+    return;
+  }
+
+  if (siteOpen.value) {
     if (to.path === '/coming-soon') {
       return navigateTo('/');
     }

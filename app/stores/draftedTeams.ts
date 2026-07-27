@@ -8,7 +8,7 @@ import type { Database, TablesInsert } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const config = useRuntimeConfig();
+  const { getActiveSeason } = useAppSettings();
 
   const draftedTeams: Ref<DraftedTeamWithPlayers[] | null> = ref(null);
 
@@ -24,8 +24,9 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   });
 
   const fetchDraftedTeams = async () => {
+    const activeSeason = await getActiveSeason();
     const { data, error } = await supabase
-      .rpc('get_drafted_teams_by_season', { active_season_param: config.public.ACTIVE_SEASON });
+      .rpc('get_drafted_teams_by_season', { active_season_param: activeSeason });
     if (error) throw error;
     draftedTeams.value = data;
   };
@@ -33,10 +34,11 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const fetchDraftedTeamsWithPlayerPointsByGameweek = async (
     selectedGameWeek: number,
   ) => {
+    const activeSeason = await getActiveSeason();
     const { data, error } = await supabase
       .rpc('get_drafted_teams_with_player_points_by_gameweek', {
         game_week_param: selectedGameWeek,
-        active_season_param: config.public.ACTIVE_SEASON,
+        active_season_param: activeSeason,
       });
     if (error) throw error;
     return data;
@@ -77,7 +79,8 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
     return data;
   };
 
-  const bulkUpsertDraftedTeams = (teamData: string) => {
+  const bulkUpsertDraftedTeams = async (teamData: string) => {
+    const activeSeason = await getActiveSeason();
     const parsedDraftedTeams: DraftedTeamWithPlayers[] = JSON.parse(teamData);
     parsedDraftedTeams.map(async (team) => {
       const { players, ...draftedTeamData } = team;
@@ -95,7 +98,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
         allowed_transfers: draftedTeamData.allowed_transfers,
         total_team_value: draftedTeamData.total_team_value ?? 0,
         is_invalid_team: draftedTeamData.is_invalid_team ?? false,
-        active_season: config.public.ACTIVE_SEASON,
+        active_season: activeSeason,
       });
       await supabase.from('drafted_players').upsert(formattedDraftedPlayers);
     });

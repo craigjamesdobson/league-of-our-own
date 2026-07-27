@@ -232,7 +232,6 @@ pnpm test app/tests/team-builder/ # Run specific test directory
 runtimeConfig: {
   public: {
     SITE_URL: process.env.SITE_URL,           // Application base URL
-    ACTIVE_SEASON: process.env.ACTIVE_SEASON, // Current football season (e.g., "2024-25")
     nodeEnv: process.env.NODE_ENV,
     turnstile: {
       siteKey: process.env.TURNSTILE_SITE_KEY // Cloudflare Turnstile (bot protection)
@@ -244,8 +243,12 @@ runtimeConfig: {
 **Usage**:
 ```typescript
 const config = useRuntimeConfig();
-const activeSeason = config.public.ACTIVE_SEASON;
+const siteUrl = config.public.SITE_URL;
 ```
+
+Operational values such as the active Season and whether the site or team
+registration is open live in `public.settings`. Read them through
+`useAppSettings`; do not add them to runtime configuration.
 
 ---
 

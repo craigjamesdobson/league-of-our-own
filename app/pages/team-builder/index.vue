@@ -14,8 +14,7 @@ const {
 } = useTeamBuilder();
 
 const route = useRoute();
-const config = useRuntimeConfig();
-const registrationOpen = computed(() => config.public.TEAM_REGISTRATION_OPEN);
+const { teamRegistrationOpen: registrationOpen } = useAppSettings();
 
 if (registrationOpen.value && route.query.id) {
   await fetchDraftedTeamData();

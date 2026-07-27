@@ -4,6 +4,11 @@ import {
   type FplPlayer,
   type PlayerForSync,
 } from './fplPlayers';
+import {
+  prepareFplFixturesForSync,
+  type FplFixture,
+  type FixtureForSync,
+} from './fplFixtures';
 import { CURATED_DEVELOPMENT_TEAMS } from './fplDevelopmentTeams';
 
 export interface FplSeedBootstrap {
@@ -11,21 +16,7 @@ export interface FplSeedBootstrap {
   elements: FplPlayer[];
 }
 
-export interface FplSeedFixture {
-  id: number;
-  event: number;
-  team_h: number;
-  team_a: number;
-}
-
-interface FixtureSeed {
-  id: number;
-  game_week: number;
-  home_team: number;
-  away_team: number;
-  home_team_score: null;
-  away_team_score: null;
-}
+export type FplSeedFixture = FplFixture;
 
 interface DraftedTeamSeed {
   drafted_team_id: number;
@@ -71,7 +62,7 @@ interface SettingSeed {
 interface FplDevelopmentSeed {
   teams: ReturnType<typeof prepareFplTeamsForSync>;
   players: PlayerForSync[];
-  fixtures: FixtureSeed[];
+  fixtures: FixtureForSync[];
   draftedTeams: DraftedTeamSeed[];
   draftedPlayers: DraftedPlayerSeed[];
   draftedTransfers: DraftedTransferSeed[];
@@ -92,61 +83,16 @@ export const createFplDevelopmentSeed = (
   }
 
   const teams = prepareFplTeamsForSync({ teams: bootstrap.teams });
-  const teamIds = new Set(teams.map(team => team.id));
-
   if (!Array.isArray(bootstrap.elements)) {
     throw new Error('FPL bootstrap payload does not contain an elements array');
   }
 
   const players = prepareFplPlayersForSync({ elements: bootstrap.elements });
 
-  if (!Array.isArray(fplFixtures) || fplFixtures.length !== 380) {
-    throw new Error('FPL fixtures payload must contain exactly 380 fixtures');
-  }
-
-  const fixtureIds = new Set<number>();
-  const clubsByEvent = new Map<number, Set<number>>();
-  const fixtureCountsByEvent = new Map<number, number>();
-  const fixtures: FixtureSeed[] = fplFixtures.map((fixture) => {
-    if (
-      !Number.isInteger(fixture.id)
-      || fixture.id <= 0
-      || fixtureIds.has(fixture.id)
-    ) {
-      throw new Error('FPL fixtures must have unique positive integer ids');
-    }
-    if (!Number.isInteger(fixture.event) || fixture.event < 1 || fixture.event > 38) {
-      throw new Error(`FPL fixture ${fixture.id} has an invalid event`);
-    }
-    if (!teamIds.has(fixture.team_h) || !teamIds.has(fixture.team_a)) {
-      throw new Error(`FPL fixture ${fixture.id} references an unknown club`);
-    }
-
-    fixtureIds.add(fixture.id);
-    const eventClubs = clubsByEvent.get(fixture.event) ?? new Set<number>();
-    eventClubs.add(fixture.team_h);
-    eventClubs.add(fixture.team_a);
-    clubsByEvent.set(fixture.event, eventClubs);
-    fixtureCountsByEvent.set(
-      fixture.event,
-      (fixtureCountsByEvent.get(fixture.event) ?? 0) + 1,
-    );
-
-    return {
-      id: fixture.id,
-      game_week: fixture.event,
-      home_team: fixture.team_h,
-      away_team: fixture.team_a,
-      home_team_score: null,
-      away_team_score: null,
-    };
-  });
-
-  for (let event = 1; event <= 38; event += 1) {
-    if (fixtureCountsByEvent.get(event) !== 10 || clubsByEvent.get(event)?.size !== 20) {
-      throw new Error(`FPL event ${event} must contain all 20 clubs exactly once`);
-    }
-  }
+  const fixtures = prepareFplFixturesForSync(
+    fplFixtures,
+    teams.map(team => team.id),
+  );
 
   const playersByCode = new Map(
     bootstrap.elements.map(player => [player.code, player]),
@@ -289,8 +235,11 @@ export const createFplDevelopmentSeed = (
   );
 
   const settings: SettingSeed[] = [
+    { setting_key: 'active_season', setting_value: '26-27' },
     { setting_key: 'current_gameweek', setting_value: '1' },
     { setting_key: 'season_complete', setting_value: 'false' },
+    { setting_key: 'site_open', setting_value: 'true' },
+    { setting_key: 'team_registration_open', setting_value: 'true' },
   ];
 
   return {

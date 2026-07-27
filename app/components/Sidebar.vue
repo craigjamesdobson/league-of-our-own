@@ -2,7 +2,7 @@
 import { useAccountStore } from '@/stores/account';
 
 const accountStore = useAccountStore();
-const config = useRuntimeConfig();
+const { teamRegistrationOpen } = useAppSettings();
 
 const open = defineModel<boolean>('open', { default: true });
 
@@ -42,7 +42,7 @@ const teamBuilderRoute = {
 };
 
 const navigationItems = computed(() => {
-  const publicRoutes = config.public.TEAM_REGISTRATION_OPEN
+  const publicRoutes = teamRegistrationOpen.value
     ? [teamBuilderRoute, ...routes]
     : routes;
 

@@ -67,9 +67,10 @@ it after `bootstrap-static`, then validate the response before writing anything:
 
 - exactly 380 fixtures;
 - numeric, unique fixture IDs;
-- events 1 through 38, with 10 fixtures in each event;
+- gameweek assignments between 1 and 38, allowing postponements and rearranged
+  gameweeks to contain more or fewer than 10 fixtures;
 - home and away IDs that exist in the imported 20 clubs;
-- each club appearing once in every event;
+- every club pairing appearing once at each venue;
 - no fixture pairing a club with itself.
 
 The existing local fixture columns can be mapped directly:

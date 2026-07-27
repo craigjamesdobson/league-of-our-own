@@ -9,10 +9,10 @@ import WeeklyTransfers from '@/components/Dashboard/WeeklyTransfers.vue';
 import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vue';
 import WelcomeBack from '@/components/Home/WelcomeBack.vue';
 
-const config = useRuntimeConfig();
+const { teamRegistrationOpen } = useAppSettings();
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
-const registrationOpen = computed(() => config.public.TEAM_REGISTRATION_OPEN);
+const registrationOpen = teamRegistrationOpen;
 
 const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasGameweekData = computed(() => dashboard.hasGameweekData());

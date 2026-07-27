@@ -204,11 +204,11 @@ Configuration and environment setup for this project.
 
 ## Environment Variables
 
-### ACTIVE_SEASON
+### active_season
 
 **Type:** String
 **Format:** YYYY-YY
-**Example:** 2024-25
+**Example:** 26-27
 **Purpose:** Current fantasy season
 
 ...

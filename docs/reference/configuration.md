@@ -16,7 +16,6 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
-ACTIVE_SEASON=2024-25
 SITE_URL=http://localhost:3000
 
 # Security (optional - required for form submissions)
@@ -33,7 +32,6 @@ On your deployment platform (Vercel, Netlify, etc.):
 ```
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
-ACTIVE_SEASON=2024-25
 SITE_URL=https://yourdomain.com
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
@@ -64,24 +62,6 @@ NODE_ENV=production
 1. Supabase dashboard → Settings → API
 2. Copy "anon public" key
 3. Never use service_role key in client code
-
-### `ACTIVE_SEASON` (Required)
-
-**Type:** String
-**Format:** `YYYY-YY` (e.g., `2024-25`)
-**Purpose:** Current fantasy football season
-
-**Usage:**
-```typescript
-const config = useRuntimeConfig();
-const season = config.public.ACTIVE_SEASON;
-// Output: "2024-25"
-```
-
-**How to update:**
-- Change `.env.local` for development
-- Update deployment platform settings for production
-- Affects which season's data loads
 
 ### `SITE_URL` (Optional but Recommended)
 
@@ -133,7 +113,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       SITE_URL: process.env.SITE_URL,
-      ACTIVE_SEASON: process.env.ACTIVE_SEASON,
       nodeEnv: process.env.NODE_ENV,
       turnstile: {
         siteKey: process.env.TURNSTILE_SITE_KEY
@@ -151,12 +130,46 @@ In Vue components and composables:
 const config = useRuntimeConfig();
 
 // Access values
-const season = config.public.ACTIVE_SEASON;
 const siteUrl = config.public.SITE_URL;
 const turnstileSiteKey = config.public.turnstile.siteKey;
 ```
 
 **Note:** All configuration values are in `public` scope, making them available to client-side code. Never put secrets here.
+
+## Application Settings
+
+Operational settings live as rows in `public.settings`, so an operator can change
+application state without rebuilding or redeploying the site.
+
+| Key | Parsed type | Valid values |
+| --- | --- | --- |
+| `active_season` | string | Season key in `YY-YY` format, for example `26-27` |
+| `current_gameweek` | number | Integer from 1 to 38 |
+| `season_complete` | boolean | `true` or `false` |
+| `site_open` | boolean | `true` or `false` |
+| `team_registration_open` | boolean | `true` or `false` |
+
+Postgres stores each `setting_value` as text. `parseAppSettings` is the single
+application boundary that validates and converts those strings into typed values.
+Missing or invalid values fail closed: anonymous visitors see the coming-soon page
+and team submissions are rejected.
+
+Client code reads settings through `useAppSettings`:
+
+```typescript
+const {
+  activeSeason,
+  siteOpen,
+  teamRegistrationOpen,
+  refreshAppSettings,
+} = useAppSettings();
+
+await refreshAppSettings();
+```
+
+For a season release, update all related values in one SQL statement so clients
+never observe a partly switched Season. The `pnpm release:season` wizard provides
+the exact statement for staging and production.
 
 ## Nuxt Configuration
 
@@ -315,11 +328,13 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
 import type { Database } from '~/types/database.types';
 
 const supabase = useSupabaseClient<Database>();
+const { getActiveSeason } = useAppSettings();
+const activeSeason = await getActiveSeason();
 
 const { data } = await supabase
-  .from('players')
+  .from('drafted_teams')
   .select('*')
-  .eq('season', config.public.ACTIVE_SEASON);
+  .eq('active_season', activeSeason);
 ```
 
 ### Real-Time Subscriptions
@@ -443,4 +458,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-07-20
+**Last updated:** 2026-07-27

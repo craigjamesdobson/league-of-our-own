@@ -4,17 +4,18 @@ import type { WeeklyData, WeeklyWinners } from '~/types/Table';
 
 export const useTableStore = defineStore('table-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const config = useRuntimeConfig();
+  const { getActiveSeason } = useAppSettings();
 
   const weeklyData: Ref<WeeklyData[] | undefined> = ref();
   const weeklyWinners: Ref<WeeklyWinners[] | undefined> = ref();
 
   const fetchWeeklyStats = async (week: number) => {
+    const activeSeason = await getActiveSeason();
     const { data, error } = await supabase.rpc(
       'get_weekly_stats_for_gameweek',
       {
         target_week: week,
-        active_season_param: config.public.ACTIVE_SEASON,
+        active_season_param: activeSeason,
       },
     );
 
@@ -26,11 +27,12 @@ export const useTableStore = defineStore('table-store', () => {
   };
 
   const fetchFinalStandings = async (week: number): Promise<WeeklyData[]> => {
+    const activeSeason = await getActiveSeason();
     const { data, error } = await supabase.rpc(
       'get_weekly_stats_for_gameweek',
       {
         target_week: week,
-        active_season_param: config.public.ACTIVE_SEASON,
+        active_season_param: activeSeason,
       },
     );
 

@@ -37,10 +37,8 @@ export const validateFplFixtures = (fixtures, clubIds) => {
 
   const validClubIds = new Set(clubIds);
   const fixtureIds = new Set();
-  const eventCounts = new Map();
   const clubHomeCounts = new Map();
   const clubAwayCounts = new Map();
-  const eventClubs = new Map();
   const pairings = new Map();
   const directedPairings = new Set();
 
@@ -71,11 +69,6 @@ export const validateFplFixtures = (fixtures, clubIds) => {
     }
 
     fixtureIds.add(fixture.id);
-    eventCounts.set(fixture.event, (eventCounts.get(fixture.event) ?? 0) + 1);
-    const clubsInEvent = eventClubs.get(fixture.event) ?? new Set();
-    clubsInEvent.add(fixture.team_h);
-    clubsInEvent.add(fixture.team_a);
-    eventClubs.set(fixture.event, clubsInEvent);
     clubHomeCounts.set(
       fixture.team_h,
       (clubHomeCounts.get(fixture.team_h) ?? 0) + 1,
@@ -93,18 +86,6 @@ export const validateFplFixtures = (fixtures, clubIds) => {
     }
     directedPairings.add(directedPairingKey);
   });
-
-  for (let event = 1; event <= 38; event += 1) {
-    const expectedFixturesPerEvent = clubIds.length / 2;
-    if (eventCounts.get(event) !== expectedFixturesPerEvent) {
-      throw new Error(
-        `FPL event ${event} must contain exactly ${expectedFixturesPerEvent} fixtures`,
-      );
-    }
-    if (eventClubs.get(event)?.size !== clubIds.length) {
-      throw new Error(`Every FPL club must appear exactly once in event ${event}`);
-    }
-  }
 
   const expectedFixturesPerVenue = clubIds.length - 1;
   clubIds.forEach((club) => {

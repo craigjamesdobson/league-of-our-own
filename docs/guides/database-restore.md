@@ -1,6 +1,6 @@
 # Database Restoration Guide: Live to Development
 
-**Last updated:** 2026-07-25
+**Last updated:** 2026-07-27
 
 This guide documents the proven method for safely restoring live database data to development database when network connectivity issues prevent direct database connections.
 
@@ -49,13 +49,39 @@ application endpoints in this order:
    20 clubs and stores only each club's FPL ID, name, and short name.
 2. Call `POST /api/sync-players` with the same header. Players must be imported
    after clubs because each player references a club ID.
-3. Seed development-only drafted teams and squads from the imported players if
+3. Call `POST /api/sync-fixtures` with the same header. It requires exactly 20
+   imported clubs, validates all 380 fixtures and stores blank scores for the
+   new season.
+4. Seed development-only drafted teams and squads from the imported players if
    application scenarios need test league data.
 
-Both endpoints fetch the current FPL `bootstrap-static` payload and require the
-server's `SYNC_API_KEY`. The teams endpoint is a manual reset/re-seeding tool and
-is not called by the player-sync cron. Run these calls only against the intended
+The endpoints require the server's `SYNC_API_KEY`. Teams and players fetch the
+current FPL `bootstrap-static` payload; fixtures use the first-party FPL fixture
+feed. The teams and fixtures endpoints are manual reset/re-seeding tools and are
+not called by the player-sync cron. Run these calls only against the intended
 environment, and verify the hostname before sending them.
+
+## Guided Season Release
+
+After deploying the season-preparation migrations and application endpoints,
+run the guarded release wizard against staging first:
+
+```bash
+pnpm release:season -- staging
+```
+
+After validating staging, run the same committed procedure against production:
+
+```bash
+pnpm release:season -- production
+```
+
+The wizard does not store secrets or directly execute owner-only SQL. It opens
+the correct Supabase and Cloudflare dashboards, requires explicit confirmations
+for the backup, archive, clear, database-settings and cron steps, calls the
+three protected import endpoints, and validates their returned counts. The
+active Season and launch switches are updated in `public.settings`, so changing
+them does not require a frontend redeployment.
 
 ### Step 1: Split the Database Dump
 

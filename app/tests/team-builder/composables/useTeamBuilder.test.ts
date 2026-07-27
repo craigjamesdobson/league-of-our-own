@@ -27,7 +27,7 @@ mockNuxtImport('useSupabaseClient', () => {
 mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
     app: { baseURL: '/' },
-    public: { ACTIVE_SEASON: '26-27' },
+    public: {},
   });
 });
 

@@ -45,9 +45,12 @@ call_sync_endpoint() {
   local endpoint="$1" count_field="$2" expected_count="${3:-}" response count
 
   printf 'Calling POST /api/%s...\n' "$endpoint"
-  response=$(curl --fail-with-body --silent --show-error \
+  response=$(printf 'x-api-key: %s\n' "$SYNC_API_KEY" | curl \
+    --fail-with-body \
+    --silent \
+    --show-error \
     --request POST \
-    --header "x-api-key: $SYNC_API_KEY" \
+    --header @- \
     "$APP_URL/api/$endpoint")
   printf '%s\n' "$response"
 
@@ -78,6 +81,7 @@ call_sync_endpoint() {
 call_sync_endpoint "sync-teams" "teamsCount" 20
 call_sync_endpoint "sync-players" "playersCount"
 call_sync_endpoint "sync-fixtures" "fixturesCount" 380
+unset SYNC_API_KEY
 
 printf 'Checking deployed routes...\n'
 curl --fail-with-body --silent --show-error "$APP_URL/" >/dev/null

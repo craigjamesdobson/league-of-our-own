@@ -20,6 +20,21 @@ This runbook is currently configured for moving from 2025/26 (`25-26`) to
 - Record whether the target is staging or production and verify every URL before
   making a change.
 
+Create a target record before opening the SQL Editor:
+
+| Check | Recorded value |
+| --- | --- |
+| Environment | `staging` or `production` |
+| Expected application hostname | |
+| Expected Supabase project reference | |
+| Local commit (`git rev-parse HEAD`) | |
+| Commit shown by the deployed application revision | |
+
+The local and deployed commits must match. Confirm the application hostname and
+Supabase project reference against the target's deployment configuration. Before
+running every SQL block below, check that the open SQL Editor URL contains the
+recorded project reference. Do not rely on the currently selected browser tab.
+
 Stop if any count or validation differs from the expected result. Do not proceed
 on the assumption that the next step will repair it.
 
@@ -154,9 +169,17 @@ page. Team registration can be controlled independently using
 
 ## If something fails
 
-- Stop immediately; do not skip a failed validation.
-- Leave team registration closed.
-- Keep the cron paused.
-- Save the endpoint response or SQL error.
-- Use the archive for historical inspection and the confirmed Supabase backup if
-  operational data must be restored.
+Always stop, leave team registration closed, keep the cron paused, and save the
+endpoint response or SQL error. Then use the applicable recovery path:
+
+| Failure point | Recovery action |
+| --- | --- |
+| Before the archive succeeds | Fix the target or validation problem. No data has been cleared, so a restore is not required. |
+| Archive call fails | Do not clear. Confirm whether the transaction rolled back before retrying. If the archived Season exists, inspect it instead of running the one-off archive again. |
+| Archive succeeds but validation fails | Do not clear or rerun the archive. Investigate the archived rows and recorded counts. Restore only if the operational data or archive was corrupted. |
+| After clear, during an import | Fix the endpoint or configuration problem and rerun `pnpm season:import` from the beginning. The three imports use database upserts and are safe to retry before submissions reopen. |
+| After the settings switch or after submissions reopen | Immediately set `site_open` and `team_registration_open` to `false`. Restore the pre-rollover backup if operational data is incorrect and cannot be safely repaired. |
+
+After any backup restoration, re-check the target record, archived Season,
+operational table counts, and all five application settings. Repeat the smoke
+test before reopening registration or resuming the cron.

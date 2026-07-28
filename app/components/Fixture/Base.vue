@@ -12,7 +12,7 @@ defineModel<Fixture | undefined>('fixture');
   >
     <div class="flex flex-col items-center gap-2.5">
       <img
-        class="aspect-square w-10"
+        class="aspect-square w-10 object-contain"
         :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
       >
       <p class="text-md font-black uppercase text-slate-800 dark:text-slate-100">
@@ -27,7 +27,7 @@ defineModel<Fixture | undefined>('fixture');
     </div>
     <div class="flex flex-col items-center gap-2.5">
       <img
-        class="aspect-square w-10"
+        class="aspect-square w-10 object-contain"
         :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
       >
       <p class="text-md font-black uppercase text-slate-800 dark:text-slate-100">

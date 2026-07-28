@@ -2,7 +2,10 @@
 import { usePlayerStore } from '@/stores/players';
 
 const playerStore = usePlayerStore();
-await playerStore.fetchPlayers();
+await Promise.all([
+  playerStore.fetchPlayers(),
+  playerStore.fetchClubs(),
+]);
 
 const { initialize } = useHotjar();
 

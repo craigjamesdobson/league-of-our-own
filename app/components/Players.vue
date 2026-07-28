@@ -18,9 +18,9 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table';
+import { refDebounced } from '@vueuse/core';
 import { h, resolveComponent } from 'vue';
 import { usePlayerStore } from '@/stores/players';
-import { TEAM_DATA } from '@/logic/teams/constants';
 import { populateFilterPrices } from '@/utils/filters';
 import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
 import { getPositionName } from '@/utils/playerPosition';
@@ -55,10 +55,11 @@ const pagination = ref<PaginationState>({
   pageIndex: 0,
   pageSize: 50,
 });
+const playerSearch = ref('');
+const debouncedPlayerSearch = refDebounced(playerSearch, 250);
 const mobileFiltersOpen = ref(false);
 const UBadge = resolveComponent('UBadge');
 const UButton = resolveComponent('UButton');
-const UInput = resolveComponent('UInput');
 const UPopover = resolveComponent('UPopover');
 const USelectMenu = resolveComponent('USelectMenu');
 const UTooltip = resolveComponent('UTooltip');
@@ -76,7 +77,11 @@ const playerNameFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
     return true;
   }
 
-  return normalizeFilterValue(row.original.web_name ?? '').includes(search);
+  return normalizeFilterValue([
+    row.original.web_name,
+    row.original.first_name,
+    row.original.second_name,
+  ].filter(Boolean).join(' ')).includes(search);
 };
 
 const positionFilter: PlayerFilterFn = (row, _columnId, filterValue) => {
@@ -124,8 +129,8 @@ const availabilityFilters = [
 ] satisfies { label: string; value: AvailabilityFilter }[];
 
 const teamFilters = computed(() =>
-  TEAM_DATA.map(team => ({
-    name: team.name,
+  playerStore.getClubs.map(team => ({
+    name: team.name ?? team.short_name ?? `Team ${team.id}`,
     value: team.id,
   })),
 );
@@ -207,6 +212,7 @@ const getAvailability = (player: PlayerTableRow) => {
 };
 
 const resetFilters = () => {
+  playerSearch.value = '';
   columnFilters.value = [];
   expanded.value = {};
   sorting.value = [...defaultSorting];
@@ -216,8 +222,6 @@ const resetFilters = () => {
 const getColumnFilterValue = (id: string) => {
   return columnFilters.value.find(filter => filter.id === id)?.value;
 };
-
-const getColumnFilterString = (id: string) => String(getColumnFilterValue(id) ?? '');
 
 const getColumnFilterNumber = (id: string) => Number(getColumnFilterValue(id) ?? 0);
 
@@ -251,6 +255,8 @@ const setColumnFilterValue = (id: string, value: unknown, emptyValue: unknown) =
   pagination.value = { ...pagination.value, pageIndex: 0 };
 };
 
+watch(debouncedPlayerSearch, value => setColumnFilterValue('player', value, ''));
+
 const setColumnFilter = (column: TableColumnApi, value: unknown, emptyValue: unknown) => {
   column.setFilterValue(isEmptyFilterValue(value, emptyValue) ? undefined : value);
   expanded.value = {};
@@ -262,6 +268,14 @@ const setPageSize = (pageSize: number) => {
     pageIndex: 0,
     pageSize,
   };
+};
+
+const setCurrentPage = (page: number) => {
+  pagination.value = {
+    ...pagination.value,
+    pageIndex: page - 1,
+  };
+  expanded.value = {};
 };
 
 const getSortIcon = (column: TableColumnApi) => {
@@ -358,26 +372,6 @@ const renderClearFilterButton = (column: TableColumnApi, id: string) =>
     onClick: () => column.setFilterValue(undefined),
   });
 
-const renderPlayerHeader = (column: TableColumnApi) =>
-  h('div', { class: 'flex min-w-56 items-center gap-1.5' }, [
-    renderSortButton(column, 'Player'),
-    h(UPopover, { content: { align: 'start' } }, {
-      default: () => renderFilterButton('player', 'Filter players'),
-      content: () => h('div', { class: 'w-64 space-y-3 p-3' }, [
-        h(UInput, {
-          'modelValue': getColumnFilterString('player'),
-          'class': 'w-full normal-case',
-          'icon': 'tabler:search',
-          'size': 'sm',
-          'placeholder': 'Search players',
-          'autofocus': true,
-          'onUpdate:modelValue': (value: string) => column.setFilterValue(value || undefined),
-        }),
-        renderClearFilterButton(column, 'player'),
-      ]),
-    }),
-  ]);
-
 const renderSelectFilterHeader = ({
   column,
   id,
@@ -469,7 +463,7 @@ const renderPlayerCell = (player: PlayerTableRow) =>
 const renderTeamCell = (player: PlayerTableRow) =>
   h('div', { class: 'flex items-center gap-2' }, [
     h('img', {
-      class: 'h-6 w-6',
+      class: 'aspect-square h-6 w-6 object-contain',
       src: getImageUrl(player.team_short_name.toLowerCase()),
       alt: player.team_short_name,
     }),
@@ -511,7 +505,7 @@ const columns: ColumnDef<PlayerTableRow>[] = [
   {
     accessorKey: 'web_name',
     id: 'player',
-    header: ({ column }) => renderPlayerHeader(column as TableColumnApi),
+    header: ({ column }) => renderSortButton(column as TableColumnApi, 'Player'),
     cell: ({ row }) => renderPlayerCell(row.original),
     filterFn: playerNameFilter,
     meta: { class: { th: 'min-w-64 align-top' } },
@@ -719,7 +713,14 @@ const visibleRange = computed(() => {
               {{ visibleRange }}
             </p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <UInput
+              v-model="playerSearch"
+              icon="tabler:search"
+              placeholder="Search players"
+              size="sm"
+              class="w-full sm:w-64"
+            />
             <UButton
               icon="lucide:rotate-ccw"
               label="Reset"
@@ -735,15 +736,6 @@ const visibleRange = computed(() => {
       </div>
 
       <div class="grid gap-3 border-b border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900 md:hidden">
-        <UInput
-          :model-value="getColumnFilterString('player')"
-          icon="tabler:search"
-          placeholder="Search players"
-          size="sm"
-          class="w-full"
-          @update:model-value="setColumnFilterValue('player', $event || '', '')"
-        />
-
         <div class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2">
           <USelect
             v-model="mobileSortId"
@@ -906,7 +898,7 @@ const visibleRange = computed(() => {
               </div>
               <div class="mt-1 flex min-w-0 items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                 <img
-                  class="h-4 w-4"
+                  class="aspect-square h-4 w-4 object-contain"
                   :src="getImageUrl(row.original.team_short_name.toLowerCase())"
                   :alt="row.original.team_short_name"
                 >
@@ -1057,7 +1049,7 @@ const visibleRange = computed(() => {
                                 />
                                 <span class="flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-200">
                                   <img
-                                    class="h-5 w-5"
+                                    class="aspect-square h-5 w-5 object-contain"
                                     :src="getImageUrl(row.original.team_short_name.toLowerCase())"
                                     :alt="row.original.team_short_name"
                                   >
@@ -1150,7 +1142,7 @@ const visibleRange = computed(() => {
             :total="filteredRowCount"
             size="sm"
             show-edges
-            @update:page="pagination.pageIndex = $event - 1"
+            @update:page="setCurrentPage($event)"
           />
         </div>
       </div>

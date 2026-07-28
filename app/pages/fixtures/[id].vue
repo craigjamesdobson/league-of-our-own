@@ -193,7 +193,7 @@ const scoreStepperButton = {
             class="mx-auto my-10 flex w-full max-w-96 items-center justify-center gap-5 rounded border border-slate-200 bg-white p-5 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           >
             <img
-              class="aspect-square h-32 w-32"
+              class="aspect-square h-32 w-32 object-contain"
               :src="getImageUrl(fixture.home_team.short_name.toLowerCase())"
             >
             <div class="flex flex-col items-center gap-2.5">
@@ -235,7 +235,7 @@ const scoreStepperButton = {
               />
             </div>
             <img
-              class="aspect-square h-32 w-32"
+              class="aspect-square h-32 w-32 object-contain"
               :src="getImageUrl(fixture.away_team.short_name.toLowerCase())"
             >
           </div>

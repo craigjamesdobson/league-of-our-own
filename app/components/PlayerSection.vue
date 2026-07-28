@@ -110,7 +110,7 @@ const selectedPlayer = computed({
       >
         <div class="flex items-start gap-10">
           <img
-            class="h-8 w-8"
+            class="aspect-square h-8 w-8 object-contain"
             :src="getImageUrl(player!.team_short_name.toLowerCase())"
           >
         </div>

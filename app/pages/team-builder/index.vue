@@ -78,7 +78,7 @@ else if (registrationOpen.value) {
       v-if="saveConfirmation"
       color="success"
       variant="soft"
-      class="mx-5"
+      class="-mx-5 2xl:mx-0"
       icon="i-lucide-check-circle-2"
     >
       <template #description>
@@ -116,7 +116,7 @@ else if (registrationOpen.value) {
         <h2 class="mb-2.5 text-center text-xl font-black uppercase">
           Pick your team
         </h2>
-        <div class="sticky top-0 z-10 mb-5 flex flex-col items-center gap-2.5 border-b border-slate-200 bg-white/95 px-3 py-3 text-sm backdrop-blur 2xl:static 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:backdrop-blur-none dark:border-slate-700 dark:bg-slate-950/95">
+        <div class="sticky top-0 z-10 -mx-5 mb-5 flex flex-col items-center gap-2.5 border-b border-slate-200 bg-white/95 px-5 py-3 text-sm backdrop-blur 2xl:static 2xl:mx-0 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:backdrop-blur-none dark:border-slate-700 dark:bg-slate-950/95">
           <p class="font-bold">
             {{ selectedCount }} / 11 players selected
           </p>

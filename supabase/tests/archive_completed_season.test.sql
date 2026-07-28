@@ -13,6 +13,7 @@ select is(
       'current_gameweek',
       'season_complete',
       'site_open',
+      'league_data_public',
       'team_registration_open'
     )
   ),
@@ -21,6 +22,7 @@ select is(
     'current_gameweek', '1',
     'season_complete', 'false',
     'site_open', 'false',
+    'league_data_public', 'false',
     'team_registration_open', 'false'
   ),
   'clean migrations create every required application setting with safe defaults'

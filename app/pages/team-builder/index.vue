@@ -116,7 +116,7 @@ else if (registrationOpen.value) {
           variant="soft"
         >
           <template #description>
-            You are editing your existing team. It was last edited on <strong>{
+            You are editing your existing team. It was last edited on <strong>{{
               draftedTeamData.updated_at
                 ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
                 : draftedTeamData.created_at

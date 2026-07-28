@@ -226,22 +226,22 @@ export const useTeamBuilder = () => {
 
       let emailDeliveryFailed = false;
 
-      try {
-        await $fetch('/api/user-email', {
-          method: 'post',
-          body: {
-            title: (teamData.edited_count ?? 0) > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
-            email: draftedTeamData.value.team_email,
-            html: generateTeamEmail(draftedTeamPlayers.value, teamData),
-          },
-        });
-      }
-      catch (emailError) {
-        emailDeliveryFailed = true;
-        console.error('Failed to send team confirmation email:', emailError);
-      }
-
       if (!wasEditing) {
+        try {
+          await $fetch('/api/user-email', {
+            method: 'post',
+            body: {
+              title: 'Thank you for your team submission',
+              email: draftedTeamData.value.team_email,
+              html: generateTeamEmail(draftedTeamPlayers.value, teamData),
+            },
+          });
+        }
+        catch (emailError) {
+          emailDeliveryFailed = true;
+          console.error('Failed to send team confirmation email:', emailError);
+        }
+
         try {
           await $fetch('/api/admin-email', {
             method: 'post',
@@ -273,7 +273,9 @@ export const useTeamBuilder = () => {
         emailDeliveryFailed ? 'Team saved' : 'Success',
         emailDeliveryFailed
           ? 'Your team was saved, but a confirmation email could not be sent. Please contact the league administrator.'
-          : 'Your team has been submitted, thank you!',
+          : wasEditing
+            ? 'Your changes have been saved. No new email has been sent.'
+            : 'Your team has been submitted, thank you!',
       );
     }
     catch (submissionError) {

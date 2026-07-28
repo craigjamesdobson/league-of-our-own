@@ -122,7 +122,7 @@ else if (registrationOpen.value) {
                 : draftedTeamData.created_at
                   ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
                   : 'Unknown'
-            }}</strong>
+            }}</strong>. Changes are saved without sending another email.
           </template>
         </UAlert>
         <div

@@ -7,6 +7,7 @@ const {
   turnstileToken,
   selectedPlayerIds,
   isExistingDraftedTeam,
+  saveConfirmation,
   remainingBudget,
   teamBudget,
   teamValue,
@@ -71,79 +72,97 @@ else if (registrationOpen.value) {
   </div>
   <div
     v-else
-    class="flex flex-col-reverse gap-5 2xl:flex-row"
+    class="flex flex-col gap-5"
   >
-    <div class="px-5 2xl:w-96">
-      <h1 class="mb-2.5 text-center text-xl font-black uppercase 2xl:text-left">
-        Team details
-      </h1>
-      <TeamBuilderForm
-        v-model:drafted-team-data="draftedTeamData"
-        v-model:turnstile-token="turnstileToken"
-        :is-existing-drafted-team="isExistingDraftedTeam"
-        :remaining-budget="remainingBudget"
-        :team-budget="teamBudget"
-        :team-value="teamValue"
-        :team-submission-deadline="teamSubmissionDeadline"
-        :is-over-budget="isOverBudget"
-        :loading="loading"
-        :submit-team="submitTeam"
-      />
-    </div>
-
-    <div class="flex flex-1 flex-col">
-      <h2 class="mb-2.5 text-center text-xl font-black uppercase">
-        Pick your team
-      </h2>
-      <div class="mb-5 flex flex-col items-center gap-2.5 text-sm">
-        <p class="font-bold">
-          {{ selectedCount }} / 11 players selected
-        </p>
-        <div class="flex flex-wrap justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span
-            v-for="progress in positionProgress"
-            :key="progress.label"
-            class="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800"
-          >
-            {{ progress.label }} {{ progress.selected }}/{{ progress.total }}
-          </span>
-        </div>
-      </div>
-      <div class="text-center 2xl:hidden">
-        <UAlert
-          v-if="isExistingDraftedTeam"
-          color="info"
-          variant="soft"
-        >
-          <template #description>
-            You are editing your existing team. It was last edited on <strong>{{
-              draftedTeamData.updated_at
-                ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
-                : draftedTeamData.created_at
-                  ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
-                  : 'Unknown'
-            }}</strong>. Changes are saved without sending another email.
-          </template>
-        </UAlert>
-        <div
-          v-else
-          class="text-xs"
-        >
-          <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
-          <p class="mb-5">
-            Pick your eleven players, complete your details, and submit your team.
-          </p>
-          <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
-        </div>
-      </div>
-      <div class="grid grid-cols-12 justify-center gap-5">
-        <PlayerSection
-          v-for="(player, index) in draftedTeamPlayers"
-          :key="index"
-          v-model:player="player.selectedPlayer"
-          :selected-players="selectedPlayerIds"
-          :position="player.position"
+    <UAlert
+      v-if="saveConfirmation"
+      color="success"
+      variant="soft"
+      class="mx-5"
+      icon="i-lucide-check-circle-2"
+    >
+      <template #description>
+        <strong>{{ saveConfirmation === 'updated' ? 'Team updated' : 'Team submitted' }}</strong>
+        <span class="block text-sm">
+          {{ saveConfirmation === 'updated'
+            ? 'Your changes have been saved. No new email was sent.'
+            : 'Your team has been saved successfully. A confirmation email has been sent.' }}
+        </span>
+      </template>
+    </UAlert>
+    <div class="flex flex-col-reverse gap-5 2xl:flex-row">
+      <div class="px-5 2xl:w-96">
+        <h1 class="mb-2.5 text-center text-xl font-black uppercase 2xl:text-left">
+          Team details
+        </h1>
+        <TeamBuilderForm
+          v-model:drafted-team-data="draftedTeamData"
+          v-model:turnstile-token="turnstileToken"
+          :is-existing-drafted-team="isExistingDraftedTeam"
+          :remaining-budget="remainingBudget"
+          :team-budget="teamBudget"
+          :team-value="teamValue"
+          :team-submission-deadline="teamSubmissionDeadline"
+          :is-over-budget="isOverBudget"
+          :loading="loading"
+          :submit-team="submitTeam"
         />
+      </div>
+
+      <div class="flex flex-1 flex-col">
+        <h2 class="mb-2.5 text-center text-xl font-black uppercase">
+          Pick your team
+        </h2>
+        <div class="mb-5 flex flex-col items-center gap-2.5 text-sm">
+          <p class="font-bold">
+            {{ selectedCount }} / 11 players selected
+          </p>
+          <div class="flex flex-wrap justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+            <span
+              v-for="progress in positionProgress"
+              :key="progress.label"
+              class="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800"
+            >
+              {{ progress.label }} {{ progress.selected }}/{{ progress.total }}
+            </span>
+          </div>
+        </div>
+        <div class="text-center 2xl:hidden">
+          <UAlert
+            v-if="isExistingDraftedTeam"
+            color="info"
+            variant="soft"
+          >
+            <template #description>
+              You are editing your existing team. It was last edited on <strong>{{
+                draftedTeamData.updated_at
+                  ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+                  : draftedTeamData.created_at
+                    ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+                    : 'Unknown'
+              }}</strong>. Changes are saved without sending another email.
+            </template>
+          </UAlert>
+          <div
+            v-else
+            class="text-xs"
+          >
+            <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
+            <p class="mb-5">
+              Pick your eleven players, complete your details, and submit your team.
+            </p>
+            <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
+          </div>
+        </div>
+        <div class="grid grid-cols-12 justify-center gap-5">
+          <PlayerSection
+            v-for="(player, index) in draftedTeamPlayers"
+            :key="index"
+            v-model:player="player.selectedPlayer"
+            :selected-players="selectedPlayerIds"
+            :position="player.position"
+          />
+        </div>
       </div>
     </div>
   </div>

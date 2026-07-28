@@ -59,6 +59,7 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
+  const saveConfirmation = ref<'submitted' | 'updated' | null>(null);
   const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason.value));
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
   const turnstileToken = ref<string | null>(null);
@@ -196,6 +197,7 @@ export const useTeamBuilder = () => {
     try {
       loading.value.submittingForm = true;
       error.value = null;
+      saveConfirmation.value = null;
 
       await delay(1000);
 
@@ -277,6 +279,7 @@ export const useTeamBuilder = () => {
             ? 'Your changes have been saved. No new email has been sent.'
             : 'Your team has been submitted, thank you!',
       );
+      saveConfirmation.value = wasEditing ? 'updated' : 'submitted';
     }
     catch (submissionError) {
       const message = submissionError instanceof Error
@@ -294,6 +297,7 @@ export const useTeamBuilder = () => {
     draftedTeamData.value = createEmptyTeamData(activeSeason.value);
     setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     error.value = null;
+    saveConfirmation.value = null;
   };
 
   const validateForm = (): boolean => {
@@ -322,6 +326,7 @@ export const useTeamBuilder = () => {
   return {
     loading: readonly(loading),
     error: readonly(error),
+    saveConfirmation: readonly(saveConfirmation),
     draftedTeamData,
     draftedTeamPlayers,
     turnstileToken,

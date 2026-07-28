@@ -91,7 +91,10 @@ else if (registrationOpen.value) {
       </template>
     </UAlert>
     <div class="flex flex-col-reverse gap-5 2xl:flex-row">
-      <div class="px-5 2xl:w-96">
+      <div
+        id="team-details"
+        class="scroll-mt-20 px-5 2xl:w-96"
+      >
         <h1 class="mb-2.5 text-center text-xl font-black uppercase 2xl:text-left">
           Team details
         </h1>
@@ -113,7 +116,7 @@ else if (registrationOpen.value) {
         <h2 class="mb-2.5 text-center text-xl font-black uppercase">
           Pick your team
         </h2>
-        <div class="mb-5 flex flex-col items-center gap-2.5 text-sm">
+        <div class="sticky top-0 z-10 mb-5 flex flex-col items-center gap-2.5 border-b border-slate-200 bg-white/95 px-3 py-3 text-sm backdrop-blur 2xl:static 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:backdrop-blur-none dark:border-slate-700 dark:bg-slate-950/95">
           <p class="font-bold">
             {{ selectedCount }} / 11 players selected
           </p>
@@ -126,6 +129,38 @@ else if (registrationOpen.value) {
               {{ progress.label }} {{ progress.selected }}/{{ progress.total }}
             </span>
           </div>
+          <div class="grid w-full max-w-sm grid-cols-3 gap-2 text-center text-xs 2xl:hidden">
+            <div>
+              <p class="text-slate-500 dark:text-slate-400">
+                Value
+              </p>
+              <p class="font-bold text-slate-900 dark:text-slate-100">
+                £{{ teamValue.toFixed(1) }}m
+              </p>
+            </div>
+            <div>
+              <p class="text-slate-500 dark:text-slate-400">
+                Budget
+              </p>
+              <p class="font-bold text-slate-900 dark:text-slate-100">
+                £{{ teamBudget.toFixed(1) }}m
+              </p>
+            </div>
+            <div>
+              <p class="text-slate-500 dark:text-slate-400">
+                Remaining
+              </p>
+              <p :class="isOverBudget ? 'font-bold text-red-600 dark:text-red-300' : 'font-bold text-emerald-600 dark:text-emerald-300'">
+                £{{ remainingBudget.toFixed(1) }}m
+              </p>
+            </div>
+          </div>
+          <a
+            href="#team-details"
+            class="text-xs font-bold text-blue-600 underline underline-offset-2 dark:text-blue-300 2xl:hidden"
+          >
+            Team details &amp; submit
+          </a>
         </div>
         <div class="text-center 2xl:hidden">
           <UAlert

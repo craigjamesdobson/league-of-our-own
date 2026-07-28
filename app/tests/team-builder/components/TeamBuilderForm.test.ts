@@ -15,6 +15,7 @@ const mountTeamBuilderForm = (overrides = {}) => {
       remainingBudget: 10,
       teamBudget: 90,
       teamValue: 80,
+      teamSubmissionDeadline: '2026-08-20',
       isOverBudget: false,
       loading: { submittingForm: false },
       submitTeam,

@@ -18,7 +18,10 @@ const {
 } = useTeamBuilder();
 
 const route = useRoute();
-const { teamRegistrationOpen: registrationOpen } = useAppSettings();
+const {
+  teamRegistrationOpen: registrationOpen,
+  teamSubmissionDeadline,
+} = useAppSettings();
 
 const selectedCount = computed(() => selectedPlayerIds.value.length);
 const positionCounts = computed(() => {
@@ -79,6 +82,7 @@ else if (registrationOpen.value) {
         :remaining-budget="remainingBudget"
         :team-budget="teamBudget"
         :team-value="teamValue"
+        :team-submission-deadline="teamSubmissionDeadline"
         :is-over-budget="isOverBudget"
         :loading="loading"
         :submit-team="submitTeam"

@@ -13,6 +13,7 @@ const props = defineProps<{
   remainingBudget: number;
   teamBudget: number;
   teamValue: number;
+  teamSubmissionDeadline: string;
   isOverBudget: boolean;
   loading: { submittingForm: boolean };
   submitTeam: () => Promise<void>;
@@ -58,6 +59,15 @@ const contactNumber = computed({
   set: (value: string) => {
     draftedTeamData.value.contact_number = value.trim() || null;
   },
+});
+
+const formattedDeadline = computed(() => {
+  if (!props.teamSubmissionDeadline) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(`${props.teamSubmissionDeadline}T00:00:00Z`));
 });
 
 const handleTeamSubmit = async () => {
@@ -124,7 +134,7 @@ const handleTeamSubmit = async () => {
         <p class="uppercase font-black">
           Team entry is now open
         </p>
-        <p>Submission deadline: 20th August 2026</p>
+        <p>Submission deadline: {{ formattedDeadline }}</p>
       </div>
     </template>
   </UAlert>

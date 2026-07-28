@@ -149,6 +149,7 @@ application state without rebuilding or redeploying the site.
 | `site_open` | boolean | `true` or `false` |
 | `league_data_public` | boolean | `true` or `false` |
 | `team_registration_open` | boolean | `true` or `false` |
+| `team_submission_deadline` | date | `YYYY-MM-DD` |
 
 Postgres stores each `setting_value` as text. `parseAppSettings` is the single
 application boundary that validates and converts those strings into typed values.

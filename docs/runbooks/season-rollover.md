@@ -140,6 +140,7 @@ set
     when 'site_open' then 'true'
     when 'league_data_public' then 'false'
     when 'team_registration_open' then 'true'
+    when 'team_submission_deadline' then '2026-08-20'
   end,
   updated_at = now()
 where setting_key in (
@@ -148,7 +149,8 @@ where setting_key in (
   'season_complete',
   'site_open',
   'league_data_public',
-  'team_registration_open'
+  'team_registration_open',
+  'team_submission_deadline'
 );
 ```
 

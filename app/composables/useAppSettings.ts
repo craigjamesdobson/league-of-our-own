@@ -104,6 +104,9 @@ export function useAppSettings() {
     teamRegistrationOpen: computed(
       () => settings.value?.teamRegistrationOpen ?? false,
     ),
+    teamSubmissionDeadline: computed(
+      () => settings.value?.teamSubmissionDeadline ?? '',
+    ),
     refreshAppSettings,
     getActiveSeason,
     getCurrentGameweek,

@@ -10,6 +10,7 @@ export interface AppSettings {
   siteOpen: boolean;
   leagueDataPublic: boolean;
   teamRegistrationOpen: boolean;
+  teamSubmissionDeadline: string;
 }
 
 export const APP_SETTING_KEYS = [
@@ -19,6 +20,7 @@ export const APP_SETTING_KEYS = [
   'site_open',
   'league_data_public',
   'team_registration_open',
+  'team_submission_deadline',
 ] as const;
 
 const parseBooleanSetting = (key: string, value: string | undefined): boolean => {
@@ -57,6 +59,14 @@ const parseCurrentGameweek = (value: string): number => {
   return gameweek;
 };
 
+const parseTeamSubmissionDeadline = (value: string): string => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) {
+    throw new Error('Setting team_submission_deadline must use the YYYY-MM-DD format');
+  }
+
+  return value;
+};
+
 export const parseAppSettings = (rows: AppSettingRow[]): AppSettings => {
   const values = new Map(
     rows.map(row => [row.setting_key, row.setting_value]),
@@ -79,6 +89,9 @@ export const parseAppSettings = (rows: AppSettingRow[]): AppSettings => {
     teamRegistrationOpen: parseBooleanSetting(
       'team_registration_open',
       values.get('team_registration_open'),
+    ),
+    teamSubmissionDeadline: parseTeamSubmissionDeadline(
+      requireSetting(values, 'team_submission_deadline'),
     ),
   };
 };

@@ -59,7 +59,7 @@ const generateTeamEmail = (players: DraftedTeamPlayer[], data: {
   total_team_value: number;
   key: string;
 }) => renderLayout(
-  `${data.team_name} is in`,
+  escapeHtml(`${data.team_name} is in`),
   `
     <p>Thanks for submitting your team. Here is a copy of your selection for your records.</p>
     <table style="width:100%;border-collapse:collapse;margin:20px 0;">${renderSquad(players)}</table>
@@ -82,7 +82,7 @@ const generateAdminEmail = (players: DraftedTeamPlayer[], data: {
   total_team_value: number;
   key: string;
 }) => renderLayout(
-  `New team: ${escapeHtml(data.team_name)}`,
+  escapeHtml(`New team: ${data.team_name}`),
   `
     <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
       <tr><td style="padding:6px 0;color:#64748b;width:120px;">Owner</td><td style="padding:6px 0;font-weight:700;">${escapeHtml(data.team_owner)}</td></tr>

@@ -64,7 +64,9 @@ else if (registrationOpen.value) {
       variant="soft"
       class="max-w-xl"
     >
-      Team entries are currently closed.
+      <template #description>
+        Team entries are currently closed.
+      </template>
     </UAlert>
   </div>
   <div
@@ -113,17 +115,25 @@ else if (registrationOpen.value) {
           color="info"
           variant="soft"
         >
-          You are editing your existing team.
+          <template #description>
+            You are editing your existing team. It was last edited on <strong>{
+              draftedTeamData.updated_at
+                ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+                : draftedTeamData.created_at
+                  ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+                  : 'Unknown'
+            }}</strong>
+          </template>
         </UAlert>
         <div
           v-else
           class="text-xs"
         >
-          <USeparator class="my-5" />
+          <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
           <p class="mb-5">
             Pick your eleven players, complete your details, and submit your team.
           </p>
-          <USeparator class="my-5" />
+          <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
         </div>
       </div>
       <div class="grid grid-cols-12 justify-center gap-5">

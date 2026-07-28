@@ -193,5 +193,5 @@ endpoint response or SQL error. Then use the applicable recovery path:
 | After the settings switch or after submissions reopen | Immediately set `site_open`, `league_data_public`, and `team_registration_open` to `false`. Restore the pre-rollover backup if operational data is incorrect and cannot be safely repaired. |
 
 After any backup restoration, re-check the target record, archived Season,
-operational table counts, and all six application settings. Repeat the smoke
+operational table counts, and all seven application settings. Repeat the smoke
 test before reopening registration or resuming the cron.

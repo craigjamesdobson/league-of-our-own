@@ -60,7 +60,15 @@ const parseCurrentGameweek = (value: string): number => {
 };
 
 const parseTeamSubmissionDeadline = (value: string): string => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(Date.parse(`${value}T00:00:00Z`))) {
+  const parts = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const date = parts
+    ? new Date(Date.UTC(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])))
+    : null;
+
+  if (!date
+    || date.getUTCFullYear() !== Number(parts![1])
+    || date.getUTCMonth() !== Number(parts![2]) - 1
+    || date.getUTCDate() !== Number(parts![3])) {
     throw new Error('Setting team_submission_deadline must use the YYYY-MM-DD format');
   }
 

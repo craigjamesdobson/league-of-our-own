@@ -78,7 +78,7 @@ else if (registrationOpen.value) {
       v-if="saveConfirmation"
       color="success"
       variant="soft"
-      class="-mx-5 2xl:mx-0"
+      class="w-full"
       icon="i-lucide-check-circle-2"
     >
       <template #description>

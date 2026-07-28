@@ -1,6 +1,6 @@
 # Season rollover runbook
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-07-28
 
 Use this runbook first in staging and then in production. The SQL remains a
 deliberate manual operation because archiving and clearing operational data are

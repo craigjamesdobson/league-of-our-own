@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useAccountStore } from '@/stores/account';
+import { canAccessLeagueRoute } from '../../shared/utils/leagueRouteAccess';
 
 const accountStore = useAccountStore();
-const { teamRegistrationOpen } = useAppSettings();
+const { leagueDataPublic, teamRegistrationOpen } = useAppSettings();
 
 const open = defineModel<boolean>('open', { default: true });
 
@@ -42,9 +43,14 @@ const teamBuilderRoute = {
 };
 
 const navigationItems = computed(() => {
+  const visibleRoutes = routes.filter(route => canAccessLeagueRoute(
+    route.to,
+    leagueDataPublic.value,
+    accountStore.userIsLoggedIn,
+  ));
   const publicRoutes = teamRegistrationOpen.value
-    ? [teamBuilderRoute, ...routes]
-    : routes;
+    ? [teamBuilderRoute, ...visibleRoutes]
+    : visibleRoutes;
 
   return accountStore.userIsLoggedIn
     ? [...publicRoutes, fixturesRoute]

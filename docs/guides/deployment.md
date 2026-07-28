@@ -66,7 +66,7 @@ PRODUCTION_DB_PASSWORD
 
 Store project IDs and database passwords in the matching GitHub environment. Do not expose deployment secrets to pull-request jobs.
 
-The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
+The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
 
 ## Local release verification
 

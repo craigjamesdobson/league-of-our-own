@@ -1,8 +1,10 @@
+import { canAccessLeagueRoute } from '../../shared/utils/leagueRouteAccess';
+
 const publicRoutes = new Set(['/coming-soon', '/account/login']);
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const user = useSupabaseUser();
-  const { refreshAppSettings, siteOpen } = useAppSettings();
+  const { refreshAppSettings, siteOpen, leagueDataPublic } = useAppSettings();
 
   try {
     await refreshAppSettings();
@@ -19,6 +21,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (siteOpen.value) {
     if (to.path === '/coming-soon') {
+      return navigateTo('/');
+    }
+
+    if (!canAccessLeagueRoute(to.path, leagueDataPublic.value, Boolean(user.value))) {
       return navigateTo('/');
     }
 

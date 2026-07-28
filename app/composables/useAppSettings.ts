@@ -98,6 +98,9 @@ export function useAppSettings() {
     settings: readonly(settings),
     activeSeason: computed(() => settings.value?.activeSeason ?? ''),
     siteOpen: computed(() => settings.value?.siteOpen ?? false),
+    leagueDataPublic: computed(
+      () => settings.value?.leagueDataPublic ?? false,
+    ),
     teamRegistrationOpen: computed(
       () => settings.value?.teamRegistrationOpen ?? false,
     ),

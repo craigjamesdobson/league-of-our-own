@@ -8,6 +8,7 @@ export interface AppSettings {
   currentGameweek: number;
   seasonComplete: boolean;
   siteOpen: boolean;
+  leagueDataPublic: boolean;
   teamRegistrationOpen: boolean;
 }
 
@@ -16,6 +17,7 @@ export const APP_SETTING_KEYS = [
   'current_gameweek',
   'season_complete',
   'site_open',
+  'league_data_public',
   'team_registration_open',
 ] as const;
 
@@ -70,6 +72,10 @@ export const parseAppSettings = (rows: AppSettingRow[]): AppSettings => {
       values.get('season_complete'),
     ),
     siteOpen: parseBooleanSetting('site_open', values.get('site_open')),
+    leagueDataPublic: parseBooleanSetting(
+      'league_data_public',
+      values.get('league_data_public'),
+    ),
     teamRegistrationOpen: parseBooleanSetting(
       'team_registration_open',
       values.get('team_registration_open'),

@@ -60,7 +60,15 @@ const contactNumber = computed({
 
 const handleTeamSubmit = async () => {
   // Use the composable's submit function (which handles team/player validation)
-  await props.submitTeam();
+  try {
+    await props.submitTeam();
+  }
+  finally {
+    turnstileTokenModel.value = null;
+    if (typeof turnstileRef.value?.reset === 'function') {
+      turnstileRef.value.reset();
+    }
+  }
 };
 </script>
 

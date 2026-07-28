@@ -136,10 +136,13 @@ const selectedPlayer = computed({
       <template #item-label="{ item }">
         <div class="flex h-full w-full flex-col justify-center gap-2.5">
           <div class="flex gap-2.5">
-            <span class="w-1/6">{{ item.player_id }}</span>
-            <span class="w-1/6">{{ item.team_short_name }}</span>
-            <span class="w-3/6">{{ item.web_name }}</span>
-            <span class="w-1/6">{{ item.cost.toFixed(1) }}</span>
+            <img
+              class="h-5 w-5 object-contain"
+              :src="getImageUrl(item.team_short_name.toLowerCase())"
+              :alt="`${item.team_short_name} crest`"
+            >
+            <span class="w-4/6">{{ item.web_name }}</span>
+            <span class="w-2/6 text-right">£{{ item.cost.toFixed(1) }}m</span>
           </div>
           <div
             v-if="item?.unavailable_for_season"

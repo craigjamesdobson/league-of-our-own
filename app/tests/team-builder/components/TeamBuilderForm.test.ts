@@ -13,6 +13,8 @@ const mountTeamBuilderForm = (overrides = {}) => {
       turnstileToken: 'token',
       isExistingDraftedTeam: false,
       remainingBudget: 10,
+      teamBudget: 90,
+      teamValue: 80,
       isOverBudget: false,
       loading: { submittingForm: false },
       submitTeam,

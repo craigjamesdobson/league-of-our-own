@@ -11,6 +11,8 @@ const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamD
 const props = defineProps<{
   isExistingDraftedTeam: boolean;
   remainingBudget: number;
+  teamBudget: number;
+  teamValue: number;
   isOverBudget: boolean;
   loading: { submittingForm: boolean };
   submitTeam: () => Promise<void>;
@@ -105,8 +107,8 @@ const handleTeamSubmit = async () => {
       <USeparator class="my-5" />
     </div>
     <p class="font-bold text-xs mb-5">
-      If you do not receive an email when submitting or editing, your team submission has
-      failed. Please email us with as much detail as possible: <a
+      Your team may still be saved if the confirmation email is delayed or missing.
+      Please contact us to check your submission: <a
         class="underline font-bold"
         href="mailto:leagueofourown.fpl@gmail.com"
       >leagueofourown.fpl@gmail.com</a>.
@@ -138,33 +140,39 @@ const handleTeamSubmit = async () => {
       class="w-full"
       label="Team name"
       name="team_name"
+      required
     >
       <UInput
         v-model="draftedTeamData.team_name"
         class="w-full"
         type="text"
+        autocomplete="organization"
       />
     </UFormField>
     <UFormField
       class="w-full"
       label="Team owner"
       name="team_owner"
+      required
     >
       <UInput
         v-model="draftedTeamData.team_owner"
         class="w-full"
         type="text"
+        autocomplete="name"
       />
     </UFormField>
     <UFormField
       class="w-full"
       label="Team email"
       name="team_email"
+      required
     >
       <UInput
         v-model="draftedTeamData.team_email"
         class="w-full"
         type="email"
+        autocomplete="email"
       />
     </UFormField>
     <UFormField
@@ -175,7 +183,9 @@ const handleTeamSubmit = async () => {
       <UInput
         v-model="contactNumber"
         class="w-full"
-        type="text"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
       />
     </UFormField>
     <div class="flex w-full flex-col gap-1">
@@ -205,6 +215,9 @@ const handleTeamSubmit = async () => {
           class="font-bold uppercase"
         >Transfers allowed</label>
       </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        Teams with transfers have an £85.0m budget. Leave this unchecked for the standard £90.0m budget.
+      </p>
     </div>
     <UAlert
       :color="props.isOverBudget ? 'error' : 'success'"
@@ -214,11 +227,25 @@ const handleTeamSubmit = async () => {
     >
       <template #description>
         <div class="flex flex-col items-center gap-2.5">
-          <div class="flex items-center gap-2.5">
-            Transfer Budget Remaining:
-            <span class="text-lg font-black">{{
-              props.remainingBudget.toFixed(1)
-            }}</span>
+          <div class="grid w-full grid-cols-3 gap-2 text-center text-xs">
+            <div>
+              <p>Squad value</p>
+              <p class="text-lg font-black">
+                £{{ props.teamValue.toFixed(1) }}m
+              </p>
+            </div>
+            <div>
+              <p>Budget</p>
+              <p class="text-lg font-black">
+                £{{ props.teamBudget.toFixed(1) }}m
+              </p>
+            </div>
+            <div>
+              <p>Remaining</p>
+              <p class="text-lg font-black">
+                £{{ props.remainingBudget.toFixed(1) }}m
+              </p>
+            </div>
           </div>
         </div>
       </template>
@@ -231,7 +258,7 @@ const handleTeamSubmit = async () => {
     <UButton
       :loading="props.loading.submittingForm"
       class="w-full justify-center"
-      label="Submit team"
+      :label="isExistingDraftedTeam ? 'Save changes' : 'Submit team'"
       type="submit"
     />
   </UForm>

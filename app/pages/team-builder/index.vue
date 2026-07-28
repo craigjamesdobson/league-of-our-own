@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { PlayerPosition } from '~/types/PlayerPosition';
+
 const {
   draftedTeamData,
   draftedTeamPlayers,
@@ -6,6 +8,8 @@ const {
   selectedPlayerIds,
   isExistingDraftedTeam,
   remainingBudget,
+  teamBudget,
+  teamValue,
   isOverBudget,
   loading,
   submitTeam,
@@ -15,6 +19,24 @@ const {
 
 const route = useRoute();
 const { teamRegistrationOpen: registrationOpen } = useAppSettings();
+
+const selectedCount = computed(() => selectedPlayerIds.value.length);
+const positionCounts = computed(() => {
+  const counts = new Map<PlayerPosition, number>();
+  for (const player of draftedTeamPlayers.value) {
+    if (player.selectedPlayer) {
+      counts.set(player.position, (counts.get(player.position) ?? 0) + 1);
+    }
+  }
+  return counts;
+});
+
+const positionProgress = computed(() => [
+  { label: 'GK', selected: positionCounts.value.get(PlayerPosition.GOALKEEPER) ?? 0, total: 1 },
+  { label: 'DEF', selected: positionCounts.value.get(PlayerPosition.DEFENDER) ?? 0, total: 4 },
+  { label: 'MID', selected: positionCounts.value.get(PlayerPosition.MIDFIELDER) ?? 0, total: 3 },
+  { label: 'FWD', selected: positionCounts.value.get(PlayerPosition.FORWARD) ?? 0, total: 3 },
+]);
 
 if (registrationOpen.value && route.query.id) {
   await fetchDraftedTeamData();
@@ -55,6 +77,8 @@ else if (registrationOpen.value) {
         v-model:turnstile-token="turnstileToken"
         :is-existing-drafted-team="isExistingDraftedTeam"
         :remaining-budget="remainingBudget"
+        :team-budget="teamBudget"
+        :team-value="teamValue"
         :is-over-budget="isOverBudget"
         :loading="loading"
         :submit-team="submitTeam"
@@ -65,6 +89,20 @@ else if (registrationOpen.value) {
       <h2 class="mb-2.5 text-center text-xl font-black uppercase">
         Pick your team
       </h2>
+      <div class="mb-5 flex flex-col items-center gap-2.5 text-sm">
+        <p class="font-bold">
+          {{ selectedCount }} / 11 players selected
+        </p>
+        <div class="flex flex-wrap justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <span
+            v-for="progress in positionProgress"
+            :key="progress.label"
+            class="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800"
+          >
+            {{ progress.label }} {{ progress.selected }}/{{ progress.total }}
+          </span>
+        </div>
+      </div>
       <div class="text-center 2xl:hidden">
         <UAlert
           v-if="isExistingDraftedTeam"

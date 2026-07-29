@@ -1,7 +1,7 @@
 import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert, Tables } from '~/types/database.types';
+import type { TablesInsert, Tables } from '~/types/database.types';
 import type { Database as DatabaseGenerated } from '~/types/database-generated.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
 import { delay } from '@/utils/utility';
@@ -36,7 +36,6 @@ const createEmptyTeamData = (activeSeason: string): TablesInsert<'drafted_teams'
 
 export const useTeamBuilder = () => {
   const { activeSeason } = useAppSettings();
-  const supabase = useSupabaseClient<Database>();
   const route = useRoute();
   const router = useRouter();
   const toast = useNuxtToast();
@@ -60,6 +59,7 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
+  const saveConfirmation = ref<'submitted' | 'updated' | null>(null);
   const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason.value));
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
   const turnstileToken = ref<string | null>(null);
@@ -105,28 +105,13 @@ export const useTeamBuilder = () => {
       loading.value.fetchingTeam = true;
       error.value = null;
 
-      const { data, error: fetchError } = await supabase
-        .from('drafted_teams')
-        .select(
-          ` *,
-            players:drafted_players(
-              drafted_player_id,
-              drafted_team,
-              ...players_view(*)
-            )
-          `,
-        )
-        .eq('key', id)
-        .single();
+      const data = await $fetch<{
+        players: DraftedPlayerFromQuery[];
+      } & Omit<Tables<'drafted_teams'>, 'key'>>(`/api/team-submission/${encodeURIComponent(id)}`);
 
-      if (fetchError) {
-        error.value = 'No team found';
-        addToast('error', 'No team found', 'No team was found using that id');
-        setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
-        return;
-      }
-
-      draftedTeamData.value = data;
+      // The edit key authorises subsequent updates, but it is already present
+      // in the URL and should not be echoed by the server response.
+      draftedTeamData.value = { ...data, key: id };
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE, data.players);
     }
     catch {
@@ -207,9 +192,12 @@ export const useTeamBuilder = () => {
   };
 
   const submitTeam = async (): Promise<void> => {
+    if (loading.value.submittingForm) return;
+
     try {
       loading.value.submittingForm = true;
       error.value = null;
+      saveConfirmation.value = null;
 
       await delay(1000);
 
@@ -238,32 +226,67 @@ export const useTeamBuilder = () => {
         query: { id: teamData.key },
       });
 
-      await useFetch('/api/user-email', {
-        method: 'post',
-        body: {
-          title: (teamData.edited_count ?? 0) > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
-          email: draftedTeamData.value.team_email,
-          html: generateTeamEmail(draftedTeamPlayers.value, teamData),
-        },
-      });
+      let emailDeliveryFailed = false;
 
       if (!wasEditing) {
-        await useFetch('/api/admin-email', {
-          method: 'post',
-          body: {
-            email: 'leagueofourown.fpl@gmail.com',
-            html: generateAdminEmail(draftedTeamPlayers.value, teamData),
-          },
-        });
+        try {
+          await $fetch('/api/user-email', {
+            method: 'post',
+            body: {
+              title: 'Thank you for your team submission',
+              email: draftedTeamData.value.team_email,
+              html: generateTeamEmail(draftedTeamPlayers.value, teamData),
+            },
+          });
+        }
+        catch (emailError) {
+          emailDeliveryFailed = true;
+          console.error('Failed to send team confirmation email:', emailError);
+        }
+
+        try {
+          await $fetch('/api/admin-email', {
+            method: 'post',
+            body: {
+              email: 'leagueofourown.fpl@gmail.com',
+              html: generateAdminEmail(draftedTeamPlayers.value, teamData),
+            },
+          });
+        }
+        catch (emailError) {
+          emailDeliveryFailed = true;
+          console.error('Failed to send admin team notification:', emailError);
+        }
       }
 
-      await fetchDraftedTeamData(teamData.key);
+      try {
+        await fetchDraftedTeamData(teamData.key);
+        if (error.value) {
+          draftedTeamData.value = teamData;
+        }
+      }
+      catch (refreshError) {
+        console.error('Team saved but could not refresh the edit form:', refreshError);
+        draftedTeamData.value = teamData;
+      }
 
-      addToast('success', 'Success', 'Your team has been submitted, thank you!');
+      addToast(
+        emailDeliveryFailed ? 'error' : 'success',
+        emailDeliveryFailed ? 'Team saved' : 'Success',
+        emailDeliveryFailed
+          ? 'Your team was saved, but a confirmation email could not be sent. Please contact the league administrator.'
+          : wasEditing
+            ? 'Your changes have been saved. No new email has been sent.'
+            : 'Your team has been submitted, thank you!',
+      );
+      saveConfirmation.value = wasEditing ? 'updated' : 'submitted';
     }
-    catch {
-      error.value = 'Failed to submit team';
-      addToast('error', 'Error', 'Failed to submit team. Please try again.');
+    catch (submissionError) {
+      const message = submissionError instanceof Error
+        ? submissionError.message
+        : 'Failed to submit team. Please try again.';
+      error.value = message;
+      addToast('error', 'Submission failed', message);
     }
     finally {
       loading.value.submittingForm = false;
@@ -274,6 +297,7 @@ export const useTeamBuilder = () => {
     draftedTeamData.value = createEmptyTeamData(activeSeason.value);
     setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     error.value = null;
+    saveConfirmation.value = null;
   };
 
   const validateForm = (): boolean => {
@@ -302,6 +326,7 @@ export const useTeamBuilder = () => {
   return {
     loading: readonly(loading),
     error: readonly(error),
+    saveConfirmation: readonly(saveConfirmation),
     draftedTeamData,
     draftedTeamPlayers,
     turnstileToken,

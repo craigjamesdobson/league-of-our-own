@@ -10,13 +10,17 @@ describe('parseAppSettings', () => {
       { setting_key: 'current_gameweek', setting_value: '1' },
       { setting_key: 'season_complete', setting_value: 'false' },
       { setting_key: 'site_open', setting_value: 'true' },
+      { setting_key: 'league_data_public', setting_value: 'false' },
       { setting_key: 'team_registration_open', setting_value: 'false' },
+      { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
     ])).toEqual({
       activeSeason: '26-27',
       currentGameweek: 1,
       seasonComplete: false,
       siteOpen: true,
+      leagueDataPublic: false,
       teamRegistrationOpen: false,
+      teamSubmissionDeadline: '2026-08-20',
     });
   });
 
@@ -26,7 +30,9 @@ describe('parseAppSettings', () => {
       { setting_key: 'current_gameweek', setting_value: '1' },
       { setting_key: 'season_complete', setting_value: 'false' },
       { setting_key: 'site_open', setting_value: 'yes' },
+      { setting_key: 'league_data_public', setting_value: 'false' },
       { setting_key: 'team_registration_open', setting_value: 'true' },
+      { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
     ])).toThrow('Setting site_open must be true or false');
   });
 
@@ -35,7 +41,9 @@ describe('parseAppSettings', () => {
       { setting_key: 'current_gameweek', setting_value: '1' },
       { setting_key: 'season_complete', setting_value: 'false' },
       { setting_key: 'site_open', setting_value: 'false' },
+      { setting_key: 'league_data_public', setting_value: 'false' },
       { setting_key: 'team_registration_open', setting_value: 'false' },
+      { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
     ])).toThrow('Required setting active_season is missing');
   });
 
@@ -45,7 +53,9 @@ describe('parseAppSettings', () => {
       { setting_key: 'current_gameweek', setting_value: '39' },
       { setting_key: 'season_complete', setting_value: 'false' },
       { setting_key: 'site_open', setting_value: 'false' },
+      { setting_key: 'league_data_public', setting_value: 'false' },
       { setting_key: 'team_registration_open', setting_value: 'false' },
+      { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
     ];
 
     expect(() => parseAppSettings(rows))
@@ -54,5 +64,17 @@ describe('parseAppSettings', () => {
     rows[0]!.setting_value = '26-27';
     expect(() => parseAppSettings(rows))
       .toThrow('Setting current_gameweek must be an integer from 1 to 38');
+  });
+
+  it('rejects an invalid submission deadline', () => {
+    expect(() => parseAppSettings([
+      { setting_key: 'active_season', setting_value: '26-27' },
+      { setting_key: 'current_gameweek', setting_value: '1' },
+      { setting_key: 'season_complete', setting_value: 'false' },
+      { setting_key: 'site_open', setting_value: 'true' },
+      { setting_key: 'league_data_public', setting_value: 'false' },
+      { setting_key: 'team_registration_open', setting_value: 'true' },
+      { setting_key: 'team_submission_deadline', setting_value: '20/08/2026' },
+    ])).toThrow('Setting team_submission_deadline must use the YYYY-MM-DD format');
   });
 });

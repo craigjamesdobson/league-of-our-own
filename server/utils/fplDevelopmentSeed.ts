@@ -239,7 +239,9 @@ export const createFplDevelopmentSeed = (
     { setting_key: 'current_gameweek', setting_value: '1' },
     { setting_key: 'season_complete', setting_value: 'false' },
     { setting_key: 'site_open', setting_value: 'true' },
+    { setting_key: 'league_data_public', setting_value: 'false' },
     { setting_key: 'team_registration_open', setting_value: 'true' },
+    { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
   ];
 
   return {

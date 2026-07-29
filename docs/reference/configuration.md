@@ -147,7 +147,9 @@ application state without rebuilding or redeploying the site.
 | `current_gameweek` | number | Integer from 1 to 38 |
 | `season_complete` | boolean | `true` or `false` |
 | `site_open` | boolean | `true` or `false` |
+| `league_data_public` | boolean | `true` or `false` |
 | `team_registration_open` | boolean | `true` or `false` |
+| `team_submission_deadline` | date | `YYYY-MM-DD` |
 
 Postgres stores each `setting_value` as text. `parseAppSettings` is the single
 application boundary that validates and converts those strings into typed values.
@@ -160,6 +162,7 @@ Client code reads settings through `useAppSettings`:
 const {
   activeSeason,
   siteOpen,
+  leagueDataPublic,
   teamRegistrationOpen,
   refreshAppSettings,
 } = useAppSettings();
@@ -459,4 +462,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-07-28

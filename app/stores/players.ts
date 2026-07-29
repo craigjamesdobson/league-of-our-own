@@ -5,16 +5,10 @@ import type {
   PlayerSeasonStatistics,
   PlayerWithSeasonStatistics,
 } from '~/types/Player';
-import { PlayerPosition } from '~/types/PlayerPosition';
 import type { Database, Tables } from '~/types/database.types';
 
-interface FilterData {
-  filterName: string;
-  filterPrice: number;
-  filterTeam: number | undefined;
-}
-
 type PlayerStatisticRow = Pick<Tables<'player_statistics'>, 'player_id' | 'goals' | 'assists' | 'clean_sheet' | 'red_card' | 'points'>;
+type Club = Pick<Tables<'teams'>, 'id' | 'name' | 'short_name'>;
 
 const emptyPlayerSeasonStatistics = (): PlayerSeasonStatistics => ({
   season_goals: 0,
@@ -54,7 +48,7 @@ const mergePlayersWithSeasonStatistics = (
 
 export const usePlayerStore = defineStore('player-store', () => {
   const players: Ref<PlayerWithSeasonStatistics[]> = ref([]);
-  const filteredPlayers: Ref<PlayerWithSeasonStatistics[]> = ref([]);
+  const clubs: Ref<Club[]> = ref([]);
   const playerUpdatedDate: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
@@ -85,7 +79,6 @@ export const usePlayerStore = defineStore('player-store', () => {
       }
 
       players.value = mergePlayersWithSeasonStatistics(playerData ?? [], playerStatisticsData ?? []);
-      filteredPlayers.value = players.value;
       await fetchPlayerUpdatedDate();
       isLoaded.value = true;
     }
@@ -97,6 +90,17 @@ export const usePlayerStore = defineStore('player-store', () => {
         console.error('An unknown error occurred.');
       }
     }
+  };
+
+  const fetchClubs = async () => {
+    const supabase = useSupabaseClient<Database>();
+    const { data, error } = await supabase
+      .from('teams')
+      .select('id, name, short_name')
+      .order('name');
+
+    if (error) throw new Error(error.message);
+    clubs.value = data ?? [];
   };
 
   const fetchPlayerUpdatedDate = async () => {
@@ -178,37 +182,6 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
   };
 
-  const filterPlayers = ({
-    filterName = '',
-    filterPrice = 0,
-    filterTeam = 0,
-  }: FilterData) => {
-    let newFilteredPlayers = [...players.value];
-    if (filterName) {
-      newFilteredPlayers = newFilteredPlayers.filter(player =>
-        (player.web_name ?? '')
-          .normalize('NFD')
-          .replace(/[\u0300-\u036F]/g, '')
-          .toLowerCase()
-          .includes(filterName.toLowerCase()),
-      );
-    }
-
-    if (filterPrice) {
-      newFilteredPlayers = newFilteredPlayers.filter(
-        player => player.cost === +filterPrice,
-      );
-    }
-
-    if (filterTeam) {
-      newFilteredPlayers = newFilteredPlayers.filter(
-        p => p.team === filterTeam,
-      );
-    }
-
-    filteredPlayers.value = newFilteredPlayers;
-  };
-
   const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
 
   const getPlayerByID = computed(
@@ -216,47 +189,18 @@ export const usePlayerStore = defineStore('player-store', () => {
   );
 
   const getPlayers = computed(() => players.value);
-
-  const formatFilteredPlayersByPosition = computed(() => {
-    return [
-      {
-        position: 'Goalkeepers',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.GOALKEEPER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Defenders',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.DEFENDER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Midfielders',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.MIDFIELDER)
-          .sort((a, b) => a.team - b.team),
-      },
-      {
-        position: 'Forwards',
-        players: filteredPlayers.value
-          .filter(x => x.position === PlayerPosition.FORWARD)
-          .sort((a, b) => a.team - b.team),
-      },
-    ];
-  });
+  const getClubs = computed(() => clubs.value);
 
   return {
     players,
-    filteredPlayers,
     isLoaded,
     fetchPlayers,
+    fetchClubs,
     upsertPlayerData,
-    filterPlayers,
     getPlayers,
+    getClubs,
     getPlayerByID,
     getPlayerLastUpdatedDate,
-    formatFilteredPlayersByPosition,
   };
 });
 

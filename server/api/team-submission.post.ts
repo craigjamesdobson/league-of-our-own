@@ -81,6 +81,12 @@ export default defineEventHandler(async (event) => {
         });
 
         if (error || !data) {
+          if (error) {
+            console.error('[team-submission] save_team_submission failed:', error.message);
+          }
+          else if (!data) {
+            console.error('[team-submission] save_team_submission returned no saved team');
+          }
           const isMissingTeam = error?.message.includes('No editable team found');
           throw new TeamSubmissionError(
             isMissingTeam ? 404 : 500,

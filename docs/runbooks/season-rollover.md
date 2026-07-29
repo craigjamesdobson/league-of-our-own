@@ -1,6 +1,6 @@
 # Season rollover runbook
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-07-28
 
 Use this runbook first in staging and then in production. The SQL remains a
 deliberate manual operation because archiving and clearing operational data are
@@ -49,6 +49,7 @@ where setting_key = 'team_registration_open';
 ```
 
 Confirm the team builder no longer accepts a submission before continuing.
+Keep `league_data_public` set to `'false'` during the reveal window.
 
 ## 2. Archive 2025/26
 
@@ -137,7 +138,9 @@ set
     when 'current_gameweek' then '1'
     when 'season_complete' then 'false'
     when 'site_open' then 'true'
+    when 'league_data_public' then 'false'
     when 'team_registration_open' then 'true'
+    when 'team_submission_deadline' then '2026-08-20'
   end,
   updated_at = now()
 where setting_key in (
@@ -145,19 +148,28 @@ where setting_key in (
   'current_gameweek',
   'season_complete',
   'site_open',
-  'team_registration_open'
+  'league_data_public',
+  'team_registration_open',
+  'team_submission_deadline'
 );
 ```
 
 Use `'false'` for `site_open` if the public site should remain on the holding
 page. Team registration can be controlled independently using
 `team_registration_open`.
+Keep `league_data_public = 'false'` until the league reveal is ready. Then set it
+to `'true'` in a separate settings update; this makes Teams, Table, scores and
+team-derived dashboard data public while leaving the submission setting
+independent.
 
 ## 7. Smoke test
 
 - Load the welcome page as an anonymous visitor.
 - Open the team builder and submit one valid test team.
 - Log in as each admin and verify the populate/validate workflow.
+- While `league_data_public` is `false`, confirm anonymous Teams and Table links
+  are hidden and direct URLs return to the welcome page; confirm admins can still
+  access them.
 - Confirm the archived Season remains viewable.
 - Remove the submitted smoke-test team if it should not remain.
 
@@ -178,8 +190,8 @@ endpoint response or SQL error. Then use the applicable recovery path:
 | Archive call fails | Do not clear. Confirm whether the transaction rolled back before retrying. If the archived Season exists, inspect it instead of running the one-off archive again. |
 | Archive succeeds but validation fails | Do not clear or rerun the archive. Investigate the archived rows and recorded counts. Restore only if the operational data or archive was corrupted. |
 | After clear, during an import | Fix the endpoint or configuration problem and rerun `pnpm season:import` from the beginning. The three imports use database upserts and are safe to retry before submissions reopen. |
-| After the settings switch or after submissions reopen | Immediately set `site_open` and `team_registration_open` to `false`. Restore the pre-rollover backup if operational data is incorrect and cannot be safely repaired. |
+| After the settings switch or after submissions reopen | Immediately set `site_open`, `league_data_public`, and `team_registration_open` to `false`. Restore the pre-rollover backup if operational data is incorrect and cannot be safely repaired. |
 
 After any backup restoration, re-check the target record, archived Season,
-operational table counts, and all five application settings. Repeat the smoke
+operational table counts, and all seven application settings. Repeat the smoke
 test before reopening registration or resuming the cron.

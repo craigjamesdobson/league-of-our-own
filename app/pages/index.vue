@@ -8,11 +8,18 @@ import WeeklyStats from '@/components/Dashboard/WeeklyStats.vue';
 import WeeklyTransfers from '@/components/Dashboard/WeeklyTransfers.vue';
 import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vue';
 import WelcomeBack from '@/components/Home/WelcomeBack.vue';
+import { useAccountStore } from '@/stores/account';
 
-const { teamRegistrationOpen } = useAppSettings();
+const { teamRegistrationOpen, leagueDataPublic } = useAppSettings();
+const accountStore = useAccountStore();
 const dashboard = useHomepageDashboard();
 const tableStore = useTableStore();
 const registrationOpen = teamRegistrationOpen;
+const leagueIsPublic = leagueDataPublic;
+const showWelcomeBack = computed(() =>
+  registrationOpen.value
+  || (!leagueIsPublic.value && !accountStore.userIsLoggedIn),
+);
 
 const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasGameweekData = computed(() => dashboard.hasGameweekData());
@@ -40,14 +47,14 @@ const refreshPage = () => {
 };
 
 onMounted(async () => {
-  if (!registrationOpen.value) {
+  if (!registrationOpen.value && (leagueIsPublic.value || accountStore.userIsLoggedIn)) {
     await dashboard.loadDashboardData();
   }
 });
 </script>
 
 <template>
-  <WelcomeBack v-if="registrationOpen" />
+  <WelcomeBack v-if="showWelcomeBack" />
   <div
     v-else
     class="min-h-full text-slate-900 dark:text-slate-100"

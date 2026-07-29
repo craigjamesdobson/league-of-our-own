@@ -27,7 +27,7 @@
             trailing-icon="i-lucide-arrow-right"
             color="neutral"
             size="lg"
-            class="font-black uppercase text-brand"
+            class="font-black uppercase"
           />
           <NuxtLink
             to="/rules"

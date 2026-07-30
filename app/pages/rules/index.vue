@@ -339,5 +339,16 @@ const deadlineLabel = computed(() => {
   #__nuxt > div > main > div {
     padding: 0 !important;
   }
+
+  #__nuxt > div > main main .grid {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #__nuxt > div > main main section,
+  #__nuxt > div > main main article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }
 </style>

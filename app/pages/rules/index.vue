@@ -13,16 +13,6 @@
             2026/27 season
           </p>
         </div>
-        <UButton
-          href="/rules.pdf"
-          label="Download PDF"
-          icon="i-lucide-download"
-          target="_blank"
-          color="neutral"
-          variant="soft"
-          size="md"
-          class="h-10 shrink-0 self-end sm:ml-auto sm:self-center"
-        />
       </div>
     </header>
 
@@ -47,45 +37,10 @@
             <strong>no transfers</strong> available for the whole season.
           </RulesRuleCard>
         </div>
-        <div class="mt-5 rounded-2xl border border-default bg-elevated p-5 sm:p-6">
-          <h3 class="font-black uppercase tracking-wide">
-            Squad formation
-          </h3>
-          <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
-              <Icon
-                name="i-lucide-goal"
-                class="size-5 text-primary"
-                aria-hidden="true"
-              />
-              <span><strong>1</strong> goalkeeper</span>
-            </li>
-            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
-              <Icon
-                name="i-lucide-shield"
-                class="size-5 text-primary"
-                aria-hidden="true"
-              />
-              <span><strong>4</strong> defenders</span>
-            </li>
-            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
-              <Icon
-                name="i-lucide-circle-dot"
-                class="size-5 text-primary"
-                aria-hidden="true"
-              />
-              <span><strong>3</strong> midfielders</span>
-            </li>
-            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
-              <Icon
-                name="i-lucide-footprints"
-                class="size-5 text-primary"
-                aria-hidden="true"
-              />
-              <span><strong>3</strong> forwards</span>
-            </li>
-          </ul>
-        </div>
+        <p class="mt-5 text-muted">
+          Each team contains eleven players. The team builder checks the required
+          positions and budget automatically when you submit.
+        </p>
       </section>
 
       <section
@@ -146,15 +101,14 @@
         />
         <div class="prose prose-slate max-w-none text-muted dark:prose-invert">
           <p>
-            Weekly fixtures run from <strong>Friday at 7pm</strong> to the Friday morning
-            deadline. A gameweek is based on the actual set of Premier League fixtures
-            played within that scoring period.
+            Each gameweek is the actual set of Premier League fixtures assigned to that
+            scoring period. It may contain more or fewer than ten matches.
           </p>
           <ul>
-            <li>If a gameweek has only eight matches, it includes those eight matches.</li>
+            <li>All matches assigned to that gameweek count once they are scored.</li>
             <li>
-              Matches rearranged and played later in the season count in the gameweek in
-              which they are played.
+              Rearranged matches count in the gameweek to which they are ultimately
+              assigned.
             </li>
           </ul>
           <p>
@@ -185,13 +139,7 @@
             than the outgoing player, plus any unused money in the team’s total budget.
           </p>
           <p>
-            Updated player lists are available on the
-            <NuxtLink
-              to="/players"
-              class="font-semibold text-primary underline underline-offset-4"
-            >
-              Players
-            </NuxtLink> page.
+            Player availability and prices are shown in the team builder.
           </p>
         </div>
       </section>
@@ -230,7 +178,8 @@
             win a weekly fixture. The prize is shared if there is more than one winner.
           </RulesRuleCard>
           <RulesRuleCard title="Season prize pool">
-            The remaining prize pool is shared between the top five finishers:
+            After weekly prizes are paid, the remaining season prize pool is shared between
+            the top five finishers:
             <ul class="mt-4 grid gap-2 sm:grid-cols-2">
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
@@ -291,9 +240,9 @@
         />
         <div class="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
           <p class="text-muted">
-            Please use the online team builder. It removes manual data entry and helps
-            prevent incorrect player IDs, positions, and overspending. The page guides you
-            through entering your team details and selecting your eleven players.
+            Please use the online team builder. It removes manual data entry and checks
+            player IDs, positions, the eleven-player requirement, and your budget before
+            submission.
           </p>
           <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <UButton
@@ -303,7 +252,7 @@
               color="primary"
             />
             <p class="text-sm font-bold text-primary">
-              Submission deadline: Thursday 20 August 2026
+              Submission deadline: {{ deadlineLabel }}
             </p>
           </div>
         </div>
@@ -339,4 +288,21 @@
   </main>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { teamSubmissionDeadline, refreshAppSettings } = useAppSettings();
+
+await refreshAppSettings();
+
+const deadlineLabel = computed(() => {
+  if (!teamSubmissionDeadline.value) {
+    return 'the published deadline';
+  }
+
+  return new Intl.DateTimeFormat('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(`${teamSubmissionDeadline.value}T00:00:00`));
+});
+</script>

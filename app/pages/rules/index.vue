@@ -13,6 +13,16 @@
             2026/27 season
           </p>
         </div>
+        <UButton
+          href="/rules.pdf"
+          label="Download PDF"
+          icon="i-lucide-download"
+          target="_blank"
+          color="neutral"
+          variant="soft"
+          size="md"
+          class="h-10 shrink-0 self-end sm:ml-auto sm:self-center print:hidden"
+        />
       </div>
     </header>
 
@@ -189,9 +199,14 @@
             title="Weekly prizes"
             icon="i-lucide-trophy"
           >
-            A weekly prize of <strong>£10.00</strong> is awarded to the team or teams with
-            the highest score for each gameweek. The prize is shared if there is more than
-            one winner.
+            <p>
+              A weekly prize of <strong>£10.00</strong> is awarded to the team or teams with
+              the highest score for each gameweek.
+            </p>
+            <p>
+              The prize is shared if there is more than
+              one winner.
+            </p>
           </RulesRuleCard>
           <RulesRuleCard
             title="Season prize pool"
@@ -200,23 +215,23 @@
             After weekly prizes are paid, the remaining season prize pool is shared between
             the top five finishers:
             <ul class="mt-4 space-y-2">
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary px-3 py-1 text-sm text-white">1st</strong>
                 <span class="ml-auto">50%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/65 px-3 py-1 text-sm text-white">2nd</strong>
                 <span class="ml-auto">25%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/40 px-3 py-1 text-sm text-primary">3rd</strong>
                 <span class="ml-auto">12.5%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/20 px-3 py-1 text-sm text-primary">4th</strong>
                 <span class="ml-auto">7.5%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">5th</strong>
                 <span class="ml-auto">5%</span>
               </li>
@@ -304,3 +319,25 @@ const deadlineLabel = computed(() => {
   }).format(new Date(`${teamSubmissionDeadline.value}T00:00:00`));
 });
 </script>
+
+<style>
+@media print {
+  body {
+    background: white !important;
+  }
+
+  #__nuxt > div > aside,
+  #__nuxt > div > main > header {
+    display: none !important;
+  }
+
+  #__nuxt > div > main {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  #__nuxt > div > main > div {
+    padding: 0 !important;
+  }
+}
+</style>

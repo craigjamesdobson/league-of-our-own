@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
+  <main class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12 xl:max-w-4xl">
     <header class="mb-10 rounded-3xl bg-brand px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
       <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -21,7 +21,7 @@
           color="neutral"
           variant="soft"
           size="md"
-          class="h-10 shrink-0 self-end sm:self-center"
+          class="h-10 shrink-0 self-end sm:ml-auto sm:self-center"
         />
       </div>
     </header>
@@ -51,11 +51,39 @@
           <h3 class="font-black uppercase tracking-wide">
             Squad formation
           </h3>
-          <ul class="mt-3 grid gap-2 text-muted sm:grid-cols-2 lg:grid-cols-4">
-            <li>1 goalkeeper</li>
-            <li>4 defenders</li>
-            <li>3 midfielders</li>
-            <li>3 forwards</li>
+          <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
+              <Icon
+                name="i-lucide-goal"
+                class="size-5 text-primary"
+                aria-hidden="true"
+              />
+              <span><strong>1</strong> goalkeeper</span>
+            </li>
+            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
+              <Icon
+                name="i-lucide-shield"
+                class="size-5 text-primary"
+                aria-hidden="true"
+              />
+              <span><strong>4</strong> defenders</span>
+            </li>
+            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
+              <Icon
+                name="i-lucide-circle-dot"
+                class="size-5 text-primary"
+                aria-hidden="true"
+              />
+              <span><strong>3</strong> midfielders</span>
+            </li>
+            <li class="flex items-center gap-3 rounded-xl bg-surface-100 p-3 dark:bg-slate-900">
+              <Icon
+                name="i-lucide-footprints"
+                class="size-5 text-primary"
+                aria-hidden="true"
+              />
+              <span><strong>3</strong> forwards</span>
+            </li>
           </ul>
         </div>
       </section>
@@ -203,12 +231,47 @@
           </RulesRuleCard>
           <RulesRuleCard title="Season prize pool">
             The remaining prize pool is shared between the top five finishers:
-            <ul class="mt-3 space-y-2">
-              <li><strong>1st:</strong> 50%</li>
-              <li><strong>2nd:</strong> 25%</li>
-              <li><strong>3rd:</strong> 12.5%</li>
-              <li><strong>4th:</strong> 7.5%</li>
-              <li><strong>5th:</strong> 5%</li>
+            <ul class="mt-4 grid gap-2 sm:grid-cols-2">
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+                <Icon
+                  name="i-lucide-medal"
+                  class="size-4 text-amber-500"
+                  aria-hidden="true"
+                />
+                <strong>1st</strong><span class="ml-auto">50%</span>
+              </li>
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+                <Icon
+                  name="i-lucide-medal"
+                  class="size-4 text-slate-400"
+                  aria-hidden="true"
+                />
+                <strong>2nd</strong><span class="ml-auto">25%</span>
+              </li>
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+                <Icon
+                  name="i-lucide-medal"
+                  class="size-4 text-orange-500"
+                  aria-hidden="true"
+                />
+                <strong>3rd</strong><span class="ml-auto">12.5%</span>
+              </li>
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+                <Icon
+                  name="i-lucide-award"
+                  class="size-4 text-primary"
+                  aria-hidden="true"
+                />
+                <strong>4th</strong><span class="ml-auto">7.5%</span>
+              </li>
+              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
+                <Icon
+                  name="i-lucide-award"
+                  class="size-4 text-primary"
+                  aria-hidden="true"
+                />
+                <strong>5th</strong><span class="ml-auto">5%</span>
+              </li>
             </ul>
           </RulesRuleCard>
         </div>

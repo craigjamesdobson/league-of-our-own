@@ -235,7 +235,7 @@
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
-                  name="i-lucide-ribbon"
+                  name="i-lucide-award"
                   class="size-7 text-primary"
                   aria-hidden="true"
                 />
@@ -243,7 +243,7 @@
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
-                  name="i-lucide-ribbon"
+                  name="i-lucide-award"
                   class="size-7 text-primary"
                   aria-hidden="true"
                 />

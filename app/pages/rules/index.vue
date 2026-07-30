@@ -13,16 +13,6 @@
             2026/27 season
           </p>
         </div>
-        <UButton
-          href="/rules.pdf"
-          label="Download PDF"
-          icon="i-lucide-download"
-          target="_blank"
-          color="neutral"
-          variant="soft"
-          size="md"
-          class="h-10 shrink-0 self-end sm:ml-auto sm:self-center"
-        />
       </div>
     </header>
 
@@ -100,9 +90,9 @@
           </RulesRuleCard>
         </div>
         <p class="mt-5 text-sm text-muted">
-          All scoring data is taken from the official Premier League site:
+          Player and fixture data is taken from the official Fantasy Premier League data:
           <a
-            href="https://www.premierleague.com/en/fixtures"
+            href="https://fantasy.premierleague.com/"
             target="_blank"
             rel="noreferrer"
             class="font-semibold text-primary underline underline-offset-4"
@@ -199,8 +189,9 @@
             title="Weekly prizes"
             icon="i-lucide-trophy"
           >
-            A weekly prize of <strong>£10.00</strong> is awarded to the team or teams that
-            win a weekly fixture. The prize is shared if there is more than one winner.
+            A weekly prize of <strong>£10.00</strong> is awarded to the team or teams with
+            the highest score for each gameweek. The prize is shared if there is more than
+            one winner.
           </RulesRuleCard>
           <RulesRuleCard
             title="Season prize pool"
@@ -248,9 +239,8 @@
         />
         <div class="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
           <p class="text-muted">
-            Please use the online team builder. It removes manual data entry and checks
-            player IDs, positions, the eleven-player requirement, and your budget before
-            submission.
+            Choose your transfer option, then use the online team builder to select your
+            squad and submit your team. It validates your selection and budget automatically.
           </p>
           <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <UButton

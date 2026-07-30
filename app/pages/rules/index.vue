@@ -29,7 +29,7 @@
     <div class="space-y-12">
       <section
         id="pricing"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="1"
@@ -90,7 +90,7 @@
 
       <section
         id="scoring"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="2"
@@ -137,7 +137,7 @@
 
       <section
         id="fixtures"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="3"
@@ -166,7 +166,7 @@
 
       <section
         id="transfers"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="4"
@@ -198,7 +198,7 @@
 
       <section
         id="entry-fee"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="5"
@@ -217,7 +217,7 @@
 
       <section
         id="prize-money"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="6"
@@ -282,7 +282,7 @@
 
       <section
         id="team-builder"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="7"
@@ -311,7 +311,7 @@
 
       <section
         id="final-notes"
-        class="scroll-mt-6"
+        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="8"

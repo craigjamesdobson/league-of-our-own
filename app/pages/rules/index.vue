@@ -214,19 +214,19 @@
                 <span class="ml-auto">50%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/85 px-3 py-1 text-sm text-white">2nd</strong>
+                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/65 px-3 py-1 text-sm text-white">2nd</strong>
                 <span class="ml-auto">25%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/70 px-3 py-1 text-sm text-white">3rd</strong>
+                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/40 px-3 py-1 text-sm text-primary">3rd</strong>
                 <span class="ml-auto">12.5%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/55 px-3 py-1 text-sm text-white">4th</strong>
+                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/20 px-3 py-1 text-sm text-primary">4th</strong>
                 <span class="ml-auto">7.5%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/40 px-3 py-1 text-sm text-primary">5th</strong>
+                <strong class="inline-flex w-12 justify-center rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">5th</strong>
                 <span class="ml-auto">5%</span>
               </li>
             </ul>

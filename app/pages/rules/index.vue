@@ -1,7 +1,7 @@
 <template>
-  <main class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
+  <main class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:py-12">
     <header class="mb-10 rounded-3xl bg-brand px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
-      <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div class="flex w-full flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p class="mb-3 text-sm font-black uppercase tracking-[0.25em] text-white/60">
             League of Our Own
@@ -13,6 +13,16 @@
             2026/27 season
           </p>
         </div>
+        <UButton
+          href="/rules.pdf"
+          label="Download PDF"
+          icon="i-lucide-download"
+          target="_blank"
+          color="neutral"
+          variant="soft"
+          size="md"
+          class="h-10 shrink-0 self-end sm:ml-auto sm:self-center"
+        />
       </div>
     </header>
 
@@ -53,16 +63,25 @@
           icon="i-lucide-chart-no-axes-combined"
         />
         <div class="grid gap-5 sm:grid-cols-2">
-          <RulesRuleCard title="Clean sheets">
+          <RulesRuleCard
+            title="Clean sheets"
+            icon="i-lucide-shield-check"
+          >
             <p><strong>5 points</strong> for a goalkeeper keeping a clean sheet.</p>
             <p class="mt-2">
               <strong>2 points</strong> for a defender keeping a clean sheet.
             </p>
           </RulesRuleCard>
-          <RulesRuleCard title="Red cards">
+          <RulesRuleCard
+            title="Red cards"
+            icon="i-lucide-square"
+          >
             <strong>10 points will be deducted</strong> for any player receiving a red card.
           </RulesRuleCard>
-          <RulesRuleCard title="Goals">
+          <RulesRuleCard
+            title="Goals"
+            icon="i-lucide-goal"
+          >
             <ul class="space-y-2">
               <li><strong>10 points</strong> for a goalkeeper scoring a goal</li>
               <li><strong>7 points</strong> for a defender scoring a goal</li>
@@ -72,7 +91,10 @@
               <li><strong>10 extra points</strong> for a hat-trick or more</li>
             </ul>
           </RulesRuleCard>
-          <RulesRuleCard title="Assists">
+          <RulesRuleCard
+            title="Assists"
+            icon="i-lucide-hand-helping"
+          >
             <strong>3 points</strong> will be awarded for each assist. No bonus points are
             awarded for multiple assists.
           </RulesRuleCard>
@@ -173,18 +195,24 @@
           icon="i-lucide-trophy"
         />
         <div class="grid gap-5 lg:grid-cols-2">
-          <RulesRuleCard title="Weekly prizes">
+          <RulesRuleCard
+            title="Weekly prizes"
+            icon="i-lucide-trophy"
+          >
             A weekly prize of <strong>£10.00</strong> is awarded to the team or teams that
             win a weekly fixture. The prize is shared if there is more than one winner.
           </RulesRuleCard>
-          <RulesRuleCard title="Season prize pool">
+          <RulesRuleCard
+            title="Season prize pool"
+            icon="i-lucide-award"
+          >
             After weekly prizes are paid, the remaining season prize pool is shared between
             the top five finishers:
-            <ul class="mt-4 grid gap-2 sm:grid-cols-2">
+            <ul class="mt-4 space-y-2">
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
-                  name="i-lucide-medal"
-                  class="size-4 text-amber-500"
+                  name="i-lucide-trophy"
+                  class="size-7 text-primary"
                   aria-hidden="true"
                 />
                 <strong>1st</strong><span class="ml-auto">50%</span>
@@ -192,7 +220,7 @@
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
                   name="i-lucide-medal"
-                  class="size-4 text-slate-400"
+                  class="size-7 text-primary"
                   aria-hidden="true"
                 />
                 <strong>2nd</strong><span class="ml-auto">25%</span>
@@ -200,7 +228,7 @@
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
                   name="i-lucide-medal"
-                  class="size-4 text-orange-500"
+                  class="size-7 text-primary"
                   aria-hidden="true"
                 />
                 <strong>3rd</strong><span class="ml-auto">12.5%</span>
@@ -208,7 +236,7 @@
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
                   name="i-lucide-award"
-                  class="size-4 text-primary"
+                  class="size-7 text-primary"
                   aria-hidden="true"
                 />
                 <strong>4th</strong><span class="ml-auto">7.5%</span>
@@ -216,7 +244,7 @@
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
                 <Icon
                   name="i-lucide-award"
-                  class="size-4 text-primary"
+                  class="size-7 text-primary"
                   aria-hidden="true"
                 />
                 <strong>5th</strong><span class="ml-auto">5%</span>

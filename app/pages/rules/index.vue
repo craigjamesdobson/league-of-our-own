@@ -20,7 +20,8 @@
           target="_blank"
           color="neutral"
           variant="soft"
-          class="shrink-0"
+          size="md"
+          class="h-10 shrink-0 self-center"
         />
       </div>
     </header>
@@ -55,6 +56,7 @@
         <SectionHeading
           number="1"
           title="Pricing"
+          icon="i-lucide-wallet-cards"
         />
         <div class="grid gap-5 lg:grid-cols-2">
           <RuleCard title="Option 1">
@@ -87,6 +89,7 @@
         <SectionHeading
           number="2"
           title="Scoring"
+          icon="i-lucide-chart-no-axes-combined"
         />
         <div class="grid gap-5 sm:grid-cols-2">
           <RuleCard title="Clean sheets">
@@ -133,6 +136,7 @@
         <SectionHeading
           number="3"
           title="Weekly fixtures"
+          icon="i-lucide-calendar-days"
         />
         <div class="prose prose-slate max-w-none text-muted dark:prose-invert">
           <p>
@@ -161,6 +165,7 @@
         <SectionHeading
           number="4"
           title="Transfers"
+          icon="i-lucide-arrow-left-right"
         />
         <div class="space-y-4 text-muted">
           <p><strong>Four transfers</strong> can be made throughout the season: two before 1 January and two after.</p>
@@ -192,6 +197,7 @@
         <SectionHeading
           number="5"
           title="Entry fee"
+          icon="i-lucide-pound-sterling"
         />
         <p class="text-muted">
           The entry fee is <strong>£20.00</strong>. Please pay when you submit your team,
@@ -210,6 +216,7 @@
         <SectionHeading
           number="6"
           title="Prize money"
+          icon="i-lucide-trophy"
         />
         <div class="grid gap-5 lg:grid-cols-2">
           <RuleCard title="Weekly prizes">
@@ -239,6 +246,7 @@
         <SectionHeading
           number="7"
           title="Team builder"
+          icon="i-lucide-shirt"
         />
         <div class="rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
           <p class="text-muted">
@@ -267,6 +275,7 @@
         <SectionHeading
           number="8"
           title="Final notes"
+          icon="i-lucide-mail"
         />
         <div class="space-y-4 text-muted">
           <p>

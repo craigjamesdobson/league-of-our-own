@@ -1,5 +1,5 @@
 <template>
-  <main class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12 xl:max-w-4xl">
+  <main class="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:py-12">
     <header class="mb-10 rounded-3xl bg-brand px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10">
       <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -16,7 +16,7 @@
       </div>
     </header>
 
-    <div class="space-y-12">
+    <div class="mx-auto space-y-12 xl:max-w-4xl">
       <section
         id="pricing"
         class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"

@@ -21,53 +21,31 @@
           color="neutral"
           variant="soft"
           size="md"
-          class="h-10 shrink-0 self-center"
+          class="h-10 shrink-0 self-end sm:self-center"
         />
       </div>
     </header>
-
-    <nav
-      aria-label="Rules sections"
-      class="mb-10 rounded-2xl border border-default bg-elevated p-4 sm:p-5"
-    >
-      <p class="mb-3 text-xs font-black uppercase tracking-[0.2em] text-muted">
-        Contents
-      </p>
-      <ol class="grid gap-2 text-sm font-semibold sm:grid-cols-2 lg:grid-cols-4">
-        <li
-          v-for="section in sections"
-          :key="section.id"
-        >
-          <a
-            :href="`#${section.id}`"
-            class="text-primary underline-offset-4 hover:underline"
-          >
-            {{ section.number }}. {{ section.title }}
-          </a>
-        </li>
-      </ol>
-    </nav>
 
     <div class="space-y-12">
       <section
         id="pricing"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="1"
           title="Pricing"
           icon="i-lucide-wallet-cards"
         />
         <div class="grid gap-5 lg:grid-cols-2">
-          <RuleCard title="Option 1">
+          <RulesRuleCard title="Option 1">
             You will have <strong>£85 million</strong> to spend with up to
             <strong>four transfers</strong>. Two transfers can be used before 1 January
             and two after. See the Transfers section for the full rules.
-          </RuleCard>
-          <RuleCard title="Option 2">
+          </RulesRuleCard>
+          <RulesRuleCard title="Option 2">
             You will have <strong>£90 million</strong> to spend with
             <strong>no transfers</strong> available for the whole season.
-          </RuleCard>
+          </RulesRuleCard>
         </div>
         <div class="mt-5 rounded-2xl border border-default bg-elevated p-5 sm:p-6">
           <h3 class="font-black uppercase tracking-wide">
@@ -86,22 +64,22 @@
         id="scoring"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="2"
           title="Scoring"
           icon="i-lucide-chart-no-axes-combined"
         />
         <div class="grid gap-5 sm:grid-cols-2">
-          <RuleCard title="Clean sheets">
+          <RulesRuleCard title="Clean sheets">
             <p><strong>5 points</strong> for a goalkeeper keeping a clean sheet.</p>
             <p class="mt-2">
               <strong>2 points</strong> for a defender keeping a clean sheet.
             </p>
-          </RuleCard>
-          <RuleCard title="Red cards">
+          </RulesRuleCard>
+          <RulesRuleCard title="Red cards">
             <strong>10 points will be deducted</strong> for any player receiving a red card.
-          </RuleCard>
-          <RuleCard title="Goals">
+          </RulesRuleCard>
+          <RulesRuleCard title="Goals">
             <ul class="space-y-2">
               <li><strong>10 points</strong> for a goalkeeper scoring a goal</li>
               <li><strong>7 points</strong> for a defender scoring a goal</li>
@@ -110,11 +88,11 @@
               <li><strong>5 extra points</strong> for two goals in one game</li>
               <li><strong>10 extra points</strong> for a hat-trick or more</li>
             </ul>
-          </RuleCard>
-          <RuleCard title="Assists">
+          </RulesRuleCard>
+          <RulesRuleCard title="Assists">
             <strong>3 points</strong> will be awarded for each assist. No bonus points are
             awarded for multiple assists.
-          </RuleCard>
+          </RulesRuleCard>
         </div>
         <p class="mt-5 text-sm text-muted">
           All scoring data is taken from the official Premier League site:
@@ -133,7 +111,7 @@
         id="fixtures"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="3"
           title="Weekly fixtures"
           icon="i-lucide-calendar-days"
@@ -162,7 +140,7 @@
         id="transfers"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="4"
           title="Transfers"
           icon="i-lucide-arrow-left-right"
@@ -194,7 +172,7 @@
         id="entry-fee"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="5"
           title="Entry fee"
           icon="i-lucide-pound-sterling"
@@ -213,17 +191,17 @@
         id="prize-money"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="6"
           title="Prize money"
           icon="i-lucide-trophy"
         />
         <div class="grid gap-5 lg:grid-cols-2">
-          <RuleCard title="Weekly prizes">
+          <RulesRuleCard title="Weekly prizes">
             A weekly prize of <strong>£10.00</strong> is awarded to the team or teams that
             win a weekly fixture. The prize is shared if there is more than one winner.
-          </RuleCard>
-          <RuleCard title="Season prize pool">
+          </RulesRuleCard>
+          <RulesRuleCard title="Season prize pool">
             The remaining prize pool is shared between the top five finishers:
             <ul class="mt-3 space-y-2">
               <li><strong>1st:</strong> 50%</li>
@@ -232,7 +210,7 @@
               <li><strong>4th:</strong> 7.5%</li>
               <li><strong>5th:</strong> 5%</li>
             </ul>
-          </RuleCard>
+          </RulesRuleCard>
         </div>
         <p class="mt-5 text-sm text-muted">
           The exact prize amounts depend on the number of entries.
@@ -243,7 +221,7 @@
         id="team-builder"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="7"
           title="Team builder"
           icon="i-lucide-shirt"
@@ -272,7 +250,7 @@
         id="final-notes"
         class="scroll-mt-6"
       >
-        <SectionHeading
+        <RulesSectionHeading
           number="8"
           title="Final notes"
           icon="i-lucide-mail"
@@ -298,15 +276,4 @@
   </main>
 </template>
 
-<script setup lang="ts">
-const sections = [
-  { id: 'pricing', number: 1, title: 'Pricing' },
-  { id: 'scoring', number: 2, title: 'Scoring' },
-  { id: 'fixtures', number: 3, title: 'Weekly fixtures' },
-  { id: 'transfers', number: 4, title: 'Transfers' },
-  { id: 'entry-fee', number: 5, title: 'Entry fee' },
-  { id: 'prize-money', number: 6, title: 'Prize money' },
-  { id: 'team-builder', number: 7, title: 'Team builder' },
-  { id: 'final-notes', number: 8, title: 'Final notes' },
-];
-</script>
+<script setup lang="ts"></script>

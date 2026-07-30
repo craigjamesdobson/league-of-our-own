@@ -48,8 +48,8 @@
           </RulesRuleCard>
         </div>
         <p class="mt-5 text-muted">
-          Each team contains eleven players. The team builder checks the required
-          positions and budget automatically when you submit.
+          Choose whether you want to play with transfers, then let the team builder
+          validate your selection rules and budget automatically before you submit.
         </p>
       </section>
 

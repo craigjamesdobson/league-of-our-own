@@ -210,38 +210,43 @@
             the top five finishers:
             <ul class="mt-4 space-y-2">
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <span
-                  class="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-black text-white"
+                <Icon
+                  name="i-lucide-trophy"
+                  class="size-7 text-primary"
                   aria-hidden="true"
-                >1</span>
+                />
                 <strong>1st</strong><span class="ml-auto">50%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <span
-                  class="flex size-8 items-center justify-center rounded-full bg-primary/15 text-sm font-black text-primary"
+                <Icon
+                  name="i-lucide-medal"
+                  class="size-7 text-primary"
                   aria-hidden="true"
-                >2</span>
+                />
                 <strong>2nd</strong><span class="ml-auto">25%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <span
-                  class="flex size-8 items-center justify-center rounded-full bg-primary/15 text-sm font-black text-primary"
+                <Icon
+                  name="i-lucide-medal"
+                  class="size-7 text-primary"
                   aria-hidden="true"
-                >3</span>
+                />
                 <strong>3rd</strong><span class="ml-auto">12.5%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <span
-                  class="flex size-8 items-center justify-center rounded-full bg-primary/15 text-sm font-black text-primary"
+                <Icon
+                  name="i-lucide-ribbon"
+                  class="size-7 text-primary"
                   aria-hidden="true"
-                >4</span>
+                />
                 <strong>4th</strong><span class="ml-auto">7.5%</span>
               </li>
               <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-2 dark:bg-slate-900">
-                <span
-                  class="flex size-8 items-center justify-center rounded-full bg-primary/15 text-sm font-black text-primary"
+                <Icon
+                  name="i-lucide-ribbon"
+                  class="size-7 text-primary"
                   aria-hidden="true"
-                >5</span>
+                />
                 <strong>5th</strong><span class="ml-auto">5%</span>
               </li>
             </ul>

@@ -7,9 +7,6 @@ await draftedTeamsStore.fetchDraftedTeams();
 
 <template>
   <div v-if="draftedTeamsStore.getDraftedTeams">
-    <h1 class="main-heading">
-      Teams
-    </h1>
     <div class="grid lg:grid-cols-2 xl:grid-cols-4">
       <div
         v-for="draftedTeam in draftedTeamsStore.getDraftedTeams"
@@ -24,9 +21,6 @@ await draftedTeamsStore.fetchDraftedTeams();
     </div>
   </div>
   <div v-else>
-    <h1 class="main-heading">
-      Loading...
-    </h1>
     <div class="grid lg:grid-cols-2 xl:grid-cols-4">
       <div
         v-for="i in 12"

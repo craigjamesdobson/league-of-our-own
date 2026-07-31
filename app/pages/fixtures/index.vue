@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 import { useAppSettings } from '~/composables/useAppSettings';
@@ -7,7 +7,7 @@ import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/da
 import { calculateWeeklyStats } from '~/composables/useWeeklyStats';
 
 const supabase = useSupabaseClient<Database>();
-const toast = useToast();
+const toast = useNuxtToast();
 const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
@@ -161,63 +161,62 @@ const updateWeeklyStats = async () => {
 
 <template>
   <div>
-    <Toast />
     <div class="flex flex-col md:flex-row gap-5 md:justify-between mb-2.5">
       <div class="flex flex-col gap-2.5">
-        <h1 class="text-2xl font-black uppercase">
-          Fixtures
-        </h1>
-
         <div class="flex gap-2.5">
-          <Message
+          <UAlert
             v-if="fixtureStore.fixtures && weekIsInComplete"
-            class="!m-0"
-            :closable="false"
+            color="info"
+            variant="soft"
           >
-            This week is currently incomplete ({{ (progressStats?.total || 0) - (progressStats?.populated || 0) }} fixtures remaining)
-          </Message>
-          <Message
+            <template #description>
+              This week is currently incomplete ({{ (progressStats?.total || 0) - (progressStats?.populated || 0) }} fixtures remaining)
+            </template>
+          </UAlert>
+          <UAlert
             v-else-if="fixtureStore.fixtures && !weekIsVerified"
-            class="!m-0"
-            :closable="false"
-            severity="warn"
+            color="warning"
+            variant="soft"
           >
-            {{ progressStats?.needsVerification || 0 }} fixture{{ (progressStats?.needsVerification || 0) === 1 ? '' : 's' }} need{{ (progressStats?.needsVerification || 0) === 1 ? 's' : '' }} verification before saving
-          </Message>
-          <Message
+            <template #description>
+              {{ progressStats?.needsVerification || 0 }} fixture{{ (progressStats?.needsVerification || 0) === 1 ? '' : 's' }} need{{ (progressStats?.needsVerification || 0) === 1 ? 's' : '' }} verification before saving
+            </template>
+          </UAlert>
+          <UAlert
             v-else-if="fixtureStore.fixtures"
-            class="!m-0"
-            :closable="false"
-            severity="success"
+            color="success"
+            variant="soft"
           >
-            All fixtures for this week have been verified ✓
-          </Message>
+            <template #description>
+              All fixtures for this week have been verified
+            </template>
+          </UAlert>
         </div>
       </div>
       <div class="mb-5 flex flex-col md:items-end gap-2.5">
         <label
-          class="font-bold uppercase"
+          class="font-bold uppercase text-slate-700 dark:text-slate-300"
           for="gameweeks"
         >Select a game week</label>
         <div class="flex gap-2.5">
-          <Select
+          <USelectMenu
             v-model="selectedWeek"
-            :options="weeks"
+            class="w-28"
+            :items="weeks"
             placeholder="Select a gameweek"
-            scroll-height="25rem"
           >
-            <template #value="slotProps">
-              <div class="flex items-center">
-                <div>WEEK {{ slotProps.value }}</div>
+            <template #default="{ modelValue }">
+              <div class="flex min-w-0 items-center">
+                <div>WEEK {{ modelValue }}</div>
               </div>
             </template>
-            <template #option="slotProps">
-              <div class="flex items-center">
-                <div>WEEK {{ slotProps.option }}</div>
+            <template #item-label="{ item }">
+              <div class="flex min-w-0 items-center">
+                <div>WEEK {{ item }}</div>
               </div>
             </template>
-          </Select>
-          <Button
+          </USelectMenu>
+          <UButton
             label="Save week"
             :disabled="weekIsInComplete || !weekIsVerified"
             @click="updateWeeklyStats"
@@ -234,118 +233,72 @@ const updateWeeklyStats = async () => {
           v-for="(fixture, index) in fixtureStore.fixtures"
           :key="fixture.id"
           :to="`/fixtures/${fixture.id}`"
-          class="bg-white hover:border-primary rounded-sm border-2 py-2.5 px-5 duration-300 ease-in-out *:transition-all relative group"
+          class="rounded-sm border-2 py-2.5 px-5 duration-300 ease-in-out *:transition-all relative group text-slate-900 dark:text-slate-100"
           :class="{
-            'border-green-500 bg-green-50': fixture.verified_by && fixture.verified_at,
-            'border-yellow-400 bg-yellow-50': !(fixture.verified_by && fixture.verified_at) && fixture.populated_by && fixture.populated_at,
-            'border-gray-200 bg-gray-50': !fixture.populated_by || !fixture.populated_at,
-            'hover:border-green-600': fixture.verified_by && fixture.verified_at,
-            'hover:border-yellow-500': !(fixture.verified_by && fixture.verified_at) && fixture.populated_by && fixture.populated_at,
-            'hover:border-primary': !fixture.populated_by || !fixture.populated_at,
+            'border-green-500 bg-green-50 hover:border-green-600 dark:border-green-700 dark:bg-green-950/50 dark:hover:border-green-500': fixture.verified_by && fixture.verified_at,
+            'border-yellow-400 bg-yellow-50 hover:border-yellow-500 dark:border-yellow-700 dark:bg-yellow-950/50 dark:hover:border-yellow-500': !(fixture.verified_by && fixture.verified_at) && fixture.populated_by && fixture.populated_at,
+            'border-gray-200 bg-gray-50 hover:border-primary dark:border-slate-700 dark:bg-slate-900 dark:hover:border-primary-400': !fixture.populated_by || !fixture.populated_at,
           }"
         >
           <!-- Status header with badge and icon -->
           <div class="flex justify-between items-center mb-5">
             <!-- Status badge -->
-            <span
+            <UBadge
               v-if="fixture.verified_by && fixture.verified_at"
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-            >
-              Verified
-            </span>
-            <span
+              label="Verified"
+              color="success"
+              variant="soft"
+            />
+            <UBadge
               v-else-if="fixture.populated_by && fixture.populated_at"
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
-            >
-              Needs Verification
-            </span>
-            <span
+              label="Needs Verification"
+              color="warning"
+              variant="soft"
+            />
+            <UBadge
               v-else
-              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600"
-            >
-              Not Populated
-            </span>
+              label="Not Populated"
+              color="neutral"
+              variant="soft"
+            />
 
             <!-- Status icon -->
             <div class="flex gap-1">
               <!-- Verified icon -->
-              <div
+              <UTooltip
                 v-if="fixture.verified_by && fixture.verified_at"
-                class="opacity-80"
-                title="Verified"
+                text="Verified"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-green-600"
-                >
-                  <path d="M9 12l2 2 4-4" />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                  />
-                </svg>
-              </div>
+                <Icon
+                  name="i-lucide-circle-check"
+                  size="20"
+                  class="text-green-600 dark:text-green-300"
+                />
+              </UTooltip>
 
               <!-- Needs verification icon -->
-              <div
+              <UTooltip
                 v-else-if="fixture.populated_by && fixture.populated_at"
-                class="opacity-70"
-                title="Needs Verification"
+                text="Needs Verification"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-yellow-600"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                  />
-                  <path d="M12 8v4" />
-                  <path d="m12 16 .01 0" />
-                </svg>
-              </div>
+                <Icon
+                  name="i-lucide-circle-alert"
+                  size="20"
+                  class="text-yellow-600 dark:text-yellow-300"
+                />
+              </UTooltip>
 
               <!-- Empty fixture icon -->
-              <div
+              <UTooltip
                 v-else
-                class="opacity-50"
-                title="Not Populated"
+                text="Not Populated"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-gray-500"
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="10"
-                  />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-              </div>
+                <Icon
+                  name="i-lucide-clock"
+                  size="20"
+                  class="text-gray-500 dark:text-slate-400"
+                />
+              </UTooltip>
             </div>
           </div>
 
@@ -359,7 +312,7 @@ const updateWeeklyStats = async () => {
         <div
           v-for="i in 10"
           :key="i"
-          class="bg-surface-50 border p-5"
+          class="bg-white border border-slate-200 p-5 dark:bg-slate-900 dark:border-slate-700"
         >
           <SkeletonFixture />
         </div>

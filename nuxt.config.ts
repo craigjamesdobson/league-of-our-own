@@ -1,31 +1,3 @@
-import { definePreset } from '@primeuix/themes';
-import Aura from '@primeuix/themes/aura';
-
-const AuraCustom = definePreset(Aura, {
-  semantic: {
-    primary: {
-      50: '#e6e6f2',
-      100: '#c8c9e6',
-      200: '#a4a5d4',
-      300: '#7e80c1',
-      400: '#5558a3',
-      500: '#0b0c3d',
-      600: '#090a32',
-      700: '#070827',
-      800: '#05061d',
-      900: '#030414',
-      950: '#01010a',
-    },
-  },
-  components: {
-    tooltip: {
-      root: {
-        maxWidth: '15rem',
-      },
-    },
-  },
-});
-
 export default defineNuxtConfig({
   modules: [
     // Core framework modules
@@ -33,10 +5,7 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
 
     // UI and styling modules
-    '@nuxtjs/tailwindcss',
-    '@primevue/nuxt-module',
-    '@nuxt/icon',
-    '@nuxtjs/color-mode',
+    '@nuxt/ui',
 
     // Analytics and tracking
     '@nuxt/scripts',
@@ -96,8 +65,8 @@ export default defineNuxtConfig({
   css: ['@/assets/styles/base.css'],
 
   colorMode: {
-    preference: 'system', // Respects user's system preference
-    fallback: 'light', // Fallback when system preference can't be determined
+    preference: 'system',
+    fallback: 'light',
   },
 
   runtimeConfig: {
@@ -106,7 +75,6 @@ export default defineNuxtConfig({
     },
     public: {
       SITE_URL: process.env.SITE_URL,
-      ACTIVE_SEASON: process.env.ACTIVE_SEASON,
       nodeEnv: process.env.NODE_ENV || 'development',
       turnstile: {
         siteKey: process.env.TURNSTILE_SITE_KEY,
@@ -122,32 +90,24 @@ export default defineNuxtConfig({
     },
   },
 
-  hotjar: {
-    hotjarId: 5090647,
+  vite: {
+    optimizeDeps: {
+      include: ['zod'],
+    },
   },
 
-  primevue: {
-    autoImport: true,
-    components: {
-      exclude: [
-        'Form',
-        'FormField',
-        'Editor',
-        'Chart',
-      ],
+  fonts: {
+    providers: {
+      bunny: false,
+      fontshare: false,
+      fontsource: false,
+      google: false,
+      googleicons: false,
     },
-    options: {
-      ripple: true,
-      inputVariant: 'filled',
-      theme: {
-        preset: AuraCustom,
-        options: {
-          prefix: 'p',
-          darkModeSelector: false,
-          cssLayer: false,
-        },
-      },
-    },
+  },
+
+  hotjar: {
+    hotjarId: 5090647,
   },
 
   scripts: {
@@ -162,7 +122,4 @@ export default defineNuxtConfig({
     redirect: false,
   },
 
-  turnstile: {
-    addValidateEndpoint: true,
-  },
 });

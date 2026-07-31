@@ -16,7 +16,6 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
-ACTIVE_SEASON=2024-25
 SITE_URL=http://localhost:3000
 
 # Security (optional - required for form submissions)
@@ -33,7 +32,6 @@ On your deployment platform (Vercel, Netlify, etc.):
 ```
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
-ACTIVE_SEASON=2024-25
 SITE_URL=https://yourdomain.com
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
@@ -64,24 +62,6 @@ NODE_ENV=production
 1. Supabase dashboard → Settings → API
 2. Copy "anon public" key
 3. Never use service_role key in client code
-
-### `ACTIVE_SEASON` (Required)
-
-**Type:** String
-**Format:** `YYYY-YY` (e.g., `2024-25`)
-**Purpose:** Current fantasy football season
-
-**Usage:**
-```typescript
-const config = useRuntimeConfig();
-const season = config.public.ACTIVE_SEASON;
-// Output: "2024-25"
-```
-
-**How to update:**
-- Change `.env.local` for development
-- Update deployment platform settings for production
-- Affects which season's data loads
 
 ### `SITE_URL` (Optional but Recommended)
 
@@ -133,7 +113,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       SITE_URL: process.env.SITE_URL,
-      ACTIVE_SEASON: process.env.ACTIVE_SEASON,
       nodeEnv: process.env.NODE_ENV,
       turnstile: {
         siteKey: process.env.TURNSTILE_SITE_KEY
@@ -151,12 +130,50 @@ In Vue components and composables:
 const config = useRuntimeConfig();
 
 // Access values
-const season = config.public.ACTIVE_SEASON;
 const siteUrl = config.public.SITE_URL;
 const turnstileSiteKey = config.public.turnstile.siteKey;
 ```
 
 **Note:** All configuration values are in `public` scope, making them available to client-side code. Never put secrets here.
+
+## Application Settings
+
+Operational settings live as rows in `public.settings`, so an operator can change
+application state without rebuilding or redeploying the site.
+
+| Key | Parsed type | Valid values |
+| --- | --- | --- |
+| `active_season` | string | Season key in `YY-YY` format, for example `26-27` |
+| `current_gameweek` | number | Integer from 1 to 38 |
+| `season_complete` | boolean | `true` or `false` |
+| `site_open` | boolean | `true` or `false` |
+| `league_data_public` | boolean | `true` or `false` |
+| `team_registration_open` | boolean | `true` or `false` |
+| `team_submission_deadline` | date | `YYYY-MM-DD` |
+
+Postgres stores each `setting_value` as text. `parseAppSettings` is the single
+application boundary that validates and converts those strings into typed values.
+Missing or invalid values fail closed: anonymous visitors see the coming-soon page
+and team submissions are rejected.
+
+Client code reads settings through `useAppSettings`:
+
+```typescript
+const {
+  activeSeason,
+  siteOpen,
+  leagueDataPublic,
+  teamRegistrationOpen,
+  refreshAppSettings,
+} = useAppSettings();
+
+await refreshAppSettings();
+```
+
+For a season release, update all related values in one SQL statement so clients
+never observe a partly switched Season. The
+[Season rollover runbook](../runbooks/season-rollover.md) provides the exact
+statement and the staging-to-production procedure.
 
 ## Nuxt Configuration
 
@@ -180,24 +197,34 @@ import type { DraftedTeam } from '~/types/DraftedTeam'
 
 **Nuxt 4 Convention:** All application code lives in `/app/` directory.
 
-### PrimeVue Configuration
+### Nuxt UI Configuration
 
 ```typescript
-modules: ['@primevue/nuxt-module'],
-primevue: {
-  options: {
-    unstyled: false,  // Use included styles
-    ripple: true,     // Ripple effect on components
-  },
-  components: {
-    exclude: ['Form', 'FormField', 'Editor', 'Chart'],  // Don't auto-import these
-  }
+modules: ['@nuxt/ui'],
+colorMode: {
+  preference: 'system',
+  fallback: 'light'
 }
 ```
 
-**Theme:** Aura preset with custom primary color palette
+Semantic component colors are configured in `app.config.ts`:
 
-**Styling:** Tailwind CSS integration via `tailwindcss-primeui`
+```typescript
+export default defineAppConfig({
+  ui: {
+    colors: {
+      primary: 'primary',
+      neutral: 'slate',
+      success: 'green',
+      warning: 'amber',
+      error: 'red',
+      info: 'sky'
+    }
+  }
+})
+```
+
+`app.vue` wraps the application in `UApp`, which provides overlays and toasts. Generic controls use Nuxt UI directly; forms use `UForm`, `UFormField`, and Zod schemas.
 
 ### Supabase Configuration
 
@@ -305,11 +332,13 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
 import type { Database } from '~/types/database.types';
 
 const supabase = useSupabaseClient<Database>();
+const { getActiveSeason } = useAppSettings();
+const activeSeason = await getActiveSeason();
 
 const { data } = await supabase
-  .from('players')
+  .from('drafted_teams')
   .select('*')
-  .eq('season', config.public.ACTIVE_SEASON);
+  .eq('active_season', activeSeason);
 ```
 
 ### Real-Time Subscriptions
@@ -333,20 +362,21 @@ const subscription = supabase
 
 ## Tailwind CSS Configuration
 
-### tailwind.config.ts
+### app/assets/styles/base.css
 
-```typescript
-module.exports = {
-  content: [
-    './app/components/**/*.{vue,js,ts}',
-    './app/pages/**/*.vue',
-    './app/layouts/**/*.vue'
-  ],
-  plugins: [
-    require('tailwindcss-primeui')  // PrimeVue integration
-  ]
+```css
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-display: "Rubik", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --color-brand: #0b0c3d;
+  --color-primary-500: #4f46e5;
 }
 ```
+
+Tailwind CSS v4 discovers utility usage automatically, so this project does not use a `tailwind.config.ts` content list. Shared brand, typography, and spacing tokens are defined with `@theme` in the CSS entry point.
 
 ### Usage
 
@@ -356,7 +386,7 @@ module.exports = {
 </button>
 ```
 
-Tailwind utility classes combined with PrimeVue components.
+Tailwind utilities can be combined with Nuxt UI's semantic color utilities and component `ui` props.
 
 ## ESLint & Prettier Configuration
 
@@ -432,4 +462,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2025-11-15
+**Last updated:** 2026-07-28

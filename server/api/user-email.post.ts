@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     return data;
   }
   catch (error) {
-    return { error };
+    console.error('User email delivery failed:', error);
+    throw createError({ statusCode: 502, statusMessage: 'Confirmation email could not be sent' });
   }
 });

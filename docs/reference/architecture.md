@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Web Application
 
-*Last updated: 2025-11-15*
+*Last updated: 2026-07-20*
 
 ## Overview
 
@@ -20,7 +20,7 @@ This is a sophisticated fantasy football web application built with modern web t
 ### Frontend Architecture
 
 #### Core Framework
-- **Nuxt 4** (v4.1.2) - Vue.js framework configured as SPA
+- **Nuxt 4** - Vue.js framework configured as SPA
   - SSR disabled (`ssr: false`)
   - File-based routing with `/app/pages/` directory
   - Auto-imports for components and composables
@@ -28,27 +28,26 @@ This is a sophisticated fantasy football web application built with modern web t
   - `/app/` directory for all application code (Nuxt 4 convention)
 
 #### UI Framework & Styling
-- **PrimeVue** (v4.2.5) - Component library
-  - Custom Aura theme with `theme: 'none'` configuration
-  - Integrated with Tailwind CSS via `tailwindcss-primeui`
-  - Comprehensive component set (DataTable, Calendar, Dialog, etc.)
+- **Nuxt UI 4** - Accessible component library and application UI foundation
+  - Semantic colors configured in `app.config.ts`
+  - App-level overlays and toasts provided by `UApp`
+  - System-aware light/dark color mode with a sidebar preference control
 
-- **Tailwind CSS** (v3.4.17) - Utility-first CSS framework
-  - Custom configuration for PrimeVue integration
+- **Tailwind CSS 4** - Utility-first CSS framework
+  - CSS-first theme configuration in `app/assets/styles/base.css`
   - Responsive design with breakpoints
   - Custom colour palette and typography
 
 #### State Management
-- **Pinia** (v2.3.0) - Vue 3 state management
+- **Pinia 3** - Vue 3 state management
   - Modular store architecture
   - TypeScript-first approach
   - Reactive state with computed properties
 
 #### Validation & Forms
-- **Vuelidate** (v2.0.3) - Form validation library
-  - Reactive validation rules
-  - Integration with PrimeVue components
-  - Custom validation patterns
+- **Zod 4** - Runtime form validation and submit-payload typing
+  - Local schemas integrated with Nuxt UI `UForm` and `UFormField`
+  - Validation messages live beside form schemas
 
 ### Backend Integration
 
@@ -109,9 +108,7 @@ league-of-our-own/
 ```
 app/components/
 ├── Common/               # Reusable UI components
-│   ├── FormField.vue    # Form input wrapper
-│   ├── Modal.vue        # Centralised modal system
-│   └── ...
+│   └── CalculationsLegend.vue
 ├── Drafted/             # Fantasy team management
 ├── Fixture/             # Match fixture components
 ├── Skeleton/            # Loading state components
@@ -121,7 +118,7 @@ app/components/
 ```
 
 #### Key Component Patterns
-- **Centralised Modal System**: Single `Modal.vue` component with content injection
+- **Nuxt UI Overlays**: Dialogs and drawers use Nuxt UI overlay components through `UApp`
 - **Skeleton Loading**: Dedicated skeleton components for each data type
 - **Feature-based Organisation**: Components grouped by business feature
 - **Reusable Common Components**: Shared UI elements with consistent API
@@ -344,7 +341,7 @@ pnpm generate-types  # Supabase type generation
 - **Pinia State Management**: Preferred over Vuex for Vue 3 compatibility
 
 #### **Important Decisions**
-- **PrimeVue UI Library**: Chosen for comprehensive component set
+- **Nuxt UI Library**: Chosen as the shared component, theming, overlay, and form foundation
 - **File-based Routing**: Leveraged Nuxt 4's convention over configuration
 - **Composable Architecture**: Adopted for reusable business logic
 - **Two-stage Verification**: Implemented for data integrity
@@ -352,6 +349,6 @@ pnpm generate-types  # Supabase type generation
 #### **Supporting Decisions**
 - **Tailwind CSS**: Selected for utility-first styling approach
 - **pnpm Package Manager**: Chosen for performance and disk efficiency
-- **Vuelidate Validation**: Integrated for form validation needs
+- **Zod Validation**: Integrated with Nuxt UI forms for runtime validation and typed submit payloads
 - **Resend Email Service**: Selected for reliable email delivery
 - **Cloudflare Turnstile**: Implemented for bot protection (privacy-focused, elderly-friendly)

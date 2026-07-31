@@ -45,23 +45,23 @@ const visible = ref(false);
             for="gameweeks"
           >Select a game week</label>
           <div class="flex gap-2.5">
-            <Select
+            <USelectMenu
               v-model="selectedWeek"
-              :options="weeks"
+              class="w-28"
+              :items="weeks"
               placeholder="Select a gameweek"
-              scroll-height="25rem"
             >
-              <template #value="slotProps">
-                <div class="flex items-center">
-                  <div>WEEK {{ slotProps.value }}</div>
+              <template #default="{ modelValue }">
+                <div class="flex min-w-0 items-center">
+                  <div>WEEK {{ modelValue }}</div>
                 </div>
               </template>
-              <template #option="slotProps">
-                <div class="flex items-center">
-                  <div>WEEK {{ slotProps.option }}</div>
+              <template #item-label="{ item }">
+                <div class="flex min-w-0 items-center">
+                  <div>WEEK {{ item }}</div>
                 </div>
               </template>
-            </Select>
+            </USelectMenu>
           </div>
         </div>
       </div>
@@ -81,37 +81,45 @@ const visible = ref(false);
         :weekly-data="tableStore.weeklyData"
         :drafted-teams-with-points="draftedTeamsWithPoints"
       />
-      <Message v-else>
-        This week is not yet available
-      </Message>
-    </div>
-    <Dialog
-      v-model:visible="visible"
-      class="w-[90%] sm:w-[500px]"
-      pt:header:class="!pb-0"
-      pt:title:class="uppercase !mb-0"
-      pt:content:class="!p-0 !pb-2"
-      dismissable-mask
-      modal
-      :header="`Week ${selectedWeek} score`"
-    >
-      <DraftedTeamWithPoints
-        :active-week="selectedWeek"
-        :drafted-team="selectedDraftedTeam"
+      <UAlert
+        v-else
+        color="info"
+        variant="soft"
+        description="This week is not yet available"
       />
-      <CommonCalculationsLegend />
-      <Message
-        class="mx-4 my-1"
-        severity="info"
-      >
-        See the <NuxtLink
-          class="underline"
-          to="/rules"
-        >rules</NuxtLink> for a
-        full
-        breakdown of score calculations
-      </Message>
-    </Dialog>
+    </div>
+    <UModal
+      v-model:open="visible"
+      :title="`Week ${selectedWeek} score`"
+      :dismissible="true"
+      :ui="{
+        overlay: 'bg-slate-950/75',
+        content: 'w-[calc(100vw-2rem)] max-w-[500px] overflow-hidden bg-white text-slate-900 ring-slate-200 dark:bg-slate-900 dark:text-slate-100 dark:ring-slate-700',
+        body: 'overflow-x-hidden p-0 pb-2',
+        title: 'uppercase',
+      }"
+    >
+      <template #body>
+        <DraftedTeamWithPoints
+          :active-week="selectedWeek"
+          :drafted-team="selectedDraftedTeam"
+        />
+        <CommonCalculationsLegend />
+        <UAlert
+          class="mx-4 my-1"
+          color="info"
+          variant="soft"
+        >
+          <template #description>
+            See the <NuxtLink
+              class="underline"
+              to="/rules"
+            >rules</NuxtLink> for a
+            full breakdown of score calculations
+          </template>
+        </UAlert>
+      </template>
+    </UModal>
     <div class="flex flex-col gap-2.5 lg:col-span-2">
       <WeeklyWinners />
     </div>

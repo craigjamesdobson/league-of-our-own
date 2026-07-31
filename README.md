@@ -29,7 +29,7 @@ This app is powered by modern technologies to deliver a fast, reliable, and intu
 ### **Frontend**
 - **Nuxt.js**: A framework for building high-performance Vue.js applications with server-side rendering and static generation.
 - **Tailwind CSS**: A utility-first CSS framework for creating responsive and elegant designs.
-- **PrimeVue**: A comprehensive UI component library for Vue.js, providing a wide range of pre-designed components to speed up development.
+- **Nuxt UI**: Accessible Vue components, Zod-backed forms, theme tokens, and light/dark color modes.
 
 ### **Backend**
 - **Supabase**: A hosted backend-as-a-service providing real-time databases, authentication, and API functionality.
@@ -45,3 +45,6 @@ If you have any questions or feedback, feel free to get in touch.
 
 _Note: This project is a personal endeavor and is not affiliated with any official fantasy football organisations._
 
+---
+
+**Last updated:** 2026-07-20

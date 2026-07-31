@@ -1,5 +1,7 @@
 # Database Restoration Guide: Live to Development
 
+**Last updated:** 2026-07-27
+
 This guide documents the proven method for safely restoring live database data to development database when network connectivity issues prevent direct database connections.
 
 ## Problem Statement
@@ -28,6 +30,44 @@ Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all ne
 1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only`)
 2. **Development database** access via Supabase web dashboard
 3. **Working directory**: Create `temp/` folder for split files
+
+`supabase/seed.sql` is an ignored, temporary live-data artifact. Automatic SQL
+seeding is disabled in `supabase/config.toml`; local development uses the
+explicit clean or FPL-backed reset workflows documented in
+[Local Development](local-development.md#local-database-resets).
+
+## Refresh New-Season FPL Reference Data
+
+For a local database, use `pnpm db:reset:fpl`. It resets the schema, imports the
+current clubs, players and fixtures, creates dummy league data, and creates the
+two local fixture-workflow users in one guarded command.
+
+For a deployed environment, refresh Premier League reference data through the
+application endpoints in this order:
+
+1. Call `POST /api/sync-teams` with the `x-api-key` header. This imports exactly
+   20 clubs and stores only each club's FPL ID, name, and short name.
+2. Call `POST /api/sync-players` with the same header. Players must be imported
+   after clubs because each player references a club ID.
+3. Call `POST /api/sync-fixtures` with the same header. It requires exactly 20
+   imported clubs, validates all 380 fixtures and stores blank scores for the
+   new season.
+4. Seed development-only drafted teams and squads from the imported players if
+   application scenarios need test league data.
+
+The endpoints require the server's `SYNC_API_KEY`. Teams and players fetch the
+current FPL `bootstrap-static` payload; fixtures use the first-party FPL fixture
+feed. The teams and fixtures endpoints are manual reset/re-seeding tools and are
+not called by the player-sync cron. Run these calls only against the intended
+environment, and verify the hostname before sending them.
+
+## Season Release
+
+Follow the committed [Season rollover runbook](../runbooks/season-rollover.md)
+against staging first and production second. The backup, archive, clear,
+database-settings, cron, and smoke-test decisions remain explicit manual steps.
+The focused `pnpm season:import -- staging|production` command performs only the
+ordered reference-data imports and their machine-checkable validations.
 
 ### Step 1: Split the Database Dump
 
@@ -209,6 +249,5 @@ temp/
 
 ---
 
-**Last Updated**: September 2025
 **Verified Working**: Supabase projects with 5000+ line database dumps
 **Environment**: WSL2 with IPv6 connectivity issues

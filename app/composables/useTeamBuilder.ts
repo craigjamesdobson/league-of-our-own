@@ -1,10 +1,9 @@
-import { useToast } from 'primevue/usetoast';
+import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import type { DraftedTeamPlayer } from '~/types/DraftedTeamPlayer';
 import { PlayerPosition } from '~/types/PlayerPosition';
-import type { Database, TablesInsert, Tables } from '~/types/database.types';
+import type { TablesInsert, Tables } from '~/types/database.types';
 import type { Database as DatabaseGenerated } from '~/types/database-generated.types';
 import { generateAdminEmail, generateTeamEmail } from '@/pages/team-builder/email';
-import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { delay } from '@/utils/utility';
 
 interface LoadingState {
@@ -24,8 +23,8 @@ const DEFAULT_TEAM_STRUCTURE = [
   { position: PlayerPosition.FORWARD, count: 3 },
 ];
 
-const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
-  active_season: '25-26',
+const createEmptyTeamData = (activeSeason: string): TablesInsert<'drafted_teams'> => ({
+  active_season: activeSeason,
   team_name: '',
   team_owner: '',
   team_email: '',
@@ -36,11 +35,23 @@ const createEmptyTeamData = (): TablesInsert<'drafted_teams'> => ({
 });
 
 export const useTeamBuilder = () => {
-  const supabase = useSupabaseClient<Database>();
+  const { activeSeason } = useAppSettings();
   const route = useRoute();
   const router = useRouter();
-  const toast = useToast();
-  const draftedTeamsStore = useDraftedTeamsStore();
+  const toast = useNuxtToast();
+
+  const addToast = (
+    color: 'error' | 'success',
+    title: string,
+    description: string,
+  ) => {
+    toast.add({
+      color,
+      title,
+      description,
+      duration: 3000,
+    });
+  };
 
   const loading = ref<LoadingState>({
     fetchingTeam: false,
@@ -48,7 +59,8 @@ export const useTeamBuilder = () => {
   });
 
   const error = ref<string | null>(null);
-  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData());
+  const saveConfirmation = ref<'submitted' | 'updated' | null>(null);
+  const draftedTeamData = ref<Tables<'drafted_teams'> | TablesInsert<'drafted_teams'>>(createEmptyTeamData(activeSeason.value));
   const draftedTeamPlayers = ref<DraftedTeamPlayer[]>([]);
   const turnstileToken = ref<string | null>(null);
 
@@ -84,12 +96,7 @@ export const useTeamBuilder = () => {
     const id = teamId || route.query.id;
     if (!id || typeof id !== 'string') {
       error.value = 'Invalid team ID';
-      toast.add({
-        severity: 'error',
-        summary: 'Invalid team ID',
-        detail: 'No valid team ID provided',
-        life: 3000,
-      });
+      addToast('error', 'Invalid team ID', 'No valid team ID provided');
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
       return;
     }
@@ -98,43 +105,18 @@ export const useTeamBuilder = () => {
       loading.value.fetchingTeam = true;
       error.value = null;
 
-      const { data, error: fetchError } = await supabase
-        .from('drafted_teams')
-        .select(
-          ` *,
-            players:drafted_players(
-              drafted_player_id,
-              drafted_team,
-              ...players_view(*)
-            )
-          `,
-        )
-        .eq('key', id)
-        .single();
+      const data = await $fetch<{
+        players: DraftedPlayerFromQuery[];
+      } & Omit<Tables<'drafted_teams'>, 'key'>>(`/api/team-submission/${encodeURIComponent(id)}`);
 
-      if (fetchError) {
-        error.value = 'No team found';
-        toast.add({
-          severity: 'error',
-          summary: 'No team found',
-          detail: 'No team was found using that id',
-          life: 3000,
-        });
-        setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
-        return;
-      }
-
-      draftedTeamData.value = data;
+      // The edit key authorises subsequent updates, but it is already present
+      // in the URL and should not be echoed by the server response.
+      draftedTeamData.value = { ...data, key: id };
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE, data.players);
     }
     catch {
       error.value = 'Failed to fetch team data';
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to fetch team data',
-        life: 3000,
-      });
+      addToast('error', 'Error', 'Failed to fetch team data');
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     }
     finally {
@@ -210,9 +192,12 @@ export const useTeamBuilder = () => {
   };
 
   const submitTeam = async (): Promise<void> => {
+    if (loading.value.submittingForm) return;
+
     try {
       loading.value.submittingForm = true;
       error.value = null;
+      saveConfirmation.value = null;
 
       await delay(1000);
 
@@ -220,67 +205,88 @@ export const useTeamBuilder = () => {
         return;
       }
 
-      // Verify Turnstile token using built-in endpoint
-      const turnstileVerification = await $fetch('/_turnstile/validate', {
+      const wasEditing = isExistingDraftedTeam.value;
+      const teamData = await $fetch<Tables<'drafted_teams'>>('/api/team-submission', {
         method: 'POST',
-        body: { token: turnstileToken.value },
+        body: {
+          turnstileToken: turnstileToken.value,
+          editKey: wasEditing ? draftedTeamData.value.key : null,
+          teamName: draftedTeamData.value.team_name,
+          teamOwner: draftedTeamData.value.team_owner,
+          teamEmail: draftedTeamData.value.team_email,
+          contactNumber: draftedTeamData.value.contact_number,
+          allowCommunication: draftedTeamData.value.allow_communication,
+          allowedTransfers: draftedTeamData.value.allowed_transfers,
+          playerIds: draftedTeamPlayers.value.map(player => player.selectedPlayer!.player_id),
+        },
       });
-
-      if (!turnstileVerification.success) {
-        toast.add({
-          severity: 'error',
-          summary: 'Security Check Failed',
-          detail: 'Security verification failed. Please try again.',
-          life: 3000,
-        });
-        return;
-      }
-
-      const teamData = await upsertTeamData(isExistingDraftedTeam.value);
-
-      await upsertPlayerData(teamData.drafted_team_id, isExistingDraftedTeam.value);
 
       router.push({
         path: 'team-builder',
         query: { id: teamData.key },
       });
 
-      await useFetch('/api/user-email', {
-        method: 'post',
-        body: {
-          title: (teamData.edited_count ?? 0) > 0 ? 'Your team has been updated' : 'Thank you for your team submission',
-          email: draftedTeamData.value.team_email,
-          html: generateTeamEmail(draftedTeamPlayers.value, teamData),
-        },
-      });
+      let emailDeliveryFailed = false;
 
-      if (!isExistingDraftedTeam.value) {
-        await useFetch('/api/admin-email', {
-          method: 'post',
-          body: {
-            email: 'leagueofourown.fpl@gmail.com',
-            html: generateAdminEmail(draftedTeamPlayers.value, teamData),
-          },
-        });
+      if (!wasEditing) {
+        try {
+          await $fetch('/api/user-email', {
+            method: 'post',
+            body: {
+              title: 'Thank you for your team submission',
+              email: draftedTeamData.value.team_email,
+              html: generateTeamEmail(draftedTeamPlayers.value, teamData),
+            },
+          });
+        }
+        catch (emailError) {
+          emailDeliveryFailed = true;
+          console.error('Failed to send team confirmation email:', emailError);
+        }
+
+        try {
+          await $fetch('/api/admin-email', {
+            method: 'post',
+            body: {
+              email: 'leagueofourown.fpl@gmail.com',
+              html: generateAdminEmail(draftedTeamPlayers.value, teamData),
+            },
+          });
+        }
+        catch (emailError) {
+          emailDeliveryFailed = true;
+          console.error('Failed to send admin team notification:', emailError);
+        }
       }
 
-      await fetchDraftedTeamData(teamData.key);
+      try {
+        await fetchDraftedTeamData(teamData.key);
+        if (error.value) {
+          draftedTeamData.value = teamData;
+        }
+      }
+      catch (refreshError) {
+        console.error('Team saved but could not refresh the edit form:', refreshError);
+        draftedTeamData.value = teamData;
+      }
 
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Your team has been submitted, thank you!',
-        life: 3000,
-      });
+      addToast(
+        emailDeliveryFailed ? 'error' : 'success',
+        emailDeliveryFailed ? 'Team saved' : 'Success',
+        emailDeliveryFailed
+          ? 'Your team was saved, but a confirmation email could not be sent. Please contact the league administrator.'
+          : wasEditing
+            ? 'Your changes have been saved. No new email has been sent.'
+            : 'Your team has been submitted, thank you!',
+      );
+      saveConfirmation.value = wasEditing ? 'updated' : 'submitted';
     }
-    catch {
-      error.value = 'Failed to submit team';
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to submit team. Please try again.',
-        life: 3000,
-      });
+    catch (submissionError) {
+      const message = submissionError instanceof Error
+        ? submissionError.message
+        : 'Failed to submit team. Please try again.';
+      error.value = message;
+      addToast('error', 'Submission failed', message);
     }
     finally {
       loading.value.submittingForm = false;
@@ -288,9 +294,10 @@ export const useTeamBuilder = () => {
   };
 
   const resetForm = (): void => {
-    draftedTeamData.value = createEmptyTeamData();
+    draftedTeamData.value = createEmptyTeamData(activeSeason.value);
     setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     error.value = null;
+    saveConfirmation.value = null;
   };
 
   const validateForm = (): boolean => {
@@ -299,78 +306,27 @@ export const useTeamBuilder = () => {
         draftedTeamPlayer => draftedTeamPlayer.selectedPlayer === null,
       )
     ) {
-      toast.add({
-        severity: 'error',
-        summary: 'Form errors',
-        detail: 'Please select all players before submitting team',
-        life: 3000,
-      });
+      addToast('error', 'Form errors', 'Please select all players before submitting team');
       return false;
     }
 
     if (isOverBudget.value) {
-      toast.add({
-        severity: 'error',
-        summary: 'Form errors',
-        detail: 'Your team is overbudget, please adjust your players',
-        life: 3000,
-      });
+      addToast('error', 'Form errors', 'Your team is overbudget, please adjust your players');
       return false;
     }
 
     if (!turnstileToken.value) {
-      toast.add({
-        severity: 'error',
-        summary: 'Security Check Required',
-        detail: 'Please complete the security check before submitting',
-        life: 3000,
-      });
+      addToast('error', 'Security Check Required', 'Please complete the security check before submitting');
       return false;
     }
 
     return true;
   };
 
-  const upsertTeamData = async (isEditing: boolean): Promise<Tables<'drafted_teams'>> => {
-    const draftedTeamUpsertData: TablesInsert<'drafted_teams'> = {
-      team_name: draftedTeamData.value.team_name,
-      team_owner: draftedTeamData.value.team_owner,
-      team_email: draftedTeamData.value.team_email,
-      contact_number: draftedTeamData.value.contact_number,
-      allow_communication: draftedTeamData.value.allow_communication,
-      allowed_transfers: draftedTeamData.value.allowed_transfers,
-      active_season: '25-26',
-      total_team_value: teamValue.value,
-    };
-
-    if (isEditing) {
-      draftedTeamUpsertData.drafted_team_id = draftedTeamData.value.drafted_team_id;
-      draftedTeamUpsertData.edited_count = (draftedTeamData.value.edited_count ?? 0) + 1;
-    }
-
-    return await draftedTeamsStore.upsertDraftedTeam(draftedTeamUpsertData);
-  };
-
-  const upsertPlayerData = async (draftedTeamID: number, isEditing: boolean): Promise<void> => {
-    const draftedPlayersUpsertData = draftedTeamPlayers.value.map((x) => {
-      const data: TablesInsert<'drafted_players'> = {
-        drafted_player: x.selectedPlayer?.player_id,
-        drafted_team: draftedTeamID,
-      };
-
-      if (isEditing) {
-        data.drafted_player_id = x.draftedPlayerID;
-      }
-
-      return data;
-    });
-
-    await draftedTeamsStore.upsertDraftedPlayers(draftedPlayersUpsertData);
-  };
-
   return {
     loading: readonly(loading),
     error: readonly(error),
+    saveConfirmation: readonly(saveConfirmation),
     draftedTeamData,
     draftedTeamPlayers,
     turnstileToken,

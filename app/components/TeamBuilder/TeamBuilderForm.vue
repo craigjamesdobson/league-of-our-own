@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import useVuelidate from '@vuelidate/core';
-import { email, helpers, required } from '@vuelidate/validators';
-import { useToast } from 'primevue/usetoast';
+import { z } from 'zod';
 import type { TablesInsert } from '~/types/database.types';
-
-const toast = useToast();
 
 // Use defineModel for two-way binding
 const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', {
@@ -14,7 +10,11 @@ const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamD
 // Accept other props from parent component
 const props = defineProps<{
   isExistingDraftedTeam: boolean;
+  selectedCount: number;
   remainingBudget: number;
+  teamBudget: number;
+  teamValue: number;
+  teamSubmissionDeadline: string;
   isOverBudget: boolean;
   loading: { submittingForm: boolean };
   submitTeam: () => Promise<void>;
@@ -45,36 +45,15 @@ onActivated(() => {
 // Use props instead of composable
 const { isExistingDraftedTeam } = toRefs(props);
 
-const rules = computed(() => {
-  return {
-    team_name: {
-      required: helpers.withMessage('The team name field is required', required),
-    },
-    team_owner: {
-      required: helpers.withMessage(
-        'The team owner field is required',
-        required,
-      ),
-    },
-    team_email: {
-      required: helpers.withMessage('The email field is required', required),
-      email: helpers.withMessage('Invalid email format', email),
-    },
-    contact_number: {
-      number: helpers.withMessage('Invalid phone number', helpers.regex(/^(07\d{9})$/)),
-    },
-  };
+const teamDetailsSchema = z.object({
+  team_name: z.string().min(1, 'The team name field is required'),
+  team_owner: z.string().min(1, 'The team owner field is required'),
+  team_email: z.string().min(1, 'The email field is required').email('Invalid email format'),
+  contact_number: z.preprocess(
+    value => value ?? '',
+    z.string().regex(/^(|07\d{9})$/, 'Invalid phone number'),
+  ),
 });
-
-// Create a reactive object for validation that only includes the fields we validate
-const validationData = computed(() => ({
-  team_name: draftedTeamData.value.team_name,
-  team_owner: draftedTeamData.value.team_owner,
-  team_email: draftedTeamData.value.team_email,
-  contact_number: draftedTeamData.value.contact_number,
-}));
-
-const v$ = useVuelidate(rules, validationData);
 
 const contactNumber = computed({
   get: () => draftedTeamData.value.contact_number || '',
@@ -83,180 +62,195 @@ const contactNumber = computed({
   },
 });
 
+const formattedDeadline = computed(() => {
+  if (!props.teamSubmissionDeadline) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(`${props.teamSubmissionDeadline}T00:00:00Z`));
+});
+
+const submitButtonLabel = computed(() => {
+  if (props.isOverBudget) return 'Reduce squad cost';
+  if (props.selectedCount < 11) return `Select ${11 - props.selectedCount} more players`;
+  return isExistingDraftedTeam.value ? 'Save my changes' : 'Submit my team';
+});
+
 const handleTeamSubmit = async () => {
-  // Validate form fields first
-  if (v$.value.$invalid) {
-    v$.value.$touch();
-
-    toast.add({
-      severity: 'error',
-      summary: 'Form errors',
-      detail: 'Team details are incorrect, please review validation errors',
-      life: 3000,
-    });
-    return;
-  }
-
   // Use the composable's submit function (which handles team/player validation)
-  await props.submitTeam();
+  try {
+    await props.submitTeam();
+  }
+  finally {
+    turnstileTokenModel.value = null;
+    if (typeof turnstileRef.value?.reset === 'function') {
+      turnstileRef.value.reset();
+    }
+  }
 };
 </script>
 
 <template>
-  <div class="hidden 2xl:flex flex-col">
-    <Message
-      v-if="isExistingDraftedTeam"
-      severity="info"
-      :closable="false"
-      size="small"
+  <div class="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4 shadow-sm dark:border-slate-700/80 dark:bg-slate-900/60 sm:p-5">
+    <h1 class="mb-5 text-center text-xl font-black uppercase 2xl:text-left">
+      Team details
+    </h1>
+    <div class="hidden 2xl:flex flex-col">
+      <UAlert
+        v-if="isExistingDraftedTeam"
+        color="info"
+        variant="soft"
+        class="mb-5"
+      >
+        <template #description>
+          You are editing your existing team. It was last edited on <strong>{{
+            draftedTeamData.updated_at
+              ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
+              : draftedTeamData.created_at
+                ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
+                : 'Unknown'
+          }}</strong>. Changes are saved without sending another email.
+        </template>
+      </UAlert>
+      <div
+        v-else
+        class="flex flex-col text-xs"
+      >
+        <USeparator class="mb-5" />
+        <p class="mb-5">
+          Choose your transfer option, pick your players, then enter your details below.
+        </p>
+        <p>
+          Once you submit your team, you will receive an email confirming your selection and a link to edit
+          your team if you wish.
+        </p>
+        <USeparator class="my-5" />
+      </div>
+      <p class="font-bold text-xs mb-5">
+        Your team may still be saved if the confirmation email is delayed or missing.
+        Please contact us to check your submission: <a
+          class="underline font-bold"
+          href="mailto:leagueofourown.fpl@gmail.com"
+        >leagueofourown.fpl@gmail.com</a>.
+      </p>
+    </div>
+    <UAlert
+      color="success"
+      variant="soft"
       class="mb-5"
     >
-      You are editing your existing team. <br>It was last edited on <strong>{{
-        draftedTeamData.updated_at
-          ? new Date(draftedTeamData.updated_at).toLocaleDateString('en-GB')
-          : draftedTeamData.created_at
-            ? new Date(draftedTeamData.created_at).toLocaleDateString('en-GB')
-            : 'Unknown'
-      }}</strong>
-    </Message>
-    <div
-      v-else
-      class="flex flex-col text-xs"
-    >
-      <Divider />
-      <p class="mb-5">
-        Pick your team, fill in the form below, and then submit your team.
-      </p>
-      <p>
-        Once you submit your team, you will receive an email confirming your selection and a link to edit
-        your team if you wish.
-      </p>
-      <Divider />
-    </div>
-    <p class="font-bold text-xs mb-5">
-      If you do not receive an email when submitting or editing, your team submission has
-      failed. Please email us with as much detail as possible: <a
-        class="underline font-bold"
-        href="mailto:leagueofourown.fpl@gmail.com"
-      >leagueofourown.fpl@gmail.com</a>.
-    </p>
-  </div>
-  <div
-    class="flex flex-col items-center gap-1 rounded-md bg-orange-100/70 border  text-orange-700 border-orange-200 p-2.5 mb-5"
-  >
-    <p>Deadline for submissions is</p>
-    <p class="uppercase font-black">
-      Wed 13th Aug 2025
-    </p>
-  </div>
-  <form
-    v-if="draftedTeamData"
-    :key="draftedTeamData.key || 'new-team'"
-    class="flex flex-col items-start gap-5"
-  >
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_name"
-      >Team name</label>
-      <CommonFormField
-        v-model="draftedTeamData.team_name"
-        :validation="v$.team_name"
-        type="text"
-      />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_owner"
-      >Team owner</label>
-      <CommonFormField
-        v-model="draftedTeamData.team_owner"
-        :validation="v$.team_owner"
-        type="text"
-      />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="team_email"
-      >Team email</label>
-      <CommonFormField
-        v-model="draftedTeamData.team_email"
-        :validation="v$.team_email"
-        type="email"
-      />
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <label
-        class="font-bold uppercase"
-        for="contact_number"
-      >Contact number</label>
-      <CommonFormField
-        v-model="contactNumber"
-        :validation="v$.contact_number"
-        type="text"
-      />
-      <div
-        v-if="draftedTeamData.contact_number"
-        class="flex items-center gap-5 mt-2.5"
-      >
-        <Checkbox
-          v-model="draftedTeamData.allow_communication"
-          input-id="allow_communication"
-          :binary="true"
-        />
-        <label
-          for="allow_communication"
-          class="text-xs"
-        >If you would like to be added to a WhatsApp group for
-          updates and general chat, please tick this box</label>
-      </div>
-    </div>
-    <div class="flex w-full flex-col gap-1">
-      <div class="flex items-center gap-5">
-        <Checkbox
-          v-model="draftedTeamData.allowed_transfers"
-          input-id="allowed_transfers"
-          :binary="true"
-        />
-        <label
-          for="allowed_transfers"
-          class="font-bold uppercase"
-        >Transfers allowed</label>
-      </div>
-    </div>
-    <Message
-      :severity="props.isOverBudget ? 'error' : 'success'"
-      class="w-full !my-0"
-      :closable="false"
-    >
-      <template #icon>
-        <Icon
-          class="mr-2.5 self-start"
-          size="22"
-          name="tabler:pig-money"
-        />
+      <template #description>
+        <div class="flex flex-col items-center gap-1">
+          <p class="uppercase font-black">
+            Team entry is now open
+          </p>
+          <p>Submission deadline: {{ formattedDeadline }}</p>
+        </div>
       </template>
-      <div class="flex flex-col items-center gap-2.5">
-        <div class="flex items-center gap-2.5">
-          Transfer Budget Remaining:
-          <span class="text-lg font-black">{{
-            props.remainingBudget.toFixed(1)
-          }}</span>
+    </UAlert>
+    <UForm
+      v-if="draftedTeamData"
+      :key="draftedTeamData.key || 'new-team'"
+      :schema="teamDetailsSchema"
+      :state="draftedTeamData"
+      class="flex flex-col items-start gap-5"
+      @submit="handleTeamSubmit"
+    >
+      <UFormField
+        class="w-full"
+        label="Team name"
+        name="team_name"
+        required
+      >
+        <UInput
+          v-model="draftedTeamData.team_name"
+          class="w-full"
+          type="text"
+          autocomplete="organization"
+        />
+      </UFormField>
+      <UFormField
+        class="w-full"
+        label="Your name"
+        name="team_owner"
+        required
+      >
+        <UInput
+          v-model="draftedTeamData.team_owner"
+          class="w-full"
+          type="text"
+          autocomplete="name"
+        />
+      </UFormField>
+      <UFormField
+        class="w-full"
+        label="Email address"
+        name="team_email"
+        required
+      >
+        <UInput
+          v-model="draftedTeamData.team_email"
+          class="w-full"
+          type="email"
+          autocomplete="email"
+        />
+      </UFormField>
+      <UFormField
+        class="w-full"
+        label="Contact number (optional)"
+        name="contact_number"
+      >
+        <UInput
+          v-model="contactNumber"
+          class="w-full"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+        />
+      </UFormField>
+      <div class="flex w-full flex-col gap-1">
+        <div
+          v-if="draftedTeamData.contact_number"
+          class="flex items-center gap-5 mt-2.5"
+        >
+          <UCheckbox
+            id="allow_communication"
+            v-model="draftedTeamData.allow_communication"
+          />
+          <label
+            for="allow_communication"
+            class="text-xs"
+          >If you would like to be added to a WhatsApp group for
+            updates and general chat, please tick this box</label>
         </div>
       </div>
-    </Message>
-    <NuxtTurnstile
-      ref="turnstileRef"
-      v-model="turnstileToken"
-      class="mx-auto"
-    />
-    <Button
-      :loading="props.loading.submittingForm"
-      class="w-full"
-      label="Submit team"
-      @click="handleTeamSubmit"
-    />
-  </form>
+      <div
+        v-if="props.selectedCount === 11 && !props.isOverBudget"
+        class="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-800 dark:bg-emerald-950/30"
+      >
+        <p class="font-black uppercase text-emerald-800 dark:text-emerald-200">
+          Final check
+        </p>
+        <p class="mt-1 text-xs text-emerald-700 dark:text-emerald-300">
+          11 players selected · £{{ props.teamValue.toFixed(1) }}m of £{{ props.teamBudget.toFixed(1) }}m used · £{{ props.remainingBudget.toFixed(1) }}m remaining
+        </p>
+        <p class="mt-1 text-xs text-emerald-700 dark:text-emerald-300">
+          {{ draftedTeamData.allowed_transfers ? 'Transfers are allowed during the season.' : 'No transfers are allowed during the season.' }}
+        </p>
+      </div>
+      <NuxtTurnstile
+        ref="turnstileRef"
+        v-model="turnstileToken"
+        class="mx-auto"
+      />
+      <UButton
+        :disabled="props.selectedCount < 11 || props.isOverBudget"
+        :loading="props.loading.submittingForm"
+        class="w-full justify-center"
+        :label="submitButtonLabel"
+        type="submit"
+      />
+    </UForm>
+  </div>
 </template>

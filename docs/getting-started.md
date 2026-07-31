@@ -2,7 +2,7 @@
 
 Welcome to League of Our Own! This guide walks you through setting up the project locally.
 
-> **Technology Stack**: Nuxt 4, Vue 3, PrimeVue, Supabase, TypeScript
+> **Technology Stack**: Nuxt 4, Vue 3, Nuxt UI, Tailwind CSS v4, Supabase, TypeScript
 > **For TDD workflow and code standards**, see `~/.claude/CLAUDE.md`
 
 ## Prerequisites
@@ -45,7 +45,6 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_anon_key
 
 # Application Configuration
-ACTIVE_SEASON=2024-25
 SITE_URL=http://localhost:3000
 
 # Security (optional for local development)
@@ -57,6 +56,11 @@ TURNSTILE_SITE_KEY=your_turnstile_site_key
 2. Select your project
 3. Go to Settings > API
 4. Copy `Project URL` and `anon public key`
+
+The active Season, current gameweek, site availability, registration availability,
+and season-complete state are stored in the Supabase `settings` table. A local
+database reset creates safe defaults; `pnpm db:reset:fpl` creates an open 2026/27
+development setup.
 
 ## 4. Generate Supabase Types
 
@@ -163,4 +167,4 @@ pnpm generate-types         # Regenerate Supabase types
 
 ---
 
-**Last updated:** 2025-11-15
+**Last updated:** 2026-07-27

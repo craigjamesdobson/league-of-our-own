@@ -2,7 +2,10 @@
 import { usePlayerStore } from '@/stores/players';
 
 const playerStore = usePlayerStore();
-await playerStore.fetchPlayers();
+await Promise.all([
+  playerStore.fetchPlayers(),
+  playerStore.fetchClubs(),
+]);
 
 const { initialize } = useHotjar();
 
@@ -10,10 +13,10 @@ initialize();
 </script>
 
 <template>
-  <div>
+  <UApp>
     <NuxtLayout>
       <NuxtPage keepalive />
     </NuxtLayout>
     <div id="modals" />
-  </div>
+  </UApp>
 </template>

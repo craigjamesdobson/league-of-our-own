@@ -15,6 +15,48 @@ pnpm dev
 
 The application runs at **http://localhost:3000** with `--host` flag for network access.
 
+## Local Database Resets
+
+Local resets never load a default SQL fixture. Choose one of the explicit
+workflows instead.
+
+### Empty database
+
+```bash
+pnpm db:reset:clean
+```
+
+This rebuilds the local database from migrations and creates no application or
+Auth data.
+
+### FPL-backed development database
+
+```bash
+pnpm db:reset:fpl
+```
+
+This rebuilds the local database, fetches the current official FPL clubs,
+players and fixtures, then creates four dummy fantasy teams with valid squads,
+weekly standings and lightweight transfer history. Fixtures start with blank
+scores so the population and verification workflow remains testable.
+
+Choose a different dummy-team count from 1 to 12 with:
+
+```bash
+pnpm db:reset:fpl --teams 8
+```
+
+The FPL reset creates two confirmed local-only users:
+
+| Purpose | Email | Password |
+| --- | --- | --- |
+| Populate fixture data | `admin1@local.test` | `LocalAdmin1!2026` |
+| Verify fixture data | `admin2@local.test` | `LocalAdmin2!2026` |
+
+The seeder reads its connection details from `supabase status` and refuses any
+Supabase API or database URL that is not a loopback address. It cannot seed a
+linked staging or production project.
+
 ### Hot Reload Behavior
 
 - **Vue components**: Instant HMR (hot module replacement)
@@ -270,4 +312,4 @@ git reset --hard HEAD~1
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-07-25

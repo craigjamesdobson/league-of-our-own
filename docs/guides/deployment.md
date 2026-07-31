@@ -1,197 +1,124 @@
 # Deployment
 
-Production deployment guide for this project.
+How changes are verified and promoted through staging and production.
 
-## Deployment Overview
+## Current deployment model
 
-This project is deployed as a static SPA (Single Page Application).
+GitHub Actions verifies both the Nuxt application and Supabase migrations. After verification, it applies database migrations for pushes to protected branches:
 
-**Build Output:** `.output/public/`
-**Build Command:** `pnpm build`
-**Deployment Strategy:** [Configure for your platform - Vercel/Netlify/etc.]
+- `staging` deploys migrations to the staging Supabase project.
+- `main` deploys migrations to the production Supabase project.
 
-## Prerequisites
+The workflow builds the application with `pnpm build`, producing the Nitro application in `.output`. The current Nitro preset is `node-server` because the repository includes server API routes.
 
-Before deploying:
+Frontend hosting is configured outside this repository or has not yet been recorded here. GitHub Actions does not currently publish `.output`. Confirm the frontend hosting target, build-time environment, and staging URL before relying on a branch merge to update the website.
 
-1. All tests passing: `pnpm test`
-2. No TypeScript errors: `pnpm typecheck`
-3. No linting issues: `pnpm lint`
-4. Production build succeeds: `pnpm build`
+## Pull-request verification
 
-## Environment Variables
+Pull requests into `staging` or `main` run two required jobs in parallel.
 
-Production requires different variables than development.
-
-### Required for Production
-
-```env
-# Supabase Configuration (Production Project)
-SUPABASE_URL=https://your-production-project.supabase.co
-SUPABASE_KEY=your_production_anon_key
-
-# Application
-ACTIVE_SEASON=2024-25
-SITE_URL=https://yourdomain.com
-
-# Security
-TURNSTILE_SITE_KEY=your_production_turnstile_key
-NODE_ENV=production
-```
-
-**DO NOT** commit `.env` files with secrets. Use platform-specific secret management:
-
-- **Vercel**: Project Settings → Environment Variables
-- **Netlify**: Site Settings → Build & Deploy → Environment
-- **Your Hosting**: Use environment variable injection
-
-### Getting Production Supabase Keys
-
-1. Log in to [supabase.com](https://supabase.com)
-2. Select your **production** project
-3. Settings → API → Copy production credentials
-4. **Never use development keys in production**
-
-## Building for Production
+The application job runs:
 
 ```bash
-# Build production bundle
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
 pnpm build
+```
 
-# Test the production build locally
+The database job starts a clean local Supabase instance and applies all migrations.
+
+Configure branch protection to require:
+
+- `CI / application`
+- `CI / database-migrations`
+
+## Staging promotion
+
+1. Open a pull request targeting `staging`.
+2. Review the change and wait for both required checks.
+3. Merge the pull request.
+4. GitHub Actions repeats both checks against the exact merged commit.
+5. After both pass, the workflow applies migrations to the staging Supabase project.
+6. Confirm the frontend hosting platform has deployed the same commit.
+7. Complete staging smoke tests and any feature-specific manual QA.
+
+Database deployment never begins if lint, typechecking, tests, the Nuxt build, or local migration validation fails.
+
+## Production promotion
+
+Promote tested staging changes through a pull request into `main`. The same verification gates run before the production database deployment. Production and staging deployment jobs use separate GitHub environments and cannot overlap with another deployment to the same environment.
+
+## GitHub environments and secrets
+
+The repository requires `staging` and `production` GitHub environments.
+
+Database deployment uses:
+
+```text
+SUPABASE_ACCESS_TOKEN
+STAGING_PROJECT_ID
+STAGING_DB_PASSWORD
+PRODUCTION_PROJECT_ID
+PRODUCTION_DB_PASSWORD
+```
+
+Store project IDs and database passwords in the matching GitHub environment. Do not expose deployment secrets to pull-request jobs.
+
+The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
+
+## Local release verification
+
+Use the repository's pinned Node and pnpm versions, then run:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
 pnpm preview
 ```
 
-Visit `http://localhost:3000` to verify the production build works correctly.
+The preview command serves the generated Nitro application locally.
 
-## Deployment Platforms
+## Post-deployment checks
 
-### Vercel (Recommended)
+For staging and production:
 
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Project Settings
-3. Vercel auto-deploys on push to main
-
-**Configuration:**
-- Framework: Nuxt
-- Build Command: `pnpm build`
-- Output Directory: `.output/public`
-
-### Netlify
-
-1. Connect GitHub repository
-2. Configure build settings:
-   - Build command: `pnpm build`
-   - Publish directory: `.output/public`
-3. Add environment variables in Site Settings
-4. Deploy
-
-### Other Platforms
-
-For other hosting:
-
-1. Build locally: `pnpm build`
-2. Deploy `.output/public/` directory
-3. Ensure environment variables are configured
-4. Test after deployment
-
-## Post-Deployment Verification
-
-After deploying:
-
-1. **Check Application Loads**
-   - Visit your domain
-   - No 404 errors
-   - No console errors (F12 → Console)
-
-2. **Test Key Features**
-   - Login with test account
-   - Load a page that requires data
-   - Verify Supabase is connected
-
-3. **Monitor Errors**
-   - Check application logs
-   - Monitor browser console for errors
-   - Verify no TypeScript errors in production
+1. Record the deployed commit SHA.
+2. Confirm the site loads without browser-console errors.
+3. Check public routes such as `/`, `/table`, and `/players`.
+4. Verify login and an authenticated route.
+5. Verify Supabase reads and writes use the expected environment.
+6. Exercise any forms, server API routes, or migrations changed by the release.
+7. Check desktop and mobile layouts in light and dark mode for UI changes.
 
 ## Rollback
 
-If deployment has issues:
+Frontend rollback depends on the hosting platform. Prefer redeploying the last known-good application artifact or commit.
 
-1. **Revert Last Deployment**
-   - Vercel: Click "Rollback" on previous deployment
-   - Netlify: Deploy from previous working commit
-   - Manual: Deploy previous version
+Do not reverse an applied Supabase migration by deleting its migration file. Create a corrective forward migration unless a documented recovery procedure explicitly requires database restoration. Application changes that accompany schema migrations should remain compatible during staged rollout and rollback.
 
-2. **Check Deployment Logs**
-   - Look for build errors
-   - Check environment variables are set
-   - Verify database connectivity
+## Known gap
 
-## Database Schema Changes
+The repository has no frontend deployment job. To close that gap:
 
-For major schema changes:
+1. Identify the hosting platform and staging URL.
+2. Decide which public configuration is embedded at build time.
+3. Upload the verified `.output` directory as a workflow artifact on trusted branch pushes.
+4. Add a frontend deployment job that consumes that exact artifact.
+5. Add an HTTP smoke check against the deployed staging URL.
+6. Document the platform-specific rollback procedure.
 
-1. **Deploy Code First**
-   - Deploy application with schema migration code
-   - Application should handle old/new schema gracefully
+## See also
 
-2. **Run Migrations**
-   - Use Supabase dashboard or migration tools
-   - Test with production data first if possible
-
-3. **Verify**
-   - Check application still works
-   - Monitor for errors
-
-## Performance Monitoring
-
-After deployment, monitor:
-
-- **Page Load Time**: Should be <2 seconds
-- **API Response Time**: Supabase queries should be fast
-- **Error Rate**: Monitor for exceptions
-- **User Experience**: Test on slow networks (Chrome DevTools throttling)
-
-## Troubleshooting Deployment
-
-### Build Fails on Platform
-
-**Check:**
-1. Node version matches (typically 18+)
-2. All environment variables set
-3. Dependencies installable (`pnpm install`)
-4. No git errors in build logs
-
-### Application Loads but Shows Errors
-
-**Check:**
-1. Environment variables correct
-2. Supabase project accessible
-3. CORS configured if needed
-4. Check browser console (F12)
-
-### Supabase Connection Fails
-
-**Check:**
-1. `SUPABASE_URL` correct
-2. `SUPABASE_KEY` valid for production project
-3. Row-level security (RLS) policies not blocking
-4. Network access allowed
-
-### Blank Page or 404 Errors
-
-**Check:**
-1. `.output/public/` contains files
-2. Build output deployed correctly
-3. Web server routing configured for SPA (serve index.html for all routes)
-4. Base path configuration in `nuxt.config.ts`
-
-## See Also
-
-- [Configuration Reference](../reference/configuration.md) - Environment variables
-- [Troubleshooting Guide](troubleshooting.md) - Common issues
+- [CI workflow reference](../../.github/workflows/README.md)
+- [Configuration reference](../reference/configuration.md)
+- [Database reference](../reference/database.md)
+- [Troubleshooting guide](troubleshooting.md)
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-07-28

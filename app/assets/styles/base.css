@@ -1,3 +1,49 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-display: "Rubik", sans-serif;
+  --font-sans: "Inter", sans-serif;
+
+  --spacing-sidebar: 18rem;
+
+  --color-brand: #0b0c3d;
+  --color-brand-50: #e6e6f2;
+  --color-brand-100: #c8c9e6;
+  --color-brand-200: #a4a5d4;
+  --color-brand-300: #7e80c1;
+  --color-brand-400: #5558a3;
+  --color-brand-500: #0b0c3d;
+  --color-brand-600: #090a32;
+  --color-brand-700: #070827;
+  --color-brand-800: #05061d;
+  --color-brand-900: #030414;
+  --color-brand-950: #01010a;
+
+  --color-primary: #1e3a8a;
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-200: #c7d2fe;
+  --color-primary-300: #a5b4fc;
+  --color-primary-400: #818cf8;
+  --color-primary-500: #4f46e5;
+  --color-primary-600: #3730a3;
+  --color-primary-700: #1e3a8a;
+  --color-primary-800: #172554;
+  --color-primary-900: #11194a;
+  --color-primary-950: #080d2a;
+}
+
+.dark {
+  --color-primary: #1e40af;
+}
+
+@layer utilities {
+  .dark .bg-primary.text-inverted {
+    --ui-text-inverted: var(--color-slate-50);
+  }
+}
+
 .main-heading {
   @apply text-2xl tracking-wider font-black uppercase mb-4;
 }

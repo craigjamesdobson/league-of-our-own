@@ -51,6 +51,7 @@
 ### 🔧 **Migrations** - Version Upgrades
 **Time-bound procedures for major upgrades**
 
+- [Nuxt UI Migration](migrations/nuxt-ui-migration.md) - Nuxt UI migration record and final QA checklist
 - [Nuxt 4 Migration](migrations/nuxt-4-migration.md) - Upgrade from Nuxt 3 to Nuxt 4
 
 → **Full migrations index:** [Migrations](migrations/)
@@ -99,7 +100,7 @@
 
 ### **Technology Stack**
 - **Framework:** Nuxt 4 (Vue 3, TypeScript)
-- **Styling:** Tailwind CSS + PrimeVue
+- **Styling:** Nuxt UI + Tailwind CSS v4, with light and dark themes
 - **Backend:** Supabase (PostgreSQL)
 - **Testing:** Vitest + Vue Test Utils
 - **Deployment:** SPA mode (static hosting)
@@ -198,6 +199,6 @@ See [Project Management](project-management/) for full history.
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-07-20
 
 *This documentation supports systematic improvement of a working application. Navigate by purpose using the sections above.*

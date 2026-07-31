@@ -27,7 +27,7 @@
             trailing-icon="i-lucide-arrow-right"
             color="neutral"
             size="lg"
-            class="font-black uppercase"
+            class="!bg-white !text-slate-900 font-black uppercase hover:!bg-slate-100 active:!bg-slate-200 dark:!bg-white dark:!text-slate-900 dark:hover:!bg-slate-100 dark:active:!bg-slate-200"
           />
           <NuxtLink
             to="/rules"

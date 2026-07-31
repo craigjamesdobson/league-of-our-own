@@ -12,6 +12,7 @@ const mountTeamBuilderForm = (overrides = {}) => {
       draftedTeamData: createMockTeamInsertData(overrides),
       turnstileToken: 'token',
       isExistingDraftedTeam: false,
+      selectedCount: 11,
       remainingBudget: 10,
       teamBudget: 90,
       teamValue: 80,

@@ -24,23 +24,46 @@ const {
   teamSubmissionDeadline,
 } = useAppSettings();
 
-const selectedCount = computed(() => selectedPlayerIds.value.length);
-const positionCounts = computed(() => {
-  const counts = new Map<PlayerPosition, number>();
-  for (const player of draftedTeamPlayers.value) {
-    if (player.selectedPlayer) {
-      counts.set(player.position, (counts.get(player.position) ?? 0) + 1);
-    }
-  }
-  return counts;
-});
+const positionConfig = [
+  {
+    position: PlayerPosition.GOALKEEPER,
+    label: 'Goalkeepers',
+    anchor: 'position-goalkeepers',
+  },
+  {
+    position: PlayerPosition.DEFENDER,
+    label: 'Defenders',
+    anchor: 'position-defenders',
+  },
+  {
+    position: PlayerPosition.MIDFIELDER,
+    label: 'Midfielders',
+    anchor: 'position-midfielders',
+  },
+  {
+    position: PlayerPosition.FORWARD,
+    label: 'Forwards',
+    anchor: 'position-forwards',
+  },
+] as const;
 
-const positionProgress = computed(() => [
-  { label: 'GK', selected: positionCounts.value.get(PlayerPosition.GOALKEEPER) ?? 0, total: 1 },
-  { label: 'DEF', selected: positionCounts.value.get(PlayerPosition.DEFENDER) ?? 0, total: 4 },
-  { label: 'MID', selected: positionCounts.value.get(PlayerPosition.MIDFIELDER) ?? 0, total: 3 },
-  { label: 'FWD', selected: positionCounts.value.get(PlayerPosition.FORWARD) ?? 0, total: 3 },
-]);
+const selectedCount = computed(() => selectedPlayerIds.value.length);
+const positionGroups = computed(() => positionConfig.map(group => ({
+  ...group,
+  players: draftedTeamPlayers.value.filter(player => player.position === group.position),
+})));
+
+const progressMessage = computed(() => {
+  if (isOverBudget.value) {
+    return `Over budget by £${Math.abs(remainingBudget.value).toFixed(1)}m`;
+  }
+
+  if (selectedCount.value < 11) {
+    return `${11 - selectedCount.value} players still needed`;
+  }
+
+  return 'Squad complete — ready to submit';
+});
 
 if (registrationOpen.value && route.query.id) {
   await fetchDraftedTeamData();
@@ -93,15 +116,13 @@ else if (registrationOpen.value) {
     <div class="flex flex-col-reverse gap-5 2xl:flex-row">
       <div
         id="team-details"
-        class="scroll-mt-20 px-5 2xl:w-96"
+        class="scroll-mt-20 px-5 2xl:w-[28rem]"
       >
-        <h1 class="mb-2.5 text-center text-xl font-black uppercase 2xl:text-left">
-          Team details
-        </h1>
         <TeamBuilderForm
           v-model:drafted-team-data="draftedTeamData"
           v-model:turnstile-token="turnstileToken"
           :is-existing-drafted-team="isExistingDraftedTeam"
+          :selected-count="selectedCount"
           :remaining-budget="remainingBudget"
           :team-budget="teamBudget"
           :team-value="teamValue"
@@ -113,28 +134,19 @@ else if (registrationOpen.value) {
       </div>
 
       <div class="flex flex-1 flex-col">
-        <h2 class="mb-2.5 text-center text-xl font-black uppercase">
+        <h2 class="mb-5 text-center text-xl font-black uppercase">
           Pick your team
         </h2>
-        <div class="sticky top-0 z-10 -mx-5 mb-5 flex flex-col items-center gap-2.5 border-b border-slate-200 bg-white/95 px-5 py-3 text-sm backdrop-blur 2xl:static 2xl:mx-0 2xl:border-0 2xl:bg-transparent 2xl:p-0 2xl:backdrop-blur-none dark:border-slate-700 dark:bg-slate-950/95">
+        <div class="sticky top-16 z-10 -mx-5 mb-5 flex flex-col items-center gap-3 border-b border-slate-200 bg-white/95 px-5 py-4 text-sm backdrop-blur 2xl:static 2xl:mx-0 2xl:border-0 2xl:bg-transparent 2xl:px-5 2xl:py-4 2xl:backdrop-blur-none dark:border-slate-700 dark:bg-slate-950/95">
           <p class="font-bold">
             {{ selectedCount }} / 11 players selected
           </p>
-          <div class="flex flex-wrap justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <span
-              v-for="progress in positionProgress"
-              :key="progress.label"
-              class="rounded-full bg-slate-100 px-2.5 py-1 dark:bg-slate-800"
-            >
-              {{ progress.label }} {{ progress.selected }}/{{ progress.total }}
-            </span>
-          </div>
-          <div class="grid w-full max-w-sm grid-cols-3 gap-2 text-center text-xs 2xl:hidden">
+          <div class="grid w-full max-w-sm grid-cols-3 gap-8 text-center text-sm">
             <div>
               <p class="text-slate-500 dark:text-slate-400">
-                Value
+                Squad value
               </p>
-              <p class="font-bold text-slate-900 dark:text-slate-100">
+              <p class="text-2xl font-black leading-tight text-slate-900 dark:text-slate-100">
                 £{{ teamValue.toFixed(1) }}m
               </p>
             </div>
@@ -142,7 +154,7 @@ else if (registrationOpen.value) {
               <p class="text-slate-500 dark:text-slate-400">
                 Budget
               </p>
-              <p class="font-bold text-slate-900 dark:text-slate-100">
+              <p class="text-2xl font-black leading-tight text-slate-900 dark:text-slate-100">
                 £{{ teamBudget.toFixed(1) }}m
               </p>
             </div>
@@ -150,18 +162,74 @@ else if (registrationOpen.value) {
               <p class="text-slate-500 dark:text-slate-400">
                 Remaining
               </p>
-              <p :class="isOverBudget ? 'font-bold text-red-600 dark:text-red-300' : 'font-bold text-emerald-600 dark:text-emerald-300'">
+              <p :class="isOverBudget ? 'text-2xl font-black leading-tight text-red-600 dark:text-red-300' : 'text-2xl font-black leading-tight text-emerald-600 dark:text-emerald-300'">
                 £{{ remainingBudget.toFixed(1) }}m
               </p>
             </div>
           </div>
+          <p
+            class="text-xs font-bold"
+            :class="{
+              'text-red-600 dark:text-red-300': isOverBudget,
+              'text-emerald-600 dark:text-emerald-300': !isOverBudget && selectedCount === 11,
+              'text-amber-600 dark:text-amber-300': !isOverBudget && selectedCount < 11,
+            }"
+            role="status"
+            aria-live="polite"
+          >
+            {{ progressMessage }}
+          </p>
           <a
             href="#team-details"
             class="text-xs font-bold text-blue-600 underline underline-offset-2 dark:text-blue-300 2xl:hidden"
           >
-            Team details &amp; submit
+            Enter details &amp; submit
           </a>
         </div>
+        <section class="mx-auto mb-5 w-full rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-5 2xl:max-w-3xl">
+          <div class="mb-4">
+            <h3 class="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-100">
+              Choose your transfer option
+            </h3>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              This sets your budget and determines whether you can change players during the season.
+            </p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <label class="cursor-pointer">
+              <input
+                v-model="draftedTeamData.allowed_transfers"
+                type="radio"
+                name="transfer-option"
+                :value="false"
+                class="peer sr-only"
+              >
+              <span class="block rounded-xl border border-slate-200 p-4 transition peer-checked:border-primary peer-checked:bg-primary/5 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary dark:border-slate-700 dark:peer-checked:bg-primary/10">
+                <span class="flex items-center justify-between gap-3">
+                  <span class="font-black text-slate-900 dark:text-slate-100">No transfers</span>
+                  <span class="font-black text-slate-900 dark:text-slate-100">£90m</span>
+                </span>
+                <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">Your squad stays fixed all season.</span>
+              </span>
+            </label>
+            <label class="cursor-pointer">
+              <input
+                v-model="draftedTeamData.allowed_transfers"
+                type="radio"
+                name="transfer-option"
+                :value="true"
+                class="peer sr-only"
+              >
+              <span class="block rounded-xl border border-slate-200 p-4 transition peer-checked:border-primary peer-checked:bg-primary/5 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary dark:border-slate-700 dark:peer-checked:bg-primary/10">
+                <span class="flex items-center justify-between gap-3">
+                  <span class="font-black text-slate-900 dark:text-slate-100">Transfers allowed</span>
+                  <span class="font-black text-slate-900 dark:text-slate-100">£85m</span>
+                </span>
+                <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">You can change players during the season.</span>
+              </span>
+            </label>
+          </div>
+        </section>
         <div class="text-center 2xl:hidden">
           <UAlert
             v-if="isExistingDraftedTeam"
@@ -184,19 +252,38 @@ else if (registrationOpen.value) {
           >
             <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
             <p class="mb-5">
-              Pick your eleven players, complete your details, and submit your team.
+              Choose your transfer option above, then pick 11 players. Your progress and budget stay visible as you work.
             </p>
             <div class="my-5 h-px w-full bg-slate-200 dark:bg-slate-700" />
           </div>
         </div>
-        <div class="grid grid-cols-12 justify-center gap-5">
-          <PlayerSection
-            v-for="(player, index) in draftedTeamPlayers"
-            :key="index"
-            v-model:player="player.selectedPlayer"
-            :selected-players="selectedPlayerIds"
-            :position="player.position"
-          />
+        <div class="space-y-8">
+          <section
+            v-for="(group, groupIndex) in positionGroups"
+            :id="group.anchor"
+            :key="group.position"
+            class="scroll-mt-36 rounded-2xl border border-slate-200/70 p-4 shadow-sm sm:p-5 dark:border-slate-700/70"
+            :class="groupIndex % 2 === 0 ? 'bg-slate-50 dark:bg-slate-900' : 'bg-white dark:bg-slate-800'"
+            :aria-labelledby="`${group.anchor}-heading`"
+          >
+            <div class="mb-4 border-b border-slate-200 pb-3 dark:border-slate-700">
+              <h3
+                :id="`${group.anchor}-heading`"
+                class="text-sm font-black uppercase tracking-wide text-slate-900 dark:text-slate-100"
+              >
+                {{ group.label }}
+              </h3>
+            </div>
+            <div class="grid grid-cols-12 justify-center gap-6">
+              <PlayerSection
+                v-for="(player, index) in group.players"
+                :key="`${group.position}-${index}`"
+                v-model:player="player.selectedPlayer"
+                :selected-players="selectedPlayerIds"
+                :position="player.position"
+              />
+            </div>
+          </section>
         </div>
       </div>
     </div>

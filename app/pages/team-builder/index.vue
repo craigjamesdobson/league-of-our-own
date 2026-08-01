@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PlayerPosition } from '~/types/PlayerPosition';
+import { SUPPORT_EMAIL } from '~~/shared/utils/contact';
 
 const {
   draftedTeamData,
@@ -65,6 +66,39 @@ const progressMessage = computed(() => {
   return 'Squad complete — ready to submit';
 });
 
+const saveConfirmationAlert = computed(() => {
+  switch (saveConfirmation.value) {
+    case 'updated':
+      return {
+        color: 'success' as const,
+        icon: 'i-lucide-check-circle-2',
+        title: 'Team updated',
+        description: 'Your changes have been saved. No new email was sent.',
+      };
+    case 'existing':
+      return {
+        color: 'info' as const,
+        icon: 'i-lucide-info',
+        title: 'Team already registered',
+        description: `No duplicate was created. Please email ${SUPPORT_EMAIL} so we can check your existing entry.`,
+      };
+    case 'submitted-email-failed':
+      return {
+        color: 'warning' as const,
+        icon: 'i-lucide-triangle-alert',
+        title: 'Team saved',
+        description: `Your team was saved, but the confirmation email could not be sent. Please contact ${SUPPORT_EMAIL}.`,
+      };
+    default:
+      return {
+        color: 'success' as const,
+        icon: 'i-lucide-check-circle-2',
+        title: 'Team submitted',
+        description: 'Your team has been saved successfully. A confirmation email has been sent.',
+      };
+  }
+});
+
 if (registrationOpen.value && route.query.id) {
   await fetchDraftedTeamData();
 }
@@ -99,17 +133,15 @@ else if (registrationOpen.value) {
   >
     <UAlert
       v-if="saveConfirmation"
-      color="success"
+      :color="saveConfirmationAlert.color"
       variant="soft"
       class="w-full"
-      icon="i-lucide-check-circle-2"
+      :icon="saveConfirmationAlert.icon"
     >
       <template #description>
-        <strong>{{ saveConfirmation === 'updated' ? 'Team updated' : 'Team submitted' }}</strong>
+        <strong>{{ saveConfirmationAlert.title }}</strong>
         <span class="block text-sm">
-          {{ saveConfirmation === 'updated'
-            ? 'Your changes have been saved. No new email was sent.'
-            : 'Your team has been saved successfully. A confirmation email has been sent.' }}
+          {{ saveConfirmationAlert.description }}
         </span>
       </template>
     </UAlert>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod';
 import type { TablesInsert } from '~/types/database.types';
+import { SUPPORT_EMAIL } from '~~/shared/utils/contact';
 
 // Use defineModel for two-way binding
 const draftedTeamData = defineModel<TablesInsert<'drafted_teams'>>('draftedTeamData', {
@@ -131,8 +132,8 @@ const handleTeamSubmit = async () => {
         Your team may still be saved if the confirmation email is delayed or missing.
         Please contact us to check your submission: <a
           class="underline font-bold"
-          href="mailto:leagueofourown.fpl@gmail.com"
-        >leagueofourown.fpl@gmail.com</a>.
+          :href="`mailto:${SUPPORT_EMAIL}`"
+        >{{ SUPPORT_EMAIL }}</a>.
       </p>
     </div>
     <UAlert

@@ -754,22 +754,32 @@ const visibleRange = computed(() => {
             class="shrink-0"
             @click="mobileSortDirection = mobileSortDirection === 'desc' ? 'asc' : 'desc'"
           />
+          <UButton
+            icon="lucide:funnel"
+            :label="activeFilterCount ? `${activeFilterCount}` : 'Filters'"
+            :color="activeFilterCount ? 'primary' : 'neutral'"
+            :variant="activeFilterCount ? 'soft' : 'outline'"
+            size="sm"
+            class="shrink-0"
+            @click="mobileFiltersOpen = true"
+          />
+        </div>
+
+        <Teleport to="body">
           <UDrawer
             v-model:open="mobileFiltersOpen"
+            :portal="false"
+            direction="bottom"
             title="Filters"
             description="Refine the player list"
+            :ui="{
+              content: 'w-full max-w-full',
+              container: 'w-full min-w-0 max-w-full overflow-y-auto px-4',
+              body: 'w-full min-w-0',
+            }"
           >
-            <UButton
-              icon="lucide:funnel"
-              :label="activeFilterCount ? `${activeFilterCount}` : 'Filters'"
-              :color="activeFilterCount ? 'primary' : 'neutral'"
-              :variant="activeFilterCount ? 'soft' : 'outline'"
-              size="sm"
-              class="shrink-0"
-            />
-
             <template #body>
-              <div class="space-y-4">
+              <div class="w-full min-w-0 space-y-4 pr-1">
                 <div class="space-y-1.5">
                   <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
                     Position
@@ -780,7 +790,7 @@ const visibleRange = computed(() => {
                     label-key="label"
                     value-key="value"
                     size="sm"
-                    class="w-full"
+                    class="w-full min-w-0"
                     @update:model-value="setColumnFilterValue('position', $event, null)"
                   />
                 </div>
@@ -796,12 +806,12 @@ const visibleRange = computed(() => {
                     value-key="value"
                     multiple
                     size="sm"
-                    class="w-full"
+                    class="w-full min-w-0"
                     @update:model-value="setColumnFilterValue('team', $event, [])"
                   />
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid min-w-0 grid-cols-2 gap-3">
                   <div class="space-y-1.5">
                     <label class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">
                       Cost
@@ -812,7 +822,7 @@ const visibleRange = computed(() => {
                       label-key="name"
                       value-key="value"
                       size="sm"
-                      class="w-full"
+                      class="w-full min-w-0"
                       @update:model-value="setColumnFilterValue('cost', $event, 0)"
                     />
                   </div>
@@ -827,7 +837,7 @@ const visibleRange = computed(() => {
                       label-key="label"
                       value-key="value"
                       size="sm"
-                      class="w-full"
+                      class="w-full min-w-0"
                       @update:model-value="setColumnFilterValue('availability', $event, 'all')"
                     />
                   </div>
@@ -855,7 +865,7 @@ const visibleRange = computed(() => {
               </div>
             </template>
           </UDrawer>
-        </div>
+        </Teleport>
       </div>
 
       <div class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900 md:hidden">
@@ -1126,7 +1136,7 @@ const visibleRange = computed(() => {
           <span>{{ visibleRange }}</span>
           <span>{{ activeFilterCount }} active filters</span>
         </div>
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+        <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <USelect
             :model-value="pagination.pageSize"
             :items="pageSizeOptions"
@@ -1141,7 +1151,8 @@ const visibleRange = computed(() => {
             :items-per-page="pagination.pageSize"
             :total="filteredRowCount"
             size="sm"
-            show-edges
+            :show-edges="false"
+            :sibling-count="0"
             @update:page="setCurrentPage($event)"
           />
         </div>

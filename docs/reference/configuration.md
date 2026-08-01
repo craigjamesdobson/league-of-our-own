@@ -63,11 +63,11 @@ NODE_ENV=production
 2. Copy "anon public" key
 3. Never use service_role key in client code
 
-### `SITE_URL` (Optional but Recommended)
+### `SITE_URL` (Required)
 
 **Type:** URL
 **Example:** `http://localhost:3000` (dev), `https://league.example.com` (prod)
-**Purpose:** Application base URL for redirects, emails, etc.
+**Purpose:** Application base URL for redirects and private team-edit links in transactional emails.
 
 **Used for:**
 - Email links
@@ -462,4 +462,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-07-28
+**Last updated:** 2026-08-01

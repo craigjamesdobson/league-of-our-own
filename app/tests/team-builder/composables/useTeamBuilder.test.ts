@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { nextTick } from 'vue';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import {
   createMockTeamInsertData,
+  createMockTeamTableData,
   createMockTeamWithPlayers,
 } from '@/tests/factories';
 import { useTeamBuilder } from '@/composables/useTeamBuilder';
@@ -41,10 +42,9 @@ vi.mock('@/utils/utility', () => ({
   delay: vi.fn(),
 }));
 
-vi.mock('@/pages/team-builder/email', () => ({
-  generateAdminEmail: vi.fn(),
-  generateTeamEmail: vi.fn(),
-}));
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('useTeamBuilder - Budget Calculations', () => {
   describe('Budget allocation based on transfer allowance', () => {
@@ -177,6 +177,36 @@ describe('useTeamBuilder - Budget Calculations', () => {
 
       expect(teamBuilder.isOverBudget.value).toBe(true);
 
+      app.unmount();
+    });
+  });
+
+  describe('Submission confirmation', () => {
+    it('keeps a saved-with-email-failure state when confirmation delivery fails', async () => {
+      const savedTeam = createMockTeamTableData({
+        key: '4bd08b04-a810-4faf-b368-0770360477f9',
+        total_team_value: 55,
+      });
+      const fetchMock = vi.fn()
+        .mockResolvedValueOnce({
+          outcome: 'created',
+          team: savedTeam,
+          emailSent: false,
+        })
+        .mockResolvedValueOnce({
+          ...savedTeam,
+          players: [],
+        });
+      vi.stubGlobal('$fetch', fetchMock);
+
+      const [teamBuilder, app] = withSetup(() => useTeamBuilder());
+      teamBuilder.draftedTeamData.value = createMockTeamInsertData();
+      teamBuilder.draftedTeamPlayers.value = createMockTeamWithPlayers(Array.from({ length: 11 }, () => 5));
+      teamBuilder.turnstileToken.value = 'valid-token';
+
+      await teamBuilder.submitTeam();
+
+      expect(teamBuilder.saveConfirmation.value).toBe('submitted-email-failed');
       app.unmount();
     });
   });

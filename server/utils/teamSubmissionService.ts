@@ -3,6 +3,7 @@ import {
   type SubmissionPlayer,
   validateSubmissionPlayers,
 } from './teamSubmission';
+import type { TeamSubmissionResponse } from '../../shared/types/teamSubmission';
 
 export interface SavedTeam {
   drafted_team_id: number;
@@ -33,6 +34,13 @@ export interface SaveTeamSubmission {
   totalTeamValue: number;
 }
 
+export type SaveTeamResult
+  = | { outcome: 'created'; team: SavedTeam }
+    | { outcome: 'updated'; team: SavedTeam }
+    | { outcome: 'existing-email' };
+
+export type TeamSubmissionResult = TeamSubmissionResponse<SavedTeam>;
+
 export interface TeamSubmissionDependencies {
   loadAppSettings: () => Promise<{
     activeSeason: string;
@@ -40,7 +48,8 @@ export interface TeamSubmissionDependencies {
   }>;
   verifyTurnstile: (token: string) => Promise<boolean>;
   loadPlayers: (playerIds: number[]) => Promise<SubmissionPlayer[]>;
-  saveTeam: (submission: SaveTeamSubmission) => Promise<SavedTeam>;
+  saveTeam: (submission: SaveTeamSubmission) => Promise<SaveTeamResult>;
+  sendCreatedTeamEmails: (team: SavedTeam, players: SubmissionPlayer[]) => Promise<boolean>;
 }
 
 export class TeamSubmissionError extends Error {
@@ -53,10 +62,20 @@ export class TeamSubmissionError extends Error {
   }
 }
 
+const attemptEmailDelivery = async (delivery: () => Promise<boolean>): Promise<boolean> => {
+  try {
+    return await delivery();
+  }
+  catch (error) {
+    console.error('[team-submission] email delivery failed unexpectedly', error);
+    return false;
+  }
+};
+
 export const processTeamSubmission = async (
   request: unknown,
   dependencies: TeamSubmissionDependencies,
-): Promise<SavedTeam> => {
+): Promise<TeamSubmissionResult> => {
   const submission = parseTeamSubmissionRequest(request);
 
   if (!await dependencies.verifyTurnstile(submission.turnstileToken)) {
@@ -76,7 +95,7 @@ export const processTeamSubmission = async (
   const players = await dependencies.loadPlayers(submission.playerIds);
   const totalTeamValue = validateSubmissionPlayers(players, submission.allowedTransfers);
 
-  return await dependencies.saveTeam({
+  const saveResult = await dependencies.saveTeam({
     activeSeason: settings.activeSeason,
     allowCommunication: submission.allowCommunication,
     allowedTransfers: submission.allowedTransfers,
@@ -88,4 +107,17 @@ export const processTeamSubmission = async (
     teamOwner: submission.teamOwner,
     totalTeamValue,
   });
+
+  if (saveResult.outcome === 'existing-email') {
+    return { outcome: 'existing-team' };
+  }
+
+  if (saveResult.outcome === 'updated') {
+    return saveResult;
+  }
+
+  const emailSent = await attemptEmailDelivery(
+    async () => await dependencies.sendCreatedTeamEmails(saveResult.team, players),
+  );
+  return { ...saveResult, emailSent };
 };

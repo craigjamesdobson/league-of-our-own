@@ -4,16 +4,32 @@ import {
   processTeamSubmission,
   type SavedTeam,
   type SaveTeamSubmission,
+  type SaveTeamResult,
   TeamSubmissionError,
 } from '../utils/teamSubmissionService';
+import {
+  sendCreatedTeamEmails,
+} from '../utils/teamSubmissionEmail';
 import { APP_SETTING_KEYS, parseAppSettings } from '../../shared/utils/appSettings';
 
 type SubmissionRpcClient = {
   rpc: (
     functionName: 'save_team_submission',
     args: Record<string, unknown>,
-  ) => Promise<{ data: SavedTeam | null; error: { message: string } | null }>;
+  ) => Promise<{
+    data: SavedTeam | null;
+    error: { code?: string; details?: string; message: string } | null;
+  }>;
 };
+
+const EMAIL_UNIQUE_INDEX = 'drafted_teams_season_email_unique';
+const NAME_UNIQUE_INDEX = 'drafted_teams_season_name_unique';
+
+const violatesConstraint = (
+  error: { code?: string; details?: string; message: string },
+  constraint: string,
+) => error.code === '23505'
+  && `${error.message} ${error.details ?? ''}`.includes(constraint);
 
 export default defineEventHandler(async (event) => {
   try {
@@ -57,7 +73,7 @@ export default defineEventHandler(async (event) => {
       loadPlayers: async (playerIds) => {
         const { data, error } = await supabase
           .from('players_view')
-          .select('player_id, position, cost, unavailable_for_season')
+          .select('player_id, position, cost, unavailable_for_season, web_name')
           .in('player_id', playerIds);
 
         if (error) {
@@ -66,7 +82,7 @@ export default defineEventHandler(async (event) => {
 
         return data ?? [];
       },
-      saveTeam: async (submission: SaveTeamSubmission) => {
+      saveTeam: async (submission: SaveTeamSubmission): Promise<SaveTeamResult> => {
         const { data, error } = await rpcClient.rpc('save_team_submission', {
           p_active_season: submission.activeSeason,
           p_allow_communication: submission.allowCommunication,
@@ -79,6 +95,17 @@ export default defineEventHandler(async (event) => {
           p_team_owner: submission.teamOwner,
           p_total_team_value: submission.totalTeamValue,
         });
+
+        if (error && violatesConstraint(error, EMAIL_UNIQUE_INDEX)) {
+          if (submission.editKey) {
+            throw new TeamSubmissionError(409, 'Another team already uses this email address');
+          }
+          return { outcome: 'existing-email' };
+        }
+
+        if (error && violatesConstraint(error, NAME_UNIQUE_INDEX)) {
+          throw new TeamSubmissionError(409, 'That team name is already in use for this season');
+        }
 
         if (error || !data) {
           if (error) {
@@ -94,8 +121,12 @@ export default defineEventHandler(async (event) => {
           );
         }
 
-        return data;
+        return {
+          outcome: submission.editKey ? 'updated' : 'created',
+          team: data,
+        };
       },
+      sendCreatedTeamEmails: async (team, players) => await sendCreatedTeamEmails(event, team, players),
     });
   }
   catch (error) {

@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import type { H3Event } from 'h3';
-import { handleEmailSending } from '../utils/email';
+import {
+  EMAIL_FROM,
+  EMAIL_REPLY_TO,
+  handleEmailSending,
+} from '../utils/email';
 import { prepareFplPlayersForSync } from '../utils/fplPlayers';
 import type { Database } from '~/types/database.types';
 
@@ -19,7 +23,8 @@ const sendSyncFailureEmail = async (errorMessage: string, event: H3Event) => {
     const currentTime = new Date().toISOString();
 
     await handleEmailSending({
-      from: 'League of Our Own <leagueofourown@craigjamesdobson.dev>',
+      from: EMAIL_FROM,
+      replyTo: EMAIL_REPLY_TO,
       to: [adminEmail],
       subject: 'Player Sync Failed',
       html: `

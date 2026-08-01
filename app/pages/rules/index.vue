@@ -288,10 +288,10 @@
           <p>
             For questions, email
             <a
-              href="mailto:leagueofourown.fpl@gmail.com"
+              :href="`mailto:${SUPPORT_EMAIL}`"
               class="font-semibold text-primary underline underline-offset-4"
             >
-              leagueofourown.fpl@gmail.com
+              {{ SUPPORT_EMAIL }}
             </a>
             with “Footy” in the subject line.
           </p>
@@ -302,6 +302,8 @@
 </template>
 
 <script setup lang="ts">
+import { SUPPORT_EMAIL } from '~~/shared/utils/contact';
+
 const { teamSubmissionDeadline, refreshAppSettings } = useAppSettings();
 
 await refreshAppSettings();

@@ -15,6 +15,7 @@ export interface SubmissionPlayer {
   position: number | null;
   cost: number | null;
   unavailable_for_season: boolean | null;
+  web_name?: string | null;
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -2,6 +2,10 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import type { Resend, CreateEmailOptions, CreateEmailResponse } from 'resend';
 import type { H3Event } from 'h3';
+import { SUPPORT_EMAIL } from '../../shared/utils/contact';
+
+export const EMAIL_FROM = 'League of Our Own <notifications@leagueofourown.co.uk>';
+export const EMAIL_REPLY_TO = SUPPORT_EMAIL;
 
 export const handleEmailSending = async (
   emailData: CreateEmailOptions,

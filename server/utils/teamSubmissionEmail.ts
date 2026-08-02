@@ -10,8 +10,8 @@ import {
 
 const supportEmail = EMAIL_REPLY_TO;
 
-const emailSubject = (subject: string): string =>
-  process.env.DEPLOYMENT_ENV?.trim().toLowerCase() === 'staging'
+const emailSubject = (event: H3Event, subject: string): string =>
+  useRuntimeConfig(event).deploymentBranch === 'staging'
     ? `[STAGING] ${subject}`
     : subject;
 
@@ -134,12 +134,12 @@ export const sendCreatedTeamEmails = async (
   const deliveries = await Promise.allSettled([
     sendEmail(event, {
       to: team.team_email,
-      subject: emailSubject('Thank you for your team submission'),
+      subject: emailSubject(event, 'Thank you for your team submission'),
       html: renderTeamConfirmation(event, team, players),
     }),
     sendEmail(event, {
       to: supportEmail,
-      subject: emailSubject('A new team has been submitted'),
+      subject: emailSubject(event, 'A new team has been submitted'),
       html: renderAdminNotification(event, team, players),
     }),
   ]);

@@ -4,6 +4,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sendCreatedTeamEmails } from '../../../server/utils/teamSubmissionEmail';
 
 const handleEmailSending = vi.hoisted(() => vi.fn());
+const runtimeConfig = vi.hoisted(() => ({
+  deploymentBranch: 'main',
+  app: { baseURL: '/' },
+  public: { SITE_URL: 'https://league.example.com' },
+}));
 
 vi.mock('../../../server/utils/email', () => ({
   EMAIL_FROM: 'League of Our Own <notifications@leagueofourown.co.uk>',
@@ -18,10 +23,7 @@ vi.mock('resend', () => ({
 }));
 
 mockNuxtImport('useRuntimeConfig', () => {
-  return () => ({
-    app: { baseURL: '/' },
-    public: { SITE_URL: 'https://league.example.com' },
-  });
+  return () => runtimeConfig;
 });
 
 const team = {
@@ -47,7 +49,7 @@ const players = [
 describe('team submission email delivery', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.unstubAllEnvs();
+    runtimeConfig.deploymentBranch = 'main';
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
@@ -89,7 +91,7 @@ describe('team submission email delivery', () => {
   });
 
   it('prefixes both email subjects in staging', async () => {
-    vi.stubEnv('DEPLOYMENT_ENV', 'staging');
+    runtimeConfig.deploymentBranch = 'staging';
     handleEmailSending
       .mockResolvedValueOnce({ data: { id: 'user-email' }, error: null })
       .mockResolvedValueOnce({ data: { id: 'admin-email' }, error: null });

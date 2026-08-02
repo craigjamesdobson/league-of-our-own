@@ -17,7 +17,6 @@ SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
 SITE_URL=http://localhost:3000
-DEPLOYMENT_ENV=development
 
 # Security (optional - required for form submissions)
 TURNSTILE_SITE_KEY=your_turnstile_site_key
@@ -34,7 +33,6 @@ On your deployment platform (Vercel, Netlify, etc.):
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
 SITE_URL=https://yourdomain.com
-DEPLOYMENT_ENV=production
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
 ```
@@ -80,14 +78,6 @@ NODE_ENV=production
 - Development: `http://localhost:3000`
 - Production: `https://yourdomain.com` (no trailing slash)
 
-### `DEPLOYMENT_ENV` (Required for staging email labels)
-
-**Type:** `development` | `staging` | `production`
-**Purpose:** Adds a `[STAGING]` prefix to team-submission email subjects when set to `staging`.
-
-Set this independently in each deployed environment. Production should use
-`production`; the staging/preview deployment should use `staging`.
-
 ### `TURNSTILE_SITE_KEY` (Optional)
 
 **Type:** String
@@ -121,6 +111,7 @@ Defined in `nuxt.config.ts`:
 ```typescript
 export default defineNuxtConfig({
   runtimeConfig: {
+    deploymentBranch: process.env.CF_PAGES_BRANCH,
     public: {
       SITE_URL: process.env.SITE_URL,
       nodeEnv: process.env.NODE_ENV,
@@ -131,6 +122,10 @@ export default defineNuxtConfig({
   }
 })
 ```
+
+Cloudflare Pages injects `CF_PAGES_BRANCH` during builds. Team-submission emails
+built from the `staging` branch automatically receive a `[STAGING]` subject prefix;
+emails built from `main` do not. No additional Cloudflare variable is required.
 
 ### Accessing Runtime Config
 

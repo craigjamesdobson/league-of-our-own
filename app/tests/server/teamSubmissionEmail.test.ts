@@ -47,6 +47,7 @@ const players = [
 describe('team submission email delivery', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllEnvs();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
@@ -69,6 +70,7 @@ describe('team submission email delivery', () => {
       expect.objectContaining({
         from: 'League of Our Own <notifications@leagueofourown.co.uk>',
         replyTo: 'leagueofourown.fpl@gmail.com',
+        subject: 'Thank you for your team submission',
         html: expect.stringContaining('>Worldwide Wanderers</h1>'),
       }),
       expect.anything(),
@@ -79,7 +81,30 @@ describe('team submission email delivery', () => {
       expect.objectContaining({
         from: 'League of Our Own <notifications@leagueofourown.co.uk>',
         replyTo: 'leagueofourown.fpl@gmail.com',
+        subject: 'A new team has been submitted',
       }),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('prefixes both email subjects in staging', async () => {
+    vi.stubEnv('DEPLOYMENT_ENV', 'staging');
+    handleEmailSending
+      .mockResolvedValueOnce({ data: { id: 'user-email' }, error: null })
+      .mockResolvedValueOnce({ data: { id: 'admin-email' }, error: null });
+
+    await sendCreatedTeamEmails({} as H3Event, team, players);
+
+    expect(handleEmailSending).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ subject: '[STAGING] Thank you for your team submission' }),
+      expect.anything(),
+      expect.anything(),
+    );
+    expect(handleEmailSending).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ subject: '[STAGING] A new team has been submitted' }),
       expect.anything(),
       expect.anything(),
     );

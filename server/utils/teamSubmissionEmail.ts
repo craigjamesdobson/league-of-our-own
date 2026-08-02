@@ -10,6 +10,11 @@ import {
 
 const supportEmail = EMAIL_REPLY_TO;
 
+const emailSubject = (subject: string): string =>
+  process.env.DEPLOYMENT_ENV?.trim().toLowerCase() === 'staging'
+    ? `[STAGING] ${subject}`
+    : subject;
+
 const escapeHtml = (value: string | number): string => String(value)
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
@@ -129,12 +134,12 @@ export const sendCreatedTeamEmails = async (
   const deliveries = await Promise.allSettled([
     sendEmail(event, {
       to: team.team_email,
-      subject: 'Thank you for your team submission',
+      subject: emailSubject('Thank you for your team submission'),
       html: renderTeamConfirmation(event, team, players),
     }),
     sendEmail(event, {
       to: supportEmail,
-      subject: 'A new team has been submitted',
+      subject: emailSubject('A new team has been submitted'),
       html: renderAdminNotification(event, team, players),
     }),
   ]);

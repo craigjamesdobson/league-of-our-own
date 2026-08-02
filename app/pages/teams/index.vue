@@ -2,7 +2,16 @@
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const draftedTeamsStore = useDraftedTeamsStore();
-await draftedTeamsStore.fetchDraftedTeams();
+const user = useSupabaseUser();
+
+draftedTeamsStore.clearDraftedTeamAdminMetadata();
+
+await Promise.all([
+  draftedTeamsStore.fetchDraftedTeams(),
+  user.value
+    ? draftedTeamsStore.fetchDraftedTeamAdminMetadata()
+    : Promise.resolve(),
+]);
 </script>
 
 <template>
@@ -16,6 +25,9 @@ await draftedTeamsStore.fetchDraftedTeams();
         <DraftedTeam
           v-if="draftedTeam"
           :drafted-team="draftedTeam"
+          :admin-metadata="user
+            ? draftedTeamsStore.getDraftedTeamAdminMetadataByID(draftedTeam.drafted_team_id)
+            : undefined"
         />
       </div>
     </div>

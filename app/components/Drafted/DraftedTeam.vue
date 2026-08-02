@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DraftedPlayer from './DraftedPlayer.vue';
-import TeamAdminMetadataPopover from './TeamAdminMetadataPopover.vue';
+import TeamAdminMetadataPopover from '~/components/Drafted/TeamAdminMetadataPopover.vue';
 import type { DraftedTeamWithPlayers, TeamAdminMetadata } from '~/types/DraftedTeam';
 
 const props = defineProps({

@@ -3,11 +3,14 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { defineComponent, nextTick, ref } from 'vue';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import TeamsPage from '~/pages/teams/index.vue';
+import { createMockDraftedTeam, createMockTeamAdminMetadata } from '~/tests/factories';
+import type { DraftedTeamWithPlayers, TeamAdminMetadata } from '~/types/DraftedTeam';
 
 const user = ref<{ id: string } | null>(null);
 
 const state = vi.hoisted(() => ({
   metadataLoaded: false,
+  metadata: undefined as TeamAdminMetadata | undefined,
 }));
 
 const store = vi.hoisted(() => ({
@@ -17,14 +20,9 @@ const store = vi.hoisted(() => ({
   }),
   fetchDraftedTeams: vi.fn().mockResolvedValue(undefined),
   getDraftedTeamAdminMetadataByID: vi.fn(() => state.metadataLoaded
-    ? {
-        drafted_team_id: 1,
-        created_at: '2025-01-12T10:00:00Z',
-        updated_at: null,
-        edited_count: 0,
-      }
+    ? state.metadata
     : undefined),
-  getDraftedTeams: [{ drafted_team_id: 1 }],
+  getDraftedTeams: [] as DraftedTeamWithPlayers[],
 }));
 
 mockNuxtImport('useSupabaseUser', () => {
@@ -39,6 +37,8 @@ describe('teams page admin metadata', () => {
   beforeEach(() => {
     user.value = null;
     state.metadataLoaded = false;
+    state.metadata = createMockTeamAdminMetadata();
+    store.getDraftedTeams = [createMockDraftedTeam()];
     vi.clearAllMocks();
   });
 

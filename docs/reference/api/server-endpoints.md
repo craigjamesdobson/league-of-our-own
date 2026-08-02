@@ -4,72 +4,13 @@ Reference documentation for this project's Nitro server endpoints.
 
 **Location:** `/server/api/`
 
-## Email Endpoints
+## Team submission emails
 
-### Send Email
+`POST /api/team-submission` owns all transactional email delivery for team registration. The server derives the recipient, subject, HTML, and private edit link from the validated saved team. There is deliberately no public general-purpose email endpoint.
 
-**Endpoint:** `POST /api/send-email`
+New submissions return a `created` outcome and whether both confirmation deliveries succeeded. Updates return `updated` without sending another email. If a new submission uses an email already registered in the Active Season, no duplicate is created and no email is sent; the endpoint returns `existing-team` without exposing the key to the browser, and the entrant is directed to contact the league administrator.
 
-**Purpose:** Send transactional emails via Resend
-
-**Request Body:**
-
-```typescript
-{
-  to: string;              // Recipient email address
-  subject: string;         // Email subject
-  body: string;           // Email body (plain text or HTML)
-}
-```
-
-**Example Request:**
-
-```typescript
-const response = await $fetch('/api/send-email', {
-  method: 'POST',
-  body: {
-    to: 'user@example.com',
-    subject: 'Team Updated',
-    body: '<h1>Your team has been updated</h1><p>New changes applied.</p>'
-  }
-});
-```
-
-**Response:**
-
-Success (200):
-```typescript
-{
-  success: true;
-  messageId: string;  // Unique message identifier from Resend
-}
-```
-
-Error (400):
-```typescript
-{
-  success: false;
-  error: string;  // Error description
-}
-```
-
-**Error Cases:**
-
-- `400 Bad Request` - Missing required fields (to, subject, body)
-- `500 Internal Server Error` - Resend service error
-
-**Email Sending:**
-
-Configured to use **Resend** for email delivery:
-- Server-side only (no client secrets exposed)
-- Async sending (returns immediately)
-- Production domain configured in Resend settings
-
-**Configuration:**
-
-Resend API key configured in deployment environment (not in code).
-
-See [Configuration Reference](../configuration.md) for environment setup.
+The Resend API key and sender identity are configured server-side. `SITE_URL` must be configured so edit links use the canonical application origin. See [Configuration Reference](../configuration.md).
 
 ## Creating New Endpoints
 
@@ -173,4 +114,4 @@ Server endpoints don't have built-in rate limiting configured. For production:
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-08-01

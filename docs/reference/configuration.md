@@ -17,6 +17,7 @@ SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
 SITE_URL=http://localhost:3000
+DEPLOYMENT_ENV=development
 
 # Security (optional - required for form submissions)
 TURNSTILE_SITE_KEY=your_turnstile_site_key
@@ -33,6 +34,7 @@ On your deployment platform (Vercel, Netlify, etc.):
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
 SITE_URL=https://yourdomain.com
+DEPLOYMENT_ENV=production
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
 ```
@@ -63,11 +65,11 @@ NODE_ENV=production
 2. Copy "anon public" key
 3. Never use service_role key in client code
 
-### `SITE_URL` (Optional but Recommended)
+### `SITE_URL` (Required)
 
 **Type:** URL
 **Example:** `http://localhost:3000` (dev), `https://league.example.com` (prod)
-**Purpose:** Application base URL for redirects, emails, etc.
+**Purpose:** Application base URL for redirects and private team-edit links in transactional emails.
 
 **Used for:**
 - Email links
@@ -77,6 +79,20 @@ NODE_ENV=production
 **Format:**
 - Development: `http://localhost:3000`
 - Production: `https://yourdomain.com` (no trailing slash)
+
+### `DEPLOYMENT_ENV` (Required)
+
+**Type:** `development` | `staging` | `production`
+**Purpose:** Identifies the deployed runtime so staging transactional emails are visibly labelled.
+
+Configure it separately in Cloudflare Pages:
+
+- Preview: `staging`
+- Production: `production`
+
+When the value is `staging`, team-submission email subjects receive a
+`[STAGING]` prefix. Changing the variable requires redeploying the relevant
+Cloudflare environment.
 
 ### `TURNSTILE_SITE_KEY` (Optional)
 
@@ -462,4 +478,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-07-28
+**Last updated:** 2026-08-02

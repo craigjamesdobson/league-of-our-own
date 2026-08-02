@@ -2,6 +2,7 @@
 import type { FormSubmitEvent } from '@nuxt/ui';
 import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { z } from 'zod';
+import { SUPPORT_EMAIL } from '~~/shared/utils/contact';
 import { useAccount } from '@/logic/account';
 
 const { formData, accountStore } = useAccount();
@@ -75,8 +76,8 @@ const handleUserLogin = async (event: FormSubmitEvent<LoginSchema>) => {
         Please report any bugs or issues by emailing
         <a
           class="font-bold underline"
-          href="mailto:leagueofourown.fpl@gmail.com"
-        >leagueofourown.fpl@gmail.com</a>
+          :href="`mailto:${SUPPORT_EMAIL}`"
+        >{{ SUPPORT_EMAIL }}</a>
         with as much information as possible.
       </template>
     </UAlert>

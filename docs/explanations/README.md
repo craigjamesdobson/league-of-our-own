@@ -22,6 +22,10 @@ Case studies of major refactoring work:
 Architectural Decision Records (ADRs) for significant choices:
 - **[Composable vs Component Logic](decisions/2025-01-08-composable-vs-component-logic.md)** - Why business logic lives in composables
 
+### Deployment
+Platform behavior and deployment-specific findings:
+- **[Cloudflare email environment detection](cloudflare-email-environment-detection.md)** - Reliable preview-versus-production labeling for transactional email
+
 ## Using These Explanations
 
 Explanations answer "WHY?" questions:
@@ -52,4 +56,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for documentation standards.
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-08-02

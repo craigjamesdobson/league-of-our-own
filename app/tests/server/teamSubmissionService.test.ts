@@ -50,7 +50,8 @@ const createDependencies = (
   }),
   verifyTurnstile: vi.fn().mockResolvedValue(true),
   loadPlayers: vi.fn().mockResolvedValue(validPlayers()),
-  saveTeam: vi.fn().mockResolvedValue(savedTeam),
+  saveTeam: vi.fn().mockResolvedValue({ outcome: 'created', team: savedTeam }),
+  sendCreatedTeamEmails: vi.fn().mockResolvedValue(true),
   ...overrides,
 });
 
@@ -58,7 +59,11 @@ describe('processTeamSubmission', () => {
   it('validates and saves a normalised submission using the server-calculated value', async () => {
     const dependencies = createDependencies();
 
-    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toEqual(savedTeam);
+    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toEqual({
+      outcome: 'created',
+      team: savedTeam,
+      emailSent: true,
+    });
     expect(dependencies.loadPlayers).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
     expect(dependencies.saveTeam).toHaveBeenCalledWith(expect.objectContaining({
       activeSeason: '26-27',
@@ -66,6 +71,58 @@ describe('processTeamSubmission', () => {
       teamEmail: 'owner@example.com',
       totalTeamValue: 70,
     }));
+    expect(dependencies.sendCreatedTeamEmails).toHaveBeenCalledWith(savedTeam, validPlayers());
+  });
+
+  it('updates a team without sending new-team emails', async () => {
+    const request = {
+      ...validRequest(),
+      editKey: savedTeam.key,
+    };
+    const dependencies = createDependencies({
+      saveTeam: vi.fn().mockResolvedValue({ outcome: 'updated', team: savedTeam }),
+    });
+
+    await expect(processTeamSubmission(request, dependencies)).resolves.toEqual({
+      outcome: 'updated',
+      team: savedTeam,
+    });
+    expect(dependencies.sendCreatedTeamEmails).not.toHaveBeenCalled();
+  });
+
+  it('reports an existing team without exposing it or sending email', async () => {
+    const dependencies = createDependencies({
+      saveTeam: vi.fn().mockResolvedValue({ outcome: 'existing-email' }),
+    });
+
+    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toEqual({
+      outcome: 'existing-team',
+    });
+    expect(dependencies.sendCreatedTeamEmails).not.toHaveBeenCalled();
+  });
+
+  it('reports a saved team when confirmation email delivery fails', async () => {
+    const dependencies = createDependencies({
+      sendCreatedTeamEmails: vi.fn().mockResolvedValue(false),
+    });
+
+    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toEqual({
+      outcome: 'created',
+      team: savedTeam,
+      emailSent: false,
+    });
+  });
+
+  it('does not turn a successful save into a failed submission when email delivery throws', async () => {
+    const dependencies = createDependencies({
+      sendCreatedTeamEmails: vi.fn().mockRejectedValue(new Error('Email provider unavailable')),
+    });
+
+    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toEqual({
+      outcome: 'created',
+      team: savedTeam,
+      emailSent: false,
+    });
   });
 
   it('rejects a failed security check before querying players', async () => {

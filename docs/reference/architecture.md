@@ -249,7 +249,7 @@ app/types/
 
 #### Email Service Integration
 - **Resend Service**: HTML email delivery
-- **Template System**: Dynamic email generation
+- **Template System**: Server-owned email generation; browsers cannot choose recipients or HTML
 - **Notification Types**: User confirmations, admin alerts
 
 ### API Architecture
@@ -257,8 +257,9 @@ app/types/
 #### Nitro API Endpoints
 ```
 /api/
-├── admin-email.post.ts      # Admin notification emails
-├── user-email.post.ts       # User confirmation emails
+├── team-submission.post.ts  # Validates and saves teams; sends new-team emails
+├── team-submission/
+│   └── [key].get.ts         # Loads a team using its private edit key
 └── _turnstile/
     └── validate             # Turnstile bot validation (built-in)
 ```
@@ -352,3 +353,7 @@ pnpm generate-types  # Supabase type generation
 - **Zod Validation**: Integrated with Nuxt UI forms for runtime validation and typed submit payloads
 - **Resend Email Service**: Selected for reliable email delivery
 - **Cloudflare Turnstile**: Implemented for bot protection (privacy-focused, elderly-friendly)
+
+---
+
+**Last updated:** 2026-08-01

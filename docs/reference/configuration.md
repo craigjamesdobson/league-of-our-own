@@ -17,6 +17,7 @@ SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
 SITE_URL=http://localhost:3000
+DEPLOYMENT_ENV=development
 
 # Security (optional - required for form submissions)
 TURNSTILE_SITE_KEY=your_turnstile_site_key
@@ -33,6 +34,7 @@ On your deployment platform (Vercel, Netlify, etc.):
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
 SITE_URL=https://yourdomain.com
+DEPLOYMENT_ENV=production
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
 ```
@@ -77,6 +79,14 @@ NODE_ENV=production
 **Format:**
 - Development: `http://localhost:3000`
 - Production: `https://yourdomain.com` (no trailing slash)
+
+### `DEPLOYMENT_ENV` (Required for staging email labels)
+
+**Type:** `development` | `staging` | `production`
+**Purpose:** Adds a `[STAGING]` prefix to team-submission email subjects when set to `staging`.
+
+Set this independently in each deployed environment. Production should use
+`production`; the staging/preview deployment should use `staging`.
 
 ### `TURNSTILE_SITE_KEY` (Optional)
 

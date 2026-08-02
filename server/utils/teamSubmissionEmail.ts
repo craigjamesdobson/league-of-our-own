@@ -10,8 +10,11 @@ import {
 
 const supportEmail = EMAIL_REPLY_TO;
 
+const isStaging = (): boolean =>
+  process.env.DEPLOYMENT_ENV?.trim().toLowerCase() === 'staging';
+
 const emailSubject = (subject: string): string =>
-  process.env.DEPLOYMENT_ENV?.trim().toLowerCase() === 'staging'
+  isStaging()
     ? `[STAGING] ${subject}`
     : subject;
 
@@ -41,6 +44,7 @@ const renderLayout = (title: string, content: string) => `
     <body style="margin:0;background:#f1f5f9;color:#0f172a;font-family:Arial,sans-serif;line-height:1.5;">
       <div style="max-width:620px;margin:0 auto;padding:24px 12px;">
         <div style="background:#172554;color:#fff;padding:22px 24px;border-radius:12px 12px 0 0;">
+          ${isStaging() ? '<div style="display:inline-block;background:#fbbf24;color:#422006;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.12em;line-height:1;text-transform:uppercase;margin-bottom:10px;">Staging</div>' : ''}
           <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.8;">League of Our Own</div>
           <h1 style="margin:6px 0 0;font-size:24px;">${title}</h1>
         </div>

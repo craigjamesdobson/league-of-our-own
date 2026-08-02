@@ -83,6 +83,7 @@ describe('team submission email delivery', () => {
         from: 'League of Our Own <notifications@leagueofourown.co.uk>',
         replyTo: 'leagueofourown.fpl@gmail.com',
         subject: 'A new team has been submitted',
+        html: expect.not.stringContaining('>Staging</div>'),
       }),
       expect.anything(),
       expect.anything(),
@@ -99,13 +100,19 @@ describe('team submission email delivery', () => {
 
     expect(handleEmailSending).toHaveBeenNthCalledWith(
       1,
-      expect.objectContaining({ subject: '[STAGING] Thank you for your team submission' }),
+      expect.objectContaining({
+        subject: '[STAGING] Thank you for your team submission',
+        html: expect.stringContaining('>Staging</div>'),
+      }),
       expect.anything(),
       expect.anything(),
     );
     expect(handleEmailSending).toHaveBeenNthCalledWith(
       2,
-      expect.objectContaining({ subject: '[STAGING] A new team has been submitted' }),
+      expect.objectContaining({
+        subject: '[STAGING] A new team has been submitted',
+        html: expect.stringContaining('>Staging</div>'),
+      }),
       expect.anything(),
       expect.anything(),
     );

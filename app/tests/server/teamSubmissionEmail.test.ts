@@ -69,6 +69,7 @@ describe('team submission email delivery', () => {
       expect.objectContaining({
         from: 'League of Our Own <notifications@leagueofourown.co.uk>',
         replyTo: 'leagueofourown.fpl@gmail.com',
+        html: expect.stringContaining('>Worldwide Wanderers</h1>'),
       }),
       expect.anything(),
       expect.anything(),

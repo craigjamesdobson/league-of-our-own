@@ -11,7 +11,7 @@ import {
 const supportEmail = EMAIL_REPLY_TO;
 
 const emailSubject = (event: H3Event, subject: string): string =>
-  useRuntimeConfig(event).deploymentBranch === 'staging'
+  useRuntimeConfig(event).deploymentEnvironment === 'staging'
     ? `[STAGING] ${subject}`
     : subject;
 

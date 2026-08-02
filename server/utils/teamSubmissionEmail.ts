@@ -70,7 +70,7 @@ const renderSquad = (players: SubmissionPlayer[]) => {
 };
 
 const renderTeamConfirmation = (event: H3Event, team: SavedTeam, players: SubmissionPlayer[]) => renderLayout(
-  escapeHtml(`${team.team_name} is in`),
+  escapeHtml(team.team_name),
   `
     <p>Thanks for submitting your team. Here is a copy of your selection for your records.</p>
     <table style="width:100%;border-collapse:collapse;margin:20px 0;">${renderSquad(players)}</table>

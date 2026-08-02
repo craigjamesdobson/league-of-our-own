@@ -57,28 +57,23 @@ email labeling. [Cloudflare Pages preview deployments](https://developers.cloudf
 
 ## Recommendation
 
-Use one non-secret custom runtime variable with values configured separately for
-Cloudflare's Preview and Production environments:
+Use one non-secret custom environment variable with values configured separately
+for Cloudflare's Preview and Production environments:
 
 ```text
-Preview:    NUXT_DEPLOYMENT_ENVIRONMENT=staging
-Production: NUXT_DEPLOYMENT_ENVIRONMENT=production
+Preview:    DEPLOYMENT_ENV=staging
+Production: DEPLOYMENT_ENV=production
 ```
 
-Declare an empty default in `nuxt.config.ts` so Nuxt can apply the matching
-runtime override:
+Read it inside the email-delivery request lifecycle:
 
 ```ts
-runtimeConfig: {
-  deploymentEnvironment: '',
-}
+const isStaging = process.env.DEPLOYMENT_ENV === 'staging';
 ```
 
-Then read `useRuntimeConfig(event).deploymentEnvironment` inside the server-side
-email path. Prefix the subject when its value is `staging` (or, more generally,
-when it is not `production`). This keeps the behavior portable through Nuxt,
-uses the Cloudflare request lifecycle correctly, and avoids relying on a build
-artifact remembering its source branch.
+Nitro exposes Cloudflare environment bindings through `process.env` during the
+request lifecycle. Reading the variable when the email is sent avoids both
+build-time branch detection and Nuxt runtime-config mapping.
 
 Cloudflare Pages supports only the `production` and `preview` configuration
 classes, not per-branch runtime configuration. Consequently, this setting will

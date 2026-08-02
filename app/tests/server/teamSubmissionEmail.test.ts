@@ -5,7 +5,6 @@ import { sendCreatedTeamEmails } from '../../../server/utils/teamSubmissionEmail
 
 const handleEmailSending = vi.hoisted(() => vi.fn());
 const runtimeConfig = vi.hoisted(() => ({
-  deploymentEnvironment: 'production',
   app: { baseURL: '/' },
   public: { SITE_URL: 'https://league.example.com' },
 }));
@@ -49,7 +48,7 @@ const players = [
 describe('team submission email delivery', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    runtimeConfig.deploymentEnvironment = 'production';
+    vi.unstubAllEnvs();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
@@ -91,7 +90,7 @@ describe('team submission email delivery', () => {
   });
 
   it('prefixes both email subjects in staging', async () => {
-    runtimeConfig.deploymentEnvironment = 'staging';
+    vi.stubEnv('DEPLOYMENT_ENV', 'staging');
     handleEmailSending
       .mockResolvedValueOnce({ data: { id: 'user-email' }, error: null })
       .mockResolvedValueOnce({ data: { id: 'admin-email' }, error: null });

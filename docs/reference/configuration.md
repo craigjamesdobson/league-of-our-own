@@ -17,7 +17,7 @@ SUPABASE_KEY=your_anon_public_key
 
 # Application Configuration
 SITE_URL=http://localhost:3000
-NUXT_DEPLOYMENT_ENVIRONMENT=development
+DEPLOYMENT_ENV=development
 
 # Security (optional - required for form submissions)
 TURNSTILE_SITE_KEY=your_turnstile_site_key
@@ -34,7 +34,7 @@ On your deployment platform (Vercel, Netlify, etc.):
 SUPABASE_URL=https://your-production-project.supabase.co
 SUPABASE_KEY=your_production_anon_key
 SITE_URL=https://yourdomain.com
-NUXT_DEPLOYMENT_ENVIRONMENT=production
+DEPLOYMENT_ENV=production
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
 ```
@@ -80,7 +80,7 @@ NODE_ENV=production
 - Development: `http://localhost:3000`
 - Production: `https://yourdomain.com` (no trailing slash)
 
-### `NUXT_DEPLOYMENT_ENVIRONMENT` (Required)
+### `DEPLOYMENT_ENV` (Required)
 
 **Type:** `development` | `staging` | `production`
 **Purpose:** Identifies the deployed runtime so staging transactional emails are visibly labelled.
@@ -127,7 +127,6 @@ Defined in `nuxt.config.ts`:
 ```typescript
 export default defineNuxtConfig({
   runtimeConfig: {
-    deploymentEnvironment: '',
     public: {
       SITE_URL: process.env.SITE_URL,
       nodeEnv: process.env.NODE_ENV,

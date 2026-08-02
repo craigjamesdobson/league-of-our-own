@@ -70,7 +70,6 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    deploymentEnvironment: '',
     turnstile: {
       secretKey: process.env.TURNSTILE_SECRET_KEY,
     },

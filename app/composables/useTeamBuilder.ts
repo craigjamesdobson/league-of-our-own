@@ -226,7 +226,7 @@ export const useTeamBuilder = () => {
         addToast(
           'error',
           'Team already registered',
-          `A team already exists for this email. Please contact ${SUPPORT_EMAIL} for help.`,
+          `Please check your original confirmation email for the link to edit your team. If you cannot find it, email ${SUPPORT_EMAIL} for help.`,
         );
         saveConfirmation.value = 'existing';
         return;

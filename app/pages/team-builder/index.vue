@@ -80,7 +80,7 @@ const saveConfirmationAlert = computed(() => {
         color: 'info' as const,
         icon: 'i-lucide-info',
         title: 'Team already registered',
-        description: `No duplicate was created. Please email ${SUPPORT_EMAIL} so we can check your existing entry.`,
+        description: `No duplicate was created. Please check your original confirmation email for the link to edit your team. If you cannot find it, email ${SUPPORT_EMAIL} for help.`,
       };
     case 'submitted-email-failed':
       return {

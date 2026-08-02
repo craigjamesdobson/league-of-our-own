@@ -3,7 +3,7 @@
 Why the automatic `[STAGING]` email subject prefix did not appear, and how to
 distinguish Cloudflare Pages preview email from production email reliably.
 
-## Finding
+## Context
 
 `CF_PAGES_BRANCH` is a **build-time** signal, not a documented Pages Functions
 runtime binding. Cloudflare lists it with the system variables injected into the
@@ -11,7 +11,7 @@ Pages build environment and describes it as a way to customize a build for a
 branch. It does not list `CF_PAGES_BRANCH` among the values available to a
 Function at request time. [Cloudflare Pages build configuration](https://developers.cloudflare.com/pages/configuration/build-configuration/#environment-variables)
 
-The current configuration therefore captures the variable only while Nuxt is
+An earlier attempted configuration captured the variable only while Nuxt was
 building:
 
 ```ts
@@ -39,11 +39,15 @@ lifecycle and recommends accessing them inside the handler, through runtime
 config or the request's Cloudflare bindings.
 [Nitro Cloudflare environment variables](https://nitro.build/deploy/providers/cloudflare#environment-variables)
 
-## Runtime signals available from Cloudflare Pages
+## Approach Chosen
 
-Pages has distinct `production` and `preview` deployment configurations, but it
-does not document an automatic runtime variable containing that classification.
-Its automatic `CF_PAGES_*` variables are documented under build configuration.
+Use one non-secret custom environment variable with values configured separately
+for Cloudflare's Preview and Production environments:
+
+```text
+Preview:    DEPLOYMENT_ENV=staging
+Production: DEPLOYMENT_ENV=production
+```
 
 At runtime, a Pages Function receives explicitly configured environment-variable
 bindings. Cloudflare lets the same variable have different values in production
@@ -55,16 +59,6 @@ uses hash and branch aliases under `pages.dev`, but it is an indirect signal and
 couples application behavior to routing. It should not control transactional
 email labeling. [Cloudflare Pages preview deployments](https://developers.cloudflare.com/pages/configuration/preview-deployments/)
 
-## Recommendation
-
-Use one non-secret custom environment variable with values configured separately
-for Cloudflare's Preview and Production environments:
-
-```text
-Preview:    DEPLOYMENT_ENV=staging
-Production: DEPLOYMENT_ENV=production
-```
-
 Read it inside the email-delivery request lifecycle:
 
 ```ts
@@ -75,6 +69,17 @@ Nitro exposes Cloudflare environment bindings through `process.env` during the
 request lifecycle. Reading the variable when the email is sent avoids both
 build-time branch detection and Nuxt runtime-config mapping.
 
+## Alternatives Considered
+
+- `CF_PAGES_BRANCH`: useful during a Cloudflare Pages build, but not a documented
+  request-time binding.
+- Nuxt runtime-config overrides: require a matching `NUXT_` variable and add an
+  unnecessary mapping for a server-only deployment label.
+- Request hostname detection: indirect and couples email behavior to routing and
+  domain configuration.
+
+## Trade-offs
+
 Cloudflare Pages supports only the `production` and `preview` configuration
 classes, not per-branch runtime configuration. Consequently, this setting will
 label email from every preview deployment as staging. If only the `staging`
@@ -84,6 +89,12 @@ either a branch value baked in at build time or a separate Pages project.
 
 No secret is involved, but the variable must be configured for both environments
 and the deployments must be redeployed before testing.
+
+## Learnings
+
+Cloudflare build variables and request-time bindings are different concerns.
+Deployment-sensitive server behavior should use an explicit request-time binding
+unless the behavior genuinely belongs to the build artifact.
 
 ---
 

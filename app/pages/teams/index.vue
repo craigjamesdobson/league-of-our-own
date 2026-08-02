@@ -4,13 +4,20 @@ import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 const draftedTeamsStore = useDraftedTeamsStore();
 const user = useSupabaseUser();
 
-draftedTeamsStore.clearDraftedTeamAdminMetadata();
+const loadAdminMetadata = async (isAuthenticated: boolean) => {
+  if (!isAuthenticated) {
+    draftedTeamsStore.clearDraftedTeamAdminMetadata();
+    return;
+  }
+
+  await draftedTeamsStore.fetchDraftedTeamAdminMetadata();
+};
+
+watch(user, currentUser => loadAdminMetadata(Boolean(currentUser)));
 
 await Promise.all([
   draftedTeamsStore.fetchDraftedTeams(),
-  user.value
-    ? draftedTeamsStore.fetchDraftedTeamAdminMetadata()
-    : Promise.resolve(),
+  loadAdminMetadata(Boolean(user.value)),
 ]);
 </script>
 

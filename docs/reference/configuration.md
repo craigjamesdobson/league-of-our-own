@@ -478,4 +478,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-08-02

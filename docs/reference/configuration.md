@@ -171,7 +171,9 @@ application state without rebuilding or redeploying the site.
 entries are accepted. The server rejects new submissions and edits from 00:00
 on the following day in the `Europe/London` timezone. The database submission
 function applies the same rule as a final guard if a request crosses the
-deadline while being saved.
+deadline while being saved. The team-builder page applies the same check in the
+browser, refreshes it once a minute for tabs left open across the cutoff, and
+shows a closed-state message instead of the builder controls.
 
 The scheduled `public.close_team_registration_if_due()` database function sets
 both `team_registration_open` and `league_data_public` to `false` after the

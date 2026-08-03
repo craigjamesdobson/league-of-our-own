@@ -102,5 +102,9 @@ describe('parseAppSettings', () => {
       teamRegistrationOpen: false,
       teamSubmissionDeadline: '2026-08-20',
     }, new Date('2026-08-20T22:59:59.999Z'))).toBe(false);
+    expect(isTeamRegistrationOpen({
+      teamRegistrationOpen: true,
+      teamSubmissionDeadline: '2026-08-20',
+    }, new Date('2026-08-20T23:00:00.000Z'))).toBe(false);
   });
 });

@@ -95,6 +95,16 @@ For staging and production:
 6. Exercise any forms, server API routes, or migrations changed by the release.
 7. Check desktop and mobile layouts in light and dark mode for UI changes.
 
+For admin team submission metadata changes:
+
+1. Confirm the metadata permission migration was applied successfully.
+2. While signed out, confirm team cards have no submission-history control.
+3. While signed in as an administrator, confirm the control shows created,
+   last-edited, and edit-count values on `/teams`.
+4. Confirm the anonymous Supabase role cannot select `created_at`, `updated_at`,
+   or `edited_count` from `drafted_teams`.
+5. Confirm the authenticated role can still select those fields.
+
 ## Rollback
 
 Frontend rollback depends on the hosting platform. Prefer redeploying the last known-good application artifact or commit.
@@ -121,4 +131,4 @@ The repository has no frontend deployment job. To close that gap:
 
 ---
 
-**Last updated:** 2026-07-28
+**Last updated:** 2026-08-02

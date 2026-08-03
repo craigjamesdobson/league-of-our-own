@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2025-11-15*
+*Last updated: 2026-08-02*
 
 ## Overview
 
@@ -131,7 +131,7 @@ CREATE TABLE drafted_teams (
     contact_number text,
     edited_count integer DEFAULT 0,
     created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now()
+    updated_at timestamptz
 );
 ```
 
@@ -140,7 +140,14 @@ CREATE TABLE drafted_teams (
 - `allowed_transfers`: Whether team can make player transfers
 - `total_team_value`: Calculated team value for budget validation
 - `active_season`: Season identifier (e.g., "24-25")
-- `edited_count`: Number of times team has been modified
+- `created_at`: When the team was first submitted
+- `updated_at`: When the `drafted_teams` row was last updated; remains `NULL` until the first update and is maintained by a database trigger
+- `edited_count`: Number of successful edit-link resubmissions after the original submission; it does not count every administrative or transfer change
+
+**Submission Metadata Access:**
+- Public team functions omit `created_at`, `updated_at`, and `edited_count`
+- Anonymous users do not have direct column privileges for these fields
+- Authenticated administrators can fetch the three fields for the admin-only submission history popover on the teams page
 
 **Budget Constraints:**
 - Standard teams: 90 points maximum

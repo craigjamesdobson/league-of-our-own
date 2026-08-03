@@ -3,6 +3,7 @@ import { initDraftedTeamData } from '~/logic/drafted-teams';
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type {
   DraftedTeamWithPlayers,
+  TeamAdminMetadata,
 } from '~/types/DraftedTeam';
 import type { Database, TablesInsert } from '~/types/database.types';
 
@@ -11,6 +12,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const { getActiveSeason } = useAppSettings();
 
   const draftedTeams: Ref<DraftedTeamWithPlayers[] | null> = ref(null);
+  const draftedTeamAdminMetadata: Ref<Record<number, TeamAdminMetadata>> = ref({});
 
   const getDraftedTeams = computed(() =>
     initDraftedTeamData(draftedTeams.value),
@@ -23,12 +25,34 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       draftedTeamsValue?.find(x => x.drafted_team_id === id);
   });
 
+  const getDraftedTeamAdminMetadataByID = computed(() => {
+    return (id: number) => draftedTeamAdminMetadata.value[id];
+  });
+
   const fetchDraftedTeams = async () => {
     const activeSeason = await getActiveSeason();
     const { data, error } = await supabase
       .rpc('get_drafted_teams_by_season', { active_season_param: activeSeason });
     if (error) throw error;
     draftedTeams.value = data;
+  };
+
+  const fetchDraftedTeamAdminMetadata = async () => {
+    const activeSeason = await getActiveSeason();
+    const { data, error } = await supabase
+      .from('drafted_teams')
+      .select('drafted_team_id, created_at, updated_at, edited_count')
+      .eq('active_season', activeSeason);
+
+    if (error) throw error;
+
+    draftedTeamAdminMetadata.value = Object.fromEntries(
+      (data ?? []).map(metadata => [metadata.drafted_team_id, metadata]),
+    );
+  };
+
+  const clearDraftedTeamAdminMetadata = () => {
+    draftedTeamAdminMetadata.value = {};
   };
 
   const fetchDraftedTeamsWithPlayerPointsByGameweek = async (
@@ -137,9 +161,13 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   return {
     draftedTeams,
+    draftedTeamAdminMetadata,
     getDraftedTeams,
     getDraftedTeamByID,
+    getDraftedTeamAdminMetadataByID,
     fetchDraftedTeams,
+    fetchDraftedTeamAdminMetadata,
+    clearDraftedTeamAdminMetadata,
     fetchDraftedPlayerByID,
     fetchDraftedTeamsWithPlayerPointsByGameweek,
     upsertDraftedTeam,

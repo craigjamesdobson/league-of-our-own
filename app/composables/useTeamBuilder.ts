@@ -12,6 +12,62 @@ interface LoadingState {
   submittingForm: boolean;
 }
 
+type UnknownError = {
+  data?: UnknownError;
+  message?: unknown;
+  response?: UnknownError;
+  status?: unknown;
+  statusCode?: unknown;
+  statusMessage?: unknown;
+};
+
+const asUnknownError = (error: unknown): UnknownError =>
+  error && typeof error === 'object' ? error as UnknownError : {};
+
+const asStatusCode = (value: unknown): number | undefined => {
+  const statusCode = typeof value === 'number' ? value : Number(value);
+  return Number.isInteger(statusCode) ? statusCode : undefined;
+};
+
+const getErrorStatusCode = (error: unknown): number | undefined => {
+  const candidate = asUnknownError(error);
+  return asStatusCode(candidate.statusCode)
+    ?? asStatusCode(candidate.status)
+    ?? asStatusCode(asUnknownError(candidate.response).status)
+    ?? asStatusCode(asUnknownError(candidate.data).statusCode);
+};
+
+const getErrorMessages = (error: unknown): string[] => {
+  const candidate = asUnknownError(error);
+  const data = asUnknownError(candidate.data);
+  return [candidate.message, candidate.statusMessage, data.message, data.statusMessage]
+    .filter((message): message is string => typeof message === 'string');
+};
+
+const isTeamRegistrationClosedError = (error: unknown): boolean => {
+  const messages = getErrorMessages(error);
+  return getErrorStatusCode(error) === 403
+    || messages.some(message => message.includes('Team registration is closed'));
+};
+
+export const getTeamSubmissionErrorAlert = (error: unknown, editing: boolean) => {
+  if (isTeamRegistrationClosedError(error)) {
+    return {
+      title: editing ? 'Team editing closed' : 'Team submissions closed',
+      description: editing
+        ? 'The submission deadline has passed, so saved teams can no longer be changed.'
+        : 'The submission deadline has passed, so new teams are no longer being accepted.',
+    };
+  }
+
+  return {
+    title: editing ? 'Unable to load team' : 'Submission failed',
+    description: editing
+      ? 'We could not load that saved team. Please check the link and try again.'
+      : 'We could not submit your team. Please try again.',
+  };
+};
+
 type DraftedPlayerFromQuery = {
   drafted_player_id: number;
   drafted_team: number | null;
@@ -115,9 +171,10 @@ export const useTeamBuilder = () => {
       draftedTeamData.value = { ...data, key: id };
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE, data.players);
     }
-    catch {
-      error.value = 'Failed to fetch team data';
-      addToast('error', 'Error', 'Failed to fetch team data');
+    catch (fetchError) {
+      const alert = getTeamSubmissionErrorAlert(fetchError, true);
+      error.value = alert.description;
+      addToast('error', alert.title, alert.description);
       setTeamPlayers(DEFAULT_TEAM_STRUCTURE);
     }
     finally {
@@ -266,11 +323,9 @@ export const useTeamBuilder = () => {
         : result.outcome === 'updated' ? 'updated' : 'submitted';
     }
     catch (submissionError) {
-      const message = submissionError instanceof Error
-        ? submissionError.message
-        : 'Failed to submit team. Please try again.';
-      error.value = message;
-      addToast('error', 'Submission failed', message);
+      const alert = getTeamSubmissionErrorAlert(submissionError, isExistingDraftedTeam.value);
+      error.value = alert.description;
+      addToast('error', alert.title, alert.description);
     }
     finally {
       loading.value.submittingForm = false;

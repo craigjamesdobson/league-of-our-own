@@ -6,7 +6,10 @@ import {
   createMockTeamTableData,
   createMockTeamWithPlayers,
 } from '@/tests/factories';
-import { useTeamBuilder } from '@/composables/useTeamBuilder';
+import {
+  getTeamSubmissionErrorAlert,
+  useTeamBuilder,
+} from '@/composables/useTeamBuilder';
 import { withSetup } from '@/tests/setup';
 
 // Mock Nuxt composables used by useTeamBuilder
@@ -44,6 +47,22 @@ vi.mock('@/utils/utility', () => ({
 
 afterEach(() => {
   vi.unstubAllGlobals();
+});
+
+describe('team submission error messages', () => {
+  it('turns a closed-submission response into a user-friendly message', () => {
+    expect(getTeamSubmissionErrorAlert({ statusCode: 403 }, false)).toEqual({
+      title: 'Team submissions closed',
+      description: 'The submission deadline has passed, so new teams are no longer being accepted.',
+    });
+  });
+
+  it('does not expose raw request details for an unexpected submission error', () => {
+    expect(getTeamSubmissionErrorAlert({ message: '[POST] "/api/team-submission": 500' }, false)).toEqual({
+      title: 'Submission failed',
+      description: 'We could not submit your team. Please try again.',
+    });
+  });
 });
 
 describe('useTeamBuilder - Budget Calculations', () => {

@@ -64,6 +64,7 @@ export default defineEventHandler(async (event) => {
         return {
           activeSeason: settings.activeSeason,
           teamRegistrationOpen: settings.teamRegistrationOpen,
+          teamSubmissionDeadline: settings.teamSubmissionDeadline,
         };
       },
       verifyTurnstile: async (token) => {
@@ -101,6 +102,10 @@ export default defineEventHandler(async (event) => {
             throw new TeamSubmissionError(409, 'Another team already uses this email address');
           }
           return { outcome: 'existing-email' };
+        }
+
+        if (error?.message.includes('Team registration is closed')) {
+          throw new TeamSubmissionError(403, 'Team registration is closed');
         }
 
         if (error && violatesConstraint(error, NAME_UNIQUE_INDEX)) {

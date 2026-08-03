@@ -4,6 +4,7 @@ import {
   validateSubmissionPlayers,
 } from './teamSubmission';
 import type { TeamSubmissionResponse } from '../../shared/types/teamSubmission';
+import { isTeamRegistrationOpen } from '../../shared/utils/appSettings';
 
 export interface SavedTeam {
   drafted_team_id: number;
@@ -45,7 +46,9 @@ export interface TeamSubmissionDependencies {
   loadAppSettings: () => Promise<{
     activeSeason: string;
     teamRegistrationOpen: boolean;
+    teamSubmissionDeadline: string;
   }>;
+  now?: () => Date;
   verifyTurnstile: (token: string) => Promise<boolean>;
   loadPlayers: (playerIds: number[]) => Promise<SubmissionPlayer[]>;
   saveTeam: (submission: SaveTeamSubmission) => Promise<SaveTeamResult>;
@@ -84,7 +87,7 @@ export const processTeamSubmission = async (
 
   const settings = await dependencies.loadAppSettings();
 
-  if (!settings.teamRegistrationOpen) {
+  if (!isTeamRegistrationOpen(settings, dependencies.now?.())) {
     throw new TeamSubmissionError(403, 'Team registration is closed');
   }
 

@@ -47,6 +47,7 @@ const createDependencies = (
   loadAppSettings: vi.fn().mockResolvedValue({
     activeSeason: '26-27',
     teamRegistrationOpen: true,
+    teamSubmissionDeadline: '2026-08-20',
   }),
   verifyTurnstile: vi.fn().mockResolvedValue(true),
   loadPlayers: vi.fn().mockResolvedValue(validPlayers()),
@@ -143,6 +144,7 @@ describe('processTeamSubmission', () => {
       loadAppSettings: vi.fn().mockResolvedValue({
         activeSeason: '26-27',
         teamRegistrationOpen: false,
+        teamSubmissionDeadline: '2026-08-20',
       }),
     });
 
@@ -151,6 +153,28 @@ describe('processTeamSubmission', () => {
       message: 'Team registration is closed',
     });
     expect(dependencies.loadPlayers).not.toHaveBeenCalled();
+  });
+
+  it('rejects submissions after the UK deadline even when the registration flag is still open', async () => {
+    const dependencies = createDependencies({
+      now: () => new Date('2026-08-20T23:00:00.000Z'),
+    });
+
+    await expect(processTeamSubmission(validRequest(), dependencies)).rejects.toMatchObject({
+      statusCode: 403,
+      message: 'Team registration is closed',
+    });
+    expect(dependencies.loadPlayers).not.toHaveBeenCalled();
+  });
+
+  it('allows submissions through 23:59 UK time on the deadline date', async () => {
+    const dependencies = createDependencies({
+      now: () => new Date('2026-08-20T22:59:59.999Z'),
+    });
+
+    await expect(processTeamSubmission(validRequest(), dependencies)).resolves.toMatchObject({
+      outcome: 'created',
+    });
   });
 
   it('does not save a team when authoritative player validation fails', async () => {

@@ -2,7 +2,23 @@
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 
 const draftedTeamsStore = useDraftedTeamsStore();
-await draftedTeamsStore.fetchDraftedTeams();
+const user = useSupabaseUser();
+
+const loadAdminMetadata = async (isAuthenticated: boolean) => {
+  if (!isAuthenticated) {
+    draftedTeamsStore.clearDraftedTeamAdminMetadata();
+    return;
+  }
+
+  await draftedTeamsStore.fetchDraftedTeamAdminMetadata();
+};
+
+watch(user, currentUser => loadAdminMetadata(Boolean(currentUser)));
+
+await Promise.all([
+  draftedTeamsStore.fetchDraftedTeams(),
+  loadAdminMetadata(Boolean(user.value)),
+]);
 </script>
 
 <template>
@@ -16,6 +32,9 @@ await draftedTeamsStore.fetchDraftedTeams();
         <DraftedTeam
           v-if="draftedTeam"
           :drafted-team="draftedTeam"
+          :admin-metadata="user
+            ? draftedTeamsStore.getDraftedTeamAdminMetadataByID(draftedTeam.drafted_team_id)
+            : undefined"
         />
       </div>
     </div>

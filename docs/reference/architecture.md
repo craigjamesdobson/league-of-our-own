@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Web Application
 
-*Last updated: 2026-07-20*
+*Last updated: 2026-08-02*
 
 ## Overview
 
@@ -246,6 +246,24 @@ app/types/
 - **Authentication**: Custom user profiles with role-based access
 - **Real-time Updates**: Live data synchronisation
 - **Row Level Security**: Data access control
+
+#### Team Submission Metadata Privacy
+
+The `drafted_teams.created_at`, `updated_at`, and `edited_count` fields expose
+operational submission history. Public league views do not need this history,
+so public team functions omit the fields and anonymous users have no direct
+column privileges for them. The Teams page fetches them separately only after
+Supabase provides an authenticated user, then displays them in an admin-only
+popover.
+
+The client-side visibility check is a user-interface convenience, not the
+security control. PostgreSQL grants are responsible for preventing anonymous
+reads even if someone calls Supabase directly.
+
+This design assumes every authenticated account is an administrator, matching
+the application's current account model. If member accounts are introduced,
+replace that assumption with an explicit administrator role in both database
+policies and the UI authorization check.
 
 #### Email Service Integration
 - **Resend Service**: HTML email delivery

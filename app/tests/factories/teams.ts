@@ -1,5 +1,15 @@
-import type { DraftedTeamWithPlayers } from '@/types/DraftedTeam';
-import type { TablesInsert, Tables } from '@/types/database.types';
+import type { DraftedTeamWithPlayers, TeamAdminMetadata } from '~/types/DraftedTeam';
+import type { TablesInsert, Tables } from '~/types/database.types';
+
+export const createMockTeamAdminMetadata = (
+  overrides?: Partial<TeamAdminMetadata>,
+): TeamAdminMetadata => ({
+  drafted_team_id: 1,
+  created_at: '2025-01-12T10:00:00Z',
+  updated_at: null,
+  edited_count: 0,
+  ...overrides,
+});
 
 /**
  * Factory function for creating mock DraftedTeam data for testing.

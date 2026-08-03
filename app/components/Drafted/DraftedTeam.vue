@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DraftedPlayer from './DraftedPlayer.vue';
-import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
+import TeamAdminMetadataPopover from '~/components/Drafted/TeamAdminMetadataPopover.vue';
+import type { DraftedTeamWithPlayers, TeamAdminMetadata } from '~/types/DraftedTeam';
 
 const props = defineProps({
   draftedTeam: {
@@ -10,6 +11,10 @@ const props = defineProps({
   editable: {
     type: Boolean,
     default: false,
+  },
+  adminMetadata: {
+    type: Object as PropType<TeamAdminMetadata>,
+    default: undefined,
   },
 });
 
@@ -56,15 +61,24 @@ const handleEditPlayer = (playerID: number) => {
           props.draftedTeam?.team_owner
         }}</span>
       </div>
-      <UTooltip
-        v-if="props.draftedTeam?.allowed_transfers"
-        text="Transfers allowed"
+      <div
+        v-if="props.draftedTeam?.allowed_transfers || props.adminMetadata"
+        class="flex items-center gap-1"
       >
-        <Icon
-          size="24"
-          name="ic:round-swap-horiz"
+        <UTooltip
+          v-if="props.draftedTeam?.allowed_transfers"
+          text="Transfers allowed"
+        >
+          <Icon
+            size="24"
+            name="ic:round-swap-horiz"
+          />
+        </UTooltip>
+        <TeamAdminMetadataPopover
+          v-if="props.adminMetadata"
+          :metadata="props.adminMetadata"
         />
-      </UTooltip>
+      </div>
     </div>
     <div
       v-for="player in props.draftedTeam.players"

@@ -1,6 +1,7 @@
 // Central exports for all test fixtures
 export {
   createMockDraftedTeam,
+  createMockTeamAdminMetadata,
   createMockTeamInsertData,
   createMockTeamTableData,
 } from './teams';

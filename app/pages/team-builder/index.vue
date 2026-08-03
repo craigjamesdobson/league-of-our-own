@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PlayerPosition } from '~/types/PlayerPosition';
+import { isTeamRegistrationOpen } from '~~/shared/utils/appSettings';
 import { SUPPORT_EMAIL } from '~~/shared/utils/contact';
 
 const {
@@ -24,6 +25,14 @@ const {
   teamRegistrationOpen: registrationOpen,
   teamSubmissionDeadline,
 } = useAppSettings();
+
+const deadlineCheckTime = ref(new Date());
+let deadlineCheckInterval: ReturnType<typeof setInterval> | undefined;
+
+const registrationIsOpen = computed(() => isTeamRegistrationOpen({
+  teamRegistrationOpen: registrationOpen.value,
+  teamSubmissionDeadline: teamSubmissionDeadline.value,
+}, deadlineCheckTime.value));
 
 const positionConfig = [
   {
@@ -99,10 +108,22 @@ const saveConfirmationAlert = computed(() => {
   }
 });
 
-if (registrationOpen.value && route.query.id) {
+onMounted(() => {
+  deadlineCheckInterval = setInterval(() => {
+    deadlineCheckTime.value = new Date();
+  }, 60_000);
+});
+
+onBeforeUnmount(() => {
+  if (deadlineCheckInterval) {
+    clearInterval(deadlineCheckInterval);
+  }
+});
+
+if (registrationIsOpen.value && route.query.id) {
   await fetchDraftedTeamData();
 }
-else if (registrationOpen.value) {
+else if (registrationIsOpen.value) {
   setTeamPlayers([
     { position: 1, count: 1 },
     { position: 2, count: 4 },
@@ -114,16 +135,20 @@ else if (registrationOpen.value) {
 
 <template>
   <div
-    v-if="!registrationOpen"
+    v-if="!registrationIsOpen"
     class="flex min-h-full items-center justify-center"
   >
     <UAlert
       color="info"
       variant="soft"
+      icon="i-lucide-lock-keyhole"
       class="max-w-xl"
     >
+      <template #title>
+        Team submissions closed
+      </template>
       <template #description>
-        Team entries are currently closed.
+        Team submissions are now closed. Teams will be available before the season begins.
       </template>
     </UAlert>
   </div>

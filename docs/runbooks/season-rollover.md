@@ -1,6 +1,6 @@
 # Season rollover runbook
 
-**Last updated:** 2026-07-28
+**Last updated:** 2026-08-03
 
 Use this runbook first in staging and then in production. The SQL remains a
 deliberate manual operation because archiving and clearing operational data are
@@ -50,6 +50,25 @@ where setting_key = 'team_registration_open';
 
 Confirm the team builder no longer accepts a submission before continuing.
 Keep `league_data_public` set to `'false'` during the reveal window.
+
+## Automated deadline closure
+
+After the deadline-closure migration is deployed, enable the `pg_cron` module
+in the Supabase Dashboard and create a recurring job that runs at 00:00 and
+23:00 UTC:
+
+```sql
+select public.close_team_registration_if_due();
+```
+
+Use the schedule `0 0,23 * * *` and a descriptive job name such as
+`close-team-registration-if-due`. Supabase databases and the standard Cron
+schedule use UTC/GMT; the two daily runs mean one aligns with UK midnight in
+winter and the other aligns with UK midnight in summer. The function safely
+no-ops on the extra run. Confirm the job appears in the Cron dashboard and
+inspect its run history after a staging test. The function uses `Europe/London`
+calendar dates, while the application and database submission function reject
+late requests independently of Cron.
 
 ## 2. Archive 2025/26
 

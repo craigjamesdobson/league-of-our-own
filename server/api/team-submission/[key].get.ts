@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '~/types/database.types';
-import { APP_SETTING_KEYS, parseAppSettings } from '../../../shared/utils/appSettings';
+import {
+  APP_SETTING_KEYS,
+  isTeamRegistrationOpen,
+  parseAppSettings,
+} from '../../../shared/utils/appSettings';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -36,7 +40,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: 'Application settings are invalid' });
   }
 
-  if (!settings.teamRegistrationOpen) {
+  if (!isTeamRegistrationOpen(settings)) {
     throw createError({ statusCode: 403, statusMessage: 'Team registration is closed' });
   }
 

@@ -167,6 +167,17 @@ application state without rebuilding or redeploying the site.
 | `team_registration_open` | boolean | `true` or `false` |
 | `team_submission_deadline` | date | `YYYY-MM-DD` |
 
+`team_submission_deadline` is interpreted as the final UK calendar day on which
+entries are accepted. The server rejects new submissions and edits from 00:00
+on the following day in the `Europe/London` timezone. The database submission
+function applies the same rule as a final guard if a request crosses the
+deadline while being saved.
+
+The scheduled `public.close_team_registration_if_due()` database function sets
+both `team_registration_open` and `league_data_public` to `false` after the
+deadline. Configure it as a recurring Supabase Cron job; the server-side check
+remains authoritative if the job is delayed.
+
 Postgres stores each `setting_value` as text. `parseAppSettings` is the single
 application boundary that validates and converts those strings into typed values.
 Missing or invalid values fail closed: anonymous visitors see the coming-soon page
@@ -478,4 +489,4 @@ Default includes `--host` for network access (see package.json scripts).
 
 ---
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-08-03

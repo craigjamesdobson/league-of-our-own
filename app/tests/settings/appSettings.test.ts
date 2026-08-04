@@ -1,7 +1,11 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { parseAppSettings } from '../../../shared/utils/appSettings';
+import {
+  isTeamRegistrationOpen,
+  isTeamSubmissionDeadlinePassed,
+  parseAppSettings,
+} from '../../../shared/utils/appSettings';
 
 describe('parseAppSettings', () => {
   it('returns typed application settings from database rows', () => {
@@ -76,5 +80,31 @@ describe('parseAppSettings', () => {
       { setting_key: 'team_registration_open', setting_value: 'true' },
       { setting_key: 'team_submission_deadline', setting_value: '20/08/2026' },
     ])).toThrow('Setting team_submission_deadline must use the YYYY-MM-DD format');
+  });
+
+  it('evaluates the submission deadline using UK calendar time', () => {
+    expect(isTeamSubmissionDeadlinePassed(
+      '2026-08-20',
+      new Date('2026-08-20T22:59:59.999Z'),
+    )).toBe(false);
+    expect(isTeamSubmissionDeadlinePassed(
+      '2026-08-20',
+      new Date('2026-08-20T23:00:00.000Z'),
+    )).toBe(true);
+  });
+
+  it('combines the manual registration flag with the deadline', () => {
+    expect(isTeamRegistrationOpen({
+      teamRegistrationOpen: true,
+      teamSubmissionDeadline: '2026-08-20',
+    }, new Date('2026-08-20T22:59:59.999Z'))).toBe(true);
+    expect(isTeamRegistrationOpen({
+      teamRegistrationOpen: false,
+      teamSubmissionDeadline: '2026-08-20',
+    }, new Date('2026-08-20T22:59:59.999Z'))).toBe(false);
+    expect(isTeamRegistrationOpen({
+      teamRegistrationOpen: true,
+      teamSubmissionDeadline: '2026-08-20',
+    }, new Date('2026-08-20T23:00:00.000Z'))).toBe(false);
   });
 });

@@ -13,6 +13,8 @@ export interface AppSettings {
   teamSubmissionDeadline: string;
 }
 
+export const TEAM_SUBMISSION_TIME_ZONE = 'Europe/London';
+
 export const APP_SETTING_KEYS = [
   'active_season',
   'current_gameweek',
@@ -74,6 +76,34 @@ const parseTeamSubmissionDeadline = (value: string): string => {
 
   return value;
 };
+
+const formatDateInTimeZone = (date: Date, timeZone: string): string => {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const values = new Map(parts.map(part => [part.type, part.value]));
+
+  return `${values.get('year')}-${values.get('month')}-${values.get('day')}`;
+};
+
+/**
+ * Treats the configured date as the final day on which teams may be submitted
+ * in the league's timezone. Submissions close at 00:00 on the following UK
+ * calendar day, so the deadline remains open through 23:59:59 UK time.
+ */
+export const isTeamSubmissionDeadlinePassed = (
+  deadline: string,
+  now: Date = new Date(),
+): boolean => formatDateInTimeZone(now, TEAM_SUBMISSION_TIME_ZONE) > deadline;
+
+export const isTeamRegistrationOpen = (
+  settings: Pick<AppSettings, 'teamRegistrationOpen' | 'teamSubmissionDeadline'>,
+  now: Date = new Date(),
+): boolean => settings.teamRegistrationOpen
+  && !isTeamSubmissionDeadlinePassed(settings.teamSubmissionDeadline, now);
 
 export const parseAppSettings = (rows: AppSettingRow[]): AppSettings => {
   const values = new Map(

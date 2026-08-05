@@ -119,10 +119,10 @@ For production, use:
 pnpm season:import -- production
 ```
 
-The script asks for the deployed application URL, the target Supabase URL, and
-requires the target name to be typed again. It reads both `SYNC_API_KEY` and
-`SUPABASE_SERVICE_ROLE_KEY` with hidden input. It then imports in the required
-order:
+The script asks for the deployed application URL and the target Supabase URL,
+requires the target name to be typed again, and reads `SYNC_API_KEY` with hidden
+input. The Node importer then prompts for the Supabase service-role key with
+hidden input. It imports in the required order:
 
 1. Exactly 20 clubs.
 2. A positive number of current players.

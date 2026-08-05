@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-05*
 
 ## Overview
 

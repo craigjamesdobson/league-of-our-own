@@ -9,6 +9,7 @@ import type {
 import type { Database, Tables } from '~/types/database.types';
 
 type PlayerStatisticRow = Pick<Tables<'player_statistics'>, 'player_id' | 'goals' | 'assists' | 'clean_sheet' | 'red_card' | 'points'>;
+type PreviousSeasonStatisticRow = Pick<Tables<'player_previous_season_statistics'>, 'player_id' | 'goals' | 'assists' | 'clean_sheets' | 'red_cards' | 'points' | 'minutes'>;
 type Club = Pick<Tables<'teams'>, 'id' | 'name' | 'short_name'>;
 
 const emptyPlayerSeasonStatistics = (): PlayerSeasonStatistics => ({
@@ -45,6 +46,18 @@ const aggregatePlayerStatistics = (playerStatistics: PlayerStatisticRow[]) => {
   }, new Map<number, PlayerSeasonStatistics>());
 };
 
+const mapPreviousSeasonStatistics = (
+  statistics: PreviousSeasonStatisticRow[],
+): PlayerPreviousSeasonStatistics[] => statistics.map(statisticsRow => ({
+  player_id: statisticsRow.player_id,
+  previous_season_goals: statisticsRow.goals,
+  previous_season_assists: statisticsRow.assists,
+  previous_season_clean_sheets: statisticsRow.clean_sheets,
+  previous_season_red_cards: statisticsRow.red_cards,
+  previous_season_points: statisticsRow.points,
+  previous_season_minutes: statisticsRow.minutes,
+}));
+
 const mergePlayersWithSeasonStatistics = (
   players: Player[],
   playerStatistics: PlayerStatisticRow[],
@@ -65,7 +78,7 @@ const mergePlayersWithSeasonStatistics = (
 export const usePlayerStore = defineStore('player-store', () => {
   const players: Ref<PlayerWithSeasonStatistics[]> = ref([]);
   const clubs: Ref<Club[]> = ref([]);
-  const playerUpdatedDate: Ref<string | null> = ref(null);
+  const playerDataLastSyncedAt: Ref<string | null> = ref(null);
   const isLoaded = ref(false);
 
   const fetchPlayers = async () => {
@@ -74,6 +87,7 @@ export const usePlayerStore = defineStore('player-store', () => {
       const [
         { data: playerData, error: playerError },
         { data: playerStatisticsData, error: playerStatisticsError },
+        { data: previousSeasonStatisticsData, error: previousSeasonStatisticsError },
       ] = await Promise.all([
         supabase
           .from('players_view')
@@ -82,6 +96,9 @@ export const usePlayerStore = defineStore('player-store', () => {
         supabase
           .from('player_statistics')
           .select('player_id, goals, assists, clean_sheet, red_card, points'),
+        supabase
+          .from('player_previous_season_statistics')
+          .select('player_id, goals, assists, clean_sheets, red_cards, points, minutes'),
       ]);
 
       if (playerError) {
@@ -94,23 +111,17 @@ export const usePlayerStore = defineStore('player-store', () => {
         return;
       }
 
-      players.value = mergePlayersWithSeasonStatistics(playerData ?? [], playerStatisticsData ?? []);
-      await fetchPlayerUpdatedDate();
-      isLoaded.value = true;
+      if (previousSeasonStatisticsError) {
+        console.warn('Could not load previous-season player statistics:', previousSeasonStatisticsError.message);
+      }
 
-      try {
-        const previousSeasonStatistics = await $fetch<PlayerPreviousSeasonStatistics[]>(
-          '/api/player-previous-season-stats',
-        );
-        players.value = mergePlayersWithSeasonStatistics(
-          playerData ?? [],
-          playerStatisticsData ?? [],
-          previousSeasonStatistics,
-        );
-      }
-      catch (previousSeasonError) {
-        console.warn('Could not load previous-season player statistics:', previousSeasonError);
-      }
+      players.value = mergePlayersWithSeasonStatistics(
+        playerData ?? [],
+        playerStatisticsData ?? [],
+        mapPreviousSeasonStatistics(previousSeasonStatisticsData ?? []),
+      );
+      await fetchPlayerDataLastSyncedAt();
+      isLoaded.value = true;
     }
     catch (error) {
       if (typeof error === 'object' && error !== null && 'message' in error) {
@@ -133,19 +144,20 @@ export const usePlayerStore = defineStore('player-store', () => {
     clubs.value = data ?? [];
   };
 
-  const fetchPlayerUpdatedDate = async () => {
+  const fetchPlayerDataLastSyncedAt = async () => {
     const supabase = useSupabaseClient<Database>();
     const { data, error } = await supabase
-      .from('players')
-      .select('updated_at')
-      .limit(1)
-      .single();
+      .from('settings')
+      .select('setting_value')
+      .eq('setting_key', 'player_data_last_synced_at')
+      .maybeSingle();
 
     if (error) {
-      throw new Error(error.message);
+      console.warn('Could not load player data sync status:', error.message);
+      return;
     }
 
-    playerUpdatedDate.value = data.updated_at;
+    playerDataLastSyncedAt.value = data?.setting_value ?? null;
   };
 
   const upsertPlayerData = async (playerData: string) => {
@@ -214,7 +226,7 @@ export const usePlayerStore = defineStore('player-store', () => {
     }
   };
 
-  const getPlayerLastUpdatedDate = computed(() => playerUpdatedDate.value);
+  const getPlayerDataLastSyncedAt = computed(() => playerDataLastSyncedAt.value);
 
   const getPlayerByID = computed(
     () => (id: number) => players.value.find(x => x.player_id === id),
@@ -232,11 +244,12 @@ export const usePlayerStore = defineStore('player-store', () => {
     getPlayers,
     getClubs,
     getPlayerByID,
-    getPlayerLastUpdatedDate,
+    getPlayerDataLastSyncedAt,
   };
 });
 
 export {
   aggregatePlayerStatistics,
+  mapPreviousSeasonStatistics,
   mergePlayersWithSeasonStatistics,
 };

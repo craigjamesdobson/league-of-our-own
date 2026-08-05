@@ -80,6 +80,7 @@ call_sync_endpoint() {
 
 call_sync_endpoint "sync-teams" "teamsCount" 20
 call_sync_endpoint "sync-players" "playersCount"
+call_sync_endpoint "sync-player-previous-season-stats" "statsCount"
 call_sync_endpoint "sync-fixtures" "fixturesCount" 380
 unset SYNC_API_KEY
 

@@ -9,9 +9,54 @@ export type { Json } from './database-generated.types';
 // Note: weekly_stats removed - calculated client-side now instead of using placeholder values
 type DraftedTeamWithPlayerPointsByGameweek = DraftedTeamWithPlayers;
 
+type PlayerPreviousSeasonStatisticsTable = {
+  Row: {
+    assists: number;
+    clean_sheets: number;
+    goals: number;
+    minutes: number;
+    player_id: number;
+    points: number;
+    red_cards: number;
+    season_name: string | null;
+    synced_at: string;
+  };
+  Insert: {
+    assists?: number;
+    clean_sheets?: number;
+    goals?: number;
+    minutes?: number;
+    player_id: number;
+    points?: number;
+    red_cards?: number;
+    season_name?: string | null;
+    synced_at?: string;
+  };
+  Update: {
+    assists?: number;
+    clean_sheets?: number;
+    goals?: number;
+    minutes?: number;
+    player_id?: number;
+    points?: number;
+    red_cards?: number;
+    season_name?: string | null;
+    synced_at?: string;
+  };
+  Relationships: [];
+};
+
+type DatabaseWithPlayerPreviousSeasonStatistics = DatabaseGenerated & {
+  public: {
+    Tables: DatabaseGenerated['public']['Tables'] & {
+      player_previous_season_statistics: PlayerPreviousSeasonStatisticsTable;
+    };
+  };
+};
+
 // Override the type for a specific column in a view:
 export type Database = MergeDeep<
-  DatabaseGenerated,
+  DatabaseWithPlayerPreviousSeasonStatistics,
   {
     public: {
       Functions: {

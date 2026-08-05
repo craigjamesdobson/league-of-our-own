@@ -16,9 +16,11 @@ season begins. For those totals, use
 per-season summary, including points, minutes, goals, assists, clean sheets,
 and red cards.
 
-The application fetches this data through the cached
-`GET /api/player-previous-season-stats` endpoint. The upstream FPL API is
-public but does not have an official reference site; the [Postman endpoint
+The application stores this data in the `player_previous_season_statistics`
+table. Populate it once per season with the protected
+`POST /api/sync-player-previous-season-stats` endpoint; the normal player sync
+does not overwrite it. The upstream FPL API is public but does not have an
+official reference site; the [Postman endpoint
 reference](https://www.postman.com/fplassist/fpl-assist/request/fyydugb/element-summary)
 and [FPL data reference](https://james-leslie.github.io/fplstat/data-reference/)
 are useful community documentation.

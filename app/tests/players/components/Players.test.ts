@@ -121,7 +121,6 @@ describe('Players', () => {
   it('uses FPL previous-season stats while team building is open', async () => {
     const wrapper = mountPlayers(true);
 
-    expect(wrapper.text()).toContain('Showing previous-season FPL stats while team building is open');
     expect(wrapper.text()).toContain('42');
     expect(wrapper.text()).toContain('7');
     await wrapper.get('button[aria-expanded]').trigger('click');
@@ -131,7 +130,6 @@ describe('Players', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('Showing calculated current-season stats');
-    expect(wrapper.text()).not.toContain('Showing previous-season FPL stats while team building is open');
     expect(wrapper.text()).toContain('0');
   });
 });

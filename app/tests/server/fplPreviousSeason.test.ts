@@ -24,6 +24,7 @@ describe('getPreviousSeasonStatistics', () => {
       },
     ])).toEqual({
       player_id: 1,
+      season_name: '2025/26',
       previous_season_goals: 0,
       previous_season_assists: 0,
       previous_season_clean_sheets: 19,
@@ -36,6 +37,7 @@ describe('getPreviousSeasonStatistics', () => {
   it('defaults missing history to zeroes', () => {
     expect(getPreviousSeasonStatistics(2, [])).toEqual({
       player_id: 2,
+      season_name: null,
       previous_season_goals: 0,
       previous_season_assists: 0,
       previous_season_clean_sheets: 0,

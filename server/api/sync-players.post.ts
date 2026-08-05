@@ -90,6 +90,19 @@ export default defineEventHandler(async (event) => {
       throw new Error(`Database upsert failed: ${error.message}`);
     }
 
+    const syncTimestamp = new Date().toISOString();
+    const { error: syncStatusError } = await supabase
+      .from('settings')
+      .upsert({
+        setting_key: 'player_data_last_synced_at',
+        setting_value: syncTimestamp,
+        updated_at: syncTimestamp,
+      }, { onConflict: 'setting_key' });
+
+    if (syncStatusError) {
+      throw new Error(`Sync status update failed: ${syncStatusError.message}`);
+    }
+
     return {
       success: true,
       message: `Successfully synced ${formattedPlayerData.length} players`,

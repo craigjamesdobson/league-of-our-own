@@ -113,6 +113,31 @@ CREATE TABLE players (
 - `now_cost`: Player price in FPL points (divided by 10 for display)
 - `status`: Player availability (a=available, i=injured, d=doubtful, s=suspended, u=unavailable)
 
+### `player_previous_season_statistics` - Previous-Season Player Snapshot
+
+**Purpose**: Durable snapshot of the most recent completed FPL season used to
+help users choose teams before the new season begins.
+
+```sql
+CREATE TABLE player_previous_season_statistics (
+    player_id integer PRIMARY KEY,
+    season_name text,
+    minutes integer NOT NULL DEFAULT 0,
+    goals integer NOT NULL DEFAULT 0,
+    assists integer NOT NULL DEFAULT 0,
+    clean_sheets integer NOT NULL DEFAULT 0,
+    red_cards integer NOT NULL DEFAULT 0,
+    points integer NOT NULL DEFAULT 0,
+    synced_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+This table intentionally has no foreign key to `players`. The current player
+reference data is replaced during season rollover, while this snapshot must
+remain available across that replacement. It is populated once per season by
+the protected `POST /api/sync-player-previous-season-stats` endpoint and is
+read by the player store in one query.
+
 ### 3. `drafted_teams` - Fantasy Teams
 
 **Purpose**: User-created fantasy teams with budget and transfer management.

@@ -26,6 +26,7 @@ import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
 import { getPositionName } from '@/utils/playerPosition';
 import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
+import { isTeamRegistrationOpen } from '~~/shared/utils/appSettings';
 
 const playerStore = usePlayerStore();
 
@@ -58,6 +59,8 @@ const pagination = ref<PaginationState>({
 const playerSearch = ref('');
 const debouncedPlayerSearch = refDebounced(playerSearch, 250);
 const mobileFiltersOpen = ref(false);
+const statsDisplayTime = ref(new Date());
+let statsDisplayInterval: ReturnType<typeof setInterval> | undefined;
 const UBadge = resolveComponent('UBadge');
 const UButton = resolveComponent('UButton');
 const UPopover = resolveComponent('UPopover');
@@ -151,7 +154,54 @@ const mobileSortOptions = [
   { label: 'Player', value: 'player' },
 ] satisfies { label: string; value: SortOptionId }[];
 
-const players = computed(() => playerStore.getPlayers);
+const { teamRegistrationOpen, teamSubmissionDeadline } = useAppSettings();
+
+const showPreviousSeasonStats = computed(() => isTeamRegistrationOpen({
+  teamRegistrationOpen: teamRegistrationOpen.value,
+  teamSubmissionDeadline: teamSubmissionDeadline.value,
+}, statsDisplayTime.value));
+
+const players = computed<PlayerTableRow[]>(() => playerStore.getPlayers.map((player) => {
+  if (!showPreviousSeasonStats.value) {
+    return player;
+  }
+
+  return {
+    ...player,
+    season_goals: player.previous_season_goals,
+    season_assists: player.previous_season_assists,
+    season_clean_sheets: player.previous_season_clean_sheets,
+    season_red_cards: player.previous_season_red_cards,
+    season_points: player.previous_season_points,
+    minutes: player.previous_season_minutes,
+  };
+}));
+
+const statsDisplayLabel = computed(() => showPreviousSeasonStats.value
+  ? null
+  : 'Showing calculated current-season stats');
+
+const formattedPlayerUpdatedDate = computed(() => {
+  const updatedAt = playerStore.getPlayerDataLastSyncedAt;
+
+  if (!updatedAt) {
+    return null;
+  }
+
+  const date = new Date(updatedAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+});
 
 const activeFilterCount = computed(() => {
   return columnFilters.value.length;
@@ -694,6 +744,18 @@ const visibleRange = computed(() => {
 
   return `${start}-${end} of ${filteredRowCount.value} players`;
 });
+
+onMounted(() => {
+  statsDisplayInterval = setInterval(() => {
+    statsDisplayTime.value = new Date();
+  }, 60_000);
+});
+
+onBeforeUnmount(() => {
+  if (statsDisplayInterval) {
+    clearInterval(statsDisplayInterval);
+  }
+});
 </script>
 
 <template>
@@ -703,35 +765,81 @@ const visibleRange = computed(() => {
     class="w-full"
   >
     <div class="w-full rounded-md border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
-      <div class="flex flex-col gap-4 border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-        <div class="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-          <div>
+      <div class="border-b border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div class="min-w-0">
             <h1 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
               Players
             </h1>
+            <p
+              v-if="statsDisplayLabel"
+              class="mt-0.5 text-xs text-slate-500 dark:text-slate-400"
+            >
+              {{ statsDisplayLabel }}
+            </p>
+          </div>
+          <div class="flex w-full shrink-0 flex-col gap-2 lg:w-auto lg:items-end">
             <p class="text-sm text-slate-600 dark:text-slate-300">
               {{ visibleRange }}
             </p>
+            <div class="flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto">
+              <UInput
+                v-model="playerSearch"
+                icon="tabler:search"
+                placeholder="Search players"
+                size="sm"
+                class="w-full sm:w-64"
+              />
+              <UButton
+                icon="lucide:rotate-ccw"
+                label="Reset"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :disabled="!canResetTable"
+                class="dark:!text-slate-100 dark:hover:!bg-slate-800"
+                @click="resetFilters"
+              />
+            </div>
           </div>
-          <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-            <UInput
-              v-model="playerSearch"
-              icon="tabler:search"
-              placeholder="Search players"
-              size="sm"
-              class="w-full sm:w-64"
-            />
-            <UButton
-              icon="lucide:rotate-ccw"
-              label="Reset"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              :disabled="!canResetTable"
-              class="dark:!text-slate-100 dark:hover:!bg-slate-800"
-              @click="resetFilters"
-            />
-          </div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900 sm:flex-row">
+        <div
+          v-if="showPreviousSeasonStats && playerStore.getPreviousSeasonStatisticsAvailable"
+          class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-info/10 px-3 py-2 text-xs text-info"
+        >
+          <UIcon
+            name="lucide:info"
+            class="mt-0.5 size-4 shrink-0"
+          />
+          <p class="leading-4">
+            <span class="font-semibold">Previous-season stats:</span>
+            last season's FPL stats are shown as a guide while you build your team.
+          </p>
+        </div>
+        <div
+          v-else-if="showPreviousSeasonStats"
+          class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-warning/10 px-3 py-2 text-xs text-warning"
+        >
+          <UIcon
+            name="lucide:triangle-alert"
+            class="mt-0.5 size-4 shrink-0"
+          />
+          <p class="leading-4">
+            <span class="font-semibold">Previous-season stats:</span>
+            the seasonal data sync has not completed yet.
+          </p>
+        </div>
+        <div class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-success/10 px-3 py-2 text-xs text-success">
+          <UIcon
+            name="lucide:refresh-cw"
+            class="mt-0.5 size-4 shrink-0"
+          />
+          <p class="leading-4">
+            <span class="font-semibold">Data refreshed daily:</span>
+            last sync {{ formattedPlayerUpdatedDate ?? 'not recorded yet' }}.
+          </p>
         </div>
       </div>
 

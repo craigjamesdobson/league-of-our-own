@@ -10,7 +10,17 @@ interface PlayerSeasonStatistics {
   season_points: number;
 }
 
-type PlayerWithSeasonStatistics = Player & PlayerSeasonStatistics;
+interface PlayerPreviousSeasonStatistics {
+  player_id: number;
+  previous_season_goals: number;
+  previous_season_assists: number;
+  previous_season_clean_sheets: number;
+  previous_season_red_cards: number;
+  previous_season_points: number;
+  previous_season_minutes: number;
+}
+
+type PlayerWithSeasonStatistics = Player & PlayerSeasonStatistics & PlayerPreviousSeasonStatistics;
 
 interface PlayerInsertData extends Tables<'players'> {
   id: number;
@@ -24,4 +34,11 @@ interface PlayerWithStats extends Player {
   week_points: number;
 }
 
-export type { Player, PlayerSeasonStatistics, PlayerWithSeasonStatistics, PlayerWithStats, PlayerInsertData };
+export type {
+  Player,
+  PlayerPreviousSeasonStatistics,
+  PlayerSeasonStatistics,
+  PlayerWithSeasonStatistics,
+  PlayerWithStats,
+  PlayerInsertData,
+};

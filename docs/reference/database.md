@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-05*
 
 ## Overview
 
@@ -112,6 +112,31 @@ CREATE TABLE players (
 - `element_type`: 1=Goalkeeper, 2=Defender, 3=Midfielder, 4=Forward
 - `now_cost`: Player price in FPL points (divided by 10 for display)
 - `status`: Player availability (a=available, i=injured, d=doubtful, s=suspended, u=unavailable)
+
+### `player_previous_season_statistics` - Previous-Season Player Snapshot
+
+**Purpose**: Durable snapshot of the most recent completed FPL season used to
+help users choose teams before the new season begins.
+
+```sql
+CREATE TABLE player_previous_season_statistics (
+    player_id integer PRIMARY KEY,
+    season_name text,
+    minutes integer NOT NULL DEFAULT 0,
+    goals integer NOT NULL DEFAULT 0,
+    assists integer NOT NULL DEFAULT 0,
+    clean_sheets integer NOT NULL DEFAULT 0,
+    red_cards integer NOT NULL DEFAULT 0,
+    points integer NOT NULL DEFAULT 0,
+    synced_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+This table intentionally has no foreign key to `players`. The current player
+reference data is replaced during season rollover, while this snapshot must
+remain available across that replacement. It is populated once per season by
+the protected `POST /api/sync-player-previous-season-stats` endpoint and is
+read by the player store in one query.
 
 ### 3. `drafted_teams` - Fantasy Teams
 
@@ -357,6 +382,13 @@ LEFT JOIN teams t ON p.team = t.id;
 -- Season-aware: Filters teams by active_season parameter
 -- Used for: Weekly performance tracking, league table generation
 ```
+
+#### `players_view`
+
+The public player view includes the FPL reference fields used by the player
+search, including `total_points`. While team building is open, the search uses
+these FPL fields as previous-season reference stats; after registration closes,
+it uses the app-calculated totals from `player_statistics`.
 
 #### `get_player_stats_by_team_id(team_id integer)`
 ```sql

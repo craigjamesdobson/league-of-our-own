@@ -7,6 +7,22 @@ Server-side endpoints and integrations for this application.
 ### Server Endpoints
 - **[Server Endpoints](server-endpoints.md)** - Nitro API routes (email, etc.)
 
+### Fantasy Premier League API
+
+`bootstrap-static/` supplies the current player catalogue and live-season
+fields. It does not provide the completed previous-season totals once the new
+season begins. For those totals, use
+`element-summary/{player_id}/`; its `history_past` array contains each player's
+per-season summary, including points, minutes, goals, assists, clean sheets,
+and red cards.
+
+The application fetches this data through the cached
+`GET /api/player-previous-season-stats` endpoint. The upstream FPL API is
+public but does not have an official reference site; the [Postman endpoint
+reference](https://www.postman.com/fplassist/fpl-assist/request/fyydugb/element-summary)
+and [FPL data reference](https://james-leslie.github.io/fplstat/data-reference/)
+are useful community documentation.
+
 ## Supabase Integration
 
 Database queries use type-safe Supabase client:
@@ -37,4 +53,4 @@ See [Database Reference](../database.md) for schema.
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-08-05

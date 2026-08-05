@@ -168,11 +168,12 @@ const players = computed<PlayerTableRow[]>(() => playerStore.getPlayers.map((pla
 
   return {
     ...player,
-    season_goals: player.goals_scored ?? 0,
-    season_assists: player.assists ?? 0,
-    season_clean_sheets: player.clean_sheets ?? 0,
-    season_red_cards: player.red_cards ?? 0,
-    season_points: player.total_points ?? 0,
+    season_goals: player.previous_season_goals,
+    season_assists: player.previous_season_assists,
+    season_clean_sheets: player.previous_season_clean_sheets,
+    season_red_cards: player.previous_season_red_cards,
+    season_points: player.previous_season_points,
+    minutes: player.previous_season_minutes,
   };
 }));
 

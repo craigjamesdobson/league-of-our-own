@@ -36,11 +36,17 @@ const mountPlayers = (registrationOpen = false) => {
       ...createMockPlayer({
         player_id: 1,
         web_name: 'Bukayo Saka',
-        goals_scored: 7,
-        assists: 4,
-        clean_sheets: 6,
-        red_cards: 1,
-        total_points: 42,
+        goals_scored: 0,
+        assists: 0,
+        clean_sheets: 0,
+        red_cards: 0,
+        total_points: 0,
+        previous_season_goals: 7,
+        previous_season_assists: 4,
+        previous_season_clean_sheets: 6,
+        previous_season_red_cards: 1,
+        previous_season_points: 42,
+        previous_season_minutes: 3330,
       }),
       season_goals: 0,
       season_assists: 0,
@@ -52,11 +58,17 @@ const mountPlayers = (registrationOpen = false) => {
       ...createMockPlayer({
         player_id: 2,
         web_name: 'Erling Haaland',
-        goals_scored: 5,
-        assists: 3,
-        clean_sheets: 2,
+        goals_scored: 0,
+        assists: 0,
+        clean_sheets: 0,
         red_cards: 0,
-        total_points: 30,
+        total_points: 0,
+        previous_season_goals: 5,
+        previous_season_assists: 3,
+        previous_season_clean_sheets: 2,
+        previous_season_red_cards: 0,
+        previous_season_points: 30,
+        previous_season_minutes: 2500,
       }),
       season_goals: 0,
       season_assists: 0,
@@ -112,6 +124,8 @@ describe('Players', () => {
     expect(wrapper.text()).toContain('Showing previous-season FPL stats while team building is open');
     expect(wrapper.text()).toContain('42');
     expect(wrapper.text()).toContain('7');
+    await wrapper.get('button[aria-expanded]').trigger('click');
+    expect(wrapper.text()).toContain('3330 mins');
 
     teamRegistrationOpen.value = false;
     await wrapper.vm.$nextTick();

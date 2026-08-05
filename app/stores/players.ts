@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import type {
   Player,
   PlayerInsertData,
+  PlayerPreviousSeasonStatistics,
   PlayerSeasonStatistics,
   PlayerWithSeasonStatistics,
 } from '~/types/Player';
@@ -16,6 +17,16 @@ const emptyPlayerSeasonStatistics = (): PlayerSeasonStatistics => ({
   season_clean_sheets: 0,
   season_red_cards: 0,
   season_points: 0,
+});
+
+const emptyPreviousSeasonStatistics = (playerId: number): PlayerPreviousSeasonStatistics => ({
+  player_id: playerId,
+  previous_season_goals: 0,
+  previous_season_assists: 0,
+  previous_season_clean_sheets: 0,
+  previous_season_red_cards: 0,
+  previous_season_points: 0,
+  previous_season_minutes: 0,
 });
 
 const aggregatePlayerStatistics = (playerStatistics: PlayerStatisticRow[]) => {
@@ -37,12 +48,17 @@ const aggregatePlayerStatistics = (playerStatistics: PlayerStatisticRow[]) => {
 const mergePlayersWithSeasonStatistics = (
   players: Player[],
   playerStatistics: PlayerStatisticRow[],
+  previousSeasonStatistics: PlayerPreviousSeasonStatistics[] = [],
 ): PlayerWithSeasonStatistics[] => {
   const statisticsByPlayerId = aggregatePlayerStatistics(playerStatistics);
+  const previousSeasonStatisticsByPlayerId = new Map(
+    previousSeasonStatistics.map(statistics => [statistics.player_id, statistics]),
+  );
 
   return players.map(player => ({
     ...player,
     ...(statisticsByPlayerId.get(player.player_id) ?? emptyPlayerSeasonStatistics()),
+    ...(previousSeasonStatisticsByPlayerId.get(player.player_id) ?? emptyPreviousSeasonStatistics(player.player_id)),
   }));
 };
 
@@ -81,6 +97,20 @@ export const usePlayerStore = defineStore('player-store', () => {
       players.value = mergePlayersWithSeasonStatistics(playerData ?? [], playerStatisticsData ?? []);
       await fetchPlayerUpdatedDate();
       isLoaded.value = true;
+
+      try {
+        const previousSeasonStatistics = await $fetch<PlayerPreviousSeasonStatistics[]>(
+          '/api/player-previous-season-stats',
+        );
+        players.value = mergePlayersWithSeasonStatistics(
+          playerData ?? [],
+          playerStatisticsData ?? [],
+          previousSeasonStatistics,
+        );
+      }
+      catch (previousSeasonError) {
+        console.warn('Could not load previous-season player statistics:', previousSeasonError);
+      }
     }
     catch (error) {
       if (typeof error === 'object' && error !== null && 'message' in error) {

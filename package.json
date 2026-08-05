@@ -20,6 +20,7 @@
     "db:reset:clean": "supabase db reset --no-seed",
     "db:reset:fpl": "supabase db reset --no-seed && TMPDIR=/tmp tsx scripts/seed-fpl-development.ts",
     "season:import": "bash scripts/import-season-data.sh",
+    "season:sync-previous-stats": "TMPDIR=/tmp tsx scripts/sync-previous-season-stats.ts",
     "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs"
   },
   "dependencies": {

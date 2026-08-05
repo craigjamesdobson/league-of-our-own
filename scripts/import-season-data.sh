@@ -13,7 +13,7 @@ if [[ "$TARGET" != "staging" && "$TARGET" != "production" ]]; then
   exit 1
 fi
 
-for command_name in curl node; do
+for command_name in curl node pnpm; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     printf 'Required command is not installed: %s\n' "$command_name" >&2
     exit 1
@@ -80,7 +80,8 @@ call_sync_endpoint() {
 
 call_sync_endpoint "sync-teams" "teamsCount" 20
 call_sync_endpoint "sync-players" "playersCount"
-call_sync_endpoint "sync-player-previous-season-stats" "statsCount"
+printf 'Running the Node previous-season statistics import...\n'
+pnpm season:sync-previous-stats
 call_sync_endpoint "sync-fixtures" "fixturesCount" 380
 unset SYNC_API_KEY
 

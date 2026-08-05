@@ -19,6 +19,18 @@ export interface PreviousSeasonPlayerStatistics {
   previous_season_minutes: number;
 }
 
+export interface PreviousSeasonStatisticsRow {
+  player_id: number;
+  season_name: string | null;
+  minutes: number;
+  goals: number;
+  assists: number;
+  clean_sheets: number;
+  red_cards: number;
+  points: number;
+  synced_at: string;
+}
+
 export interface FplElementSummary {
   history_past?: FplHistoryPast[];
 }
@@ -44,6 +56,21 @@ export const getPreviousSeasonStatistics = (
     previous_season_minutes: latestSeason?.minutes ?? 0,
   };
 };
+
+export const buildPreviousSeasonStatisticsRows = (
+  statistics: PreviousSeasonPlayerStatistics[],
+  syncedAt: string,
+): PreviousSeasonStatisticsRow[] => statistics.map(statistic => ({
+  player_id: statistic.player_id,
+  season_name: statistic.season_name,
+  minutes: statistic.previous_season_minutes,
+  goals: statistic.previous_season_goals,
+  assists: statistic.previous_season_assists,
+  clean_sheets: statistic.previous_season_clean_sheets,
+  red_cards: statistic.previous_season_red_cards,
+  points: statistic.previous_season_points,
+  synced_at: syncedAt,
+}));
 
 const FPL_BOOTSTRAP_URL = 'https://fantasy.premierleague.com/api/bootstrap-static';
 const FPL_ELEMENT_SUMMARY_URL = 'https://fantasy.premierleague.com/api/element-summary';

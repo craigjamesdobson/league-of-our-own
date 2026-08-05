@@ -135,8 +135,8 @@ CREATE TABLE player_previous_season_statistics (
 This table intentionally has no foreign key to `players`. The current player
 reference data is replaced during season rollover, while this snapshot must
 remain available across that replacement. It is populated once per season by
-the protected `POST /api/sync-player-previous-season-stats` endpoint and is
-read by the player store in one query.
+the Node `pnpm season:sync-previous-stats` import and is read by the player
+store in one query.
 
 ### 3. `drafted_teams` - Fantasy Teams
 

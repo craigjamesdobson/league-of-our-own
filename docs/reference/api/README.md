@@ -17,10 +17,12 @@ per-season summary, including points, minutes, goals, assists, clean sheets,
 and red cards.
 
 The application stores this data in the `player_previous_season_statistics`
-table. Populate it once per season with the protected
-`POST /api/sync-player-previous-season-stats` endpoint; the normal player sync
-does not overwrite it. The upstream FPL API is public but does not have an
-official reference site; the [Postman endpoint
+table. Populate it once per season with the Node
+`pnpm season:sync-previous-stats` import, entering the target Supabase URL and
+service-role key when prompted. The normal player sync does not overwrite it.
+The import runs outside the deployed application so it can fetch the complete
+player set without Cloudflare request limits. The upstream FPL API is public but
+does not have an official reference site; the [Postman endpoint
 reference](https://www.postman.com/fplassist/fpl-assist/request/fyydugb/element-summary)
 and [FPL data reference](https://james-leslie.github.io/fplstat/data-reference/)
 are useful community documentation.

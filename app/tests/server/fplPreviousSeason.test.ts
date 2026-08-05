@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { getPreviousSeasonStatistics } from '../../../server/utils/fplPreviousSeason';
+import {
+  buildPreviousSeasonStatisticsRows,
+  getPreviousSeasonStatistics,
+} from '../../../server/utils/fplPreviousSeason';
 
 describe('getPreviousSeasonStatistics', () => {
   it('selects the latest completed season from FPL history', () => {
@@ -45,5 +48,30 @@ describe('getPreviousSeasonStatistics', () => {
       previous_season_points: 0,
       previous_season_minutes: 0,
     });
+  });
+});
+
+describe('buildPreviousSeasonStatisticsRows', () => {
+  it('maps the fetched statistics to the durable snapshot shape', () => {
+    expect(buildPreviousSeasonStatisticsRows([{
+      player_id: 1,
+      season_name: '2025/26',
+      previous_season_goals: 7,
+      previous_season_assists: 4,
+      previous_season_clean_sheets: 6,
+      previous_season_red_cards: 1,
+      previous_season_points: 42,
+      previous_season_minutes: 3330,
+    }], '2026-08-05T22:00:00.000Z')).toEqual([{
+      player_id: 1,
+      season_name: '2025/26',
+      minutes: 3330,
+      goals: 7,
+      assists: 4,
+      clean_sheets: 6,
+      red_cards: 1,
+      points: 42,
+      synced_at: '2026-08-05T22:00:00.000Z',
+    }]);
   });
 });

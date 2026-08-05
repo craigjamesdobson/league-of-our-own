@@ -49,6 +49,7 @@ export type Database = MergeDeep<
             is_unavailable: boolean;
             news: string;
             player_id: number;
+            total_points: number;
             position: number;
             red_cards: number;
             second_name: string;

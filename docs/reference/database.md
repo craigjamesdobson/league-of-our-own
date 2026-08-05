@@ -356,6 +356,13 @@ LEFT JOIN teams t ON p.team = t.id;
 -- Used for: Weekly performance tracking, league table generation
 ```
 
+#### `players_view`
+
+The public player view includes the FPL reference fields used by the player
+search, including `total_points`. While team building is open, the search uses
+these FPL fields as previous-season reference stats; after registration closes,
+it uses the app-calculated totals from `player_statistics`.
+
 #### `get_player_stats_by_team_id(team_id integer)`
 ```sql
 -- Returns players with cumulative statistics for a specific team

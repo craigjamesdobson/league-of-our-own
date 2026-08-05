@@ -26,6 +26,7 @@ import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
 import { getPositionName } from '@/utils/playerPosition';
 import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
+import { isTeamRegistrationOpen } from '~~/shared/utils/appSettings';
 
 const playerStore = usePlayerStore();
 
@@ -58,6 +59,8 @@ const pagination = ref<PaginationState>({
 const playerSearch = ref('');
 const debouncedPlayerSearch = refDebounced(playerSearch, 250);
 const mobileFiltersOpen = ref(false);
+const statsDisplayTime = ref(new Date());
+let statsDisplayInterval: ReturnType<typeof setInterval> | undefined;
 const UBadge = resolveComponent('UBadge');
 const UButton = resolveComponent('UButton');
 const UPopover = resolveComponent('UPopover');
@@ -151,7 +154,31 @@ const mobileSortOptions = [
   { label: 'Player', value: 'player' },
 ] satisfies { label: string; value: SortOptionId }[];
 
-const players = computed(() => playerStore.getPlayers);
+const { teamRegistrationOpen, teamSubmissionDeadline } = useAppSettings();
+
+const showPreviousSeasonStats = computed(() => isTeamRegistrationOpen({
+  teamRegistrationOpen: teamRegistrationOpen.value,
+  teamSubmissionDeadline: teamSubmissionDeadline.value,
+}, statsDisplayTime.value));
+
+const players = computed<PlayerTableRow[]>(() => playerStore.getPlayers.map((player) => {
+  if (!showPreviousSeasonStats.value) {
+    return player;
+  }
+
+  return {
+    ...player,
+    season_goals: player.goals_scored ?? 0,
+    season_assists: player.assists ?? 0,
+    season_clean_sheets: player.clean_sheets ?? 0,
+    season_red_cards: player.red_cards ?? 0,
+    season_points: player.total_points ?? 0,
+  };
+}));
+
+const statsDisplayLabel = computed(() => showPreviousSeasonStats.value
+  ? 'Showing previous-season FPL stats while team building is open'
+  : 'Showing calculated current-season stats');
 
 const activeFilterCount = computed(() => {
   return columnFilters.value.length;
@@ -694,6 +721,18 @@ const visibleRange = computed(() => {
 
   return `${start}-${end} of ${filteredRowCount.value} players`;
 });
+
+onMounted(() => {
+  statsDisplayInterval = setInterval(() => {
+    statsDisplayTime.value = new Date();
+  }, 60_000);
+});
+
+onBeforeUnmount(() => {
+  if (statsDisplayInterval) {
+    clearInterval(statsDisplayInterval);
+  }
+});
 </script>
 
 <template>
@@ -711,6 +750,9 @@ const visibleRange = computed(() => {
             </h1>
             <p class="text-sm text-slate-600 dark:text-slate-300">
               {{ visibleRange }}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              {{ statsDisplayLabel }}
             </p>
           </div>
           <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">

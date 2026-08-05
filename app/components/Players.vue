@@ -806,7 +806,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="flex flex-col gap-2 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900 sm:flex-row">
         <div
-          v-if="showPreviousSeasonStats"
+          v-if="showPreviousSeasonStats && playerStore.getPreviousSeasonStatisticsAvailable"
           class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-info/10 px-3 py-2 text-xs text-info"
         >
           <UIcon
@@ -816,6 +816,19 @@ onBeforeUnmount(() => {
           <p class="leading-4">
             <span class="font-semibold">Previous-season stats:</span>
             last season's FPL stats are shown as a guide while you build your team.
+          </p>
+        </div>
+        <div
+          v-else-if="showPreviousSeasonStats"
+          class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-warning/10 px-3 py-2 text-xs text-warning"
+        >
+          <UIcon
+            name="lucide:triangle-alert"
+            class="mt-0.5 size-4 shrink-0"
+          />
+          <p class="leading-4">
+            <span class="font-semibold">Previous-season stats:</span>
+            the seasonal data sync has not completed yet.
           </p>
         </div>
         <div class="flex min-w-0 flex-1 items-start gap-2 rounded-md bg-success/10 px-3 py-2 text-xs text-success">

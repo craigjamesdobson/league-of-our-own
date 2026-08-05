@@ -79,6 +79,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   const players: Ref<PlayerWithSeasonStatistics[]> = ref([]);
   const clubs: Ref<Club[]> = ref([]);
   const playerDataLastSyncedAt: Ref<string | null> = ref(null);
+  const previousSeasonStatisticsAvailable = ref(false);
   const isLoaded = ref(false);
 
   const fetchPlayers = async () => {
@@ -114,6 +115,9 @@ export const usePlayerStore = defineStore('player-store', () => {
       if (previousSeasonStatisticsError) {
         console.warn('Could not load previous-season player statistics:', previousSeasonStatisticsError.message);
       }
+
+      previousSeasonStatisticsAvailable.value = !previousSeasonStatisticsError
+        && (previousSeasonStatisticsData?.length ?? 0) > 0;
 
       players.value = mergePlayersWithSeasonStatistics(
         playerData ?? [],
@@ -227,6 +231,7 @@ export const usePlayerStore = defineStore('player-store', () => {
   };
 
   const getPlayerDataLastSyncedAt = computed(() => playerDataLastSyncedAt.value);
+  const getPreviousSeasonStatisticsAvailable = computed(() => previousSeasonStatisticsAvailable.value);
 
   const getPlayerByID = computed(
     () => (id: number) => players.value.find(x => x.player_id === id),
@@ -245,6 +250,7 @@ export const usePlayerStore = defineStore('player-store', () => {
     getClubs,
     getPlayerByID,
     getPlayerDataLastSyncedAt,
+    getPreviousSeasonStatisticsAvailable,
   };
 });
 

@@ -29,6 +29,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const statistics = await fetchPreviousSeasonStatistics();
+    const syncedAt = new Date().toISOString();
     const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
     const { error } = await supabase
       .from('player_previous_season_statistics')
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
           clean_sheets: statistic.previous_season_clean_sheets,
           red_cards: statistic.previous_season_red_cards,
           points: statistic.previous_season_points,
+          synced_at: syncedAt,
         })),
         { onConflict: 'player_id' },
       );

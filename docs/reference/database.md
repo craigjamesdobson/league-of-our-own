@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-05*
+*Last updated: 2026-08-07*
 
 ## Overview
 
@@ -136,7 +136,10 @@ This table intentionally has no foreign key to `players`. The current player
 reference data is replaced during season rollover, while this snapshot must
 remain available across that replacement. It is populated once per season by
 the Node `pnpm season:sync-previous-stats` import and is read by the player
-store in one query.
+store in one query. Historical `assists` and `clean_sheets` are retained as
+supplied by FPL. The team-builder display normalizes only `clean_sheets` to
+zero for midfielders and forwards; assists remain visible for all positions.
+Goalkeepers and defenders retain their clean-sheet values when displayed.
 
 ### 3. `drafted_teams` - Fantasy Teams
 

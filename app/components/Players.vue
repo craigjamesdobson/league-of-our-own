@@ -23,6 +23,7 @@ import { h, resolveComponent } from 'vue';
 import { usePlayerStore } from '@/stores/players';
 import { populateFilterPrices } from '@/utils/filters';
 import { loadPlayerFallbackImage, getImageUrl } from '@/utils/images';
+import { getHistoricalCleanSheetsForDisplay } from '@/utils/playerHistoricalStats';
 import { getPositionName } from '@/utils/playerPosition';
 import type { PlayerWithSeasonStatistics } from '~/types/Player';
 import { PlayerPosition } from '~/types/PlayerPosition';
@@ -166,11 +167,16 @@ const players = computed<PlayerTableRow[]>(() => playerStore.getPlayers.map((pla
     return player;
   }
 
+  const historicalCleanSheets = getHistoricalCleanSheetsForDisplay(
+    player.position,
+    player.previous_season_clean_sheets,
+  );
+
   return {
     ...player,
     season_goals: player.previous_season_goals,
     season_assists: player.previous_season_assists,
-    season_clean_sheets: player.previous_season_clean_sheets,
+    season_clean_sheets: historicalCleanSheets,
     season_red_cards: player.previous_season_red_cards,
     season_points: player.previous_season_points,
     minutes: player.previous_season_minutes,
@@ -815,7 +821,7 @@ onBeforeUnmount(() => {
           />
           <p class="leading-4">
             <span class="font-semibold">Previous-season stats:</span>
-            last season's FPL stats are shown as a guide while you build your team.
+            previous-season Fantasy Premier League stats are shown as a guide for picking your team; they are indicative, not an exact scoring projection.
           </p>
         </div>
         <div

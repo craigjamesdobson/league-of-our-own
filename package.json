@@ -13,12 +13,15 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
+    "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts",
+    "db:restore-local": "./scripts/db-restore-local.sh",
+    "db:restore-staging": "./scripts/db-restore-staging.sh",
+    "db:rebuild-staging": "./scripts/db-rebuild-staging.sh",
     "db:reset:clean": "supabase db reset --no-seed",
     "db:reset:fpl": "supabase db reset --no-seed && TMPDIR=/tmp tsx scripts/seed-fpl-development.ts",
     "season:import": "bash scripts/import-season-data.sh",
-    "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs",
-    "generate-types": "npx supabase gen types typescript --project-id jcjsymrofqoppfuacfqv > types/database-generated.types.ts",
-    "generate-types:local": "npx supabase gen types typescript --local > types/database-generated.types.ts"
+    "season:sync-previous-stats": "TMPDIR=/tmp tsx scripts/sync-previous-season-stats.ts",
+    "generate-fixtures:2627": "node scripts/generate-fpl-fixture-seed.mjs"
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",

@@ -1,11 +1,12 @@
 # Season rollover runbook
 
-**Last updated:** 2026-08-03
+**Last updated:** 2026-08-05
 
 Use this runbook first in staging and then in production. The SQL remains a
 deliberate manual operation because archiving and clearing operational data are
-the important, destructive parts of the rollover. The import script only calls
-the protected teams, players, and fixtures endpoints and validates their output.
+the important, destructive parts of the rollover. The import script calls the
+protected teams, players, and fixtures endpoints and runs the previous-season
+statistics import directly from Node.
 
 This runbook is currently configured for moving from 2025/26 (`25-26`) to
 2026/27 (`26-27`). Review those values before using it for a later Season.
@@ -13,8 +14,10 @@ This runbook is currently configured for moving from 2025/26 (`25-26`) to
 ## Before starting
 
 - Deploy the exact Season-preparation commit and all migrations to the target.
-- Confirm `SYNC_API_KEY`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` are
-  configured for the deployed application.
+- Confirm the target application's `SYNC_API_KEY` and the target Supabase URL
+  and service-role key are available to the import operator. The Node import
+  prompts for the Supabase values and does not persist them or require them in
+  the deployed application.
 - Confirm a current, restorable Supabase backup exists.
 - Pause the player-sync cron manually.
 - Record whether the target is staging or production and verify every URL before
@@ -116,13 +119,15 @@ For production, use:
 pnpm season:import -- production
 ```
 
-The script asks for the deployed application URL, requires the target name to be
-typed again, and reads `SYNC_API_KEY` with hidden input. It then imports in the
-required order:
+The script asks for the deployed application URL and the target Supabase URL,
+requires the target name to be typed again, and reads `SYNC_API_KEY` with hidden
+input. The Node importer then prompts for the Supabase service-role key with
+hidden input. It imports in the required order:
 
 1. Exactly 20 clubs.
 2. A positive number of current players.
-3. Exactly 380 fixtures across the Season.
+3. The previous-season statistics import completes for the current FPL player set.
+4. Exactly 380 fixtures across the Season.
 
 It also checks that `/` and `/team-builder` return successful HTTP responses.
 The key is held only for the process lifetime and is not written to disk.
@@ -208,7 +213,7 @@ endpoint response or SQL error. Then use the applicable recovery path:
 | Before the archive succeeds | Fix the target or validation problem. No data has been cleared, so a restore is not required. |
 | Archive call fails | Do not clear. Confirm whether the transaction rolled back before retrying. If the archived Season exists, inspect it instead of running the one-off archive again. |
 | Archive succeeds but validation fails | Do not clear or rerun the archive. Investigate the archived rows and recorded counts. Restore only if the operational data or archive was corrupted. |
-| After clear, during an import | Fix the endpoint or configuration problem and rerun `pnpm season:import` from the beginning. The three imports use database upserts and are safe to retry before submissions reopen. |
+| After clear, during an import | Fix the endpoint or configuration problem and rerun `pnpm season:import` from the beginning. The imports use database upserts and are safe to retry before submissions reopen. |
 | After the settings switch or after submissions reopen | Immediately set `site_open`, `league_data_public`, and `team_registration_open` to `false`. Restore the pre-rollover backup if operational data is incorrect and cannot be safely repaired. |
 
 After any backup restoration, re-check the target record, archived Season,

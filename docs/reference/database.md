@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-07*
 
 ## Overview
 
@@ -112,6 +112,34 @@ CREATE TABLE players (
 - `element_type`: 1=Goalkeeper, 2=Defender, 3=Midfielder, 4=Forward
 - `now_cost`: Player price in FPL points (divided by 10 for display)
 - `status`: Player availability (a=available, i=injured, d=doubtful, s=suspended, u=unavailable)
+
+### `player_previous_season_statistics` - Previous-Season Player Snapshot
+
+**Purpose**: Durable snapshot of the most recent completed FPL season used to
+help users choose teams before the new season begins.
+
+```sql
+CREATE TABLE player_previous_season_statistics (
+    player_id integer PRIMARY KEY,
+    season_name text,
+    minutes integer NOT NULL DEFAULT 0,
+    goals integer NOT NULL DEFAULT 0,
+    assists integer NOT NULL DEFAULT 0,
+    clean_sheets integer NOT NULL DEFAULT 0,
+    red_cards integer NOT NULL DEFAULT 0,
+    points integer NOT NULL DEFAULT 0,
+    synced_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+This table intentionally has no foreign key to `players`. The current player
+reference data is replaced during season rollover, while this snapshot must
+remain available across that replacement. It is populated once per season by
+the Node `pnpm season:sync-previous-stats` import and is read by the player
+store in one query. Historical `assists` and `clean_sheets` are retained as
+supplied by FPL. The team-builder display normalizes only `clean_sheets` to
+zero for midfielders and forwards; assists remain visible for all positions.
+Goalkeepers and defenders retain their clean-sheet values when displayed.
 
 ### 3. `drafted_teams` - Fantasy Teams
 
@@ -344,17 +372,26 @@ LEFT JOIN teams t ON p.team = t.id;
 -- Used for: Team management displays, admin overview
 ```
 
-#### `get_drafted_teams_by_season(season text)`
+#### `get_drafted_teams_by_season(active_season_param text)`
 ```sql
--- Returns teams filtered by season
--- Used for: Season-specific team listings
+-- Returns teams filtered by season with admin metadata
+-- Enhanced: Now includes created_at, updated_at, edited_count fields
+-- Used for: Season-specific team listings, admin team management
 ```
 
-#### `get_drafted_teams_with_player_points_by_gameweek(week integer)`
+#### `get_drafted_teams_with_player_points_by_gameweek(game_week_param integer, active_season_param text)`
 ```sql
--- Returns teams with player points for specific gameweek
+-- Returns teams with player points for specific gameweek and season
+-- Season-aware: Filters teams by active_season parameter
 -- Used for: Weekly performance tracking, league table generation
 ```
+
+#### `players_view`
+
+The public player view includes the FPL reference fields used by the player
+search, including `total_points`. While team building is open, the search uses
+these FPL fields as previous-season reference stats; after registration closes,
+it uses the app-calculated totals from `player_statistics`.
 
 #### `get_player_stats_by_team_id(team_id integer)`
 ```sql
@@ -362,9 +399,10 @@ LEFT JOIN teams t ON p.team = t.id;
 -- Used for: Team performance analysis
 ```
 
-#### `get_weekly_stats_for_gameweek(week integer)`
+#### `get_weekly_stats_for_gameweek(target_week integer, active_season_param text)`
 ```sql
--- Returns team statistics for specific gameweek
+-- Returns team statistics for specific gameweek and season
+-- Season-aware: Filters statistics by active_season parameter
 -- Used for: Weekly leaderboards, performance comparisons
 ```
 
@@ -439,6 +477,27 @@ const { data: players, error } = await supabase
   .order('total_points', { ascending: false });
 ```
 
+#### Season-Parameterized Function Calls
+```typescript
+// Environment-driven season management
+const activeSeasonParam = config.public.ACTIVE_SEASON || '24-25';
+
+// Season-aware database function calls
+const { data: weeklyStats } = await supabase.rpc('get_weekly_stats_for_gameweek', {
+  target_week: weekNumber,
+  active_season_param: activeSeasonParam
+});
+
+const { data: teamData } = await supabase.rpc('get_drafted_teams_with_player_points_by_gameweek', {
+  game_week_param: gameWeek,
+  active_season_param: activeSeasonParam
+});
+
+const { data: seasonTeams } = await supabase.rpc('get_drafted_teams_by_season', {
+  active_season_param: activeSeasonParam
+});
+```
+
 #### Bulk Operations
 ```typescript
 // Efficient bulk inserts for statistics
@@ -459,7 +518,7 @@ const { data } = await supabase
       drafted_player:players(*)
     )
   `)
-  .eq('active_season', '24-25');
+  .eq('active_season', activeSeasonParam);
 ```
 
 ### Security Patterns
@@ -522,6 +581,7 @@ ORDER BY total_points DESC;
 -- Example migration pattern
 -- 20250619115026_remote_schema.sql
 -- 20250619125933_fixture_verification_and_population.sql
+-- 20250719190435_parameterize_season_functions.sql
 ```
 
 #### Migration Principles
@@ -529,6 +589,60 @@ ORDER BY total_points DESC;
 - **Data Preservation**: Migrations preserve existing data
 - **Rollback Safe**: Migrations can be safely reverted
 - **Testing Required**: All migrations tested before deployment
+
+### Season Parameterization Migration (2025-07-19)
+
+**Migration**: `20250719190435_parameterize_season_functions.sql`
+
+**Objective**: Parameterize database functions to support environment-driven season management, enabling smooth transitions between fantasy football seasons.
+
+**Functions Modified**:
+
+#### `get_drafted_teams_with_player_points_by_gameweek()`
+```sql
+-- BEFORE: Single parameter
+get_drafted_teams_with_player_points_by_gameweek(game_week_param integer)
+
+-- AFTER: Season-aware
+get_drafted_teams_with_player_points_by_gameweek(game_week_param integer, active_season_param text)
+```
+
+**Change**: Added `active_season_param` parameter to filter teams by season
+**Impact**: Enables multi-season data management and clean season transitions
+
+#### `get_weekly_stats_for_gameweek()`
+```sql
+-- BEFORE: Single parameter  
+get_weekly_stats_for_gameweek(target_week integer)
+
+-- AFTER: Season-aware
+get_weekly_stats_for_gameweek(target_week integer, active_season_param text)
+```
+
+**Change**: Added `active_season_param` parameter for season-specific statistics
+**Impact**: Weekly statistics now properly isolated by season
+
+#### `get_drafted_teams_by_season()`
+```sql
+-- Enhanced with admin metadata
+get_drafted_teams_by_season(active_season_param text)
+-- Returns: created_at, updated_at, edited_count fields added
+```
+
+**Change**: Enhanced to include administrative metadata fields
+**Impact**: Improved team management transparency and audit capabilities
+
+**Environment Integration**:
+```typescript
+// Frontend integration pattern
+const activeSeasonParam = config.public.ACTIVE_SEASON || '24-25';
+
+// Function calls now include season parameter
+const { data } = await supabase.rpc('get_weekly_stats_for_gameweek', {
+  target_week: weekNumber,
+  active_season_param: activeSeasonParam
+});
+```
 
 ### Schema Evolution
 ```sql

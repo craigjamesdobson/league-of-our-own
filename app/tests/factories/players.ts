@@ -1,17 +1,28 @@
 import type { DraftedTeamPlayer } from '@/types/DraftedTeamPlayer';
-import type { Player } from '@/types/Player';
+import type { Player, PlayerPreviousSeasonStatistics } from '@/types/Player';
 import { PlayerPosition } from '@/types/PlayerPosition';
 import type { DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } from '@/types/DraftedPlayer';
 import type { DraftedTeamWithPlayers } from '@/types/DraftedTeam';
 import type { Tables } from '@/types/database.types';
+
+interface MockHistoricalCleanSheetStats {
+  clean_sheets: number;
+}
+
+export const createMockHistoricalCleanSheetStats = (
+  overrides?: Partial<MockHistoricalCleanSheetStats>,
+): MockHistoricalCleanSheetStats => ({
+  clean_sheets: 6,
+  ...overrides,
+});
 
 /**
  * Factory function for creating mock Player data for testing.
  * Uses sensible defaults based on real player data structure.
  */
 export const createMockPlayer = (
-  overrides?: Partial<Player>,
-): Player => {
+  overrides?: Partial<Player & PlayerPreviousSeasonStatistics>,
+): Player & PlayerPreviousSeasonStatistics => {
   return {
     player_id: 1,
     first_name: 'Test',
@@ -32,6 +43,13 @@ export const createMockPlayer = (
     news: '',
     red_cards: 0,
     status: 'a',
+    total_points: 0,
+    previous_season_goals: 0,
+    previous_season_assists: 0,
+    previous_season_clean_sheets: 0,
+    previous_season_red_cards: 0,
+    previous_season_points: 0,
+    previous_season_minutes: 0,
     web_name: 'Test Player',
     minutes: 90,
     ...overrides,
@@ -151,6 +169,7 @@ export const createMockPlayerViewData = (
     news: '',
     red_cards: 0,
     status: 'a',
+    total_points: 0,
     web_name: 'Test Player',
     minutes: 90,
     ...overrides,

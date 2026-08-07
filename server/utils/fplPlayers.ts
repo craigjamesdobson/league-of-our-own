@@ -16,6 +16,7 @@ export interface FplPlayer {
   team_code: number;
   web_name: string;
   minutes: number;
+  total_points: number;
   goals_scored: number;
   assists: number;
   clean_sheets: number;
@@ -40,6 +41,7 @@ export interface PlayerForSync {
   team_code: number;
   web_name: string;
   minutes: number;
+  total_points: number;
   goals_scored: number;
   assists: number;
   clean_sheets: number;
@@ -76,6 +78,7 @@ export const prepareFplPlayersForSync = (
     team_code: player.team_code,
     web_name: player.web_name,
     minutes: player.minutes,
+    total_points: player.total_points,
     goals_scored: player.goals_scored,
     assists: player.assists,
     clean_sheets: player.clean_sheets,

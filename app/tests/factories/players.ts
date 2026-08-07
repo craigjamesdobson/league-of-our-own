@@ -5,6 +5,17 @@ import type { DraftedPlayerWithWeeklyStats, DraftedTransferWithWeeklyStats } fro
 import type { DraftedTeamWithPlayers } from '@/types/DraftedTeam';
 import type { Tables } from '@/types/database.types';
 
+interface MockHistoricalCleanSheetStats {
+  clean_sheets: number;
+}
+
+export const createMockHistoricalCleanSheetStats = (
+  overrides?: Partial<MockHistoricalCleanSheetStats>,
+): MockHistoricalCleanSheetStats => ({
+  clean_sheets: 6,
+  ...overrides,
+});
+
 /**
  * Factory function for creating mock Player data for testing.
  * Uses sensible defaults based on real player data structure.

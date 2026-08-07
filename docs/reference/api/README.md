@@ -20,6 +20,10 @@ The application stores this data in the `player_previous_season_statistics`
 table. Populate it once per season with the Node
 `pnpm season:sync-previous-stats` import, entering the target Supabase URL and
 service-role key when prompted. The normal player sync does not overwrite it.
+The snapshot retains the raw FPL assists and clean-sheet values. When these
+historical stats are shown in the team builder, clean sheets are displayed as
+zero for midfielders and forwards; assists remain visible for all positions.
+Goalkeepers and defenders retain their clean-sheet values when displayed.
 The import runs outside the deployed application so it can fetch the complete
 player set without Cloudflare request limits. The upstream FPL API is public but
 does not have an official reference site; the [Postman endpoint
@@ -57,4 +61,4 @@ See [Database Reference](../database.md) for schema.
 
 ---
 
-**Last updated:** 2026-08-05
+**Last updated:** 2026-08-07

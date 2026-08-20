@@ -7,6 +7,8 @@ const props = defineProps<{
   standings: WeeklyData[];
 }>();
 
+const { isFavouriteTeam } = useFavouriteTeam();
+
 const ribbonCount = 18;
 
 const champion = computed(() => props.standings[0]);
@@ -62,7 +64,9 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
         </div>
 
         <div class="relative z-10 space-y-6">
-          <section class="rounded-3xl border border-yellow-300 bg-gradient-to-br from-yellow-50/95 via-white/95 to-slate-50/95 p-6 text-center shadow-sm backdrop-blur-sm dark:border-yellow-500/50 dark:from-yellow-950/60 dark:via-slate-900/95 dark:to-slate-800/95">
+          <section
+            class="rounded-3xl border border-yellow-300 bg-gradient-to-br from-yellow-50/95 via-white/95 to-slate-50/95 p-6 text-center shadow-sm backdrop-blur-sm dark:border-yellow-500/50 dark:from-yellow-950/60 dark:via-slate-900/95 dark:to-slate-800/95"
+          >
             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-400 text-slate-950 shadow-sm">
               <Icon
                 name="ph:crown-simple-fill"
@@ -72,8 +76,15 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
             <p class="mb-2 text-sm font-black uppercase tracking-[0.2em] text-yellow-700 dark:text-yellow-300">
               League champion
             </p>
-            <h3 class="text-3xl font-black uppercase text-slate-950 dark:text-slate-100 md:text-4xl">
+            <h3 class="flex items-center justify-center gap-2 text-3xl font-black uppercase text-slate-950 dark:text-slate-100 md:text-4xl">
               {{ champion.team_name }}
+              <Icon
+                v-if="isFavouriteTeam(champion.drafted_team_id)"
+                name="lucide:user-round-check"
+                size="22"
+                class="shrink-0 text-amber-500"
+                aria-hidden="true"
+              />
             </h3>
             <p class="mt-2 text-sm font-bold uppercase text-slate-500 dark:text-slate-400">
               {{ champion.team_owner }}
@@ -102,8 +113,15 @@ const runnersUp = computed(() => props.standings.slice(1, 5));
                     {{ index + 2 }}
                   </div>
                   <div class="min-w-0">
-                    <p class="truncate font-black uppercase text-slate-900 dark:text-slate-100">
+                    <p class="flex items-center gap-1.5 truncate font-black uppercase text-slate-900 dark:text-slate-100">
                       {{ team.team_name }}
+                      <Icon
+                        v-if="isFavouriteTeam(team.drafted_team_id)"
+                        name="lucide:user-round-check"
+                        size="14"
+                        class="shrink-0 text-amber-500"
+                        aria-hidden="true"
+                      />
                     </p>
                     <p class="truncate text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
                       {{ team.team_owner }}

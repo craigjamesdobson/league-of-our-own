@@ -17,6 +17,8 @@ const props = defineProps({
   },
 });
 
+const { isFavouriteTeam } = useFavouriteTeam();
+
 type EnhancedTeamData = WeeklyData & {
   isWinner: boolean;
 };
@@ -85,8 +87,15 @@ const getBadgeClasses = (isWinner: boolean) => [
             <span v-else>{{ index + 1 }}</span>
           </div>
           <div class="text-left">
-            <div class="font-bold text-lg text-slate-800 uppercase dark:text-slate-100">
+            <div class="flex items-center gap-1.5 font-bold text-lg text-slate-800 uppercase dark:text-slate-100">
               {{ team.team_name }}
+              <Icon
+                v-if="isFavouriteTeam(team.drafted_team_id)"
+                name="lucide:user-round-check"
+                size="16"
+                class="shrink-0 text-amber-500"
+                aria-hidden="true"
+              />
             </div>
             <div class="text-sm text-slate-600 uppercase dark:text-slate-300">
               {{ team.team_owner }}

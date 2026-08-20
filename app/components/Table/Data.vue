@@ -16,6 +16,8 @@ const showTeamPoints = (id: number) => {
   visible.value = true;
 };
 
+const { isFavouriteTeam } = useFavouriteTeam();
+
 const columns: TableColumn<WeeklyData>[] = [
   { id: 'position' },
   { accessorKey: 'prev_week_position', id: 'prev_week_position' },
@@ -96,7 +98,9 @@ const columns: TableColumn<WeeklyData>[] = [
     </template>
 
     <template #team_name-cell="{ row }">
-      <div class="flex gap-2.5">
+      <div
+        class="flex gap-2.5"
+      >
         <UTooltip text="Show points breakdown">
           <UButton
             icon="lucide:info"
@@ -109,8 +113,19 @@ const columns: TableColumn<WeeklyData>[] = [
           />
         </UTooltip>
         <div class="flex flex-col gap-1 uppercase">
-          <div class="font-black lg:text-base">
+          <div class="flex items-center gap-1.5 font-black lg:text-base">
             {{ row.original.team_name }}
+            <UTooltip
+              v-if="isFavouriteTeam(row.original.drafted_team_id)"
+              text="Your team"
+            >
+              <Icon
+                name="lucide:user-round-check"
+                size="15"
+                class="shrink-0 text-amber-500"
+                aria-hidden="true"
+              />
+            </UTooltip>
           </div>
           <div class="text-xs">
             {{ row.original.team_owner }}

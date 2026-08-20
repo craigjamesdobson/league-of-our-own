@@ -1,12 +1,29 @@
 <script lang="ts" setup>
 import type { TableColumn } from '@nuxt/ui';
 import { useTableStore } from '@/stores/table';
-import type { WeeklyWinners } from '~/types/Table';
+import { useDraftedTeamsStore } from '~/stores/draftedTeams';
+import type { WeeklyWinner, WeeklyWinners } from '~/types/Table';
 
 const tableStore = useTableStore();
+const draftedTeamsStore = useDraftedTeamsStore();
+const { isFavouriteTeam } = useFavouriteTeam();
 
-onMounted(() => {
-  tableStore.fetchWeeklyWinners();
+const getWinnerTeamId = (winner: WeeklyWinner) => {
+  if (winner.drafted_team_id) {
+    return winner.drafted_team_id;
+  }
+
+  return draftedTeamsStore.getDraftedTeams?.find(team =>
+    team.team_name === winner.team_name && team.team_owner === winner.team_owner,
+  )?.drafted_team_id;
+};
+
+onMounted(async () => {
+  await Promise.all([
+    tableStore.fetchWeeklyWinners(),
+    // The team list is only needed for backwards-compatible payloads without IDs.
+    draftedTeamsStore.fetchDraftedTeams().catch(() => undefined),
+  ]);
 });
 
 const columns: TableColumn<WeeklyWinners>[] = [
@@ -60,11 +77,24 @@ const columns: TableColumn<WeeklyWinners>[] = [
       <template v-if="!!row.original.points">
         <div class="flex flex-col gap-2.5">
           <div
-            v-for="(winner, index) in row.original.top_teams"
-            :key="index"
+            v-for="winner in row.original.top_teams"
+            :key="`${row.original.week}-${winner.team_name}-${winner.team_owner}`"
             class="flex flex-col gap-1 text-sm font-black uppercase"
           >
-            <div>{{ winner.team_name }}</div>
+            <div class="flex items-center gap-1.5">
+              {{ winner.team_name }}
+              <UTooltip
+                v-if="isFavouriteTeam(getWinnerTeamId(winner) ?? -1)"
+                text="Your team"
+              >
+                <Icon
+                  name="lucide:user-round-check"
+                  size="15"
+                  class="shrink-0 text-amber-500"
+                  aria-hidden="true"
+                />
+              </UTooltip>
+            </div>
             <div class="text-xs font-normal text-slate-500 dark:text-slate-400">
               {{ winner.team_owner }}
             </div>

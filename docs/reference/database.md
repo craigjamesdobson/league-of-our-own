@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-20*
 
 ## Overview
 
@@ -371,6 +371,7 @@ LEFT JOIN teams t ON p.team = t.id;
 #### `get_weekly_winners()`
 ```sql
 -- Returns weekly winners across all completed weeks
+-- Each winner includes drafted_team_id for stable team identity
 -- Used for: Historical winners display, achievement tracking
 ```
 

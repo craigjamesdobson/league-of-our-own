@@ -8,6 +8,7 @@ export {
 
 export {
   createMockPlayer,
+  createMockHistoricalCleanSheetStats,
   createMockDraftedTeamPlayer,
   createMockDraftedTeamPlayerWithSelection,
   createMockTeamStructure,
@@ -24,3 +25,4 @@ export {
 export { createMockFplTeams } from './fplTeams';
 export { createMockFplPlayers } from './fplPlayers';
 export { createMockFplFixtures } from './fplFixtures';
+export { createMockFplHistoryPast } from './fplPreviousSeason';

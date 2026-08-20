@@ -62,6 +62,30 @@ describe('mergePlayersWithSeasonStatistics', () => {
       season_points: 0,
     });
   });
+
+  it('merges previous-season statistics by player id', () => {
+    const [result] = mergePlayersWithSeasonStatistics([
+      createMockPlayer({ player_id: 3 }),
+    ], [], [{
+      player_id: 3,
+      previous_season_goals: 8,
+      previous_season_assists: 5,
+      previous_season_clean_sheets: 10,
+      previous_season_red_cards: 1,
+      previous_season_points: 127,
+      previous_season_minutes: 2790,
+    }]);
+
+    expect(result).toMatchObject({
+      player_id: 3,
+      previous_season_goals: 8,
+      previous_season_assists: 5,
+      previous_season_clean_sheets: 10,
+      previous_season_red_cards: 1,
+      previous_season_points: 127,
+      previous_season_minutes: 2790,
+    });
+  });
 });
 
 describe('aggregatePlayerStatistics', () => {

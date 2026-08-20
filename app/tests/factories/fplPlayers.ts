@@ -69,6 +69,7 @@ export const createMockFplPlayers = () => {
         team_code: 100 + (((playerId - 1) % 20) + 1),
         web_name: `Player ${playerId}`,
         minutes: 0,
+        total_points: 0,
         goals_scored: 0,
         assists: 0,
         clean_sheets: 0,

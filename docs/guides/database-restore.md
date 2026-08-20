@@ -1,253 +1,175 @@
-# Database Restoration Guide: Live to Development
+# Database Restoration Guide
 
 **Last updated:** 2026-07-27
 
-This guide documents the proven method for safely restoring live database data to development database when network connectivity issues prevent direct database connections.
+This guide covers the data restoration and development reset workflows for the
+project. Production dumps use the dedicated `dump_user` PostgreSQL role with
+`SELECT`-only privileges. Write access to production is structurally impossible
+at the database level.
 
-## Problem Statement
+For full restoration-script documentation, see
+[`scripts/README.md`](../../scripts/README.md).
 
-**WSL2 IPv6 Connectivity Issues**: Direct psql connections to remote Supabase databases fail in Windows Subsystem for Linux 2 (WSL2) environments due to IPv6 network configuration problems.
+## Security Model
 
-**Specific Error**:
+Production uses a dedicated read-only `dump_user` PostgreSQL role:
+
+- `SELECT` only on the `public` and `auth` schemas.
+- `BYPASSRLS` so dumps capture all rows regardless of RLS policies.
+- No `INSERT`, `UPDATE`, `DELETE`, `DROP`, or `ALTER` privileges.
+- The `postgres` superuser password never exists locally; it is managed through
+  deployment secrets only.
+
+## Prerequisites
+
+- PostgreSQL client tools (`psql --version`).
+- Supabase CLI, installed through `pnpm install`.
+- Production project ID from the Supabase dashboard.
+- The read-only `dump_user` password.
+
+## Local Database Resets
+
+Use a clean schema with no application data:
+
 ```bash
-psql: error: connection to server at "db.YOUR_DEV_PROJECT_ID.supabase.co" (2a05:d01c:30c:9d03:c0f7:5424:becb:f4d0), port 5432 failed: Network is unreachable
+pnpm db:reset:clean
 ```
 
-**Root Cause**: WSL2's virtualized networking layer attempts IPv6 connections first, but the IPv6 stack is not properly configured, causing "Network is unreachable" errors. The system tries to connect via IPv6 addresses that aren't accessible from the WSL2 environment.
+Use current first-party FPL clubs, players, and fixtures plus fictional local
+league data and two local admin users:
 
-**Failed Solutions Attempted**:
-- Direct psql connections (IPv6 timeout)
-- `npx supabase db reset --db-url` (same IPv6 issue)
-- DNS resolution works but returns unreachable IPv6 addresses
-- Installing Windows PostgreSQL tools in WSL2 not feasible
+```bash
+pnpm db:reset:fpl
+```
 
-## Solution: SQL Editor Method
+The FPL-backed reset is the normal local workflow for exercising the application
+and rehearsing the Season archive. It does not read from production.
 
-Use Supabase's web-based SQL Editor to execute split SQL files, bypassing all network connectivity issues.
+## Workflow 1: Restore Live Data to Local
 
-### Prerequisites
+Pull production data into the local Supabase Docker instance for development.
+Local Supabase must already be running.
 
-1. **Live database dump** in `supabase/seed.sql` (generated via `npx supabase db dump --linked --data-only`)
-2. **Development database** access via Supabase web dashboard
-3. **Working directory**: Create `temp/` folder for split files
+```bash
+pnpm db:restore-local \
+  --project-id YOUR_PROD_PROJECT_ID \
+  --dump-password YOUR_DUMP_USER_PASSWORD
+```
 
-`supabase/seed.sql` is an ignored, temporary live-data artifact. Automatic SQL
-seeding is disabled in `supabase/config.toml`; local development uses the
-explicit clean or FPL-backed reset workflows documented in
-[Local Development](local-development.md#local-database-resets).
+If a recent ignored dump already exists at `supabase/seed.sql`:
 
-## Refresh New-Season FPL Reference Data
+```bash
+pnpm db:restore-local --skip-dump
+```
 
-For a local database, use `pnpm db:reset:fpl`. It resets the schema, imports the
-current clubs, players and fixtures, creates dummy league data, and creates the
-two local fixture-workflow users in one guarded command.
+The script:
 
-For a deployed environment, refresh Premier League reference data through the
+1. Dumps production through the read-only `dump_user` and connection pooler.
+2. Clears local tables.
+3. Restores through `psql` on local IPv4.
+4. Verifies row counts.
+
+## Workflow 2: Refresh Staging from Live
+
+Use this only when staging needs a current copy of production data. Staging must
+already have the required migrations.
+
+```bash
+pnpm db:restore-staging \
+  --prod-project-id YOUR_PROD_PROJECT_ID \
+  --prod-dump-password YOUR_DUMP_USER_PASSWORD \
+  --staging-project-id YOUR_STAGING_PROJECT_ID \
+  --staging-db-password YOUR_STAGING_DB_PASSWORD
+```
+
+The script:
+
+1. Dumps production using the read-only role.
+2. Verifies that the staging project ID differs from production.
+3. Connects to staging through the pooler, with a direct-IPv4 fallback.
+4. Clears and restores staging.
+5. Verifies row counts.
+
+## Workflow 3: Full Staging Rebuild
+
+Use this after replacing or recreating the staging Supabase project. Obtain the
+regional pooler host from **Supabase → Settings → Database → Connection pooling**.
+
+```bash
+pnpm db:rebuild-staging \
+  --prod-project-id YOUR_PROD_PROJECT_ID \
+  --prod-dump-password YOUR_DUMP_USER_PASSWORD \
+  --staging-project-id YOUR_STAGING_PROJECT_ID \
+  --staging-db-password YOUR_STAGING_DB_PASSWORD \
+  --staging-pooler-host YOUR_STAGING_POOLER_HOST
+```
+
+The script:
+
+1. Dumps production through the read-only role.
+2. Temporarily links the Supabase CLI to staging, never production.
+3. Applies every migration.
+4. Unlinks the CLI and cleans temporary link state.
+5. Clears and restores staging.
+6. Verifies row counts.
+
+After recreating staging, update `STAGING_PROJECT_ID` and
+`STAGING_DB_PASSWORD` in the GitHub staging environment.
+
+## New-Season Reference Data
+
+For deployed environments, import reference data through the protected
 application endpoints in this order:
 
-1. Call `POST /api/sync-teams` with the `x-api-key` header. This imports exactly
-   20 clubs and stores only each club's FPL ID, name, and short name.
-2. Call `POST /api/sync-players` with the same header. Players must be imported
-   after clubs because each player references a club ID.
-3. Call `POST /api/sync-fixtures` with the same header. It requires exactly 20
-   imported clubs, validates all 380 fixtures and stores blank scores for the
-   new season.
-4. Seed development-only drafted teams and squads from the imported players if
-   application scenarios need test league data.
+1. `POST /api/sync-teams` imports exactly 20 clubs.
+2. `POST /api/sync-players` imports the current players after their clubs exist.
+3. `POST /api/sync-fixtures` validates and imports all 380 Season fixtures.
 
-The endpoints require the server's `SYNC_API_KEY`. Teams and players fetch the
-current FPL `bootstrap-static` payload; fixtures use the first-party FPL fixture
-feed. The teams and fixtures endpoints are manual reset/re-seeding tools and are
-not called by the player-sync cron. Run these calls only against the intended
-environment, and verify the hostname before sending them.
-
-## Season Release
-
-Follow the committed [Season rollover runbook](../runbooks/season-rollover.md)
-against staging first and production second. The backup, archive, clear,
-database-settings, cron, and smoke-test decisions remain explicit manual steps.
-The focused `pnpm season:import -- staging|production` command performs only the
-ordered reference-data imports and their machine-checkable validations.
-
-### Step 1: Split the Database Dump
-
-Split the large seed.sql file into manageable chunks for SQL Editor execution:
+The focused command performs these calls and validates their counts:
 
 ```bash
-# Create temporary directory
-mkdir temp/
-
-# Split by table sections (adjust line numbers based on your dump structure)
-sed -n '1,1969p' supabase/seed.sql > temp/part1_auth.sql
-sed -n '1970,2707p' supabase/seed.sql > temp/part2_auth_users.sql
-sed -n '2708,3529p' supabase/seed.sql > temp/part3_teams_players.sql
-sed -n '3530,4441p' supabase/seed.sql > temp/part4_drafted_data.sql
-sed -n '4442,5032p' supabase/seed.sql > temp/part5_statistics.sql
+pnpm season:import -- staging
+pnpm season:import -- production
 ```
 
-**Key Split Points** (find these in your dump):
-- Line ~25: `INSERT INTO "auth"."audit_log_entries"`
-- Line ~1970: `INSERT INTO "auth"."users"`
-- Line ~2708: `INSERT INTO "public"."drafted_teams"`
-- Line ~3530: `INSERT INTO "public"."drafted_players"`
-- Line ~4442: `INSERT INTO "public"."player_statistics"`
+The endpoints require the deployed `SYNC_API_KEY`. Teams and players use FPL's
+`bootstrap-static` feed; fixtures use the first-party FPL fixtures feed. The
+teams and fixtures endpoints are manual rollover tools and are not called by the
+scheduled player sync.
 
-### Step 2: Create Clear Script
+## Season Rollover
 
-Create `temp/clear.sql` to safely remove existing data:
+Follow the committed [Season rollover runbook](../runbooks/season-rollover.md)
+against staging first and production second. Backup confirmation, archive,
+clear, settings, cron, and smoke-test decisions remain explicit manual steps.
+The import command handles only the machine-checkable reference-data import.
 
-```sql
--- CLEAR SCRIPT: Run this FIRST to clear all existing data in dev database
-SET session_replication_role = replica;
+## WSL2 and IPv6 Connectivity
 
--- Clear auth tables (in reverse dependency order)
-TRUNCATE TABLE auth.mfa_amr_claims CASCADE;
-TRUNCATE TABLE auth.refresh_tokens CASCADE;
-TRUNCATE TABLE auth.sessions CASCADE;
-TRUNCATE TABLE auth.users CASCADE;
-TRUNCATE TABLE auth.audit_log_entries CASCADE;
+The restoration scripts account for common WSL2 IPv6 problems:
 
--- Clear public tables (in reverse dependency order)
-TRUNCATE TABLE public.weekly_statistics CASCADE;
-TRUNCATE TABLE public.player_statistics CASCADE;
-TRUNCATE TABLE public.drafted_transfers CASCADE;
-TRUNCATE TABLE public.drafted_players CASCADE;
-TRUNCATE TABLE public.profiles CASCADE;
-TRUNCATE TABLE public.fixtures CASCADE;
-TRUNCATE TABLE public.players CASCADE;
-TRUNCATE TABLE public.teams CASCADE;
-TRUNCATE TABLE public.drafted_teams CASCADE;
+| Operation | Connection method | IPv6 issue? |
+| --- | --- | --- |
+| Production dump | Connection pooler via read-only `dump_user` | No |
+| Local restore | `psql` to `127.0.0.1` | No |
+| Staging write | Pooler with direct-IPv4 fallback | Handled |
 
--- Reset sequences (only public schema - auth sequences are protected)
-ALTER SEQUENCE public.drafted_players_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.drafted_teams_team_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.drafted_transfers_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.fixtures_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.player_statistics_id_seq RESTART WITH 1;
-ALTER SEQUENCE public.weekly_statistics_id_seq RESTART WITH 1;
+The staging pooler host varies by region and must be supplied explicitly when
+rebuilding staging.
 
--- Note: auth.refresh_tokens_id_seq cannot be reset due to permissions
+### Manual fallback
 
-SET session_replication_role = DEFAULT;
+If staging connectivity fails completely from WSL2:
 
--- Verification: Check that tables are empty
-SELECT 'auth.audit_log_entries' as table_name, count(*) as row_count FROM auth.audit_log_entries
-UNION ALL
-SELECT 'auth.users', count(*) FROM auth.users
-UNION ALL
-SELECT 'public.drafted_teams', count(*) FROM public.drafted_teams
-UNION ALL
-SELECT 'public.players', count(*) FROM public.players;
-```
-
-### Step 3: Add Headers to Part Files
-
-Add proper SQL headers to each part file:
-
-```sql
--- PART X: Description
-SET session_replication_role = replica;
-
--- (existing INSERT statements follow)
-```
-
-### Step 4: Execute via SQL Editor
-
-1. **Access Dev Database**: Go to development Supabase project → SQL Editor
-
-2. **Pre-Execution Check**: Before running part5, search the file for the storage.buckets section and **remove it** to avoid duplicate key errors (see "Storage Bucket Duplicate Key Errors" in Common Issues section)
-
-3. **Execute in Order**:
-   - `clear.sql` (verify tables show 0 rows)
-   - `part1_auth_audit.sql`
-   - `part2_auth_users.sql`
-   - `part3_teams_players.sql`
-   - `part4_drafted_data.sql`
-   - `part5_profiles_fixtures_stats.sql` ⚠️ (after removing storage.buckets INSERT)
-   - `part6_sequences.sql`
-
-### Step 5: Verify Success
-
-Run verification query in SQL Editor:
-
-```sql
-SELECT
-    'auth.users' as table_name, count(*) as rows FROM auth.users
-UNION ALL
-SELECT 'public.drafted_teams', count(*) FROM public.drafted_teams
-UNION ALL
-SELECT 'public.players', count(*) FROM public.players
-UNION ALL
-SELECT 'public.fixtures', count(*) FROM public.fixtures
-UNION ALL
-SELECT 'public.player_statistics', count(*) FROM public.player_statistics
-ORDER BY table_name;
-```
-
-## Common Issues and Solutions
-
-### Permission Errors on Sequences
-
-**Error**: `must be owner of sequence refresh_tokens_id_seq`
-
-**Solution**: Skip auth schema sequence resets - they're protected by Supabase. Only reset public schema sequences.
-
-### SQL Editor Timeouts
-
-**Solution**: Split large files further if needed. Most files under 1000 lines execute successfully.
-
-### IPv6 Network Issues
-
-**Solution**: This method completely bypasses network connectivity by using the web interface.
-
-### Storage Bucket Duplicate Key Errors
-
-**Error**: `ERROR: 23505: duplicate key value violates unique constraint "buckets_pkey" DETAIL: Key (id)=(avatars) already exists.`
-
-**Root Cause**: The `storage.buckets` table in your dev database already contains infrastructure buckets (like 'avatars') that were created during initial Supabase project setup. The seed.sql dump includes these buckets, causing conflicts when restoring.
-
-**Solution**: Remove the storage bucket INSERT statements from the restoration files before execution:
-
-1. **Locate the storage section** in your part file containing statistics data (typically part5):
-   ```sql
-   --
-   -- Data for Name: buckets; Type: TABLE DATA; Schema: storage; Owner: supabase_storage_admin
-   --
-
-   INSERT INTO "storage"."buckets" ("id", "name", "owner", "created_at", "updated_at", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types", "owner_id", "type") VALUES
-   	('avatars', 'avatars', NULL, '2023-07-30 17:46:08.561788+00', '2023-07-30 17:46:08.561788+00', false, false, NULL, NULL, NULL, 'STANDARD');
-   ```
-
-2. **Delete these lines entirely** - from the comment block through the INSERT statement and blank lines
-
-3. **Keep the footer**: Make sure `SET session_replication_role = DEFAULT;` remains at the end of the file
-
-**Why this is safe**: Storage buckets are infrastructure that persist across environments. They don't need to be restored from live database dumps - your dev database buckets are appropriate for development.
-
-## File Organization
-
-```
-temp/
-├── clear.sql                          # Data clearing script (42 lines)
-├── part1_auth_audit.sql               # Auth audit logs (2,459 lines)
-├── part2_auth_users.sql               # Users, sessions & tokens (1,046 lines)
-├── part3_teams_players.sql            # Teams & players (842 lines)
-├── part4_drafted_data.sql             # Drafted players & transfers (543 lines)
-├── part5_profiles_fixtures_stats.sql  # Profiles, fixtures & statistics (1,681 lines)
-│   └── ⚠️ Remove storage.buckets INSERT before execution
-├── part6_sequences.sql                # Sequence resets (62 lines)
-├── README.md                          # File documentation
-└── EXECUTION_GUIDE.md                 # Step-by-step instructions
-```
+1. Generate `supabase/seed.sql` with `pnpm db:restore-local`.
+2. Split the ignored dump into manageable chunks.
+3. Execute the chunks in order using the staging Supabase SQL Editor.
 
 ## Safety Guarantees
 
-✅ **Live database never modified** - only read from during dump creation
-✅ **Development database clearly targeted** - different hostnames prevent confusion
-✅ **Reversible operations** - can clear and restore again anytime
-✅ **Network-independent** - uses web interface instead of direct connections
-
----
-
-**Verified Working**: Supabase projects with 5000+ line database dumps
-**Environment**: WSL2 with IPv6 connectivity issues
+- Production dumps cannot write because `dump_user` lacks write privileges.
+- Restoration scripts require explicit confirmation and reject matching staging
+  and production project IDs.
+- Credentials are not committed to the repository.
+- Scripts clean temporary Supabase link state after use.
+- `.gitignore` blocks `.env` variants except `.env.example`.

@@ -71,6 +71,7 @@ export const getTeamSubmissionErrorAlert = (error: unknown, editing: boolean) =>
 type DraftedPlayerFromQuery = {
   drafted_player_id: number;
   drafted_team: number | null;
+  total_points: number | null;
 } & DatabaseGenerated['public']['Views']['players_view']['Row'];
 
 const DEFAULT_TEAM_STRUCTURE = [

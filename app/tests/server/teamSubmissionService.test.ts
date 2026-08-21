@@ -41,14 +41,19 @@ const savedTeam = {
   updated_at: null,
 };
 
+const testSubmissionDeadline = '2026-08-20';
+const beforeTestSubmissionDeadline = new Date('2026-08-20T12:00:00.000Z');
+
 const createDependencies = (
   overrides: Partial<TeamSubmissionDependencies> = {},
 ): TeamSubmissionDependencies => ({
   loadAppSettings: vi.fn().mockResolvedValue({
     activeSeason: '26-27',
     teamRegistrationOpen: true,
-    teamSubmissionDeadline: '2026-08-20',
+    teamSubmissionDeadline: testSubmissionDeadline,
   }),
+  // Ordinary submission tests run before the deadline; deadline-specific tests override this clock.
+  now: () => beforeTestSubmissionDeadline,
   verifyTurnstile: vi.fn().mockResolvedValue(true),
   loadPlayers: vi.fn().mockResolvedValue(validPlayers()),
   saveTeam: vi.fn().mockResolvedValue({ outcome: 'created', team: savedTeam }),
@@ -144,7 +149,7 @@ describe('processTeamSubmission', () => {
       loadAppSettings: vi.fn().mockResolvedValue({
         activeSeason: '26-27',
         teamRegistrationOpen: false,
-        teamSubmissionDeadline: '2026-08-20',
+        teamSubmissionDeadline: testSubmissionDeadline,
       }),
     });
 

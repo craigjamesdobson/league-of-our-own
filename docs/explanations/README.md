@@ -26,6 +26,10 @@ Architectural Decision Records (ADRs) for significant choices:
 Platform behavior and deployment-specific findings:
 - **[Cloudflare email environment detection](cloudflare-email-environment-detection.md)** - Reliable preview-versus-production labeling for transactional email
 
+### Feature behavior
+
+- **[Your team selection](your-team-selection.md)** - How the browser-persisted team preference is selected and displayed
+
 ## Using These Explanations
 
 Explanations answer "WHY?" questions:
@@ -56,4 +60,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for documentation standards.
 
 ---
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-08-20

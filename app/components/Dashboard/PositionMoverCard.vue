@@ -12,6 +12,8 @@ defineProps({
     required: true,
   },
 });
+
+const { isFavouriteTeam } = useFavouriteTeam();
 </script>
 
 <template>
@@ -21,8 +23,15 @@ defineProps({
   >
     <div class="flex items-center space-x-3">
       <div class="text-left">
-        <div class="font-bold text-sm text-slate-800 uppercase dark:text-slate-100">
+        <div class="flex items-center gap-1.5 font-bold text-sm text-slate-800 uppercase dark:text-slate-100">
           {{ team.team_name }}
+          <Icon
+            v-if="isFavouriteTeam(team.drafted_team_id)"
+            name="lucide:user-round-check"
+            size="14"
+            class="shrink-0 text-amber-500"
+            aria-hidden="true"
+          />
         </div>
         <div class="text-xs text-slate-600 uppercase dark:text-slate-300">
           {{ team.team_owner }}

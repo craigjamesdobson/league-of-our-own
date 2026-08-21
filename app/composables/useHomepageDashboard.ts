@@ -242,7 +242,7 @@ export function useHomepageDashboard() {
       ] = await Promise.all([
         supabase
           .from('drafted_players')
-          .select('drafted_player_id, drafted_player, drafted_teams(team_name, team_owner), players_view(web_name, image, team_short_name, cost)')
+          .select('drafted_player_id, drafted_player, drafted_teams(drafted_team_id, team_name, team_owner), players_view(web_name, image, team_short_name, cost)')
           .in('drafted_player_id', draftedPlayerIds),
         supabase
           .from('players_view')
@@ -295,6 +295,7 @@ export function useHomepageDashboard() {
         return {
           drafted_transfer_id: transfer.drafted_transfer_id,
           transfer_week: transfer.transfer_week || 0,
+          drafted_team_id: draftedPlayer?.drafted_teams?.drafted_team_id || 0,
           team_name: draftedPlayer?.drafted_teams?.team_name || 'Unknown Team',
           team_owner: draftedPlayer?.drafted_teams?.team_owner || 'Unknown Owner',
           player_out: playerOut?.web_name || 'Unknown Player',

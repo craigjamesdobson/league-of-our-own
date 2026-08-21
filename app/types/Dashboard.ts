@@ -1,6 +1,7 @@
 type WeeklyTransfer = {
   drafted_transfer_id: number;
   transfer_week: number;
+  drafted_team_id: number;
   team_name: string;
   team_owner: string;
   player_out: string;
@@ -17,6 +18,7 @@ type WeeklyTransfer = {
 };
 
 type TeamTransfers = {
+  drafted_team_id: number;
   team_name: string;
   team_owner: string;
   transfers: WeeklyTransfer[];

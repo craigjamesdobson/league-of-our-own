@@ -22,13 +22,16 @@ const props = defineProps({
   },
 });
 
+const { isFavouriteTeam } = useFavouriteTeam();
+
 const groupedTransfers = computed(() => {
   const grouped: Record<string, TeamTransfers> = {};
 
   props.transfers.forEach((transfer) => {
-    const key = `${transfer.team_name}-${transfer.team_owner}`;
+    const key = String(transfer.drafted_team_id);
     if (!grouped[key]) {
       grouped[key] = {
+        drafted_team_id: transfer.drafted_team_id,
         team_name: transfer.team_name,
         team_owner: transfer.team_owner,
         transfers: [],
@@ -111,14 +114,21 @@ const groupedTransfers = computed(() => {
     >
       <div
         v-for="teamGroup in groupedTransfers"
-        :key="`${teamGroup.team_name}-${teamGroup.team_owner}`"
+        :key="teamGroup.drafted_team_id"
         class="p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 shadow-sm dark:from-slate-800 dark:to-slate-900 dark:border-slate-700"
       >
         <!-- Compact Team Header -->
         <div class="flex items-center justify-between mb-3">
           <div>
-            <div class="font-bold text-base text-slate-800 uppercase dark:text-slate-100">
+            <div class="flex items-center gap-1.5 font-bold text-base text-slate-800 uppercase dark:text-slate-100">
               {{ teamGroup.team_name }}
+              <Icon
+                v-if="isFavouriteTeam(teamGroup.drafted_team_id)"
+                name="lucide:user-round-check"
+                size="15"
+                class="shrink-0 text-amber-500"
+                aria-hidden="true"
+              />
             </div>
             <div class="text-sm text-slate-600 uppercase dark:text-slate-300">
               {{ teamGroup.team_owner }} | {{ teamGroup.transfers.length }} transfer{{ teamGroup.transfers.length > 1 ? 's' : '' }}

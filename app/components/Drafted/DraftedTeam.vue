@@ -16,7 +16,23 @@ const props = defineProps({
     type: Object as PropType<TeamAdminMetadata>,
     default: undefined,
   },
+  isYourTeam: {
+    type: Boolean,
+    default: false,
+  },
+  showYourTeamControl: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits<{
+  toggleYourTeam: [];
+}>();
+
+const cardRootClass = computed(() => props.isYourTeam
+  ? 'border border-amber-400/60 bg-white shadow-sm ring-1 ring-amber-400/10 dark:border-amber-400/55 dark:bg-slate-900 dark:ring-amber-400/10'
+  : 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none');
 
 const isActiveTransfer = (transferDate: Date) => {
   return new Date(transferDate) > new Date();
@@ -43,7 +59,7 @@ const handleEditPlayer = (playerID: number) => {
     v-if="props.draftedTeam"
     class="text-slate-900 dark:text-slate-100"
     :ui="{
-      root: 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none',
+      root: cardRootClass,
       body: 'p-5 sm:p-5',
     }"
   >
@@ -53,13 +69,49 @@ const handleEditPlayer = (playerID: number) => {
         'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
       }"
     >
-      <div class="flex flex-col uppercase">
-        <span class="text-lg font-black">{{
-          props.draftedTeam?.team_name
-        }}</span>
-        <span class="text-xs font-light">{{
-          props.draftedTeam?.team_owner
-        }}</span>
+      <div class="flex min-w-0 items-center gap-2">
+        <template v-if="props.showYourTeamControl">
+          <UTooltip
+            v-if="props.isYourTeam"
+            text="Remove your team"
+          >
+            <button
+              type="button"
+              role="radio"
+              class="flex size-7 shrink-0 items-center justify-center rounded-full text-amber-500 transition-colors hover:text-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:text-amber-300 dark:hover:text-amber-200"
+              aria-checked="true"
+              :aria-label="`Remove ${props.draftedTeam.team_name} as your team`"
+              @click.stop="emit('toggleYourTeam')"
+            >
+              <Icon
+                name="lucide:user-round-check"
+                size="20"
+                aria-hidden="true"
+              />
+            </button>
+          </UTooltip>
+          <UTooltip
+            v-else
+            text="Select as your team"
+          >
+            <button
+              type="button"
+              role="radio"
+              class="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-transparent transition-colors hover:border-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-slate-600 dark:hover:border-amber-400"
+              aria-checked="false"
+              :aria-label="`Select ${props.draftedTeam.team_name} as your team`"
+              @click.stop="emit('toggleYourTeam')"
+            />
+          </UTooltip>
+        </template>
+        <div class="flex min-w-0 flex-col uppercase">
+          <span class="truncate text-lg font-black">{{
+            props.draftedTeam?.team_name
+          }}</span>
+          <span class="truncate text-xs font-light">{{
+            props.draftedTeam?.team_owner
+          }}</span>
+        </div>
       </div>
       <div
         v-if="props.draftedTeam?.allowed_transfers || props.adminMetadata"

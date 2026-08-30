@@ -13,6 +13,7 @@ interface WeeklyData {
 }
 
 interface WeeklyWinner {
+  drafted_team_id?: number;
   team_name: string;
   team_owner: string;
 }
@@ -23,4 +24,4 @@ interface WeeklyWinners {
   points: number;
 }
 
-export type { WeeklyData, WeeklyWinners };
+export type { WeeklyData, WeeklyWinner, WeeklyWinners };

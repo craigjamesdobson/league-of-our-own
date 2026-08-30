@@ -409,6 +409,7 @@ it uses the app-calculated totals from `player_statistics`.
 #### `get_weekly_winners()`
 ```sql
 -- Returns weekly winners across all completed weeks
+-- Each winner includes drafted_team_id for stable team identity
 -- Used for: Historical winners display, achievement tracking
 ```
 

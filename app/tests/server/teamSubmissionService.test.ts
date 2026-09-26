@@ -49,6 +49,7 @@ const createDependencies = (
     teamRegistrationOpen: true,
     teamSubmissionDeadline: '2026-08-20',
   }),
+  now: () => new Date('2026-08-19T12:00:00.000Z'),
   verifyTurnstile: vi.fn().mockResolvedValue(true),
   loadPlayers: vi.fn().mockResolvedValue(validPlayers()),
   saveTeam: vi.fn().mockResolvedValue({ outcome: 'created', team: savedTeam }),

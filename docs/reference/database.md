@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Database Architecture
 
-*Last updated: 2026-08-07*
+*Last updated: 2026-09-25*
 
 ## Overview
 
@@ -202,7 +202,7 @@ CREATE TABLE drafted_players (
 
 ### 5. `drafted_transfers` - Transfer Management
 
-**Purpose**: Tracking player transfers between teams with expiry management.
+**Purpose**: Tracking player transfers between teams with gameweek-based activation.
 
 ```sql
 CREATE TABLE drafted_transfers (
@@ -210,17 +210,22 @@ CREATE TABLE drafted_transfers (
     drafted_player integer REFERENCES drafted_players(drafted_player_id),
     player_id integer REFERENCES players(player_id),
     transfer_week integer NOT NULL,
-    active_transfer_expiry date,
     created_at timestamptz DEFAULT now()
 );
 ```
 
 **Transfer Logic:**
-- `transfer_week`: Week when transfer becomes active
-- `active_transfer_expiry`: Deadline for transfer activation
+- `transfer_week`: Gameweek when the replacement becomes active; all application code compares this with the active gameweek
 - Links to both old player (via `drafted_player`) and new player (via `player_id`)
 
-### 6. `fixtures` - Match Fixtures
+The historical `active_transfer_expiry` column remains in the database for backwards compatibility, but it is not read or written by the application.
+
+
+### 6. `transfer_requests` and `transfer_request_items` - Pending Transfers
+
+Public transfer submissions are stored separately from live `drafted_transfers`. A request starts as `pending` and remains private workflow data until an administrator reviews it. Public pages never read these tables, and anonymous clients have no table or RPC permissions; live public data continues to come only from `drafted_transfers`. A team’s private management key authorizes its owner to create or update the single pending request for that team while the target gameweek is still ahead of the current gameweek. Authenticated administrators must use the approval or rejection RPCs; direct status updates are not permitted. Approval is only available when the active gameweek matches the request target, then revalidates the live team, player availability, squad membership, positions, budget, transfer allowance, and active season before atomically applying the requested changes to `drafted_transfers`. The request stores the server-derived target gameweek and the requester’s details. The item table stores up to two player changes for administrator review.
+
+### 7. `fixtures` - Match Fixtures
 
 **Purpose**: Premier League match fixtures with scoring and verification workflow.
 

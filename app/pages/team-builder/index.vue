@@ -120,7 +120,15 @@ onBeforeUnmount(() => {
   }
 });
 
-if (registrationIsOpen.value && route.query.id) {
+const teamKey = typeof route.query.id === 'string' ? route.query.id : '';
+
+if (!registrationIsOpen.value && teamKey) {
+  await navigateTo({
+    path: '/manage-team',
+    query: { key: teamKey },
+  }, { redirectCode: 302 });
+}
+else if (registrationIsOpen.value && teamKey) {
   await fetchDraftedTeamData();
 }
 else if (registrationIsOpen.value) {

@@ -206,7 +206,7 @@ export const createMockDraftedTransferWithWeeklyStats = (
 ): DraftedTransferWithWeeklyStats => {
   return {
     drafted_transfer_id: 1,
-    active_transfer_expiry: new Date(),
+    created_at: new Date().toISOString(),
     transfer_week: 1,
     data: createMockPlayerViewData(),
     selected: false,

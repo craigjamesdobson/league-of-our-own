@@ -183,7 +183,7 @@ app/types/
 #### Team Management
 - **Drafted Teams**: Fantasy teams with budget constraints
 - **Team Validation**: 11 players, position requirements, budget limits
-- **Transfer System**: Optional player trading with expiry dates
+- **Transfer System**: Optional player trading activated by gameweek
 
 #### Player Management
 - **FPL Integration**: Real Premier League player data

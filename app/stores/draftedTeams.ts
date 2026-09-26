@@ -9,13 +9,14 @@ import type { Database, TablesInsert } from '~/types/database.types';
 
 export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   const supabase = useSupabaseClient<Database>();
-  const { getActiveSeason } = useAppSettings();
+  const { getActiveSeason, getCurrentGameweek } = useAppSettings();
 
   const draftedTeams: Ref<DraftedTeamWithPlayers[] | null> = ref(null);
+  const activeGameweek = ref<number | undefined>();
   const draftedTeamAdminMetadata: Ref<Record<number, TeamAdminMetadata>> = ref({});
 
   const getDraftedTeams = computed(() =>
-    initDraftedTeamData(draftedTeams.value),
+    initDraftedTeamData(draftedTeams.value, activeGameweek.value),
   );
 
   const getDraftedTeamByID = computed(() => {
@@ -30,7 +31,11 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
   });
 
   const fetchDraftedTeams = async () => {
-    const activeSeason = await getActiveSeason();
+    const [activeSeason, currentGameweek] = await Promise.all([
+      getActiveSeason(),
+      getCurrentGameweek(),
+    ]);
+    activeGameweek.value = currentGameweek;
     const { data, error } = await supabase
       .rpc('get_drafted_teams_by_season', { active_season_param: activeSeason });
     if (error) throw error;
@@ -133,7 +138,6 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
       drafted_player: number;
       player_id: number;
       transfer_week: number;
-      active_transfer_expiry: string;
     }>,
   ) => {
     const { data, error } = await supabase
@@ -161,6 +165,7 @@ export const useDraftedTeamsStore = defineStore('drafted-teams-store', () => {
 
   return {
     draftedTeams,
+    activeGameweek,
     draftedTeamAdminMetadata,
     getDraftedTeams,
     getDraftedTeamByID,

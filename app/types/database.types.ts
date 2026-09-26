@@ -1,5 +1,5 @@
 import type { MergeDeep } from 'type-fest';
-import type { Database as DatabaseGenerated } from './database-generated.types';
+import type { Database as DatabaseGenerated, Json } from './database-generated.types';
 import type { DraftedTeamWithPlayers } from './DraftedTeam';
 
 export type { Json } from './database-generated.types';
@@ -50,8 +50,103 @@ type DatabaseWithPlayerPreviousSeasonStatistics = DatabaseGenerated & {
   public: {
     Tables: DatabaseGenerated['public']['Tables'] & {
       player_previous_season_statistics: PlayerPreviousSeasonStatisticsTable;
+      transfer_requests: TransferRequestsTable;
+      transfer_request_items: TransferRequestItemsTable;
+    };
+    Functions: DatabaseGenerated['public']['Functions'] & {
+      save_transfer_request: {
+        Args: {
+          p_active_season: string;
+          p_drafted_team_id: number;
+          p_items: Json;
+          p_requester_email: string;
+          p_requester_name: string;
+          p_team_name: string;
+          p_team_key: string;
+          p_target_gameweek: number;
+          p_transfer_request_id?: number | null;
+        };
+        Returns: TransferRequestRow;
+      };
+      approve_transfer_request: {
+        Args: {
+          p_transfer_request_id: number;
+        };
+        Returns: TransferRequestRow;
+      };
+      reject_transfer_request: {
+        Args: {
+          p_transfer_request_id: number;
+        };
+        Returns: TransferRequestRow;
+      };
+      cancel_transfer_request: {
+        Args: {
+          p_team_key: string;
+          p_transfer_request_id: number;
+        };
+        Returns: TransferRequestRow;
+      };
+      cancel_transfer_request_item: {
+        Args: {
+          p_team_key: string;
+          p_transfer_number: number;
+          p_transfer_request_id: number;
+        };
+        Returns: TransferRequestRow;
+      };
     };
   };
+};
+
+type TransferRequestRow = {
+  transfer_request_id: number;
+  drafted_team_id: number;
+  active_season: string;
+  requester_name: string;
+  requester_email: string;
+  target_gameweek: number;
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  cancelled_at: string | null;
+};
+
+type TransferRequestsTable = {
+  Row: TransferRequestRow;
+  Insert: Omit<TransferRequestRow, 'transfer_request_id' | 'created_at' | 'reviewed_at' | 'reviewed_by' | 'cancelled_at'> & {
+    transfer_request_id?: number;
+    created_at?: string;
+    reviewed_at?: string | null;
+    reviewed_by?: string | null;
+    cancelled_at?: string | null;
+  };
+  Update: Partial<Pick<TransferRequestRow, 'status' | 'reviewed_at' | 'reviewed_by' | 'cancelled_at'>>;
+  Relationships: [];
+};
+
+type TransferRequestItemsTable = {
+  Row: {
+    transfer_request_item_id: number;
+    transfer_request_id: number;
+    transfer_number: number;
+    drafted_player_id: number;
+    player_id: number;
+    player_out: string;
+    player_in: string;
+  };
+  Insert: {
+    transfer_request_item_id?: number;
+    transfer_request_id: number;
+    transfer_number: number;
+    drafted_player_id: number;
+    player_id: number;
+    player_out: string;
+    player_in: string;
+  };
+  Update: Partial<TransferRequestItemsTable['Insert']>;
+  Relationships: [];
 };
 
 // Override the type for a specific column in a view:

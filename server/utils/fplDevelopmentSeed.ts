@@ -39,7 +39,6 @@ interface DraftedPlayerSeed {
 interface DraftedTransferSeed {
   drafted_transfer_id: number;
   transfer_week: number;
-  active_transfer_expiry: null;
   player_id: number;
   drafted_player: number;
 }
@@ -71,7 +70,7 @@ interface FplDevelopmentSeed {
 }
 
 const FORMATION = [1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4];
-const MAX_PLAYERS_PER_CLUB = 2;
+const MAX_PLAYERS_PER_CLUB = 3;
 
 export const createFplDevelopmentSeed = (
   bootstrap: FplSeedBootstrap,
@@ -97,26 +96,37 @@ export const createFplDevelopmentSeed = (
   const playersByCode = new Map(
     bootstrap.elements.map(player => [player.code, player]),
   );
-  const reservedCuratedCodes = new Set(
-    CURATED_DEVELOPMENT_TEAMS.flatMap(team => [
-      ...team.playerCodes,
-      ...(team.transfer ? [team.transfer.incomingPlayerCode] : []),
-    ]),
-  );
   const availableByPosition = new Map<number, FplPlayer[]>(
     [1, 2, 3, 4].map(position => [
       position,
-      bootstrap.elements.filter(player =>
-        player.element_type === position
-        && !reservedCuratedCodes.has(player.code)),
+      bootstrap.elements
+        .filter(player => player.element_type === position && player.status !== 'u')
+        .toSorted((left, right) => {
+          const leftValue = (left.total_points + (left.minutes / 90)) / left.now_cost;
+          const rightValue = (right.total_points + (right.minutes / 90)) / right.now_cost;
+          return rightValue - leftValue
+            || right.total_points - left.total_points
+            || right.minutes - left.minutes
+            || left.code - right.code;
+        }),
     ]),
   );
+  const curatedTransferCount = CURATED_DEVELOPMENT_TEAMS
+    .slice(0, teamCount)
+    .filter(team => team.transfer)
+    .length;
+  const targetTransferCount = Math.floor(teamCount / 2);
+  let generatedTransferCount = Math.max(0, targetTransferCount - curatedTransferCount);
 
   const draftedTeams: DraftedTeamSeed[] = [];
   const draftedPlayers: DraftedPlayerSeed[] = [];
 
   for (let teamId = 1; teamId <= teamCount; teamId += 1) {
     const curatedTeam = CURATED_DEVELOPMENT_TEAMS[teamId - 1];
+    const generatedTransferEnabled = !curatedTeam && generatedTransferCount > 0;
+    if (generatedTransferEnabled) {
+      generatedTransferCount -= 1;
+    }
     const squad = curatedTeam
       ? curatedTeam.playerCodes.map((code) => {
           const player = playersByCode.get(code);
@@ -127,13 +137,25 @@ export const createFplDevelopmentSeed = (
           }
           return player;
         })
-      : FORMATION.map((position) => {
-          const player = availableByPosition.get(position)?.shift();
-          if (!player) {
-            throw new Error(`Not enough FPL players to create team ${teamId}`);
-          }
-          return player;
-        });
+      : (() => {
+          const selectedPlayerIds = new Set<number>();
+          const generatedClubCounts = new Map<number, number>();
+          return FORMATION.map((position, slotIndex) => {
+            const candidates = availableByPosition.get(position) ?? [];
+            const startIndex = (teamId * FORMATION.length + slotIndex) % candidates.length;
+            const player = candidates
+              .map((_, candidateIndex) => candidates[(startIndex + candidateIndex) % candidates.length])
+              .find(candidate => candidate !== undefined
+                && !selectedPlayerIds.has(candidate.id)
+                && (generatedClubCounts.get(candidate.team) ?? 0) < MAX_PLAYERS_PER_CLUB);
+            if (!player) {
+              throw new Error(`Not enough FPL players to create team ${teamId}`);
+            }
+            selectedPlayerIds.add(player.id);
+            generatedClubCounts.set(player.team, (generatedClubCounts.get(player.team) ?? 0) + 1);
+            return player;
+          });
+        })();
     const formation = squad.map(player => player.element_type).toSorted();
     const clubCounts = new Map<number, number>();
     squad.forEach((player) => {
@@ -143,14 +165,15 @@ export const createFplDevelopmentSeed = (
     if (formation.join(',') !== FORMATION.toSorted().join(',')) {
       throw new Error(`${curatedTeam?.name ?? `Development XI ${teamId}`} has an invalid formation`);
     }
-    if (curatedTeam && squad.some(player => player.status !== 'a')) {
-      throw new Error(`${curatedTeam.name} contains an unavailable FPL player`);
+    const teamLabel = curatedTeam?.name ?? 'Development XI ' + teamId;
+    if (squad.some(player => player.status === 'u')) {
+      throw new Error(`${teamLabel} contains an unavailable FPL player`);
     }
-    if (curatedTeam && Math.max(...clubCounts.values()) > MAX_PLAYERS_PER_CLUB) {
-      throw new Error(`${curatedTeam.name} contains too many players from one club`);
+    if (Math.max(...clubCounts.values()) > MAX_PLAYERS_PER_CLUB) {
+      throw new Error(`${teamLabel} contains too many players from one club`);
     }
 
-    const allowedTransfers = curatedTeam?.allowedTransfers ?? false;
+    const allowedTransfers = curatedTeam?.allowedTransfers ?? generatedTransferEnabled;
     const totalTeamValue = squad.reduce(
       (total, player) => total + (player.now_cost / 10),
       0,
@@ -184,7 +207,7 @@ export const createFplDevelopmentSeed = (
     });
   }
 
-  const draftedTransfers = draftedTeams.flatMap((team): DraftedTransferSeed[] => {
+  const curatedTransfers = draftedTeams.flatMap((team): DraftedTransferSeed[] => {
     const transfer = CURATED_DEVELOPMENT_TEAMS[team.drafted_team_id - 1]?.transfer;
     if (!transfer) {
       return [];
@@ -213,12 +236,48 @@ export const createFplDevelopmentSeed = (
     return [{
       drafted_transfer_id: team.drafted_team_id,
       transfer_week: transfer.week,
-      active_transfer_expiry: null,
       player_id: incomingPlayer.id,
       drafted_player: draftedPlayer.drafted_player_id,
     }];
   });
 
+  const playersById = new Map(bootstrap.elements.map(player => [player.id, player]));
+  const generatedTransfers = draftedTeams.flatMap((team): DraftedTransferSeed[] => {
+    if (!team.allowed_transfers || CURATED_DEVELOPMENT_TEAMS[team.drafted_team_id - 1]?.transfer) {
+      return [];
+    }
+
+    const squad = draftedPlayers
+      .filter(player => player.drafted_team === team.drafted_team_id)
+      .map(player => ({ draftedPlayer: player, player: playersById.get(player.drafted_player) }))
+      .filter((entry): entry is { draftedPlayer: DraftedPlayerSeed; player: FplPlayer } => Boolean(entry.player));
+    const outgoing = squad.find(entry => entry.player.element_type === 3);
+    if (!outgoing) {
+      throw new Error(`Could not create a transfer for ${team.team_name}`);
+    }
+
+    const squadPlayerIds = new Set(squad.map(entry => entry.player.id));
+    const incoming = availableByPosition.get(outgoing.player.element_type)?.find(player =>
+      !squadPlayerIds.has(player.id)
+      && player.now_cost <= outgoing.player.now_cost,
+    );
+    if (!incoming) {
+      throw new Error(`Could not find a valid transfer for ${team.team_name}`);
+    }
+
+    team.total_team_value = team.total_team_value
+      - (outgoing.player.now_cost / 10)
+      + (incoming.now_cost / 10);
+
+    return [{
+      drafted_transfer_id: team.drafted_team_id,
+      transfer_week: Math.min(38, team.drafted_team_id + 4),
+      player_id: incoming.id,
+      drafted_player: outgoing.draftedPlayer.drafted_player_id,
+    }];
+  });
+
+  const draftedTransfers = [...curatedTransfers, ...generatedTransfers];
   const weeklyStatistics = draftedTeams.flatMap(team =>
     Array.from({ length: 38 }, (_, weekIndex): WeeklyStatisticSeed => {
       const week = weekIndex + 1;

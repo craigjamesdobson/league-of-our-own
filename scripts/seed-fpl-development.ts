@@ -30,7 +30,7 @@ const parseTeamCount = (args: string[]): number => {
   const separateIndex = args.indexOf('--teams');
   const rawValue = equalsArgument?.split('=')[1]
     ?? (separateIndex >= 0 ? args[separateIndex + 1] : undefined)
-    ?? '4';
+    ?? '10';
 
   return Number(rawValue);
 };

@@ -36,7 +36,7 @@ const modeItems = computed(() =>
 
 const buttonUi = computed(() => ({
   base: props.collapsed
-    ? 'grid h-12 w-12 place-items-center p-0'
+    ? 'min-h-12 w-12 justify-center overflow-hidden p-0'
     : 'min-h-12 w-full justify-start overflow-hidden px-3',
   leadingIcon: 'size-5 text-current',
   label: 'truncate text-sm font-medium',
@@ -47,6 +47,8 @@ const buttonUi = computed(() => ({
   <UTooltip
     class="w-full"
     :text="`Theme: ${activeMode.label}`"
+    :disabled="!props.collapsed"
+    :content="{ side: 'right' }"
   >
     <UDropdownMenu
       class="w-full"
@@ -61,7 +63,7 @@ const buttonUi = computed(() => ({
         color="neutral"
         variant="ghost"
         :square="collapsed"
-        class="rounded-lg text-slate-200 hover:bg-white/10 hover:text-white"
+        class="cursor-pointer rounded-lg text-slate-200 hover:bg-white/10 hover:text-white"
         :ui="buttonUi"
       />
     </UDropdownMenu>

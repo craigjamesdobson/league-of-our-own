@@ -29,6 +29,10 @@ mockNuxtImport('useSupabaseUser', () => {
   return () => user;
 });
 
+mockNuxtImport('useAppSettings', () => () => ({
+  getCurrentGameweek: vi.fn().mockResolvedValue(1),
+}));
+
 vi.mock('~/stores/draftedTeams', () => ({
   useDraftedTeamsStore: () => store,
 }));
@@ -49,6 +53,10 @@ describe('teams page admin metadata', () => {
     }), {
       global: {
         stubs: {
+          NuxtLink: defineComponent({
+            props: ['to'],
+            template: '<a :href="to"><slot /></a>',
+          }),
           DraftedTeam: defineComponent({
             props: ['adminMetadata'],
             template: '<button v-if="adminMetadata" aria-label="View submission history" />',

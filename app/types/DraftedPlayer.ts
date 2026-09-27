@@ -2,7 +2,7 @@ import type { Tables } from './database.types';
 
 interface DraftedTransfer {
   drafted_transfer_id: number;
-  active_transfer_expiry: Date;
+  created_at?: string;
   transfer_week: number;
   data: Tables<'players_view'>;
   selected: boolean;

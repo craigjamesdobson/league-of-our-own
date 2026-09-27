@@ -32,7 +32,7 @@ describe('createFplDevelopmentSeed', () => {
         .map(player => playersById.get(player.drafted_player)!.code)))
       .toEqual([
         [204936, 226597, 247348, 199796, 494521, 141746, 513418, 243298, 223094, 177815, 538207],
-        [154561, 209036, 225796, 244723, 216051, 437730, 223340, 208706, 502500, 178301, 475168],
+        [154561, 209036, 225796, 244723, 216051, 437730, 223340, 208706, 502500, 244042, 475168],
         [111234, 97032, 17761, 472769, 200834, 204480, 446008, 222531, 224117, 231747, 444102],
         [457569, 467779, 469142, 215136, 466075, 244851, 209244, 448047, 50175, 219168, 438234],
       ]);
@@ -172,5 +172,28 @@ describe('createFplDevelopmentSeed', () => {
     expect(seed.fixtures.every(fixture =>
       fixture.home_team_score === null && fixture.away_team_score === null,
     )).toBe(true);
+  });
+
+  it('creates ten development squads with five transfer histories', () => {
+    const seed = createFplDevelopmentSeed(
+      {
+        teams: createMockFplTeams(),
+        elements: createMockFplPlayers(),
+      },
+      createMockFplFixtures(),
+      10,
+    );
+
+    expect(seed.draftedTeams).toHaveLength(10);
+    expect(seed.draftedTeams.filter(team => team.allowed_transfers)).toHaveLength(5);
+    expect(seed.draftedTransfers).toHaveLength(5);
+    expect(new Set(seed.draftedTransfers.map(transfer => transfer.drafted_transfer_id))).toEqual(
+      new Set([1, 2, 5, 6, 7]),
+    );
+    expect(seed.draftedPlayers).toHaveLength(110);
+    seed.draftedTeams.forEach((team) => {
+      expect(seed.draftedPlayers.filter(player => player.drafted_team === team.drafted_team_id))
+        .toHaveLength(11);
+    });
   });
 });

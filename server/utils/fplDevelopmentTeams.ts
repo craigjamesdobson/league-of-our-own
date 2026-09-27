@@ -45,7 +45,7 @@ export const CURATED_DEVELOPMENT_TEAMS: CuratedDevelopmentTeam[] = [
       223340, // Saka
       208706, // Bruno Guimarães
       502500, // Thiago
-      178301, // Watkins
+      244042, // Muniz
       475168, // João Pedro
     ],
     transfer: {

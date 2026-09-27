@@ -136,15 +136,14 @@ values
 insert into public.drafted_transfers (
   drafted_transfer_id,
   transfer_week,
-  active_transfer_expiry,
   player_id,
   drafted_player,
   created_at
 )
 values
-  (1, 10, '2026-01-01', 23, 1, '2025-10-01 10:00:00+00'),
-  (2, 20, '2026-03-01', 24, 1, '2026-01-01 10:00:00+00'),
-  (3, 15, '2026-02-01', 25, 12, '2025-11-01 10:00:00+00');
+  (1, 10, 23, 1, '2025-10-01 10:00:00+00'),
+  (2, 20, 24, 1, '2026-01-01 10:00:00+00'),
+  (3, 15, 25, 12, '2025-11-01 10:00:00+00');
 
 insert into public.drafted_teams (
   drafted_team_id,
@@ -471,6 +470,27 @@ select throws_ok(
   'clear refuses to remove operational data when another Season is present'
 );
 
+insert into public.transfer_requests (
+  transfer_request_id,
+  drafted_team_id,
+  active_season,
+  requester_name,
+  requester_email,
+  target_gameweek
+)
+values (1, 1, '25-26', 'Alice', 'alice@example.test', 2);
+
+insert into public.transfer_request_items (
+  transfer_request_item_id,
+  transfer_request_id,
+  transfer_number,
+  drafted_player_id,
+  player_id,
+  player_out,
+  player_in
+)
+values (1, 1, 1, 1, 23, 'Player 1', 'Player 23');
+
 delete from public.weekly_statistics
 where team in (3, 4, 5, 6);
 
@@ -506,6 +526,8 @@ select ok(
   not exists (select 1 from public.drafted_teams)
   and not exists (select 1 from public.drafted_players)
   and not exists (select 1 from public.drafted_transfers)
+  and not exists (select 1 from public.transfer_requests)
+  and not exists (select 1 from public.transfer_request_items)
   and not exists (select 1 from public.weekly_statistics)
   and not exists (select 1 from public.player_statistics)
   and not exists (select 1 from public.fixtures)

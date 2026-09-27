@@ -15,7 +15,7 @@ const curatedPlayerCodesByPosition = new Map([
   [4, [
     223094, 502500, 224117, 50175,
     177815, 178301, 231747, 219168,
-    538207, 475168, 444102, 438234,
+    538207, 475168, 444102, 438234, 244042,
   ]],
 ]);
 
@@ -32,6 +32,7 @@ const curatedPlayerTeamsByCode = new Map<number, number>([
   ...playerTeamEntries([247348, 244723, 231747], 8),
   ...playerTeamEntries([111234, 17761, 215413], 9),
   ...playerTeamEntries([177815], 13),
+  ...playerTeamEntries([244042], 10),
   ...playerTeamEntries([97032, 243298, 219168], 14),
   ...[204936, 209036, 437730, 472769, 209244, 438234, 223094]
     .map((code): [number, number] => [code, 15]),

@@ -6,11 +6,21 @@ Reference documentation for this project's Nitro server endpoints.
 
 ## Team submission emails
 
-`POST /api/team-submission` owns all transactional email delivery for team registration. The server derives the recipient, subject, HTML, and private edit link from the validated saved team. There is deliberately no public general-purpose email endpoint.
+`POST /api/team-submission` owns all transactional email delivery for team registration. The server derives the recipient, subject, HTML, and private edit link from the validated saved team.
 
 New submissions return a `created` outcome and whether both confirmation deliveries succeeded. Updates return `updated` without sending another email. If a new submission uses an email already registered in the Active Season, no duplicate is created and no email is sent; the endpoint returns `existing-team` without exposing the key to the browser, and the entrant is directed to contact the league administrator.
 
 The Resend API key and sender identity are configured server-side. `SITE_URL` must be configured so edit links use the canonical application origin. See [Configuration Reference](../configuration.md).
+
+## Transfer request emails
+
+`POST /api/transfer-request` accepts a transfer request for manual review through a private team management key. It validates the requester and two transfer slots, checks the existing Cloudflare Turnstile challenge, rejects the honeypot field, and applies an in-memory limit of five requests per IP within 15 minutes. Valid requests are saved in `transfer_requests` and `transfer_request_items`, with the target gameweek inferred server-side as the next gameweek. A second pending request for the same team is rejected atomically, but returns the same generic submission error so pending-request status is not exposed publicly. Requests can be updated by submitting the existing pending request ID with the same team key while the target gameweek is still ahead of the current gameweek.
+
+`GET /api/team-management/:key` returns the private read-only team details, current squad, live transfer history, and that team's pending transfer request. The existing team-builder edit link redirects to this page after team registration closes, so existing teams can continue using their original email link.
+
+`POST /api/team-management-link` accepts an email address and a Turnstile challenge, then sends the private management link for every eligible transfer team registered to that address. The response is deliberately generic whether or not a team matches, preventing email enumeration. Requests are limited by both IP address and email address.
+
+The form sends player IDs alongside their displayed names. The database function verifies the selected team, outgoing players, incoming players, season availability, squad uniqueness, positions, budget, and two-transfer seasonal window. The endpoint still does not modify the live team. Resend sends a notification to `transfers@leagueofourown.co.uk` and a receipt to the requester. Email delivery failures do not discard a saved request, and the response reports whether both deliveries succeeded.
 
 ## Creating New Endpoints
 
@@ -99,11 +109,7 @@ export default defineEventHandler(async (event) => {
 
 ## Rate Limiting
 
-Server endpoints don't have built-in rate limiting configured. For production:
-
-- Implement rate limiting middleware
-- Use platform-specific (Vercel, Netlify) rate limiting
-- Consider Resend rate limits for email endpoints
+The transfer request endpoint has a lightweight in-memory limit for each running server instance. If traffic grows or the application runs across many stateless instances, add platform-level distributed rate limiting as a second layer.
 
 ## See Also
 
@@ -114,4 +120,4 @@ Server endpoints don't have built-in rate limiting configured. For production:
 
 ---
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-09-25

@@ -102,6 +102,14 @@ jobs:
         with:
           version: 2.45.5
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
       - name: Link staging project
         run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
 
@@ -159,6 +167,14 @@ jobs:
         uses: supabase/setup-cli@v1
         with:
           version: 2.45.5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
 
       - name: Link production project
         run: supabase link --project-ref "$SUPABASE_PROJECT_ID"

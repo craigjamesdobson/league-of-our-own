@@ -24,6 +24,8 @@ jobs:
     env:
       SUPABASE_URL: ${{ vars.SUPABASE_URL }}
       SUPABASE_KEY: ${{ vars.SUPABASE_KEY }}
+      TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+      SITE_URL: ${{ vars.SITE_URL }}
 
     steps:
       - name: Check out repository

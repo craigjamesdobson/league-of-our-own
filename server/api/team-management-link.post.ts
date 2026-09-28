@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const email = parsedRequest.data.email.toLowerCase();
   const requesterIP = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown';
 
-  if (!await verifyTurnstileToken(parsedRequest.data.turnstileToken).then(result => result.success)) {
+  if (!await verifyTurnstileToken(parsedRequest.data.turnstileToken, event).then(result => result.success)) {
     throw createError({ statusCode: 422, statusMessage: 'Security verification failed' });
   }
 

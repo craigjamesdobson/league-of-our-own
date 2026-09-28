@@ -150,7 +150,7 @@ export default defineEventHandler(async (event) => {
       sendEmail: async (request) => {
         return sendTransferRequestEmails(event, request);
       },
-      verifyTurnstile: async token => (await verifyTurnstileToken(token)).success,
+      verifyTurnstile: async token => (await verifyTurnstileToken(token, event)).success,
     });
   }
   catch (error) {

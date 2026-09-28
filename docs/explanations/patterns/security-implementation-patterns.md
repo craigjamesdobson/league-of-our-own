@@ -28,7 +28,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     turnstile: {
-      secretKey: process.env.TURNSTILE_SECRET_KEY,
+      secretKey: process.env.NITRO_TURNSTILE_SECRET_KEY,
     },
     public: {
       turnstile: {
@@ -90,7 +90,7 @@ if (!verification.success) {
 
 **Evidence**:
 - Started with `NUXT_TURNSTILE_SITE_KEY` following Nuxt patterns
-- Official module expected `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
+- Official module expected `TURNSTILE_SITE_KEY` and `NITRO_TURNSTILE_SECRET_KEY`
 - Mixing conventions caused configuration confusion
 - Stick to what the official documentation specifies
 

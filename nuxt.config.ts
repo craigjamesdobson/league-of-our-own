@@ -71,7 +71,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     turnstile: {
-      secretKey: process.env.TURNSTILE_SECRET_KEY,
+      // Supplied by Nitro at runtime via NITRO_TURNSTILE_SECRET_KEY.
+      secretKey: process.env.NITRO_TURNSTILE_SECRET_KEY,
     },
     public: {
       SITE_URL: process.env.SITE_URL,

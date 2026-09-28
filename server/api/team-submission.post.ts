@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
         };
       },
       verifyTurnstile: async (token) => {
-        const result = await verifyTurnstileToken(token);
+        const result = await verifyTurnstileToken(token, event);
         return result.success;
       },
       loadPlayers: async (playerIds) => {

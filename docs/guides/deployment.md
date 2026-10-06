@@ -30,20 +30,19 @@ pnpm build:cloudflare
 
 The database job starts a clean local Supabase instance and applies all migrations.
 
-Configure branch protection to require:
+Require these checks for pull requests into `main`:
 
 - `CI / application`
 - `CI / database-migrations`
 
 ## Staging promotion
 
-1. Open a pull request targeting `staging`.
-2. Review the change and wait for both required checks.
-3. Merge the pull request.
-4. GitHub Actions repeats both checks against the exact merged commit.
-5. After both pass, the workflow applies migrations to the staging Supabase project.
-6. The same job deploys the verified application artifact to Cloudflare Pages with `--branch=staging`.
-7. Complete staging smoke tests and any feature-specific manual QA.
+1. Merge the feature branch directly into `staging`, then push `staging`. No pull request is needed for staging testing.
+2. GitHub Actions runs both verification jobs against the exact merged commit.
+3. After both pass, the workflow applies migrations to the staging Supabase project.
+4. The same job deploys the verified application artifact to Cloudflare Pages with `--branch=staging`.
+5. Complete staging smoke tests and any feature-specific manual QA.
+6. Repeat direct merges into `staging` as the feature develops. Open a pull request into `main` once it is ready for production review.
 
 Database deployment never begins if lint, typechecking, tests, the Nuxt build, or local migration validation fails.
 

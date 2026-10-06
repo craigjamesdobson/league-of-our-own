@@ -58,20 +58,19 @@ Restrict each project ID and database password to its matching environment. Conf
 
 Set `SUPABASE_URL`, `SUPABASE_KEY`, `TURNSTILE_SITE_KEY`, and `SITE_URL` as public variables in the `ci`, `staging`, and `production` environments. Set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_PROJECT` as variables in the two deployment environments. The `ci` environment is used for pull requests and verification-only runs.
 
-Require these status checks in the branch protection rules for `staging` and `main`:
+Require these status checks for pull requests into `main`:
 
 - `CI / application`
 - `CI / database-migrations`
 
 ## Promotion flow
 
-1. Open a pull request into `staging`.
-2. Wait for both required verification jobs.
-3. Merge the pull request.
-4. The push workflow rebuilds and retests the merged commit.
-5. If both jobs pass, staging database migrations are applied, then the exact verified artifact is deployed to Cloudflare Pages on the `staging` branch.
-6. Verify the staging application before promoting the same changes to `main`.
-7. After the `main` pull request passes verification and is merged, push a `v*` release tag for that commit to deploy production.
+1. Merge the feature branch directly into `staging` and push that branch. Staging testing does not require a pull request.
+2. The push workflow rebuilds and retests the merged commit.
+3. If both jobs pass, staging database migrations are applied, then the exact verified artifact is deployed to Cloudflare Pages on the `staging` branch.
+4. Test the staging application. Repeat the direct merge and deployment as the feature develops.
+5. Open a pull request into `main` when the feature is ready for production review.
+6. After the `main` pull request passes verification and is merged, push a `v*` release tag for that commit to deploy production.
 
 ## Rollback
 

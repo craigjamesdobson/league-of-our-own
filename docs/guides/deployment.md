@@ -4,14 +4,15 @@ How changes are verified and promoted through staging and production.
 
 ## Current deployment model
 
-GitHub Actions verifies both the Nuxt application and Supabase migrations. After verification, it applies database migrations for pushes to protected branches:
+GitHub Actions verifies the Nuxt application and Supabase migrations. For pushes to protected branches, it applies migrations first and then deploys the exact verified application artifact to Cloudflare Pages:
 
-- `staging` deploys migrations to the staging Supabase project.
-- `main` deploys migrations to the production Supabase project.
+- Pushes to `staging` deploy the staging database and application.
+- Pushes to `main` run verification only.
+- Tags matching `v*` deploy production after checking that the tagged commit belongs to `main`.
 
-The workflow builds the application with `pnpm build`, producing the Nitro application in `.output`. The current Nitro preset is `node-server` because the repository includes server API routes.
+The workflow builds the application with `pnpm build:cloudflare`, producing a Cloudflare Pages artifact in `dist/`, including the Nitro server routes. It uploads the artifact with hidden files included and a name containing the exact commit SHA.
 
-Frontend hosting is configured outside this repository or has not yet been recorded here. GitHub Actions does not currently publish `.output`. Confirm the frontend hosting target, build-time environment, and staging URL before relying on a branch merge to update the website.
+After verification, GitHub Actions applies Supabase migrations first, downloads that same artifact, and deploys it with Wrangler to the matching Cloudflare Pages branch. Cloudflare Pages automatic Git deployments must be disabled so application deployment follows the database update.
 
 ## Pull-request verification
 
@@ -24,47 +25,47 @@ pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm build
+pnpm build:cloudflare
 ```
 
 The database job starts a clean local Supabase instance and applies all migrations.
 
-Configure branch protection to require:
+Require these checks for pull requests into `main`:
 
 - `CI / application`
 - `CI / database-migrations`
 
 ## Staging promotion
 
-1. Open a pull request targeting `staging`.
-2. Review the change and wait for both required checks.
-3. Merge the pull request.
-4. GitHub Actions repeats both checks against the exact merged commit.
-5. After both pass, the workflow applies migrations to the staging Supabase project.
-6. Confirm the frontend hosting platform has deployed the same commit.
-7. Complete staging smoke tests and any feature-specific manual QA.
+1. Merge the feature branch directly into `staging`, then push `staging`. No pull request is needed for staging testing.
+2. GitHub Actions runs both verification jobs against the exact merged commit.
+3. After both pass, the workflow applies migrations to the staging Supabase project.
+4. The same job deploys the verified application artifact to Cloudflare Pages with `--branch=staging`.
+5. Complete staging smoke tests and any feature-specific manual QA.
+6. Repeat direct merges into `staging` as the feature develops. Open a pull request into `main` once it is ready for production review.
 
 Database deployment never begins if lint, typechecking, tests, the Nuxt build, or local migration validation fails.
 
 ## Production promotion
 
-Promote tested staging changes through a pull request into `main`. The same verification gates run before the production database deployment. Production and staging deployment jobs use separate GitHub environments and cannot overlap with another deployment to the same environment.
+Promote tested staging changes through a pull request into `main`. Merging that pull request runs verification without deploying. Push a release tag matching `v*` for the tested commit to trigger production deployment. The workflow verifies that the tagged commit belongs to `main`, applies production migrations, then deploys the application artifact with `--branch=main`. Production and staging use separate GitHub environments, with deployments serialized within each environment.
 
 ## GitHub environments and secrets
 
-The repository requires `staging` and `production` GitHub environments.
+The repository requires `ci`, `staging`, and `production` GitHub environments. Pull requests and verification-only runs use `ci` for public build configuration.
 
 Database deployment uses:
 
 ```text
 SUPABASE_ACCESS_TOKEN
-STAGING_PROJECT_ID
-STAGING_DB_PASSWORD
-PRODUCTION_PROJECT_ID
-PRODUCTION_DB_PASSWORD
+SUPABASE_PROJECT_ID
+SUPABASE_DB_PASSWORD
+CLOUDFLARE_API_TOKEN
 ```
 
 Store project IDs and database passwords in the matching GitHub environment. Do not expose deployment secrets to pull-request jobs.
+
+Set public variables `SUPABASE_URL`, `SUPABASE_KEY`, `TURNSTILE_SITE_KEY`, and `SITE_URL` in each build environment. Set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_PROJECT` in `staging` and `production`.
 
 The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
 
@@ -111,16 +112,9 @@ Frontend rollback depends on the hosting platform. Prefer redeploying the last k
 
 Do not reverse an applied Supabase migration by deleting its migration file. Create a corrective forward migration unless a documented recovery procedure explicitly requires database restoration. Application changes that accompany schema migrations should remain compatible during staged rollout and rollback.
 
-## Known gap
+## Deployment ownership
 
-The repository has no frontend deployment job. To close that gap:
-
-1. Identify the hosting platform and staging URL.
-2. Decide which public configuration is embedded at build time.
-3. Upload the verified `.output` directory as a workflow artifact on trusted branch pushes.
-4. Add a frontend deployment job that consumes that exact artifact.
-5. Add an HTTP smoke check against the deployed staging URL.
-6. Document the platform-specific rollback procedure.
+GitHub Actions owns database and application deployment. Confirm the relevant push or tag workflow succeeds, then check the deployed application at the URL recorded in that environment's `SITE_URL`. Manual workflow runs verify changes without deploying them.
 
 ## See also
 
@@ -131,4 +125,4 @@ The repository has no frontend deployment job. To close that gap:
 
 ---
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-10-06

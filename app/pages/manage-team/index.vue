@@ -186,75 +186,105 @@ const requestManagementLink = async () => {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-5xl flex-col gap-5">
-    <UCard v-if="!teamKey">
-      <template #header>
-        <div>
-          <p class="text-xs font-black uppercase tracking-[0.2em] text-primary">
-            Private team access
-          </p>
-          <h1 class="mt-1 text-2xl font-black uppercase text-highlighted">
-            Find your team link
-          </h1>
-        </div>
-      </template>
-      <template v-if="!reminderSubmitted">
-        <p class="text-sm text-muted">
-          Your private team management link was sent to the email address used when your team was submitted. Enter that email below and we will send the link again.
-        </p>
-        <form
-          class="mt-5 flex flex-col gap-4"
-          @submit.prevent="requestManagementLink"
-        >
-          <UFormField
-            label="Team submission email"
-            required
-          >
-            <UInput
-              v-model="reminderEmail"
-              class="w-full"
-              type="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              required
-            />
-          </UFormField>
-          <NuxtTurnstile
-            ref="reminderTurnstileRef"
-            v-model="reminderTurnstileTokenValue"
-            class="self-start"
-          />
-          <UAlert
-            v-if="reminderError"
-            color="error"
-            variant="soft"
-            icon="i-lucide-triangle-alert"
-            :description="reminderError"
-          />
-          <UButton
-            type="submit"
-            class="w-fit"
-            :loading="reminderSubmitting"
-            label="Email me my team link"
-          />
-        </form>
-      </template>
-      <UAlert
-        v-else
-        color="success"
-        variant="soft"
-        icon="i-lucide-mail-check"
-        title="Check your inbox"
-        description="If an eligible team is registered to that email address, we have sent a private team management link."
-      />
-      <p class="mt-5 text-sm text-muted">
-        If you still cannot find the email, contact
-        <a
-          class="font-bold underline"
-          :href="`mailto:${SUPPORT_EMAIL}`"
-        >{{ SUPPORT_EMAIL }}</a>.
+  <div
+    class="mx-auto flex w-full min-w-0 flex-col gap-5"
+    :class="{ 'max-w-5xl': teamKey }"
+  >
+    <div v-if="!teamKey">
+      <h1 class="text-3xl font-black uppercase text-highlighted">
+        Request a transfer
+      </h1>
+      <p class="mt-2 text-sm leading-6 text-muted dark:text-slate-300">
+        Choose the online form or send an email using the template below. Both options are reviewed before changes are applied, and the same transfer rules and deadline apply.
       </p>
-    </UCard>
+    </div>
+    <div
+      v-if="!teamKey"
+      class="grid grid-cols-1 items-start gap-5 lg:grid-cols-2 lg:items-stretch"
+    >
+      <UCard
+        class="flex min-w-0 flex-col dark:divide-slate-700 dark:ring-slate-700"
+        :ui="{ body: 'flex-1', footer: 'flex min-h-20 items-center' }"
+      >
+        <template #header>
+          <div>
+            <p class="text-xs font-black uppercase tracking-[0.2em] text-primary dark:text-primary-300">
+              Option 1
+            </p>
+            <h2 class="mt-1 text-2xl font-black uppercase text-highlighted">
+              Request online
+            </h2>
+          </div>
+        </template>
+        <p class="mb-5 text-sm leading-6 text-muted dark:text-slate-300">
+          Use your private team link to select players, check your budget and transfer allowance, and submit your request. You can view, change or cancel a pending request before the deadline.
+        </p>
+        <template v-if="!reminderSubmitted">
+          <h3 class="mb-2 text-base font-bold text-highlighted">
+            Find your team link
+          </h3>
+          <p class="text-sm text-muted dark:text-slate-300">
+            Your private team management link was sent to the email address used when your team was submitted. Enter that email below and we will send the link again.
+          </p>
+          <form
+            class="mt-5 flex flex-col gap-4"
+            @submit.prevent="requestManagementLink"
+          >
+            <UFormField
+              label="Team submission email"
+              required
+            >
+              <UInput
+                v-model="reminderEmail"
+                class="w-full max-w-md"
+                :ui="{ base: 'dark:bg-slate-950/50 dark:ring-slate-600 dark:text-slate-200 dark:placeholder:text-slate-400 dark:focus-visible:ring-primary-300' }"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                required
+              />
+            </UFormField>
+            <NuxtTurnstile
+              ref="reminderTurnstileRef"
+              v-model="reminderTurnstileTokenValue"
+              :options="{ size: 'compact' }"
+              class="self-start"
+            />
+            <UAlert
+              v-if="reminderError"
+              color="error"
+              variant="soft"
+              icon="i-lucide-triangle-alert"
+              :description="reminderError"
+            />
+            <UButton
+              type="submit"
+              class="w-fit dark:bg-primary-300 dark:text-slate-950 dark:hover:bg-primary-200"
+              :loading="reminderSubmitting"
+              label="Email me my team link"
+            />
+          </form>
+        </template>
+        <UAlert
+          v-else
+          color="success"
+          variant="soft"
+          icon="i-lucide-mail-check"
+          title="Check your inbox"
+          description="If an eligible team is registered to that email address, we have sent a private team management link."
+        />
+        <template #footer>
+          <p class="text-sm text-muted dark:text-slate-300">
+            If you still cannot find the email, contact
+            <a
+              class="font-bold underline"
+              :href="`mailto:${SUPPORT_EMAIL}`"
+            >{{ SUPPORT_EMAIL }}</a>.
+          </p>
+        </template>
+      </UCard>
+      <TransferEmailOption />
+    </div>
 
     <UAlert
       v-else-if="loadingError"

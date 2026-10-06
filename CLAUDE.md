@@ -7,6 +7,7 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 ## Git Rules
 
 - **Always get explicit user approval before committing.** Show the proposed commit message and files to be committed, then wait for confirmation before running `git commit`.
+- **Staging testing uses direct merges.** Merge feature branches directly into `staging` for repeated testing. Reserve pull requests for `main`, followed by a release tag for production deployment. For deployment requests, follow `docs/guides/deployment.md`.
 
 ## Database Safety Rules
 
@@ -388,7 +389,7 @@ Templates in `.github/ISSUE_TEMPLATE/`:
 ### Workflow Pattern
 
 ```
-Idea → GitHub Issue → Branch → PR → Merge → Close Issue
+Idea → GitHub Issue → Feature branch → Direct merge into staging → Test → PR into main → Release tag
 ```
 
 **Key Practices**:
@@ -422,4 +423,4 @@ pnpm test      # Run test suite
 
 ---
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-10-06

@@ -128,17 +128,19 @@ onBeforeUnmount(() => {
 
     <UModal
       v-model:open="isOpen"
+      title="What's new"
+      description="Latest updates to League of Our Own."
       :dismissible="true"
       :ui="{
         overlay: 'bg-slate-950/60',
-        content: 'w-[92vw] max-w-2xl overflow-hidden bg-default text-highlighted ring-default',
+        content: 'w-[92vw] max-w-2xl overflow-hidden bg-default text-highlighted ring-default dark:bg-slate-900 dark:text-slate-50 dark:ring-slate-700',
       }"
     >
       <template #content>
         <div class="flex max-h-[85vh] flex-col">
-          <div class="flex items-start justify-between gap-4 border-b border-default p-6 sm:p-7">
+          <div class="flex shrink-0 items-start justify-between gap-4 border-b border-default p-6 dark:border-slate-700 sm:p-7">
             <div class="flex items-start gap-3">
-              <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-primary-300/15 dark:text-primary-300">
                 <Icon
                   name="lucide:sparkles"
                   class="size-5"
@@ -146,7 +148,7 @@ onBeforeUnmount(() => {
                 />
               </div>
               <div>
-                <p class="text-xs font-black uppercase tracking-wide text-muted">
+                <p class="text-xs font-black uppercase tracking-wide text-muted dark:text-slate-300">
                   Latest updates
                 </p>
                 <h2 class="mt-1 text-xl font-black uppercase">
@@ -159,21 +161,22 @@ onBeforeUnmount(() => {
               color="neutral"
               variant="ghost"
               square
+              class="dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
               aria-label="Close What's new"
               title="Close"
               @click="isOpen = false"
             />
           </div>
 
-          <div class="overflow-y-auto p-6 sm:p-7">
+          <div class="min-h-0 flex-1 overflow-y-auto p-6 sm:p-7">
             <div class="space-y-8">
               <article
                 v-for="entry in whatsNewEntries"
                 :key="entry.id"
-                class="border-t border-default pt-6 first:border-t-0 first:pt-0"
+                class="border-t border-default pt-6 first:border-t-0 first:pt-0 dark:border-slate-700"
               >
                 <time
-                  class="text-xs font-semibold uppercase tracking-wide text-muted"
+                  class="text-xs font-semibold uppercase tracking-wide text-muted dark:text-slate-400"
                   :datetime="entry.publishedAt"
                 >
                   {{ formatDate(entry.publishedAt) }}
@@ -181,7 +184,7 @@ onBeforeUnmount(() => {
                 <h3 class="mt-2 text-xl font-bold sm:text-2xl">
                   {{ entry.title }}
                 </h3>
-                <p class="mt-3 text-base leading-7 text-muted sm:text-lg">
+                <p class="mt-3 text-base leading-7 text-muted dark:text-slate-300 sm:text-lg">
                   {{ entry.summary }}
                 </p>
                 <UButton
@@ -193,10 +196,10 @@ onBeforeUnmount(() => {
                   color="primary"
                   variant="soft"
                   size="md"
-                  class="mt-5"
+                  class="mt-5 dark:bg-primary-300 dark:text-slate-950 dark:hover:bg-primary-200"
                   @click="isOpen = false"
                 />
-                <ul class="mt-6 space-y-3 text-sm leading-6 text-muted">
+                <ul class="mt-6 space-y-3 text-sm leading-6 text-muted dark:text-slate-300">
                   <li
                     v-for="detail in entry.details"
                     :key="detail"
@@ -204,7 +207,7 @@ onBeforeUnmount(() => {
                   >
                     <Icon
                       name="lucide:arrow-right"
-                      class="mt-1 size-4 shrink-0 text-primary"
+                      class="mt-1 size-4 shrink-0 text-primary dark:text-primary-300"
                       aria-hidden="true"
                     />
                     <span>{{ detail }}</span>
@@ -214,16 +217,16 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <footer class="border-t border-default bg-muted/20 px-6 py-4 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:px-7">
-            <p class="text-xs leading-5 text-muted">
+          <footer class="shrink-0 border-t border-default bg-muted/20 px-6 py-4 dark:border-slate-700 dark:bg-slate-800/50 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:px-7">
+            <p class="text-xs leading-5 text-muted dark:text-slate-300">
               You can open this again anytime using the
               <span class="font-semibold text-highlighted">What's new</span>
               button.
             </p>
-            <p class="mt-2 text-xs leading-5 text-muted sm:mt-0 sm:text-right">
+            <p class="mt-2 text-xs leading-5 text-muted dark:text-slate-300 sm:mt-0 sm:text-right">
               Found an issue or bug?
               <a
-                class="font-semibold text-primary underline underline-offset-2 hover:text-primary/80"
+                class="font-semibold text-primary underline underline-offset-2 hover:text-primary/80 dark:text-primary-300 dark:hover:text-primary-200"
                 :href="`mailto:${SUPPORT_EMAIL}`"
               >Let us know</a>.
             </p>

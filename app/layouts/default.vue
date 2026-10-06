@@ -22,7 +22,7 @@ const routeTitles: Record<string, string> = {
   '/account': 'Admin Dashboard',
   '/account/login': 'Admin Dashboard',
   '/team-builder': 'Team builder',
-  '/transfer-request': 'Request a transfer',
+  '/manage-team': 'Request a transfer',
 };
 
 const fixtureId = computed(() => {

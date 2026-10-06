@@ -38,24 +38,24 @@ await Promise.all([
 
 <template>
   <div v-if="draftedTeamsStore.getDraftedTeams">
-    <section class="mb-5 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <section class="mb-5 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div>
-        <p class="text-xs font-black uppercase tracking-[0.18em] text-primary">
-          Need to manage your team?
+        <p class="text-xs font-black uppercase tracking-[0.18em] text-primary dark:text-primary-300">
+          Online or by email
         </p>
-        <h1 class="mt-1 text-xl font-black uppercase text-highlighted">
-          Manage your team
+        <h1 class="mt-1 text-xl font-black uppercase text-highlighted dark:text-slate-50">
+          Request a transfer
         </h1>
-        <p class="mt-1 max-w-2xl text-sm text-muted">
-          Use your private team management link to view your squad and request transfers.
+        <p class="mt-1 max-w-2xl text-sm text-muted dark:text-slate-300">
+          Request transfers online using your private team link, or send an email using our transfer template. Choose the option that suits you.
         </p>
       </div>
       <UButton
         to="/manage-team"
         icon="i-lucide-arrow-right"
         trailing
-        label="Manage your team"
-        class="shrink-0 justify-center"
+        label="View transfer options"
+        class="shrink-0 justify-center dark:bg-primary-300 dark:text-slate-950 dark:hover:bg-primary-200"
       />
     </section>
     <div

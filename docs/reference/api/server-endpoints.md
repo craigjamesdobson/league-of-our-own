@@ -14,6 +14,10 @@ The Resend API key and sender identity are configured server-side. `SITE_URL` mu
 
 ## Transfer request emails
 
+The public `/manage-team` page offers two ways to request transfers: the online form reached through a private team link, or a copyable template to email to `transfers@leagueofourown.co.uk`.
+
+The email template includes the team name, manager name and email, and player ID, name, club and price for each outgoing and incoming player. Managers check their revised squad budget before sending. Direct emails do not call the transfer request endpoint or create a pending request in the website; the league administrator reviews and applies them manually.
+
 `POST /api/transfer-request` accepts a transfer request for manual review through a private team management key. It validates the requester and two transfer slots, checks the existing Cloudflare Turnstile challenge, rejects the honeypot field, and applies an in-memory limit of five requests per IP within 15 minutes. Valid requests are saved in `transfer_requests` and `transfer_request_items`, with the target gameweek inferred server-side as the next gameweek. A second pending request for the same team is rejected atomically, but returns the same generic submission error so pending-request status is not exposed publicly. Requests can be updated by submitting the existing pending request ID with the same team key while the target gameweek is still ahead of the current gameweek.
 
 `GET /api/team-management/:key` returns the private read-only team details, current squad, live transfer history, and that team's pending transfer request. The existing team-builder edit link redirects to this page after team registration closes, so existing teams can continue using their original email link.
@@ -120,4 +124,4 @@ The transfer request endpoint has a lightweight in-memory limit for each running
 
 ---
 
-**Last updated:** 2026-09-25
+**Last updated:** 2026-10-06

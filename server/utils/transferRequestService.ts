@@ -2,6 +2,7 @@ import {
   transferRequestSchema,
   type TransferRequestData,
 } from '../../shared/utils/transferRequest';
+import { getTransferTargetGameweek } from '../../shared/utils/transferGameweek';
 
 export class TransferRequestError extends Error {
   constructor(
@@ -88,11 +89,10 @@ export const processTransferRequest = async (
   }
 
   const settings = await dependencies.loadRequestSettings();
-  if (!settings.activeSeason || !Number.isInteger(settings.currentGameweek) || settings.currentGameweek < 1 || settings.currentGameweek >= 38) {
+  const targetGameweek = getTransferTargetGameweek(settings.currentGameweek);
+  if (!settings.activeSeason || targetGameweek === null) {
     throw new TransferRequestError(422, 'Transfer requests are not currently available');
   }
-
-  const targetGameweek = settings.currentGameweek + 1;
 
   let savedRequest;
   try {

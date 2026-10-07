@@ -162,7 +162,7 @@ const selectedPlayerIsDisabled = computed(() => {
 });
 
 const isSubmitDisabled = computed(() => {
-  return !newTransferData.player || selectedPlayerIsDisabled.value || transferWouldExceedBudget.value;
+  return !newTransferData.player || selectedPlayerIsDisabled.value || (!props.requestMode && transferWouldExceedBudget.value);
 });
 
 const clearSelectedPlayer = () => {
@@ -461,6 +461,12 @@ const modalUi = computed(() => ({
                   </span>
                 </div>
               </div>
+              <p
+                v-if="props.requestMode"
+                class="text-sm leading-6 text-muted"
+              >
+                This is the value with this replacement alone. The budget check on your request includes all selected transfers. The complete request must stay within £{{ budgetLimit }}m before you send it.
+              </p>
             </div>
             <UButton
               class="flex self-start"

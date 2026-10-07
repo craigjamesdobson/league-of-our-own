@@ -11,6 +11,7 @@ export interface AppSettings {
   leagueDataPublic: boolean;
   teamRegistrationOpen: boolean;
   teamSubmissionDeadline: string;
+  onlineTransferRequestsEnabled: boolean;
 }
 
 export const TEAM_SUBMISSION_TIME_ZONE = 'Europe/London';
@@ -23,6 +24,7 @@ export const APP_SETTING_KEYS = [
   'league_data_public',
   'team_registration_open',
   'team_submission_deadline',
+  'online_transfer_requests_enabled',
 ] as const;
 
 const parseBooleanSetting = (key: string, value: string | undefined): boolean => {
@@ -130,6 +132,10 @@ export const parseAppSettings = (rows: AppSettingRow[]): AppSettings => {
     ),
     teamSubmissionDeadline: parseTeamSubmissionDeadline(
       requireSetting(values, 'team_submission_deadline'),
+    ),
+    onlineTransferRequestsEnabled: parseBooleanSetting(
+      'online_transfer_requests_enabled',
+      values.get('online_transfer_requests_enabled') ?? 'false',
     ),
   };
 };

@@ -14,17 +14,23 @@ The Resend API key and sender identity are configured server-side. `SITE_URL` mu
 
 ## Transfer request emails
 
-The public `/manage-team` page offers two ways to request transfers: the online form reached through a private team link, or a copyable template to email to `transfers@leagueofourown.co.uk`.
+The public `/manage-team` page provides the email address, subject, gameweek, copyable template and budget reminder without requiring a team link. `/manage-team/email` remains an equivalent email destination. The league reviews and applies these emails through its existing manual process; the website does not send the email or create a pending request when the template is copied.
+
+The more complex online workflow is retained but disabled by default through `settings.online_transfer_requests_enabled = false`. Its public recovery route redirects to the email page, private team links do not load private-team logic, and the admin review panel is hidden. All online workflow API endpoints reject requests while disabled, and the database independently blocks saving, approving, rejecting and cancelling online requests, including calls from old cached admin pages. Existing manual transfer entry, team registration and manual gameweek changes remain available. Missing flag data is treated as disabled during rollout.
+
+The online workflow must remain disabled until its deadline, stale-form, rollover and overdue-request issues have been resolved. The following endpoint descriptions document the retained implementation when explicitly enabled.
+
+Public pages, the private team response and online submissions use the same `getTransferTargetGameweek` helper. Requests target the configured current gameweek plus one, through Gameweek 38. Once Gameweek 38 is active there is no target week, and the public notice says requests are closed. If settings are unavailable, the notice avoids inventing a week. The copied manual-email template includes the target gameweek when one is available.
 
 The email template includes the team name, manager name and email, and player ID, name, club and price for each outgoing and incoming player. Managers check their revised squad budget before sending. Direct emails do not call the transfer request endpoint or create a pending request in the website; the league administrator reviews and applies them manually.
 
 `POST /api/transfer-request` accepts a transfer request for manual review through a private team management key. It validates the requester and two transfer slots, checks the existing Cloudflare Turnstile challenge, rejects the honeypot field, and applies an in-memory limit of five requests per IP within 15 minutes. Valid requests are saved in `transfer_requests` and `transfer_request_items`, with the target gameweek inferred server-side as the next gameweek. A second pending request for the same team is rejected atomically, but returns the same generic submission error so pending-request status is not exposed publicly. Requests can be updated by submitting the existing pending request ID with the same team key while the target gameweek is still ahead of the current gameweek.
 
-`GET /api/team-management/:key` returns the private read-only team details, current squad, live transfer history, and that team's pending transfer request. The existing team-builder edit link redirects to this page after team registration closes, so existing teams can continue using their original email link.
+`GET /api/team-management/:key` returns the private read-only team details, current squad, live transfer history, and that team's pending transfer request when the online workflow is enabled. The existing team-builder edit link redirects to this page after team registration closes only when the workflow is enabled. With it disabled, the existing registration-closed behavior is preserved.
 
 `POST /api/team-management-link` accepts an email address and a Turnstile challenge, then sends the private management link for every eligible transfer team registered to that address. The response is deliberately generic whether or not a team matches, preventing email enumeration. Requests are limited by both IP address and email address.
 
-The form sends player IDs alongside their displayed names. The database function verifies the selected team, outgoing players, incoming players, season availability, squad uniqueness, positions, budget, and two-transfer seasonal window. The endpoint still does not modify the live team. Resend sends a notification to `transfers@leagueofourown.co.uk` and a receipt to the requester. Email delivery failures do not discard a saved request, and the response reports whether both deliveries succeeded.
+The form sends player IDs alongside their displayed names. The database function verifies the selected team, outgoing players, incoming players, season availability, squad uniqueness, positions, budget, and transfer allowance. Teams can use at most two transfers before 1 January and four across the season; unused first-half transfers carry over after January. Each request contains at most two transfers. The endpoint still does not modify the live team. Resend sends a notification to `transfers@leagueofourown.co.uk` and a receipt to the requester. Email delivery failures do not discard a saved request, and the response reports whether both deliveries succeeded.
 
 ## Creating New Endpoints
 
@@ -124,4 +130,4 @@ The transfer request endpoint has a lightweight in-memory limit for each running
 
 ---
 
-**Last updated:** 2026-10-06
+**Last updated:** 2026-10-07

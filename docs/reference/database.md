@@ -223,6 +223,14 @@ The historical `active_transfer_expiry` column remains in the database for backw
 
 ### 6. `transfer_requests` and `transfer_request_items` - Pending Transfers
 
+This workflow is retained for a future release and defaults to disabled through
+`settings.online_transfer_requests_enabled = false`. A database guard blocks all
+five request mutation RPCs while disabled, including authenticated admin approval.
+The manual `drafted_transfers` tools and gameweek setting are unaffected. Tests
+enable the workflow inside rolled-back transactions to exercise the retained
+implementation. Do not enable it until the outstanding rollover/deadline behavior
+has been resolved.
+
 Public transfer submissions are stored separately from live `drafted_transfers`. A request starts as `pending` and remains private workflow data until an administrator reviews it. Public pages never read these tables, and anonymous clients have no table or RPC permissions; live public data continues to come only from `drafted_transfers`. A team’s private management key authorizes its owner to create or update the single pending request for that team while the target gameweek is still ahead of the current gameweek. Authenticated administrators must use the approval or rejection RPCs; direct status updates are not permitted. Approval is only available when the active gameweek matches the request target, then revalidates the live team, player availability, squad membership, positions, budget, transfer allowance, and active season before atomically applying the requested changes to `drafted_transfers`. The request stores the server-derived target gameweek and the requester’s details. The item table stores up to two player changes for administrator review.
 
 ### 7. `fixtures` - Match Fixtures

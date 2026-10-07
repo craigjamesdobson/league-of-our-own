@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { readBody } from 'h3';
 import type { Database } from '~/types/database.types';
+import { assertOnlineTransferRequestsEnabled } from '../../../../utils/onlineTransferRequests';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -18,6 +19,7 @@ type CancelTransferRequestRpcClient = {
 };
 
 export default defineEventHandler(async (event) => {
+  await assertOnlineTransferRequestsEnabled();
   const key = getRouterParam(event, 'key');
 
   if (!key || !UUID_PATTERN.test(key)) {

@@ -7,7 +7,6 @@ import {
   EMAIL_REPLY_TO,
   handleEmailSending,
 } from './email';
-import { getTeamManagementUrl } from './teamManagementLink';
 
 const supportEmail = EMAIL_REPLY_TO;
 
@@ -90,9 +89,6 @@ const renderTeamConfirmation = (event: H3Event, team: SavedTeam, players: Submis
     </div>
     <p style="text-align:center;margin:24px 0;">
       <a href="${escapeHtml(getEditUrl(event, team.key))}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:12px 20px;border-radius:7px;font-weight:700;">Edit your team</a>
-    </p>
-    <p style="text-align:center;margin:24px 0;">
-      <a href="${escapeHtml(getTeamManagementUrl(event, team.key))}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;padding:12px 20px;border-radius:7px;font-weight:700;">Manage your team</a>
     </p>
     <p style="font-size:13px;color:#64748b;">If you edit your team before registration closes, this link will open your saved selection.</p>
   `,

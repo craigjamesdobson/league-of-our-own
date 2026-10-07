@@ -10,7 +10,7 @@ The `CI` workflow verifies the Nuxt application and Supabase migrations before d
 - Tags matching `v*` verify the tagged commit, confirm it belongs to `main`, then deploy production database migrations and the application.
 - Manual runs perform verification only; they do not deploy.
 
-Superseded pull-request runs are cancelled. Protected-branch runs are not cancelled so an in-progress deployment cannot be interrupted by a newer push.
+Superseded pull-request runs are cancelled. Running push and release workflows are not cancelled by newer pushes. All production release tags share a workflow concurrency group, covering verification as well as deployment. GitHub keeps only one pending run in a group, so publish one release at a time; concurrency does not define semantic-version ordering.
 
 ## Verification jobs
 
@@ -26,11 +26,11 @@ pnpm test
 pnpm build:cloudflare
 ```
 
-The application job reads public build configuration from the `ci`, `staging`, or `production` GitHub environment. No environment secrets are exposed to this job. The build produces `dist/`, which is uploaded as `cloudflare-pages-<commit-sha>` with hidden files included.
+The application job reads public build configuration from the `ci`, `staging`, or `production` GitHub environment. No environment secrets are exposed to this job. Deployable builds fail early when a required public build variable is missing. The build produces `dist/`, which is uploaded as `cloudflare-pages-<commit-sha>` with hidden files included.
 
 ### Database migrations
 
-The database job starts local Supabase with the pinned CLI version. Startup applies every migration to a clean local database. Supabase is stopped in an `always()` cleanup step.
+The database job starts local Supabase with the pinned CLI version. Startup applies every migration to a clean local database. The job then runs the pgTAP suite with `supabase test db --local`, covering database lifecycle behavior and permissions. Supabase is stopped in an `always()` cleanup step.
 
 ## Deployment jobs
 
@@ -41,7 +41,7 @@ Database deployment jobs require both verification jobs to succeed:
 
 The deployment jobs are serialized per environment and cannot overlap within that environment. Pull requests, pushes to `main`, and manual workflow runs never receive deployment secrets and never deploy.
 
-The workflow builds a Cloudflare Pages artifact once and stores it against the exact commit SHA. The staging or production deployment job applies Supabase migrations first, then deploys that artifact to Cloudflare Pages. This prevents Cloudflare from serving an application that expects a schema which has not been applied yet.
+The workflow builds a Cloudflare Pages artifact once and stores it against the exact commit SHA. The staging or production deployment job validates its Cloudflare configuration and downloads the verified artifact before applying Supabase migrations, then deploys that artifact to Cloudflare Pages. This prevents Cloudflare from serving an application that expects a schema which has not been applied yet.
 
 Cloudflare Pages automatic Git deployments must be disabled for the connected project. The workflow is then the only normal deployment path.
 

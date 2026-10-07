@@ -122,10 +122,11 @@ const pendingRequestChanged = computed(() => {
 });
 
 const clearFirstTransfer = () => {
-  formData.firstPlayerOut = '';
-  formData.firstPlayerIn = '';
-  formData.firstPlayerOutId = 0;
-  formData.firstPlayerInId = 0;
+  formData.firstPlayerOut = formData.secondPlayerOut;
+  formData.firstPlayerIn = formData.secondPlayerIn;
+  formData.firstPlayerOutId = formData.secondPlayerOutId ?? 0;
+  formData.firstPlayerInId = formData.secondPlayerInId ?? 0;
+  clearSecondTransfer();
 };
 
 const clearSecondTransfer = () => {
@@ -136,8 +137,8 @@ const clearSecondTransfer = () => {
 };
 
 const resetPlayerSelections = () => {
-  clearFirstTransfer();
   clearSecondTransfer();
+  clearFirstTransfer();
 };
 
 const selectedTeamInput = computed({
@@ -275,8 +276,11 @@ const requestedTeamValue = computed(() => {
 const transferCount = computed(() => {
   const { afterJanuary } = getCurrentTransferPeriod();
   const counts = props.transferCounts[formData.teamId];
-  return afterJanuary ? counts?.afterJanuary ?? 0 : counts?.beforeJanuary ?? 0;
+  return afterJanuary
+    ? (counts?.beforeJanuary ?? 0) + (counts?.afterJanuary ?? 0)
+    : counts?.beforeJanuary ?? 0;
 });
+const transferAllowanceLimit = computed(() => getCurrentTransferPeriod().afterJanuary ? 4 : 2);
 const transferAvailability = computed(() => getTransferAvailability(
   props.transferCounts[formData.teamId],
 ));
@@ -286,16 +290,19 @@ const firstTransferComplete = computed(() => formData.firstPlayerOutId > 0 && fo
 const secondTransferComplete = computed(() => formData.secondPlayerOutId !== null && formData.secondPlayerInId !== null);
 const requestedTransferCount = computed(() => Number(firstTransferComplete.value) + Number(secondTransferComplete.value));
 const totalTransferCount = computed(() => transferCount.value + requestedTransferCount.value);
-const transferLimitReached = computed(() => requestedTransferCount.value > 0 && totalTransferCount.value > 2);
+const transferLimitReached = computed(() => requestedTransferCount.value > 0 && totalTransferCount.value > transferAllowanceLimit.value);
 const transferAllowanceMessage = computed(() => transferLimitReached.value
-  ? 'This request exceeds the two-transfer limit for the current period.'
+  ? getCurrentTransferPeriod().afterJanuary
+    ? 'This request exceeds the four-transfer limit for the season.'
+    : 'This request exceeds the two-transfer limit before 1 January.'
   : transferSelectionDisabled.value
     ? transferSelectionMessage.value
-    : `${transferCount.value} of 2 transfers used · ${requestedTransferCount.value} selected`);
+    : `${transferCount.value} of ${transferAllowanceLimit.value} transfers used · ${requestedTransferCount.value} selected`);
 const budgetLimit = computed(() => selectedTeam.value?.allowed_transfers ? 85 : 90);
 const overBudget = computed(() => requestedTeamValue.value > budgetLimit.value);
 
 type RequestedTransfer = TransferHistoryItem & {
+  selectionNumber: 1 | 2;
   requestTransferNumber: 1 | 2 | null;
 };
 
@@ -317,6 +324,7 @@ const requestedTransfers = computed<RequestedTransfer[]>(() => [
         playerInImage: selectedFirstIn.value?.image,
         playerOutTeam: selectedFirstOut.value?.teamName,
         playerInTeam: selectedFirstIn.value?.teamName,
+        selectionNumber: 1 as const,
         requestTransferNumber: getPendingRequestTransferNumber(formData.firstPlayerOutId, formData.firstPlayerInId),
       }]
     : []),
@@ -329,6 +337,7 @@ const requestedTransfers = computed<RequestedTransfer[]>(() => [
         playerInImage: selectedSecondIn.value?.image,
         playerOutTeam: selectedSecondOut.value?.teamName,
         playerInTeam: selectedSecondIn.value?.teamName,
+        selectionNumber: 2 as const,
         requestTransferNumber: getPendingRequestTransferNumber(formData.secondPlayerOutId!, formData.secondPlayerInId!),
       }]
     : []),
@@ -336,6 +345,7 @@ const requestedTransfers = computed<RequestedTransfer[]>(() => [
 
 type TransferSlotView = {
   number: number;
+  selectionNumber?: 1 | 2;
   requestTransferNumber?: 1 | 2;
   periodLabel: string;
   status: 'used' | 'pending' | 'selected' | 'available' | 'locked';
@@ -350,7 +360,8 @@ const transferSlotViews = computed<TransferSlotView[]>(() => {
     startNumber: number,
     periodLabel: string,
     active: boolean,
-  ): TransferSlotView[] => Array.from({ length: 2 }, (_, index) => {
+    slotCount = 2,
+  ): TransferSlotView[] => Array.from({ length: slotCount }, (_, index) => {
     const completedTransfer = entries[index];
     const pendingTransfer = !completedTransfer && active
       ? requestedTransfers.value[index - entries.length]
@@ -369,6 +380,7 @@ const transferSlotViews = computed<TransferSlotView[]>(() => {
     if (pendingTransfer) {
       return {
         number: startNumber + index,
+        selectionNumber: pendingTransfer.selectionNumber,
         requestTransferNumber: pendingTransfer.requestTransferNumber ?? undefined,
         periodLabel,
         status: props.pendingRequest && !pendingRequestChanged.value ? 'pending' : 'selected',
@@ -385,6 +397,16 @@ const transferSlotViews = computed<TransferSlotView[]>(() => {
     };
   });
 
+  if (afterJanuary) {
+    return createSlots(
+      [...props.transferHistory.beforeJanuary, ...props.transferHistory.afterJanuary],
+      1,
+      'Season allowance',
+      true,
+      4,
+    );
+  }
+
   return [
     ...createSlots(props.transferHistory.beforeJanuary, 1, 'Before 1 January', !afterJanuary),
     ...createSlots(props.transferHistory.afterJanuary, 3, 'From 1 January', afterJanuary),
@@ -398,12 +420,9 @@ const transferSlotDescription = (slot: TransferSlotView) => {
   return slot.statusLabel;
 };
 
-const clearTransferSlot = (slotNumber: number) => {
-  const { afterJanuary } = getCurrentTransferPeriod();
-  const transferIndex = afterJanuary ? slotNumber - 3 : slotNumber - 1;
-
-  if (transferIndex === 0) clearFirstTransfer();
-  if (transferIndex === 1) clearSecondTransfer();
+const clearTransferSlot = (slot: TransferSlotView) => {
+  if (slot.selectionNumber === 1) clearFirstTransfer();
+  if (slot.selectionNumber === 2) clearSecondTransfer();
 };
 
 const cancelPendingTransfer = async (transferNumber: number) => {
@@ -527,7 +546,9 @@ const submitRequest = async (event: FormSubmitEvent<TransferRequestSchema>) => {
   if (submitting.value) return;
 
   if (transferLimitReached.value) {
-    errorMessage.value = 'This request would exceed the two-transfer limit for this period.';
+    errorMessage.value = getCurrentTransferPeriod().afterJanuary
+      ? 'This request would exceed the four-transfer limit for the season.'
+      : 'This request would exceed the two-transfer limit before 1 January.';
     return;
   }
   if (overBudget.value) {
@@ -735,7 +756,7 @@ const startAnotherRequest = () => {
                   type="button"
                   :aria-label="`Clear transfer ${slot.number}`"
                   :title="`Clear transfer ${slot.number}`"
-                  @click="clearTransferSlot(slot.number)"
+                  @click="clearTransferSlot(slot)"
                 />
               </div>
             </div>
@@ -1398,7 +1419,7 @@ const startAnotherRequest = () => {
           Transfer limits
         </template>
         <template #description>
-          Teams can make two transfers before 1 January and two further transfers from 1 January onwards. Your selected team’s current squad, budget, and transfer allowance are checked before the request is sent.
+          Teams can make up to two transfers before 1 January and up to four across the season. Unused transfers carry over from 1 January. You can request up to two transfers at a time. Your squad, budget and remaining allowance are checked before the request is sent.
         </template>
       </UAlert>
       <UAlert

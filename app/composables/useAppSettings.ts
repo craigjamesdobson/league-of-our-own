@@ -4,6 +4,7 @@ import {
   parseAppSettings,
   type AppSettings,
 } from '../../shared/utils/appSettings';
+import { getTransferTargetGameweek } from '../../shared/utils/transferGameweek';
 
 export function useAppSettings() {
   const supabase = useSupabaseClient<Database>();
@@ -97,12 +98,18 @@ export function useAppSettings() {
   return {
     settings: readonly(settings),
     activeSeason: computed(() => settings.value?.activeSeason ?? ''),
+    transferTargetGameweek: computed(() => settings.value
+      ? getTransferTargetGameweek(settings.value.currentGameweek)
+      : null),
     siteOpen: computed(() => settings.value?.siteOpen ?? false),
     leagueDataPublic: computed(
       () => settings.value?.leagueDataPublic ?? false,
     ),
     teamRegistrationOpen: computed(
       () => settings.value?.teamRegistrationOpen ?? false,
+    ),
+    onlineTransferRequestsEnabled: computed(
+      () => settings.value?.onlineTransferRequestsEnabled ?? false,
     ),
     teamSubmissionDeadline: computed(
       () => settings.value?.teamSubmissionDeadline ?? '',

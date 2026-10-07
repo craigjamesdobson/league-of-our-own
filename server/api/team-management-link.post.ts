@@ -5,6 +5,7 @@ import type { Database } from '~/types/database.types';
 import { APP_SETTING_KEYS, parseAppSettings } from '../../shared/utils/appSettings';
 import { isTeamManagementLinkRateLimited } from '../utils/teamManagementLinkRateLimit';
 import { sendTeamManagementLinkEmail } from '../utils/teamManagementLinkEmail';
+import { assertOnlineTransferRequestsEnabled } from '../utils/onlineTransferRequests';
 
 const requestSchema = z.object({
   email: z.string().trim().email(),
@@ -12,6 +13,7 @@ const requestSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  await assertOnlineTransferRequestsEnabled();
   const parsedRequest = requestSchema.safeParse(await readBody(event));
 
   if (!parsedRequest.success) {

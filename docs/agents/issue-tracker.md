@@ -1,6 +1,8 @@
 # Issue tracker: Local Markdown
 
-Matt skill artifacts for this repository live as Markdown files in `.scratch/`.
+Matt skill working artifacts live locally as Markdown files in ignored `.scratch/`.
+They are not release files and must not be committed. Keep durable project
+specifications under `docs/project-management/` when they need to be shared.
 
 ## Conventions
 

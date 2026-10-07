@@ -8,6 +8,7 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 
 - **Always get explicit user approval before committing.** Show the proposed commit message and files to be committed, then wait for confirmation before running `git commit`.
 - **Staging testing uses direct merges.** Merge feature branches directly into `staging` for repeated testing. Reserve pull requests for `main`, followed by a release tag for production deployment. For deployment requests, follow `docs/guides/deployment.md`.
+- **Stage explicit paths and inspect `git diff --cached --name-status` before every commit.** Temporary audits, probes and scratch notes stay local; new `.scratch/` files must not be committed. Keep durable project specifications under `docs/project-management/`.
 
 ## Database Safety Rules
 

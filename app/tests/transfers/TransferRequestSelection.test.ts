@@ -13,19 +13,20 @@ import {
   createMockPlayer,
 } from '~/tests/factories';
 
-const { requestTransfer, playerStore, applyTransfer, addToast } = vi.hoisted(() => {
+const { requestTransfer, playerStore, applyTransfer, addToast, getCurrentGameweek } = vi.hoisted(() => {
   const players: PlayerWithSeasonStatistics[] = [];
   return {
     requestTransfer: vi.fn(),
     playerStore: { players },
     applyTransfer: vi.fn(),
     addToast: vi.fn(),
+    getCurrentGameweek: vi.fn(),
   };
 });
 
 mockNuxtImport('usePlayerStore', () => () => playerStore);
 mockNuxtImport('useDraftedTeamsStore', () => () => ({ addNewTransfer: applyTransfer }));
-mockNuxtImport('useAppSettings', () => () => ({ getCurrentGameweek: async () => 4 }));
+mockNuxtImport('useAppSettings', () => () => ({ getCurrentGameweek }));
 vi.mock('@nuxt/ui/composables', async importOriginal => ({
   ...await importOriginal<typeof import('@nuxt/ui/composables')>(),
   useToast: () => ({ add: addToast }),
@@ -60,6 +61,26 @@ const TurnstileStub = defineComponent({
   emits: ['update:modelValue'],
   template: '<button type="button" data-testid="security-check" @click="$emit(\'update:modelValue\', \'verified-test-token\')">Complete security check</button>',
 });
+
+const TransferWeekInputStub = defineComponent({
+  props: { modelValue: { type: Number, required: true } },
+  emits: ['update:modelValue'],
+  template: '<input type="number" :value="modelValue">',
+});
+
+const replacementEditorStubs = {
+  UModal: SlotStub,
+  UForm: FormStub,
+  UFormField: SlotStub,
+  UButton: ButtonStub,
+  USelectMenu: defineComponent({
+    props: { items: { type: Array, default: () => [] } },
+    emits: ['update:modelValue'],
+    template: '<button type="button" data-testid="replacement" @click="$emit(\'update:modelValue\', items[0])">Choose replacement</button>',
+  }),
+  UInputNumber: TransferWeekInputStub,
+  DraftedPlayer: true,
+};
 
 const firstOutgoing = createMockDraftedPlayerWithWeeklyStats({
   drafted_player_id: 11,
@@ -119,6 +140,7 @@ const mountRequest = (options: {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getCurrentGameweek.mockResolvedValue(4);
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(new Date('2026-10-07T12:00:00Z'));
   requestTransfer.mockResolvedValue({ emailsSent: true });
@@ -319,6 +341,78 @@ describe('transfer request selections', () => {
 });
 
 describe('replacement selection budget', () => {
+  it.each([
+    { label: 'uses an earlier scheduled downgrade to fund an upgrade', liveValue: 85, scheduledCost: 3, editScheduledSlot: false, expectedValue: 85, disabled: false },
+    { label: 'counts an earlier scheduled upgrade to block an over-budget pair', liveValue: 83, scheduledCost: 7, editScheduledSlot: false, expectedValue: 87, disabled: true },
+    { label: 'uses the outgoing player price effective in the selected week', liveValue: 85, scheduledCost: 3, editScheduledSlot: true, expectedValue: 87, disabled: true },
+  ])('$label and excludes replacements after the selected week', async ({ liveValue, scheduledCost, editScheduledSlot, expectedValue, disabled }) => {
+    getCurrentGameweek.mockResolvedValue(7);
+    const replacement = createSelectionPlayer({ player_id: 99, web_name: 'Upgrade', cost: 7 });
+    playerStore.players = [replacement];
+    const scheduledOutgoing = createMockDraftedPlayerWithWeeklyStats({
+      ...firstOutgoing,
+      transfers: [
+        { drafted_transfer_id: 91, transfer_week: 8, data: createMockPlayer({ player_id: 91, cost: scheduledCost }), selected: false },
+        { drafted_transfer_id: 92, transfer_week: 9, data: createMockPlayer({ player_id: 92, cost: 1 }), selected: false },
+      ],
+    });
+    const futureTeam = createMockDraftedTeam({
+      allowed_transfers: true,
+      players: [
+        scheduledOutgoing,
+        secondOutgoing,
+        createMockDraftedPlayerWithWeeklyStats({ drafted_player_id: 15, data: createMockPlayer({ player_id: 15, cost: liveValue - 10 }) }),
+      ],
+    });
+    const wrapper = await mountSuspended(DraftedPlayerEditDialog, {
+      props: {
+        visible: true,
+        draftedPlayer: editScheduledSlot ? scheduledOutgoing : secondOutgoing,
+        team: futureTeam,
+        editable: true,
+        activeGameweek: 7,
+      },
+      global: { stubs: replacementEditorStubs },
+    });
+    wrapper.getComponent(TransferWeekInputStub).vm.$emit('update:modelValue', 8);
+    await flushPromises();
+    await wrapper.get('[data-testid="replacement"]').trigger('click');
+
+    expect(wrapper.text()).toMatch(new RegExp(`With New Transfer:\\s*£${expectedValue}\\.0m`));
+    expect(wrapper.get('button[type="submit"]').attributes('disabled') !== undefined).toBe(disabled);
+    expect(applyTransfer).not.toHaveBeenCalled();
+    wrapper.unmount();
+  });
+
+  it.each([false, true])('preserves the manual week and separate request target in request mode %s', async (requestMode) => {
+    getCurrentGameweek.mockResolvedValue(7);
+    playerStore.players = [firstIncoming];
+    const wrapper = await mountSuspended(DraftedPlayerEditDialog, {
+      props: {
+        visible: true,
+        draftedPlayer: firstOutgoing,
+        team,
+        requestMode,
+        editable: !requestMode,
+        targetGameweek: 8,
+      },
+      global: { stubs: replacementEditorStubs },
+    });
+
+    if (requestMode) {
+      expect(wrapper.findComponent(TransferWeekInputStub).exists()).toBe(false);
+      expect(wrapper.text()).toContain('Gameweek 8');
+      await wrapper.get('[data-testid="replacement"]').trigger('click');
+      await wrapper.get('form').trigger('submit');
+      expect(wrapper.emitted('requestTransfer')).toEqual([[expect.objectContaining(firstIncoming)]]);
+      expect(applyTransfer).not.toHaveBeenCalled();
+    }
+    else {
+      expect(wrapper.getComponent(TransferWeekInputStub).props('modelValue')).toBe(7);
+    }
+    wrapper.unmount();
+  });
+
   it.each([true, false])('allows a provisional expensive replacement only in request mode (%s)', async (requestMode) => {
     const replacement = createSelectionPlayer({ player_id: 99, web_name: 'Upgrade', cost: 7 });
     playerStore.players = [replacement];
@@ -337,21 +431,7 @@ describe('replacement selection budget', () => {
         requestMode,
         editable: !requestMode,
       },
-      global: {
-        stubs: {
-          UModal: SlotStub,
-          UForm: FormStub,
-          UFormField: SlotStub,
-          UButton: ButtonStub,
-          USelectMenu: defineComponent({
-            props: { items: { type: Array, default: () => [] } },
-            emits: ['update:modelValue'],
-            template: '<button type="button" data-testid="replacement" @click="$emit(\'update:modelValue\', items[0])">Choose replacement</button>',
-          }),
-          UInputNumber: true,
-          DraftedPlayer: true,
-        },
-      },
+      global: { stubs: replacementEditorStubs },
     });
     await wrapper.get('[data-testid="replacement"]').trigger('click');
     const submitButton = wrapper.get('button[type="submit"]');

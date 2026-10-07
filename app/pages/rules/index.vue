@@ -142,7 +142,7 @@
 
       <section
         id="transfers"
-        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
+        class="scroll-mt-24 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="4"

@@ -36,7 +36,7 @@ type TransferSchema = z.output<typeof transferSchema>;
 
 const newTransferData = reactive<TransferData>({
   player: undefined,
-  transferWeek: Math.min((await getCurrentGameweek()) + 1, 38),
+  transferWeek: await getCurrentGameweek(),
 });
 const stepperButton = {
   color: 'neutral' as const,
@@ -81,12 +81,17 @@ const emit = defineEmits<{
 const playerStore = usePlayerStore();
 const draftedTeamsStore = useDraftedTeamsStore();
 
+const getActiveTransfer = (player: DraftedPlayer) => {
+  const effectiveGameweek = props.requestMode ? props.activeGameweek : newTransferData.transferWeek;
+  return effectiveGameweek === null
+    ? player.transfers.at(-1)
+    : player.transfers.filter(transfer => transfer.transfer_week <= effectiveGameweek).at(-1);
+};
+
 const availableTransferPlayers = computed<TransferPlayerOption[]>(() => {
   const currentTeamPlayerIDs = new Set(
     props.team?.players.map((player) => {
-      const activeTransfer = props.activeGameweek === null
-        ? player.transfers.at(-1)
-        : player.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!).at(-1);
+      const activeTransfer = getActiveTransfer(player);
       return activeTransfer?.data.player_id ?? player.data.player_id;
     }),
   );
@@ -117,9 +122,7 @@ const budgetLimit = computed(() => {
 const currentTeamValue = computed(() => {
   if (!props.team?.players) return 0;
   return props.team.players.reduce((total, player) => {
-    const activeTransfer = props.activeGameweek === null
-      ? player.transfers.at(-1)
-      : player.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!).at(-1);
+    const activeTransfer = getActiveTransfer(player);
     const playerCost = activeTransfer
       ? activeTransfer.data.cost
       : player.data.cost;
@@ -130,9 +133,7 @@ const currentTeamValue = computed(() => {
 const teamValueWithTransfer = computed(() => {
   if (!newTransferData.player || !draftedPlayer.value) return currentTeamValue.value;
 
-  const activeTransfer = props.activeGameweek === null
-    ? draftedPlayer.value.transfers.at(-1)
-    : draftedPlayer.value.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!).at(-1);
+  const activeTransfer = getActiveTransfer(draftedPlayer.value);
   const originalPlayerCost = activeTransfer
     ? activeTransfer.data.cost
     : draftedPlayer.value.data.cost;
@@ -153,9 +154,7 @@ const selectedPlayerIsDisabled = computed(() => {
   if (!props.requestMode) return false;
 
   return props.team?.players.some((player) => {
-    const activeTransfer = props.activeGameweek === null
-      ? player.transfers.at(-1)
-      : player.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!).at(-1);
+    const activeTransfer = getActiveTransfer(player);
     const currentPlayerID = activeTransfer?.data.player_id ?? player.data.player_id;
     return currentPlayerID === newTransferData.player?.player_id;
   }) ?? false;

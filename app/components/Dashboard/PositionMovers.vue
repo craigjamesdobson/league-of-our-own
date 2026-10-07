@@ -25,7 +25,7 @@ defineProps({
     :is-loading="isLoading"
   >
     <div
-      v-if="positionMovers.biggestRisers.length > 0 || positionMovers.biggestFallers.length > 0"
+      v-if="hasResults && (positionMovers.biggestRisers.length > 0 || positionMovers.biggestFallers.length > 0)"
       class="flex-1 flex flex-col justify-between"
     >
       <PositionMoverSection

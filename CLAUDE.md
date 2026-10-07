@@ -42,7 +42,7 @@ All schema changes follow this exact flow:
 4. Commit migration file and push to branch
 5. CI validates migrations apply cleanly (`supabase db start`)
 6. Merge to `staging` branch triggers CI/CD to apply migrations to staging
-7. Merge to `main` branch triggers CI/CD to apply migrations to production
+7. Merge to `main` for verification, then push a `v*` release tag on `main` to apply production migrations and deploy
 
 ### Data Restore Scripts
 
@@ -58,8 +58,8 @@ Run `pnpm <script> --help` for usage details.
 
 ### What CI/CD Handles (never local)
 
-- `supabase db push` to production (`.github/workflows/deploy-production.yml`)
-- `supabase db push` to staging (`.github/workflows/deploy-staging.yml`)
+- `supabase db push` to production on `v*` release tags (`.github/workflows/ci.yml`)
+- `supabase db push` to staging on staging pushes (`.github/workflows/ci.yml`)
 - Migration validation via `supabase db start` (`.github/workflows/ci.yml`)
 
 ---

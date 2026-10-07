@@ -15,7 +15,8 @@ select is(
       'site_open',
       'league_data_public',
       'team_registration_open',
-      'team_submission_deadline'
+      'team_submission_deadline',
+      'online_transfer_requests_enabled'
     )
   ),
   jsonb_build_object(
@@ -25,7 +26,8 @@ select is(
     'site_open', 'false',
     'league_data_public', 'false',
     'team_registration_open', 'false',
-    'team_submission_deadline', '2026-08-20'
+    'team_submission_deadline', '2026-08-20',
+    'online_transfer_requests_enabled', 'false'
   ),
   'clean migrations create every required application setting with safe defaults'
 );

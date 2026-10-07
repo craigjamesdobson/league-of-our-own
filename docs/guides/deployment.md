@@ -4,7 +4,7 @@ How changes are verified and promoted through staging and production.
 
 ## Current deployment model
 
-GitHub Actions verifies the Nuxt application and Supabase migrations. For pushes to protected branches, it applies migrations first and then deploys the exact verified application artifact to Cloudflare Pages:
+GitHub Actions verifies the Nuxt application and Supabase migrations. For staging pushes and production release tags, it applies migrations first and then deploys the exact verified application artifact to Cloudflare Pages:
 
 - Pushes to `staging` deploy the staging database and application.
 - Pushes to `main` run verification only.
@@ -12,7 +12,7 @@ GitHub Actions verifies the Nuxt application and Supabase migrations. For pushes
 
 The workflow builds the application with `pnpm build:cloudflare`, producing a Cloudflare Pages artifact in `dist/`, including the Nitro server routes. It uploads the artifact with hidden files included and a name containing the exact commit SHA.
 
-After verification, GitHub Actions applies Supabase migrations first, downloads that same artifact, and deploys it with Wrangler to the matching Cloudflare Pages branch. Cloudflare Pages automatic Git deployments must be disabled so application deployment follows the database update.
+After verification, GitHub Actions validates its Cloudflare configuration and downloads that same artifact before applying Supabase migrations, then deploys it with Wrangler to the matching Cloudflare Pages branch. Cloudflare Pages automatic Git deployments must be disabled so application deployment follows the database update.
 
 ## Pull-request verification
 
@@ -28,7 +28,7 @@ pnpm test
 pnpm build:cloudflare
 ```
 
-The database job starts a clean local Supabase instance and applies all migrations.
+The database job starts a clean local Supabase instance and applies all migrations, then runs the pgTAP suite with `supabase test db --local` to verify database lifecycle behavior and permissions.
 
 Require these checks for pull requests into `main`:
 
@@ -48,7 +48,7 @@ Database deployment never begins if lint, typechecking, tests, the Nuxt build, o
 
 ## Production promotion
 
-Promote tested staging changes through a pull request into `main`. Merging that pull request runs verification without deploying. Push a release tag matching `v*` for the tested commit to trigger production deployment. The workflow verifies that the tagged commit belongs to `main`, applies production migrations, then deploys the application artifact with `--branch=main`. Production and staging use separate GitHub environments, with deployments serialized within each environment.
+Promote tested staging changes through a pull request into `main`. Merging that pull request runs verification without deploying. Push a release tag matching `v*` for the tested commit to trigger production deployment. The workflow verifies that the tagged commit belongs to `main`, applies production migrations, then deploys the application artifact with `--branch=main`. Production and staging use separate GitHub environments, with deployments serialized within each environment. All production release tags share a workflow concurrency group covering verification and deployment. Publish one release at a time: GitHub keeps only one pending run per group, and concurrency does not define semantic-version ordering.
 
 ## GitHub environments and secrets
 
@@ -67,7 +67,9 @@ Store project IDs and database passwords in the matching GitHub environment. Do 
 
 Set public variables `SUPABASE_URL`, `SUPABASE_KEY`, `TURNSTILE_SITE_KEY`, and `SITE_URL` in each build environment. Set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_PROJECT` in `staging` and `production`.
 
-The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
+Deployable builds fail early when one of those public build variables is missing. Configure harmless local or test values in `ci`; it must not depend on private deployment credentials.
+
+Configure Cloudflare Pages runtime bindings separately for Preview (staging) and Production: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `NITRO_TURNSTILE_SECRET_KEY`, and `DEPLOYMENT_ENV`. Set `DEPLOYMENT_ENV` to `staging` or `production` respectively. Scheduled sync endpoints also require `SYNC_API_KEY` and `ADMIN_EMAIL`. These runtime secrets are not supplied by the GitHub artifact deployment; keep them in Cloudflare, outside the public build configuration. The Turnstile secret uses `NITRO_TURNSTILE_SECRET_KEY`; the former `TURNSTILE_SECRET_KEY` name is no longer read. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
 
 ## Local release verification
 

@@ -11,7 +11,7 @@ const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
 const transferRequestsStore = useTransferRequestsStore();
 const playerStore = usePlayerStore();
-const { updateCurrentGameweek, getCurrentGameweek } = useAppSettings();
+const { updateCurrentGameweek, getCurrentGameweek, onlineTransferRequestsEnabled } = useAppSettings();
 const router = useRouter();
 
 definePageMeta({
@@ -19,7 +19,9 @@ definePageMeta({
 });
 
 await draftedTeamStore.fetchDraftedTeams();
-await transferRequestsStore.fetchPendingTransferRequests();
+if (onlineTransferRequestsEnabled.value) {
+  await transferRequestsStore.fetchPendingTransferRequests();
+}
 
 const selectedDraftedTeamID = ref<number | undefined>();
 const selectedDraftedTeam = computed(() =>
@@ -396,7 +398,10 @@ const copyApiUrl = async () => {
                 </template>
               </USelectMenu>
 
-              <div class="rounded-lg border border-default bg-default p-4">
+              <div
+                v-if="onlineTransferRequestsEnabled"
+                class="rounded-lg border border-default bg-default p-4"
+              >
                 <div class="mb-3 flex items-start gap-3">
                   <Icon
                     name="carbon:notification"

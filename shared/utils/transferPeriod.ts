@@ -42,7 +42,6 @@ export const getTransferAvailability = (
 ) => {
   const { afterJanuary } = getCurrentTransferPeriod(date);
   const totalUsed = counts.beforeJanuary + counts.afterJanuary;
-  const currentPeriodUsed = afterJanuary ? counts.afterJanuary : counts.beforeJanuary;
 
   if (totalUsed >= 4) {
     return {
@@ -51,12 +50,10 @@ export const getTransferAvailability = (
     };
   }
 
-  if (currentPeriodUsed >= 2) {
+  if (!afterJanuary && counts.beforeJanuary >= 2) {
     return {
       disabled: true,
-      message: afterJanuary
-        ? 'The two transfers available from 1 January have been used. No more transfers are available this season.'
-        : 'The two transfers before 1 January have been used. Two more transfers become available from 1 January.',
+      message: 'The two transfers before 1 January have been used. Two more transfers become available from 1 January.',
     };
   }
 

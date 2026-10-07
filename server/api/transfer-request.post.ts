@@ -8,6 +8,7 @@ import {
   TransferRequestError,
 } from '../utils/transferRequestService';
 import { sendTransferRequestEmails } from '../utils/transferRequestEmail';
+import { assertOnlineTransferRequestsEnabled } from '../utils/onlineTransferRequests';
 
 type TransferRequestRpcClient = {
   rpc: (
@@ -40,12 +41,14 @@ const getTransferRequestValidationMessage = (message: string) => {
     'The requested transfers exceed the team budget',
     'This team has already used its two transfers before 1 January',
     'This team has already used its two transfers after 1 January',
+    'This team has already used its four transfers for the season',
   ];
 
   return knownMessages.find(knownMessage => message.includes(knownMessage));
 };
 
 export default defineEventHandler(async (event) => {
+  await assertOnlineTransferRequestsEnabled();
   const requesterIP = getRequestIP(event, { xForwardedFor: true }) ?? 'unknown';
 
   try {

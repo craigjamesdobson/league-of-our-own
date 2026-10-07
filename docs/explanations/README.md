@@ -29,6 +29,7 @@ Platform behavior and deployment-specific findings:
 ### Feature behavior
 
 - **[Your team selection](your-team-selection.md)** - How the browser-persisted team preference is selected and displayed
+- **[Transfer request UX research](transfer-request-ux-research.md)** - Why the transfer entry page starts with a method choice and separates online and email instructions
 
 ## Using These Explanations
 
@@ -60,4 +61,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for documentation standards.
 
 ---
 
-**Last updated:** 2026-08-20
+**Last updated:** 2026-10-07

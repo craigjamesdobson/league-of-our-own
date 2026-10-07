@@ -24,6 +24,7 @@ const route = useRoute();
 const {
   teamRegistrationOpen: registrationOpen,
   teamSubmissionDeadline,
+  onlineTransferRequestsEnabled,
 } = useAppSettings();
 
 const deadlineCheckTime = ref(new Date());
@@ -122,7 +123,7 @@ onBeforeUnmount(() => {
 
 const teamKey = typeof route.query.id === 'string' ? route.query.id : '';
 
-if (!registrationIsOpen.value && teamKey) {
+if (!registrationIsOpen.value && teamKey && onlineTransferRequestsEnabled.value) {
   await navigateTo({
     path: '/manage-team',
     query: { key: teamKey },

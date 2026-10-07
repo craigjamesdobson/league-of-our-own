@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && 'production-release' || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -30,6 +30,16 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Validate deployment build configuration
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/staging' || startsWith(github.ref, 'refs/tags/v'))
+        run: |
+          for name in SUPABASE_URL SUPABASE_KEY TURNSTILE_SITE_KEY SITE_URL; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing public build variable $name"
+              exit 1
+            fi
+          done
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -80,6 +90,9 @@ jobs:
       - name: Validate Supabase migrations
         run: supabase db start
 
+      - name: Test database lifecycle and permissions
+        run: supabase test db --local
+
       - name: Stop local Supabase
         if: always()
         run: supabase stop
@@ -117,12 +130,6 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Link staging project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
-
-      - name: Apply migrations to staging
-        run: supabase db push
-
       - name: Validate Cloudflare deployment configuration
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -136,6 +143,12 @@ jobs:
         with:
           name: cloudflare-pages-${{ github.sha }}
           path: dist
+
+      - name: Link staging project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Apply migrations to staging
+        run: supabase db push
 
       - name: Deploy application to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
@@ -183,12 +196,6 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Link production project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
-
-      - name: Apply migrations to production
-        run: supabase db push
-
       - name: Validate Cloudflare deployment configuration
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -202,6 +209,12 @@ jobs:
         with:
           name: cloudflare-pages-${{ github.sha }}
           path: dist
+
+      - name: Link production project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Apply migrations to production
+        run: supabase db push
 
       - name: Deploy application to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

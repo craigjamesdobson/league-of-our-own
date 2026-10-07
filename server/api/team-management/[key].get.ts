@@ -3,6 +3,8 @@ import type { Database, Tables } from '~/types/database.types';
 import type { DraftedPlayerWithWeeklyStats } from '~/types/DraftedPlayer';
 import type { TransferRequest } from '~/types/TransferRequest';
 import { APP_SETTING_KEYS, parseAppSettings } from '../../../shared/utils/appSettings';
+import { getTransferTargetGameweek } from '../../../shared/utils/transferGameweek';
+import { assertOnlineTransferRequestsEnabled } from '../../utils/onlineTransferRequests';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -17,6 +19,8 @@ type ManagementTeam = Omit<Tables<'drafted_teams'>, 'key'> & {
 };
 
 export default defineEventHandler(async (event) => {
+  setResponseHeader(event, 'Cache-Control', 'no-store');
+  await assertOnlineTransferRequestsEnabled();
   const key = getRouterParam(event, 'key');
 
   if (!key || !UUID_PATTERN.test(key)) {
@@ -173,7 +177,7 @@ export default defineEventHandler(async (event) => {
     team,
     pendingRequest: requestWithItems,
     currentGameweek: settings.currentGameweek,
-    targetGameweek: settings.currentGameweek < 38 ? settings.currentGameweek + 1 : null,
+    targetGameweek: getTransferTargetGameweek(settings.currentGameweek),
     canEditPendingRequest: Boolean(
       requestWithItems && requestWithItems.target_gameweek > settings.currentGameweek,
     ),

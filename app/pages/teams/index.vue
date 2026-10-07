@@ -41,20 +41,20 @@ await Promise.all([
     <section class="mb-5 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between sm:p-6">
       <div>
         <p class="text-xs font-black uppercase tracking-[0.18em] text-primary dark:text-primary-300">
-          Online or by email
+          Transfers by email
         </p>
         <h1 class="mt-1 text-xl font-black uppercase text-highlighted dark:text-slate-50">
           Request a transfer
         </h1>
         <p class="mt-1 max-w-2xl text-sm text-muted dark:text-slate-300">
-          Request transfers online using your private team link, or send an email using our transfer template. Choose the option that suits you.
+          Send your transfer request by email. View the gameweek, copy our template and fill in your player details.
         </p>
       </div>
       <UButton
         to="/manage-team"
         icon="i-lucide-arrow-right"
         trailing
-        label="View transfer options"
+        label="View email instructions"
         class="shrink-0 justify-center dark:bg-primary-300 dark:text-slate-950 dark:hover:bg-primary-200"
       />
     </section>

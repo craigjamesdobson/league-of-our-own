@@ -131,6 +131,56 @@ describe('DraftedTeam', () => {
     expect(wrapper.find('[data-testid="displayed-transfer"]').exists()).toBe(false);
   });
 
+  it('preserves the effective transfer count while keeping future replacements hidden', async () => {
+    const draftedPlayer = createMockDraftedPlayerWithWeeklyStats({
+      data: createMockPlayer({ web_name: 'Original player' }),
+      transfers: [
+        createMockDraftedTransferWithWeeklyStats({
+          drafted_transfer_id: 21,
+          transfer_week: 2,
+          data: createMockPlayer({ web_name: 'Earlier replacement' }),
+        }),
+        createMockDraftedTransferWithWeeklyStats({
+          drafted_transfer_id: 22,
+          transfer_week: 3,
+          data: createMockPlayer({ web_name: 'Current replacement' }),
+        }),
+        createMockDraftedTransferWithWeeklyStats({
+          drafted_transfer_id: 23,
+          transfer_week: 5,
+          data: createMockPlayer({ web_name: 'Future replacement' }),
+        }),
+      ],
+    });
+    const wrapper = mount(DraftedTeam, {
+      props: {
+        draftedTeam: createMockDraftedTeam({ players: [draftedPlayer] }),
+        activeGameweek: 4,
+      },
+      global: {
+        stubs: {
+          DraftedPlayerEditDialog: true,
+          Icon: true,
+          UButton: true,
+          UCard: SlotStub,
+          UPopover: SlotStub,
+          UTooltip: SlotStub,
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain('Current replacement');
+    expect(wrapper.text()).not.toContain('Future replacement');
+    expect(wrapper.get('[title="View transfer details"]').text()).toBe('2');
+
+    await wrapper.setProps({ activeGameweek: 2 });
+    expect(wrapper.text()).toContain('Earlier replacement');
+    expect(wrapper.text()).not.toContain('Current replacement');
+    expect(wrapper.find('[title="View transfer details"]').exists()).toBe(false);
+    expect(draftedPlayer.transfers).toHaveLength(3);
+    wrapper.unmount();
+  });
+
   it('opens the full transfer history when the current player has a future transfer', async () => {
     const draftedPlayer = createMockDraftedPlayerWithWeeklyStats({
       transfers: [createMockDraftedTransferWithWeeklyStats({ transfer_week: 5 })],

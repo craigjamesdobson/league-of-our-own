@@ -42,8 +42,8 @@ const currentGameweek = ref<number>(4);
 const isUpdatingGameweek = ref(false);
 const stepperButton = {
   color: 'neutral' as const,
-  variant: 'ghost' as const,
-  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+  variant: 'link' as const,
+  class: 'text-muted hover:text-primary dark:hover:text-primary-300',
 };
 
 const handleUpsertPlayerData = async () => {

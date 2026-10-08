@@ -40,8 +40,8 @@ const newTransferData = reactive<TransferData>({
 });
 const stepperButton = {
   color: 'neutral' as const,
-  variant: 'ghost' as const,
-  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+  variant: 'link' as const,
+  class: 'text-muted hover:text-primary dark:hover:text-primary-300',
 };
 
 const visible = defineModel<boolean>('visible');
@@ -345,6 +345,7 @@ const modalUi = computed(() => ({
                   class="min-w-0 flex-1"
                   :items="availableTransferPlayers"
                   label-key="web_name"
+                  :filter-fields="['web_name', 'player_id']"
                   placeholder="Select a Player"
                   :search-input="{ placeholder: 'Search players...' }"
                 >
@@ -353,6 +354,9 @@ const modalUi = computed(() => ({
                       v-if="modelValue"
                       class="flex min-w-0 items-center gap-2"
                     >
+                      <span class="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-muted">
+                        {{ modelValue.player_id }}
+                      </span>
                       <img
                         class="size-7 shrink-0 rounded-full bg-muted object-cover"
                         :src="modelValue.image ?? undefined"
@@ -375,6 +379,9 @@ const modalUi = computed(() => ({
                       class="flex w-full min-w-0 items-center gap-2"
                       :class="{ 'opacity-50': item.disabled }"
                     >
+                      <span class="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-muted">
+                        {{ item.player_id }}
+                      </span>
                       <img
                         class="size-7 shrink-0 rounded-full bg-muted object-cover"
                         :src="item.image ?? undefined"

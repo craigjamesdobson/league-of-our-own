@@ -2,7 +2,7 @@
 
 **League of our own** - Fantasy Football Web Application
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-10-08*
 
 ## Overview
 
@@ -122,6 +122,18 @@ app/components/
 - **Skeleton Loading**: Dedicated skeleton components for each data type
 - **Feature-based Organisation**: Components grouped by business feature
 - **Reusable Common Components**: Shared UI elements with consistent API
+
+Number-input increment and decrement controls use neutral `link` buttons with
+a colour change on hover. Keep the standard keyboard focus indication; avoid
+`ghost` backgrounds that cover the input border in the compact goals, assists,
+score and gameweek fields.
+
+The manual transfer picker displays each player number in a separate column
+before the image and name, with the club beneath the name. Its `filter-fields` include
+`player_id` so administrators can search using the numbers in emailed requests.
+Team cards display replacements and transfer counts effective in the active
+gameweek, while the editor retains the complete history, including future
+transfers.
 
 ### State Management Architecture
 
@@ -374,4 +386,4 @@ pnpm generate-types  # Supabase type generation
 
 ---
 
-**Last updated:** 2026-08-01
+**Last updated:** 2026-10-08

@@ -64,13 +64,12 @@ const getActiveTransfer = (player: DraftedTeamWithPlayers['players'][number]) =>
     .at(-1);
 };
 
-const getDisplayedPlayer = (player: DraftedTeamWithPlayers['players'][number]) => {
-  const activeTransfer = getActiveTransfer(player);
-
-  return activeTransfer
-    ? { ...player, transfers: [activeTransfer] }
-    : player;
-};
+const getDisplayedPlayer = (player: DraftedTeamWithPlayers['players'][number]) => ({
+  ...player,
+  transfers: props.activeGameweek === null
+    ? player.transfers
+    : player.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!),
+});
 
 const displayedTeamValue = computed(() => {
   if (!props.draftedTeam) return 0;

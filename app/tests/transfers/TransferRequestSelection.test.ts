@@ -1,5 +1,5 @@
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime';
-import { flushPromises } from '@vue/test-utils';
+import { DOMWrapper, flushPromises } from '@vue/test-utils';
 import { defineComponent, type PropType } from 'vue';
 import type { z } from 'zod';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -336,6 +336,66 @@ describe('transfer request selections', () => {
     await flushPromises();
     expect(wrapper.find('[aria-label="Clear transfer 4"]').exists()).toBe(used === 3);
     expect(wrapper.get('button[type="submit"]').attributes('disabled') === undefined).toBe(used === 3);
+    wrapper.unmount();
+  });
+});
+
+describe('manual replacement player identification', () => {
+  it('finds a replacement by numeric ID and keeps the ID visible after selection', async () => {
+    const identifiedPlayer = createSelectionPlayer({ player_id: 123, web_name: 'Identified replacement' });
+    const draftedPlayer = createMockDraftedPlayerWithWeeklyStats({ ...firstOutgoing, transfers: [] });
+    const manualTeam = createMockDraftedTeam({ allowed_transfers: true, players: [draftedPlayer, secondOutgoing] });
+    applyTransfer.mockResolvedValue([{ drafted_transfer_id: 101 }]);
+    playerStore.players = [
+      identifiedPlayer,
+      createSelectionPlayer({ player_id: 456, web_name: 'Other replacement' }),
+    ];
+    const wrapper = await mountSuspended(DraftedPlayerEditDialog, {
+      attachTo: document.body,
+      props: {
+        visible: true,
+        draftedPlayer,
+        team: manualTeam,
+        editable: true,
+      },
+      global: {
+        stubs: {
+          ...replacementEditorStubs,
+          USelectMenu: false,
+          Teleport: false,
+        },
+      },
+    });
+
+    await wrapper.get('button[aria-haspopup="listbox"]').trigger('click');
+    await flushPromises();
+    const popup = new DOMWrapper(document.body);
+    await popup.get('input[placeholder="Search players..."]').setValue('123');
+    await flushPromises();
+
+    const options = popup.findAll('[role="option"]');
+    expect(options).toHaveLength(1);
+    const identifiedOption = popup.get('[role="option"]');
+    expect(identifiedOption.text()).toContain('Identified replacement');
+    expect(identifiedOption.text()).toContain('123');
+    expect(identifiedOption.text()).not.toContain('ID 123');
+    expect(identifiedOption.text()).not.toContain('·');
+    await identifiedOption.trigger('click');
+    await flushPromises();
+    expect(wrapper.get('button[aria-haspopup="listbox"]').text()).toContain('123');
+    expect(wrapper.get('button[aria-haspopup="listbox"]').text()).not.toContain('ID 123');
+
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    expect(applyTransfer).toHaveBeenCalledWith([{
+      drafted_player: 11,
+      player_id: 123,
+      transfer_week: 4,
+    }]);
+    expect(draftedPlayer.transfers).toEqual([expect.objectContaining({
+      drafted_transfer_id: 101,
+      data: expect.objectContaining({ player_id: 123 }),
+    })]);
     wrapper.unmount();
   });
 });

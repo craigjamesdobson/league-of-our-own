@@ -10,6 +10,7 @@ node-compile-cache/
 .env.*
 !.env.example
 dist
+.smoke-results/
 
 # Working docs and private directories
 docs/_*/

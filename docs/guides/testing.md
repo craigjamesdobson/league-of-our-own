@@ -103,6 +103,14 @@ const midfielderTen = createMockPlayer({
 
 ## Project-Specific Test Gotchas
 
+### Deployed smoke tests
+
+`pnpm test` runs the Nuxt/Vitest regression suite. `pnpm test:smoke` runs the
+separate Playwright suite against a deployed site and its database API, using
+`SITE_URL`, `SUPABASE_URL` and the public `SUPABASE_KEY`. The smoke files use
+`.smoke.ts` names so Vitest does not collect them. See
+[Deployment](deployment.md#automated-smoke-tests) for setup, coverage and reports.
+
 ### watchEffect Not Triggering in Tests
 
 **Issue:** `watchEffect` callbacks don't automatically re-execute when dependencies change in test environment.
@@ -335,4 +343,4 @@ it('slow operation', async () => {
 
 ---
 
-**Last updated:** 2025-11-09
+**Last updated:** 2026-10-08

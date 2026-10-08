@@ -72,8 +72,8 @@ export function useHomepageDashboard() {
         .select('points, week, team')
         .order('points', { ascending: false });
 
+      if (error) console.error('Error fetching weekly statistics for league averages:', error);
       if (error || !allWeeklyStats || allWeeklyStats.length === 0) {
-        console.error('Error fetching weekly statistics for league averages:', error);
         return {
           averagePoints: 0,
           totalTeams: 0,
@@ -158,9 +158,9 @@ export function useHomepageDashboard() {
           `)
           .eq('players_view.position', position);
 
+        if (statsError) console.error(`Error fetching top ${getPositionName(position)} players:`, statsError);
         if (statsError || !topPlayerStats || topPlayerStats.length === 0) {
-          console.error(`Error fetching top ${getPositionName(position)} players:`, statsError);
-          return { position, player: null };
+          return { position, players: null };
         }
 
         const playerTotals = topPlayerStats.reduce((acc, stat) => {

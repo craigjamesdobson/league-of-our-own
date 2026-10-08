@@ -111,6 +111,12 @@ separate Playwright suite against a deployed site and its database API, using
 `.smoke.ts` names so Vitest does not collect them. See
 [Deployment](deployment.md#automated-smoke-tests) for setup, coverage and reports.
 
+Dashboard statistics can legitimately be empty before results exist. The
+dashboard shows empty player summaries and zero league averages without logging
+database errors for those responses. Failed queries still report errors, and
+the deployed browser checks wait for the dashboard to finish loading before
+checking the console.
+
 ### watchEffect Not Triggering in Tests
 
 **Issue:** `watchEffect` callbacks don't automatically re-execute when dependencies change in test environment.

@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import type { AppSettings } from '../shared/utils/appSettings';
 import { canAccessLeagueRoute } from '../shared/utils/leagueRouteAccess';
 import { openSitePage, readSmokeSettings, requiredSmokeEnv, siteTest as test, siteUrl } from './helpers';
@@ -9,10 +9,17 @@ test.beforeAll(async ({ request }) => {
   settings = await readSmokeSettings(request);
 });
 
+const openCheckedPage = async (page: Page, route: string) => {
+  await openSitePage(page, route);
+  if (route === '/' && settings.siteOpen && !settings.teamRegistrationOpen && settings.leagueDataPublic) {
+    await expect(page.getByRole('heading', { name: /^Gameweek \d+ Summary$/ })).toBeVisible();
+  }
+};
+
 test('the frontend uses the database configured for this deployment', async ({ page }) => {
   const [response] = await Promise.all([
     page.waitForResponse(response => new URL(response.url()).pathname === '/rest/v1/settings'),
-    openSitePage(page, '/'),
+    openCheckedPage(page, '/'),
   ]);
   expect(response.ok()).toBe(true);
   expect(new URL(response.url()).origin).toBe(new URL(requiredSmokeEnv('SUPABASE_URL')).origin);
@@ -20,7 +27,7 @@ test('the frontend uses the database configured for this deployment', async ({ p
 
 for (const route of ['/', '/players', '/teams', '/table', '/rules']) {
   test(`site boots and renders ${route}`, async ({ page }) => {
-    await openSitePage(page, route);
+    await openCheckedPage(page, route);
     const expectedPath = !settings.siteOpen
       ? '/coming-soon'
       : canAccessLeagueRoute(route, settings.leagueDataPublic, false) ? route : '/';

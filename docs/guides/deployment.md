@@ -115,8 +115,11 @@ The suite checks that:
 
 Closed-site and private-league settings are respected: the suite expects the
 appropriate redirects instead of opening the site or changing settings. It
-does not sign in, submit forms or mutate remote data. The one POST request calls
-the existing read-only public team lookup RPC.
+does not sign in, submit forms or mutate remote data. Every direct database
+probe uses GET, including the public team lookup RPC. PostgREST executes these
+requests in read-only transactions, so attempted writes fail at the database
+level. The job uses only the public anonymous key, with no service-role key,
+database password, database CLI or migration command.
 
 Results, failure screenshots and traces are stored under `.smoke-results/`,
 which is ignored by Git. CI uploads the report as `smoke-results-<commit SHA>`.

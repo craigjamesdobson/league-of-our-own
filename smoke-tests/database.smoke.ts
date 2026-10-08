@@ -26,9 +26,9 @@ test('public player and club views are reachable', async ({ request }) => {
 
 test('public team lookup RPC is installed and responds', async ({ request }) => {
   const settings = await readSmokeSettings(request);
-  const response = await request.post(databaseRequest.url('rpc/get_drafted_teams_by_season'), {
+  const response = await request.get(databaseRequest.url('rpc/get_drafted_teams_by_season'), {
     headers: databaseRequest.headers(),
-    data: { active_season_param: settings.activeSeason },
+    params: { active_season_param: settings.activeSeason },
   });
   expect(response.ok(), `Team lookup RPC returned HTTP ${response.status()}`).toBe(true);
   const body: unknown = await response.json();

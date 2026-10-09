@@ -5,7 +5,6 @@ import { useDraftedTeamsStore } from '@/stores/draftedTeams';
 import { useTransferRequestsStore } from '@/stores/transferRequests';
 import { usePlayerStore } from '@/stores/players';
 import { useAppSettings } from '@/composables/useAppSettings';
-import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
 const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
@@ -68,14 +67,6 @@ const handleUserLogout = async () => {
   catch (err) {
     handleApiError(err, toast);
   }
-};
-
-const transfersRemainingCount = (team: DraftedTeamWithPlayers) => {
-  const totalTransfersMade = team.players
-    .map(x => x.transfers.length)
-    .reduce((total, transfers) => total + transfers, 0);
-
-  return 4 - totalTransfersMade;
 };
 
 const getTransferRequestTeamName = (teamID: number) =>
@@ -369,31 +360,16 @@ const copyApiUrl = async () => {
                 }"
               >
                 <template #item-label="{ item }">
-                  <div class="flex items-center justify-between w-full p-1">
+                  <div class="flex w-full flex-col gap-2 p-1">
                     <div class="flex flex-col gap-1">
                       <div class="font-bold text-slate-800 uppercase dark:text-slate-100">
                         {{ item.team_name }}
                       </div>
-                      <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                      <div class="text-xs text-slate-600 dark:text-slate-300">
                         <span class="uppercase">{{ item.team_owner }}</span>
-                        <span class="text-slate-400">|</span>
-                        <span class="font-medium">
-                          {{ transfersRemainingCount(item) }}/4 transfers left
-                        </span>
                       </div>
                     </div>
-
-                    <UBadge
-                      :color="
-                        transfersRemainingCount(item) > 2 ? 'success'
-                        : transfersRemainingCount(item) > 0 ? 'warning'
-                          : 'error'
-                      "
-                      variant="soft"
-                      class="h-6 w-6 justify-center rounded-full text-xs font-bold"
-                    >
-                      {{ transfersRemainingCount(item) }}
-                    </UBadge>
+                    <DraftedTransferAllowance :drafted-team="item" />
                   </div>
                 </template>
               </USelectMenu>
@@ -493,6 +469,10 @@ const copyApiUrl = async () => {
 
               <!-- Selected Team Display -->
               <div v-if="selectedDraftedTeam">
+                <DraftedTransferAllowance
+                  :drafted-team="selectedDraftedTeam"
+                  class="mb-3"
+                />
                 <DraftedTeam
                   :editable="true"
                   :drafted-team="selectedDraftedTeam"
@@ -518,20 +498,10 @@ const copyApiUrl = async () => {
                     <p class="text-base text-slate-600 mb-6 dark:text-slate-300">
                       Choose a team from the dropdown above to view and manage their transfers, players, and settings.
                     </p>
-                    <div class="text-sm text-slate-500 space-y-2 dark:text-slate-400">
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-green-500 rounded-full" />
-                        <span>Green: 3+ transfers remaining</span>
-                      </div>
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full" />
-                        <span>Yellow: 1-2 transfers remaining</span>
-                      </div>
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-red-500 rounded-full" />
-                        <span>Red: No transfers remaining</span>
-                      </div>
-                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      Up to two transfers can be used before 1 January, with four across the season.
+                      Unused transfers carry over from 1 January.
+                    </p>
                   </div>
                 </div>
               </div>

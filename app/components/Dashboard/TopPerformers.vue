@@ -4,7 +4,7 @@ import WeeklySummaryCard from '@/components/Dashboard/WeeklySummaryCard.vue';
 
 const props = defineProps({
   weeklyData: {
-    type: Array as PropType<WeeklyData[]>,
+    type: Array as PropType<readonly WeeklyData[]>,
     default: () => [],
   },
   isLoading: {

@@ -6,14 +6,14 @@ import { withSetup } from '@/tests/setup';
 import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
 
 // Mock the table store
-const mockFetchWeeklyStats = vi.fn();
+const mockFetchWeeklyStatsData = vi.fn();
 const mockFetchWeeklyWinners = vi.fn();
 const mockWeeklyData = ref<WeeklyData[] | undefined>(undefined);
 const mockWeeklyWinners = ref<WeeklyWinners[] | undefined>(undefined);
 
 vi.mock('@/stores/table', () => ({
   useTableStore: () => ({
-    fetchWeeklyStats: mockFetchWeeklyStats,
+    fetchWeeklyStatsData: mockFetchWeeklyStatsData,
     fetchWeeklyWinners: mockFetchWeeklyWinners,
     weeklyData: mockWeeklyData,
     weeklyWinners: mockWeeklyWinners,
@@ -104,7 +104,7 @@ describe('dashboard empty statistics', () => {
         error: null,
       }],
     };
-    mockFetchWeeklyStats.mockResolvedValue(undefined);
+    mockFetchWeeklyStatsData.mockResolvedValue([]);
     mockFetchWeeklyWinners.mockResolvedValue(undefined);
   });
 

@@ -102,6 +102,24 @@ const props = defineProps<{ remainingBudget: number }>();
 </script>
 ```
 
+### 4. Cached Pages Sharing Selected-Week Data
+
+`app/app.vue` uses `<NuxtPage keepalive>`, so the dashboard remains mounted while
+the table page changes its selected week. Reading `tableStore.weeklyData` from
+both pages let the table overwrite the dashboard's current-gameweek status, top
+performers, and position movers. An unfinished table request could also overwrite
+those values after navigation.
+
+`useHomepageDashboard()` now owns its weekly data and uses
+`tableStore.fetchWeeklyStatsData(currentWeek)` to fetch it without changing the
+table's selection. The table continues to use `fetchWeeklyStats(selectedWeek)`,
+which updates the store's table data. Keep data for different page selections in
+separate reactive state, even when both pages use the same database query.
+
+The regression tests in
+`app/tests/homepage-dashboard/dashboardGameweek.test.ts` cover cached navigation,
+initial loading, and late table responses for gameweeks with and without results.
+
 ## Debugging Techniques
 
 ### 1. Reactivity Debugging
@@ -216,4 +234,4 @@ Watch out for these indicators of reactivity issues:
 
 ---
 
-*Last updated: 2025-01-08*
+*Last updated: 2026-10-09*

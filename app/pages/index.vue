@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
-import { useTableStore } from '@/stores/table';
 
 import TopPerformers from '@/components/Dashboard/TopPerformers.vue';
 import PositionMovers from '@/components/Dashboard/PositionMovers.vue';
@@ -13,7 +12,6 @@ import { useAccountStore } from '@/stores/account';
 const { teamRegistrationOpen, leagueDataPublic } = useAppSettings();
 const accountStore = useAccountStore();
 const dashboard = useHomepageDashboard();
-const tableStore = useTableStore();
 const registrationOpen = teamRegistrationOpen;
 const leagueIsPublic = leagueDataPublic;
 const showWelcomeBack = computed(() =>
@@ -24,9 +22,9 @@ const showWelcomeBack = computed(() =>
 const currentGameweek = computed(() => dashboard.getCurrentGameweek());
 const hasGameweekData = computed(() => dashboard.hasGameweekData());
 const hasResults = computed(() => dashboard.hasResults());
-const weeklyData = computed(() => tableStore.weeklyData || []);
+const weeklyData = computed(() => dashboard.weeklyData.value || []);
 const isLoading = computed(() => dashboard.isLoading.value);
-const isGameweekLoading = computed(() => isLoading.value || (hasGameweekData.value && tableStore.weeklyData === undefined));
+const isGameweekLoading = computed(() => isLoading.value || (hasGameweekData.value && dashboard.weeklyData.value === undefined));
 
 const leagueAverages = computed(() => dashboard.leagueAverages.value);
 

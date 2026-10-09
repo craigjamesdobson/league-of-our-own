@@ -10,23 +10,10 @@ export const useTableStore = defineStore('table-store', () => {
   const weeklyWinners: Ref<WeeklyWinners[] | undefined> = ref();
 
   const fetchWeeklyStats = async (week: number) => {
-    const activeSeason = await getActiveSeason();
-    const { data, error } = await supabase.rpc(
-      'get_weekly_stats_for_gameweek',
-      {
-        target_week: week,
-        active_season_param: activeSeason,
-      },
-    );
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    weeklyData.value = data;
+    weeklyData.value = await fetchWeeklyStatsData(week);
   };
 
-  const fetchFinalStandings = async (week: number): Promise<WeeklyData[]> => {
+  const fetchWeeklyStatsData = async (week: number): Promise<WeeklyData[]> => {
     const activeSeason = await getActiveSeason();
     const { data, error } = await supabase.rpc(
       'get_weekly_stats_for_gameweek',
@@ -54,5 +41,5 @@ export const useTableStore = defineStore('table-store', () => {
     weeklyWinners.value = data;
   };
 
-  return { fetchWeeklyStats, fetchFinalStandings, weeklyData, weeklyWinners, fetchWeeklyWinners };
+  return { fetchWeeklyStats, fetchWeeklyStatsData, weeklyData, weeklyWinners, fetchWeeklyWinners };
 });

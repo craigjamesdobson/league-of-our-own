@@ -36,6 +36,22 @@ export type TransferPeriodCounts = {
   afterJanuary: number;
 };
 
+export const getTransferAllowance = (
+  counts: TransferPeriodCounts = { beforeJanuary: 0, afterJanuary: 0 },
+  date = new Date(),
+) => {
+  const { afterJanuary } = getCurrentTransferPeriod(date);
+  const seasonRemaining = Math.max(0, 4 - counts.beforeJanuary - counts.afterJanuary);
+
+  return {
+    afterJanuary,
+    seasonRemaining,
+    availableNow: afterJanuary
+      ? seasonRemaining
+      : Math.min(seasonRemaining, Math.max(0, 2 - counts.beforeJanuary)),
+  };
+};
+
 export const getTransferAvailability = (
   counts: TransferPeriodCounts = { beforeJanuary: 0, afterJanuary: 0 },
   date = new Date(),

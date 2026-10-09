@@ -2,6 +2,7 @@
 import DraftedPlayer from './DraftedPlayer.vue';
 import TeamAdminMetadataPopover from '~/components/Drafted/TeamAdminMetadataPopover.vue';
 import type { DraftedTeamWithPlayers, TeamAdminMetadata } from '~/types/DraftedTeam';
+import type { PlayerWithSeasonStatistics } from '~/types/Player';
 
 const props = defineProps({
   draftedTeam: {
@@ -11,6 +12,26 @@ const props = defineProps({
   editable: {
     type: Boolean,
     default: false,
+  },
+  transferRequestMode: {
+    type: Boolean,
+    default: false,
+  },
+  targetGameweek: {
+    type: Number,
+    default: null,
+  },
+  activeGameweek: {
+    type: Number,
+    default: null,
+  },
+  transferSelectionDisabled: {
+    type: Boolean,
+    default: false,
+  },
+  transferSelectionDisabledMessage: {
+    type: String,
+    default: '',
   },
   adminMetadata: {
     type: Object as PropType<TeamAdminMetadata>,
@@ -28,15 +49,37 @@ const props = defineProps({
 
 const emit = defineEmits<{
   toggleYourTeam: [];
+  transferRequested: [payload: { draftedPlayerId: number; player: PlayerWithSeasonStatistics }];
 }>();
 
 const cardRootClass = computed(() => props.isYourTeam
-  ? 'border border-amber-400/60 bg-white shadow-sm ring-1 ring-amber-400/10 dark:border-amber-400/55 dark:bg-slate-900 dark:ring-amber-400/10'
-  : 'border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none');
+  ? 'border border-warning/40 bg-default shadow-sm ring-1 ring-warning/10'
+  : 'border border-default bg-default shadow-sm');
 
-const isActiveTransfer = (transferDate: Date) => {
-  return new Date(transferDate) > new Date();
+const getActiveTransfer = (player: DraftedTeamWithPlayers['players'][number]) => {
+  if (props.activeGameweek === null) return player.transfers.at(-1);
+
+  return player.transfers
+    .filter(transfer => transfer.transfer_week <= props.activeGameweek!)
+    .at(-1);
 };
+
+const getDisplayedPlayer = (player: DraftedTeamWithPlayers['players'][number]) => ({
+  ...player,
+  transfers: props.activeGameweek === null
+    ? player.transfers
+    : player.transfers.filter(transfer => transfer.transfer_week <= props.activeGameweek!),
+});
+
+const displayedTeamValue = computed(() => {
+  if (!props.draftedTeam) return 0;
+  if (!props.draftedTeam.players.length) return props.draftedTeam.total_team_value;
+
+  return props.draftedTeam.players.reduce((total, player) => {
+    const activeTransfer = getActiveTransfer(player);
+    return total + (activeTransfer?.data.cost ?? player.data.cost);
+  }, 0);
+});
 
 const selectedDraftedPlayer = ref();
 const showDialog = ref(false);
@@ -52,21 +95,31 @@ const handleEditPlayer = (playerID: number) => {
     console.error('Error fetching drafted player:', error);
   }
 };
+
+const handleTransferRequested = (player: PlayerWithSeasonStatistics) => {
+  if (!selectedDraftedPlayer.value) return;
+
+  emit('transferRequested', {
+    draftedPlayerId: selectedDraftedPlayer.value.drafted_player_id,
+    player,
+  });
+  showDialog.value = false;
+};
 </script>
 
 <template>
   <UCard
     v-if="props.draftedTeam"
-    class="text-slate-900 dark:text-slate-100"
+    class="text-highlighted"
     :ui="{
       root: cardRootClass,
       body: 'p-5 sm:p-5',
     }"
   >
     <div
-      class="mb-2 flex items-center justify-between border-b border-slate-800 p-2 pt-0 dark:border-slate-700"
+      class="mb-2 flex items-center justify-between border-b border-default p-2 pt-0"
       :class="{
-        'bg-red-200 dark:bg-red-950/70': props.draftedTeam?.is_invalid_team,
+        'bg-error/10': props.draftedTeam?.is_invalid_team,
       }"
     >
       <div class="flex min-w-0 items-center gap-2">
@@ -78,7 +131,7 @@ const handleEditPlayer = (playerID: number) => {
             <button
               type="button"
               role="radio"
-              class="flex size-7 shrink-0 items-center justify-center rounded-full text-amber-500 transition-colors hover:text-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:text-amber-300 dark:hover:text-amber-200"
+              class="flex size-7 shrink-0 items-center justify-center rounded-full text-warning transition-colors hover:text-warning/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning"
               aria-checked="true"
               :aria-label="`Remove ${props.draftedTeam.team_name} as your team`"
               @click.stop="emit('toggleYourTeam')"
@@ -97,7 +150,7 @@ const handleEditPlayer = (playerID: number) => {
             <button
               type="button"
               role="radio"
-              class="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-transparent transition-colors hover:border-amber-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-500 dark:border-slate-600 dark:hover:border-amber-400"
+              class="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-accented bg-transparent transition-colors hover:border-warning focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning"
               aria-checked="false"
               :aria-label="`Select ${props.draftedTeam.team_name} as your team`"
               @click.stop="emit('toggleYourTeam')"
@@ -137,35 +190,40 @@ const handleEditPlayer = (playerID: number) => {
       :key="player.drafted_player_id"
       class="relative text-sm"
       :class="{
-        'bg-yellow-200 hover:bg-yellow-300 dark:bg-yellow-950/70 dark:hover:bg-yellow-900/80':
-          !!player.transfers.length
-          && isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
-        'bg-green-200 transition-all hover:bg-green-300 dark:bg-green-950/70 dark:hover:bg-green-900/80':
-          !!player.transfers.length
-          && !isActiveTransfer(player.transfers.at(-1)!.active_transfer_expiry),
+        'bg-warning/10 hover:bg-warning/20':
+          getActiveTransfer(player)?.transfer_week === props.activeGameweek,
+        'bg-success/10 transition-all hover:bg-success/20':
+          !!getActiveTransfer(player)
+          && props.activeGameweek !== null
+          && getActiveTransfer(player)!.transfer_week < props.activeGameweek,
       }"
     >
-      <div class="flex w-full items-center border-b border-slate-100 dark:border-slate-800">
+      <div class="flex w-full items-center border-b border-default">
         <DraftedPlayer
-          v-if="!player.transfers.length"
+          v-if="!getActiveTransfer(player)"
           :drafted-player="player"
+          :class="{ 'cursor-pointer': !!player.transfers.length }"
+          @click="player.transfers.length && handleEditPlayer(player.data.player_id!)"
         />
         <DraftedTransfer
-          v-else-if="player.transfers.at(-1) !== null"
-          :drafted-player="player"
+          v-else
+          :drafted-player="getDisplayedPlayer(player)"
           class="w-full cursor-pointer"
           @click="handleEditPlayer(player.data.player_id!)"
         />
         <UButton
-          v-if="props.editable"
+          v-if="props.editable || props.transferRequestMode"
           icon="tabler:switch-3"
           color="primary"
           variant="subtle"
           size="xs"
           square
           aria-label="Edit Player"
-          title="Edit Player"
+          :title="props.transferRequestMode && props.transferSelectionDisabled
+            ? props.transferSelectionDisabledMessage
+            : 'Edit Player'"
           class="mr-2"
+          :disabled="props.transferRequestMode && props.transferSelectionDisabled"
           @click="handleEditPlayer(player.data.player_id!)"
         />
       </div>
@@ -173,15 +231,21 @@ const handleEditPlayer = (playerID: number) => {
     <div class="flex justify-between px-2.5 pt-2.5">
       <span>Total</span>
       <strong>
-        {{ props.draftedTeam?.total_team_value }}
+        {{ displayedTeamValue }}
       </strong>
     </div>
+    <slot name="footer" />
   </UCard>
   <DraftedPlayerEditDialog
     v-if="selectedDraftedPlayer"
     v-model:drafted-player="selectedDraftedPlayer"
     v-model:visible="showDialog"
     :editable="props.editable"
+    :request-mode="props.transferRequestMode"
+    :target-gameweek="props.targetGameweek"
+    :active-gameweek="props.activeGameweek"
+    :selection-disabled="props.transferSelectionDisabled"
     :team="props.draftedTeam"
+    @request-transfer="handleTransferRequested"
   />
 </template>

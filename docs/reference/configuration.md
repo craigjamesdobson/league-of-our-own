@@ -28,7 +28,8 @@ NODE_ENV=development
 
 ### Production Setup
 
-On your deployment platform (Vercel, Netlify, etc.):
+Set public build variables in the matching GitHub environment (`ci`, `staging`,
+or `production`). GitHub Actions builds the Cloudflare Pages artifact:
 
 ```
 SUPABASE_URL=https://your-production-project.supabase.co
@@ -38,6 +39,27 @@ DEPLOYMENT_ENV=production
 TURNSTILE_SITE_KEY=your_production_turnstile_key
 NODE_ENV=production
 ```
+
+Configure private runtime bindings separately in Cloudflare Pages Preview
+(staging) and Production. Artifact deployment does not create these bindings:
+
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+RESEND_API_KEY
+NITRO_TURNSTILE_SECRET_KEY
+DEPLOYMENT_ENV
+```
+
+The sync endpoints also require `SYNC_API_KEY` and `ADMIN_EMAIL`. Keep service
+role and email credentials out of public build variables. The Turnstile server
+secret is `NITRO_TURNSTILE_SECRET_KEY`; the previous `TURNSTILE_SECRET_KEY` name
+is no longer read.
+
+Authenticated accounts are administrators in this application. Disable public
+Supabase signups in both hosted environments and invite administrator accounts
+through the Supabase dashboard. Hiding the website's signup UI does not disable
+Supabase's public signup API.
 
 ## Environment Variable Reference
 
@@ -166,6 +188,14 @@ application state without rebuilding or redeploying the site.
 | `league_data_public` | boolean | `true` or `false` |
 | `team_registration_open` | boolean | `true` or `false` |
 | `team_submission_deadline` | date | `YYYY-MM-DD` |
+| `online_transfer_requests_enabled` | boolean | `true` or `false`; defaults to `false` |
+
+The current transfer release uses manual email requests. Keep
+`online_transfer_requests_enabled` false: the future online workflow is retained
+but unavailable through pages, API endpoints and database mutation functions.
+Missing flag data is treated as false for backwards-compatible rollout. The flag
+does not change manual transfer entry or manual gameweek updates. Resolve the
+outstanding online deadline/rollover issues before enabling it.
 
 `team_submission_deadline` is interpreted as the final UK calendar day on which
 entries are accepted. The server rejects new submissions and edits from 00:00

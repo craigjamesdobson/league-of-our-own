@@ -1,6 +1,6 @@
 # Team Builder Backlog
 
-**Last Updated**: 2026-07-25
+**Last Updated**: 2026-09-27
 
 ## 📋 Prioritized Backlog
 
@@ -16,6 +16,16 @@
     - Nuxt pageTransition configuration
   - Ensure memory management - clear state on successful submission
   - **Context**: Current issue where users lose team selection and form data when navigating away from team builder
+
+- **Feature: Project email inbox and shared reply address**
+  - Add a reliable inbox behind the project email identity used by Resend
+  - Ensure Craig and Jim receive independent copies in their normal inboxes, with separate read/unread state
+  - Allow both people to reply using the shared project email address
+  - Decide whether to retain `leagueofourown.fpl@gmail.com` with forwarding or move to a domain-backed mailbox
+  - Configure Resend email `reply-to` headers so replies to application emails reach the monitored inbox
+  - Verify SPF, DKIM, and DMARC configuration for the sending domain
+  - Test inbound delivery, independent unread state, replies from both users, and Resend-generated emails
+  - **Context**: The current shared Gmail account means one person reading an email marks it read for everyone
 
 ## 🚀 Infrastructure Improvements
 

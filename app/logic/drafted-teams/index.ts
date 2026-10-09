@@ -1,11 +1,13 @@
 import type { DraftedPlayer } from '~/types/DraftedPlayer';
 import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
-const setTotalTeamPrice = (draftedTeamData: DraftedTeamWithPlayers) => {
+const setTotalTeamPrice = (draftedTeamData: DraftedTeamWithPlayers, activeGameweek?: number) => {
   return draftedTeamData.players.reduce((total: number, draftedPlayer: DraftedPlayer) => {
-    const lastTransfer = draftedPlayer.transfers[draftedPlayer.transfers.length - 1];
+    const lastTransfer = draftedPlayer.transfers
+      .filter(transfer => activeGameweek === undefined || transfer.transfer_week <= activeGameweek)
+      .at(-1);
     const playerPrice
-      = draftedPlayer.transfers.length > 0 && lastTransfer
+      = lastTransfer
         ? lastTransfer.data.cost
         : draftedPlayer.data.cost;
 
@@ -22,13 +24,13 @@ const setTeamValidity = (draftedTeamData: DraftedTeamWithPlayers & { total_team_
   }
 };
 
-const initDraftedTeamData = (draftedTeamsData: DraftedTeamWithPlayers[] | null) => {
+const initDraftedTeamData = (draftedTeamsData: DraftedTeamWithPlayers[] | null, activeGameweek?: number) => {
   if (!draftedTeamsData) return;
   const draftedTeamData: (DraftedTeamWithPlayers)[] = draftedTeamsData.map(
     (draftedTeam: DraftedTeamWithPlayers) => {
       const teamWithValue = {
         ...draftedTeam,
-        total_team_value: setTotalTeamPrice(draftedTeam),
+        total_team_value: setTotalTeamPrice(draftedTeam, activeGameweek),
       };
 
       return {

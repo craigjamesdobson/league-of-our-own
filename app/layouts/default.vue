@@ -22,6 +22,9 @@ const routeTitles: Record<string, string> = {
   '/account': 'Admin Dashboard',
   '/account/login': 'Admin Dashboard',
   '/team-builder': 'Team builder',
+  '/manage-team': 'Transfers',
+  '/manage-team/email': 'Transfers',
+  '/manage-team/online': 'Transfers',
 };
 
 const fixtureId = computed(() => {
@@ -93,7 +96,7 @@ watch(
   <div class="flex min-h-screen">
     <Sidebar v-model:open="sidebarOpen" />
     <main
-      class="flex min-h-screen min-w-0 flex-1 flex-col bg-surface-100 transition duration-500 ease-in-out dark:bg-slate-950"
+      class="flex min-h-screen min-w-0 flex-1 flex-col bg-muted transition duration-500 ease-in-out"
     >
       <header class="sticky top-0 z-10 flex min-h-16 shrink-0 items-center gap-3 border-b border-slate-200 bg-white/90 px-5 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 xl:px-10">
         <UButton

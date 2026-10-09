@@ -142,7 +142,7 @@
 
       <section
         id="transfers"
-        class="scroll-mt-6 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
+        class="scroll-mt-24 border-b border-slate-200 pb-12 last:border-0 dark:border-slate-800"
       >
         <RulesSectionHeading
           number="4"
@@ -215,23 +215,23 @@
             After weekly prizes are paid, the remaining season prize pool is shared between
             the top five finishers:
             <ul class="mt-4 space-y-2">
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-muted p-1">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary px-3 py-1 text-sm text-white">1st</strong>
                 <span class="ml-auto">50%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-muted p-1">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/65 px-3 py-1 text-sm text-white">2nd</strong>
                 <span class="ml-auto">25%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-muted p-1">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/40 px-3 py-1 text-sm text-primary">3rd</strong>
                 <span class="ml-auto">12.5%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-muted p-1">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/20 px-3 py-1 text-sm text-primary">4th</strong>
                 <span class="ml-auto">7.5%</span>
               </li>
-              <li class="flex items-center gap-2 rounded-lg bg-surface-100 p-1 dark:bg-slate-900">
+              <li class="flex items-center gap-2 rounded-lg bg-muted p-1">
                 <strong class="inline-flex w-12 justify-center rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">5th</strong>
                 <span class="ml-auto">5%</span>
               </li>

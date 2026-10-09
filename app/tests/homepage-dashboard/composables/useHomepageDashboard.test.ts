@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ref } from 'vue';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import type { WeeklyData, WeeklyWinners } from '@/types/Table';
@@ -80,6 +80,77 @@ describe('useHomepageDashboard', () => {
     expect(dashboard).toHaveProperty('isLoading');
     expect(dashboard).toHaveProperty('error');
 
+    app.unmount();
+  });
+});
+
+describe('dashboard empty statistics', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    tableQueues = {
+      player_statistics: Array.from({ length: 4 }, () => ({ data: [], error: null })),
+      weekly_statistics: [{ data: [], error: null }],
+      drafted_transfers: [{ data: [], error: null }],
+      settings: [{
+        data: [
+          { setting_key: 'active_season', setting_value: '26-27' },
+          { setting_key: 'current_gameweek', setting_value: '4' },
+          { setting_key: 'season_complete', setting_value: 'false' },
+          { setting_key: 'site_open', setting_value: 'true' },
+          { setting_key: 'league_data_public', setting_value: 'true' },
+          { setting_key: 'team_registration_open', setting_value: 'false' },
+          { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
+        ],
+        error: null,
+      }],
+    };
+    mockFetchWeeklyStats.mockResolvedValue(undefined);
+    mockFetchWeeklyWinners.mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    { description: 'empty array', data: [] },
+    { description: 'null result', data: null },
+  ])('loads empty position and league statistics without reporting database errors: $description', async ({ data }) => {
+    tableQueues['player_statistics'] = Array.from({ length: 4 }, () => ({ data, error: null }));
+    tableQueues['weekly_statistics'] = [{ data, error: null }];
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const [dashboard, app] = withSetup(() => useHomepageDashboard());
+
+    await dashboard.loadDashboardData();
+
+    expect(dashboard.topPositionPlayers.value).toEqual({ 1: null, 2: null, 3: null, 4: null });
+    expect(dashboard.leagueAverages.value).toEqual({
+      averagePoints: 0,
+      totalTeams: 0,
+      highestPoints: 0,
+      lowestPoints: 0,
+      weeksPlayed: 0,
+    });
+    expect(dashboard.error.value).toBeNull();
+    expect(dashboard.isLoading.value).toBe(false);
+    expect(consoleError).not.toHaveBeenCalled();
+    app.unmount();
+  });
+
+  it('still reports a failed player-statistics query', async () => {
+    const queryError = { message: 'Permission denied' };
+    tableQueues['player_statistics'] = [
+      { data: null, error: queryError },
+      ...Array.from({ length: 3 }, () => ({ data: [], error: null })),
+    ];
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const [dashboard, app] = withSetup(() => useHomepageDashboard());
+
+    await dashboard.loadDashboardData();
+
+    expect(consoleError).toHaveBeenCalledWith('Error fetching top GK players:', queryError);
+    expect(consoleError).toHaveBeenCalledTimes(1);
+    expect(dashboard.topPositionPlayers.value[1]).toBeNull();
     app.unmount();
   });
 });

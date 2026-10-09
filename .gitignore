@@ -10,9 +10,21 @@ node-compile-cache/
 .env.*
 !.env.example
 dist
+.smoke-results/
 
 # Working docs and private directories
 docs/_*/
+.scratch/
+
+# Local database exports and credentials
+supabase/backup/
+*.dump
+*.backup
+*.sql.gz
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Development email files and temporary folders
 temp/

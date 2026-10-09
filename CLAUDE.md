@@ -7,6 +7,8 @@ Project-specific guidance for **League of Our Own** - a Nuxt fantasy football we
 ## Git Rules
 
 - **Always get explicit user approval before committing.** Show the proposed commit message and files to be committed, then wait for confirmation before running `git commit`.
+- **Staging testing uses direct merges.** Merge feature branches directly into `staging` for repeated testing. Reserve pull requests for `main`, followed by a release tag for production deployment. For deployment requests, follow `docs/guides/deployment.md`.
+- **Stage explicit paths and inspect `git diff --cached --name-status` before every commit.** Temporary audits, probes and scratch notes stay local; new `.scratch/` files must not be committed. Keep durable project specifications under `docs/project-management/`.
 
 ## Database Safety Rules
 
@@ -41,7 +43,7 @@ All schema changes follow this exact flow:
 4. Commit migration file and push to branch
 5. CI validates migrations apply cleanly (`supabase db start`)
 6. Merge to `staging` branch triggers CI/CD to apply migrations to staging
-7. Merge to `main` branch triggers CI/CD to apply migrations to production
+7. Merge to `main` for verification, then push a `v*` release tag on `main` to apply production migrations and deploy
 
 ### Data Restore Scripts
 
@@ -57,8 +59,8 @@ Run `pnpm <script> --help` for usage details.
 
 ### What CI/CD Handles (never local)
 
-- `supabase db push` to production (`.github/workflows/deploy-production.yml`)
-- `supabase db push` to staging (`.github/workflows/deploy-staging.yml`)
+- `supabase db push` to production on `v*` release tags (`.github/workflows/ci.yml`)
+- `supabase db push` to staging on staging pushes (`.github/workflows/ci.yml`)
 - Migration validation via `supabase db start` (`.github/workflows/ci.yml`)
 
 ---
@@ -388,7 +390,7 @@ Templates in `.github/ISSUE_TEMPLATE/`:
 ### Workflow Pattern
 
 ```
-Idea → GitHub Issue → Branch → PR → Merge → Close Issue
+Idea → GitHub Issue → Feature branch → Direct merge into staging → Test → PR into main → Release tag
 ```
 
 **Key Practices**:
@@ -422,4 +424,4 @@ pnpm test      # Run test suite
 
 ---
 
-**Last updated:** 2026-07-27
+**Last updated:** 2026-10-06

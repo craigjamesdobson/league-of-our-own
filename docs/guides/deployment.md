@@ -4,14 +4,20 @@ How changes are verified and promoted through staging and production.
 
 ## Current deployment model
 
-GitHub Actions verifies both the Nuxt application and Supabase migrations. After verification, it applies database migrations for pushes to protected branches:
+GitHub Actions verifies the Nuxt application and Supabase migrations. For staging pushes and production release tags, it applies migrations first and then deploys the exact verified application artifact to Cloudflare Pages:
 
-- `staging` deploys migrations to the staging Supabase project.
-- `main` deploys migrations to the production Supabase project.
+- Pushes to `staging` deploy the staging database and application.
+- Pushes to `main` run verification only.
+- Tags matching `v*` deploy production after checking that the tagged commit belongs to `main`.
 
-The workflow builds the application with `pnpm build`, producing the Nitro application in `.output`. The current Nitro preset is `node-server` because the repository includes server API routes.
+The workflow builds the application with `pnpm build:cloudflare`, producing a Cloudflare Pages artifact in `dist/`, including the Nitro server routes. It uploads the artifact with hidden files included and a name containing the exact commit SHA.
 
-Frontend hosting is configured outside this repository or has not yet been recorded here. GitHub Actions does not currently publish `.output`. Confirm the frontend hosting target, build-time environment, and staging URL before relying on a branch merge to update the website.
+After verification, GitHub Actions validates its Cloudflare configuration and downloads that same artifact before applying Supabase migrations, then deploys it with Wrangler to the matching Cloudflare Pages branch. Cloudflare Pages automatic Git deployments must be disabled so application deployment follows the database update.
+
+After a successful staging or production deployment, the `post-deployment-smoke`
+job runs the browser and database API smoke suite against that environment's
+`SITE_URL` and Supabase public configuration. Pull requests and verification-only
+main pushes do not run deployed smoke tests.
 
 ## Pull-request verification
 
@@ -24,49 +30,51 @@ pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test
-pnpm build
+pnpm build:cloudflare
 ```
 
-The database job starts a clean local Supabase instance and applies all migrations.
+The database job starts a clean local Supabase instance and applies all migrations, then runs the pgTAP suite with `supabase test db --local` to verify database lifecycle behavior and permissions.
 
-Configure branch protection to require:
+Require these checks for pull requests into `main`:
 
 - `CI / application`
 - `CI / database-migrations`
 
 ## Staging promotion
 
-1. Open a pull request targeting `staging`.
-2. Review the change and wait for both required checks.
-3. Merge the pull request.
-4. GitHub Actions repeats both checks against the exact merged commit.
-5. After both pass, the workflow applies migrations to the staging Supabase project.
-6. Confirm the frontend hosting platform has deployed the same commit.
-7. Complete staging smoke tests and any feature-specific manual QA.
+1. Merge the feature branch directly into `staging`, then push `staging`. No pull request is needed for staging testing.
+2. GitHub Actions runs both verification jobs against the exact merged commit.
+3. After both pass, the workflow applies migrations to the staging Supabase project.
+4. The same job deploys the verified application artifact to Cloudflare Pages with `--branch=staging`.
+5. Confirm `post-deployment-smoke` passes, then complete feature-specific manual QA.
+6. Repeat direct merges into `staging` as the feature develops. Open a pull request into `main` once it is ready for production review.
 
 Database deployment never begins if lint, typechecking, tests, the Nuxt build, or local migration validation fails.
 
 ## Production promotion
 
-Promote tested staging changes through a pull request into `main`. The same verification gates run before the production database deployment. Production and staging deployment jobs use separate GitHub environments and cannot overlap with another deployment to the same environment.
+Promote tested staging changes through a pull request into `main`. Merging that pull request runs verification without deploying. Push a release tag matching `v*` for the tested commit to trigger production deployment. The workflow verifies that the tagged commit belongs to `main`, applies production migrations, then deploys the application artifact with `--branch=main`. Production and staging use separate GitHub environments, with deployments serialized within each environment. All production release tags share a workflow concurrency group covering verification and deployment. Publish one release at a time: GitHub keeps only one pending run per group, and concurrency does not define semantic-version ordering.
 
 ## GitHub environments and secrets
 
-The repository requires `staging` and `production` GitHub environments.
+The repository requires `ci`, `staging`, and `production` GitHub environments. Pull requests and verification-only runs use `ci` for public build configuration.
 
 Database deployment uses:
 
 ```text
 SUPABASE_ACCESS_TOKEN
-STAGING_PROJECT_ID
-STAGING_DB_PASSWORD
-PRODUCTION_PROJECT_ID
-PRODUCTION_DB_PASSWORD
+SUPABASE_PROJECT_ID
+SUPABASE_DB_PASSWORD
+CLOUDFLARE_API_TOKEN
 ```
 
 Store project IDs and database passwords in the matching GitHub environment. Do not expose deployment secrets to pull-request jobs.
 
-The frontend host is expected to provide the application's runtime and public configuration, including the applicable Supabase URL and key, site URL, Turnstile configuration, email credentials, and service-role credentials. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
+Set public variables `SUPABASE_URL`, `SUPABASE_KEY`, `TURNSTILE_SITE_KEY`, and `SITE_URL` in each build environment. Set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_PAGES_PROJECT` in `staging` and `production`.
+
+Deployable builds fail early when one of those public build variables is missing. Configure harmless local or test values in `ci`; it must not depend on private deployment credentials.
+
+Configure Cloudflare Pages runtime bindings separately for Preview (staging) and Production: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `NITRO_TURNSTILE_SECRET_KEY`, and `DEPLOYMENT_ENV`. Set `DEPLOYMENT_ENV` to `staging` or `production` respectively. Scheduled sync endpoints also require `SYNC_API_KEY` and `ADMIN_EMAIL`. These runtime secrets are not supplied by the GitHub artifact deployment; keep them in Cloudflare, outside the public build configuration. The Turnstile secret uses `NITRO_TURNSTILE_SECRET_KEY`; the former `TURNSTILE_SECRET_KEY` name is no longer read. Operational application state—including the active Season, current gameweek, site availability, league-data visibility, and team-registration availability—lives in the Supabase `settings` table and can be changed without redeploying. Refer to the configuration reference for the full inventory.
 
 ## Local release verification
 
@@ -84,6 +92,41 @@ pnpm preview
 The preview command serves the generated Nitro application locally.
 
 ## Post-deployment checks
+
+### Automated smoke tests
+
+`pnpm test:smoke` runs Playwright tests from `smoke-tests/`. Set `SITE_URL`,
+`SUPABASE_URL`, and the public anonymous `SUPABASE_KEY` for the target environment.
+Install Chromium once with `pnpm exec playwright install chromium`. CI installs
+the browser and its system dependencies automatically.
+
+The suite checks that:
+
+- Operational settings parse correctly and the player/club API and public team
+  lookup RPC respond.
+- Anonymous users cannot select manager email addresses, edit keys or private
+  transfer requests. Permission probes use `limit=0` and never retrieve those
+  values.
+- The frontend points at the expected database and key routes render without
+  application errors in a real browser.
+- Login renders and anonymous users cannot open the admin dashboard.
+- Manual transfer instructions and clipboard copying work when available, and
+  disabled online transfer routes remain gated.
+
+Closed-site and private-league settings are respected: the suite expects the
+appropriate redirects instead of opening the site or changing settings. It
+does not sign in, submit forms or mutate remote data. Every direct database
+probe uses GET, including the public team lookup RPC. PostgREST executes these
+requests in read-only transactions, so attempted writes fail at the database
+level. The job uses only the public anonymous key, with no service-role key,
+database password, database CLI or migration command.
+
+Results, failure screenshots and traces are stored under `.smoke-results/`,
+which is ignored by Git. CI uploads the report as `smoke-results-<commit SHA>`.
+Transient failures get one retry in CI. A failed smoke job makes the workflow
+fail after deployment; it does not roll back the application or database.
+
+### Manual feature QA
 
 For staging and production:
 
@@ -111,16 +154,9 @@ Frontend rollback depends on the hosting platform. Prefer redeploying the last k
 
 Do not reverse an applied Supabase migration by deleting its migration file. Create a corrective forward migration unless a documented recovery procedure explicitly requires database restoration. Application changes that accompany schema migrations should remain compatible during staged rollout and rollback.
 
-## Known gap
+## Deployment ownership
 
-The repository has no frontend deployment job. To close that gap:
-
-1. Identify the hosting platform and staging URL.
-2. Decide which public configuration is embedded at build time.
-3. Upload the verified `.output` directory as a workflow artifact on trusted branch pushes.
-4. Add a frontend deployment job that consumes that exact artifact.
-5. Add an HTTP smoke check against the deployed staging URL.
-6. Document the platform-specific rollback procedure.
+GitHub Actions owns database and application deployment. Confirm the relevant push or tag workflow succeeds, then check the deployed application at the URL recorded in that environment's `SITE_URL`. Manual workflow runs verify changes without deploying them.
 
 ## See also
 
@@ -131,4 +167,4 @@ The repository has no frontend deployment job. To close that gap:
 
 ---
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-10-08

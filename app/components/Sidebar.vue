@@ -150,17 +150,31 @@ const footerButtonUi = {
 
     <template #footer="{ state }">
       <div class="flex w-full flex-col gap-2">
+        <WhatsNewControl :collapsed="state === 'collapsed'" />
         <ColorModeControl :collapsed="state === 'collapsed'" />
-        <UButton
-          to="/account"
-          icon="uil:setting"
-          :label="state === 'expanded' ? 'Account' : undefined"
-          aria-label="Account settings"
-          color="neutral"
-          variant="ghost"
-          class="text-slate-200 hover:bg-white/10 hover:text-white"
-          :ui="footerButtonUi"
-        />
+        <UTooltip
+          class="w-full"
+          text="Account settings"
+          :disabled="state !== 'collapsed'"
+          :content="{ side: 'right' }"
+        >
+          <UButton
+            to="/account"
+            icon="uil:setting"
+            :label="state === 'expanded' ? 'Account' : undefined"
+            aria-label="Account settings"
+            color="neutral"
+            variant="ghost"
+            :square="state === 'collapsed'"
+            class="cursor-pointer text-slate-200 hover:bg-white/10 hover:text-white"
+            :ui="{
+              ...footerButtonUi,
+              base: state === 'collapsed'
+                ? 'min-h-12 w-12 justify-center overflow-hidden p-0'
+                : footerButtonUi.base,
+            }"
+          />
+        </UTooltip>
       </div>
     </template>
   </USidebar>

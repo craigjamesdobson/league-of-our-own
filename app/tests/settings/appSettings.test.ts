@@ -25,7 +25,32 @@ describe('parseAppSettings', () => {
       leagueDataPublic: false,
       teamRegistrationOpen: false,
       teamSubmissionDeadline: '2026-08-20',
+      onlineTransferRequestsEnabled: false,
     });
+  });
+
+  const rowsWithOnlineFlag = (value: string) => [
+    { setting_key: 'active_season', setting_value: '26-27' },
+    { setting_key: 'current_gameweek', setting_value: '1' },
+    { setting_key: 'season_complete', setting_value: 'false' },
+    { setting_key: 'site_open', setting_value: 'true' },
+    { setting_key: 'league_data_public', setting_value: 'false' },
+    { setting_key: 'team_registration_open', setting_value: 'false' },
+    { setting_key: 'team_submission_deadline', setting_value: '2026-08-20' },
+    { setting_key: 'online_transfer_requests_enabled', setting_value: value },
+  ];
+
+  it.each([
+    ['true', true],
+    ['false', false],
+  ])('parses the online transfer flag %s', (value, enabled) => {
+    expect(parseAppSettings(rowsWithOnlineFlag(String(value))).onlineTransferRequestsEnabled)
+      .toBe(enabled);
+  });
+
+  it.each(['yes', '', 'TRUE'])('rejects the invalid online transfer flag %s', (value) => {
+    expect(() => parseAppSettings(rowsWithOnlineFlag(value)))
+      .toThrow('Setting online_transfer_requests_enabled must be true or false');
   });
 
   it('rejects an invalid boolean instead of treating it as false', () => {

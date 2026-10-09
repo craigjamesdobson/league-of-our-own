@@ -2,14 +2,15 @@
 import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useAccountStore } from '~/stores/account';
 import { useDraftedTeamsStore } from '@/stores/draftedTeams';
+import { useTransferRequestsStore } from '@/stores/transferRequests';
 import { usePlayerStore } from '@/stores/players';
 import { useAppSettings } from '@/composables/useAppSettings';
-import type { DraftedTeamWithPlayers } from '~/types/DraftedTeam';
 
 const accountStore = useAccountStore();
 const draftedTeamStore = useDraftedTeamsStore();
+const transferRequestsStore = useTransferRequestsStore();
 const playerStore = usePlayerStore();
-const { updateCurrentGameweek, getCurrentGameweek } = useAppSettings();
+const { updateCurrentGameweek, getCurrentGameweek, onlineTransferRequestsEnabled } = useAppSettings();
 const router = useRouter();
 
 definePageMeta({
@@ -17,6 +18,9 @@ definePageMeta({
 });
 
 await draftedTeamStore.fetchDraftedTeams();
+if (onlineTransferRequestsEnabled.value) {
+  await transferRequestsStore.fetchPendingTransferRequests();
+}
 
 const selectedDraftedTeamID = ref<number | undefined>();
 const selectedDraftedTeam = computed(() =>
@@ -31,13 +35,14 @@ const transferDraftedTeams = computed(() =>
 const toast = useNuxtToast();
 const playerData = ref();
 const updating = ref(false);
+const reviewingRequestID = ref<number | null>(null);
 
 const currentGameweek = ref<number>(4);
 const isUpdatingGameweek = ref(false);
 const stepperButton = {
   color: 'neutral' as const,
-  variant: 'ghost' as const,
-  class: 'dark:!text-slate-50 dark:hover:!bg-slate-800',
+  variant: 'link' as const,
+  class: 'text-muted hover:text-primary dark:hover:text-primary-300',
 };
 
 const handleUpsertPlayerData = async () => {
@@ -64,12 +69,47 @@ const handleUserLogout = async () => {
   }
 };
 
-const transfersRemainingCount = (team: DraftedTeamWithPlayers) => {
-  const totalTransfersMade = team.players
-    .map(x => x.transfers.length)
-    .reduce((total, transfers) => total + transfers, 0);
+const getTransferRequestTeamName = (teamID: number) =>
+  draftedTeamStore.getDraftedTeamByID(teamID)?.team_name ?? 'Selected team';
 
-  return 4 - totalTransfersMade;
+const getTransferRequestReviewMessage = (targetGameweek: number) => {
+  if (targetGameweek > currentGameweek.value) {
+    return `Advance the active gameweek to ${targetGameweek} before approving this request.`;
+  }
+
+  if (targetGameweek < currentGameweek.value) {
+    return 'This request is past its target gameweek. Reject it and ask the team to submit a new request.';
+  }
+
+  return '';
+};
+
+const selectRequestTeam = (teamID: number) => {
+  selectedDraftedTeamID.value = teamID;
+};
+
+const reviewTransferRequest = async (requestID: number, status: 'approved' | 'rejected') => {
+  try {
+    reviewingRequestID.value = requestID;
+    await transferRequestsStore.reviewTransferRequest(requestID, status);
+    if (status === 'approved') {
+      await draftedTeamStore.fetchDraftedTeams();
+    }
+    toast.add({
+      color: status === 'approved' ? 'success' : 'neutral',
+      title: status === 'approved' ? 'Transfers applied' : 'Transfer request rejected',
+      description: status === 'approved'
+        ? 'The requested transfers are now live on the team.'
+        : 'The team was not changed.',
+      duration: 3000,
+    });
+  }
+  catch (error) {
+    handleApiError(error, toast);
+  }
+  finally {
+    reviewingRequestID.value = null;
+  }
 };
 
 onMounted(async () => {
@@ -320,40 +360,123 @@ const copyApiUrl = async () => {
                 }"
               >
                 <template #item-label="{ item }">
-                  <div class="flex items-center justify-between w-full p-1">
+                  <div class="flex w-full flex-col gap-2 p-1">
                     <div class="flex flex-col gap-1">
                       <div class="font-bold text-slate-800 uppercase dark:text-slate-100">
                         {{ item.team_name }}
                       </div>
-                      <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+                      <div class="text-xs text-slate-600 dark:text-slate-300">
                         <span class="uppercase">{{ item.team_owner }}</span>
-                        <span class="text-slate-400">|</span>
-                        <span class="font-medium">
-                          {{ transfersRemainingCount(item) }}/4 transfers left
-                        </span>
                       </div>
                     </div>
-
-                    <UBadge
-                      :color="
-                        transfersRemainingCount(item) > 2 ? 'success'
-                        : transfersRemainingCount(item) > 0 ? 'warning'
-                          : 'error'
-                      "
-                      variant="soft"
-                      class="h-6 w-6 justify-center rounded-full text-xs font-bold"
-                    >
-                      {{ transfersRemainingCount(item) }}
-                    </UBadge>
+                    <DraftedTransferAllowance :drafted-team="item" />
                   </div>
                 </template>
               </USelectMenu>
 
+              <div
+                v-if="onlineTransferRequestsEnabled"
+                class="rounded-lg border border-default bg-default p-4"
+              >
+                <div class="mb-3 flex items-start gap-3">
+                  <Icon
+                    name="carbon:notification"
+                    size="20"
+                    class="mt-0.5 shrink-0 text-warning"
+                  />
+                  <div>
+                    <h3 class="text-sm font-bold uppercase text-highlighted">
+                      Pending transfer requests
+                    </h3>
+                    <p class="mt-1 text-xs text-muted">
+                      Confirming a request applies the requested transfers to the live team. Reject requests that should not be applied.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  v-if="!transferRequestsStore.pendingRequests.length"
+                  class="text-sm text-muted"
+                >
+                  No pending transfer requests.
+                </div>
+                <div
+                  v-else
+                  class="space-y-3"
+                >
+                  <div
+                    v-for="request in transferRequestsStore.pendingRequests"
+                    :key="request.transfer_request_id"
+                    class="rounded-lg border border-default bg-default p-3"
+                  >
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p class="font-bold text-highlighted">
+                          {{ request.requester_name }} · {{ getTransferRequestTeamName(request.drafted_team_id) }}
+                        </p>
+                        <p class="text-xs text-muted">
+                          {{ request.requester_email }} · Applies to Gameweek {{ request.target_gameweek }}
+                        </p>
+                      </div>
+                      <UButton
+                        size="xs"
+                        color="neutral"
+                        variant="soft"
+                        label="Manage team"
+                        @click="selectRequestTeam(request.drafted_team_id)"
+                      />
+                    </div>
+                    <div class="mt-3 space-y-1 text-sm text-muted">
+                      <p
+                        v-for="item in request.items"
+                        :key="item.transfer_request_item_id"
+                      >
+                        <span class="font-semibold">Transfer {{ item.transfer_number }}:</span>
+                        {{ item.player_out }} → {{ item.player_in }}
+                      </p>
+                    </div>
+                    <p
+                      v-if="request.target_gameweek !== currentGameweek"
+                      class="mt-3 text-xs font-medium text-warning"
+                    >
+                      {{ getTransferRequestReviewMessage(request.target_gameweek) }}
+                    </p>
+                    <div class="mt-3 flex flex-wrap justify-end gap-2">
+                      <UButton
+                        size="xs"
+                        color="error"
+                        variant="ghost"
+                        label="Reject"
+                        :loading="reviewingRequestID === request.transfer_request_id"
+                        @click="reviewTransferRequest(request.transfer_request_id, 'rejected')"
+                      />
+                      <UButton
+                        size="xs"
+                        color="success"
+                        variant="soft"
+                        label="Confirm and apply"
+                        :disabled="request.target_gameweek !== currentGameweek"
+                        :title="request.target_gameweek === currentGameweek
+                          ? 'Apply this request to the active gameweek'
+                          : getTransferRequestReviewMessage(request.target_gameweek)"
+                        :loading="reviewingRequestID === request.transfer_request_id"
+                        @click="reviewTransferRequest(request.transfer_request_id, 'approved')"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Selected Team Display -->
               <div v-if="selectedDraftedTeam">
+                <DraftedTransferAllowance
+                  :drafted-team="selectedDraftedTeam"
+                  class="mb-3"
+                />
                 <DraftedTeam
                   :editable="true"
                   :drafted-team="selectedDraftedTeam"
+                  :active-gameweek="currentGameweek"
                 />
               </div>
 
@@ -375,20 +498,10 @@ const copyApiUrl = async () => {
                     <p class="text-base text-slate-600 mb-6 dark:text-slate-300">
                       Choose a team from the dropdown above to view and manage their transfers, players, and settings.
                     </p>
-                    <div class="text-sm text-slate-500 space-y-2 dark:text-slate-400">
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-green-500 rounded-full" />
-                        <span>Green: 3+ transfers remaining</span>
-                      </div>
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full" />
-                        <span>Yellow: 1-2 transfers remaining</span>
-                      </div>
-                      <div class="flex items-center justify-center gap-3">
-                        <div class="w-3 h-3 bg-red-500 rounded-full" />
-                        <span>Red: No transfers remaining</span>
-                      </div>
-                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                      Up to two transfers can be used before 1 January, with four across the season.
+                      Unused transfers carry over from 1 January.
+                    </p>
                   </div>
                 </div>
               </div>

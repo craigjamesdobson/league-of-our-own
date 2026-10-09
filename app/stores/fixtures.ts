@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { usePlayerStore } from './players';
 import type { Fixture } from '~/types/Fixture';
 import type { Player, PlayerWithStats } from '~/types/Player';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
 import type {
   Database,
   Tables,
@@ -65,13 +66,14 @@ const populatePlayersWithStats = (
 export const useFixtureStore = defineStore('fixture-store', () => {
   const supabase = useSupabaseClient<Database>();
   const playerStore = usePlayerStore();
+  const { notifyPlayerStatisticsChanged } = useLeagueDataChanges();
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
   const selectedGameweek = ref(+(route.query.week || 1));
 
   const fetchFixtures = async (gameweekID: number) => {
     fixtures.value = null;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('fixtures')
       .select(
         `
@@ -93,10 +95,11 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       .order('id')
       .returns<Fixture[]>();
     fixtures.value = data;
+    if (error) throw new Error(error.message);
   };
 
   const fetchFixtureByID = async (id: number) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('fixtures')
       .select(
         `
@@ -117,6 +120,13 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       .eq('id', id)
       .returns<Fixture[]>()
       .single();
+
+    if (error) throw new Error(error.message);
+
+    if (data && fixtures.value) {
+      fixtures.value = fixtures.value.map(fixture => fixture.id === data.id ? { ...data } : fixture);
+    }
+
     return data;
   };
 
@@ -132,25 +142,14 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       populated_at: currentTime,
     };
 
-    const selectedFixtureIndex = fixtures.value?.findIndex(
-      x => x.id === fixtureData.id,
-    );
-
-    if (selectedFixtureIndex === undefined || !fixtures.value) throw new Error('No fixture found');
-
-    // Update local fixture data with population info
-    fixtures.value[selectedFixtureIndex] = {
-      ...fixtureData,
-      populated_by: user.value?.id || null,
-      populated_at: currentTime,
-    };
-
     const { error } = await supabase
       .from('fixtures')
       .upsert(formattedFixture)
       .select();
 
     if (error) throw new Error(error.message);
+
+    return await fetchFixtureByID(fixtureData.id);
   };
 
   const fetchPlayersWithStatisticsByGameweek = async (gameweek: number) => {
@@ -212,6 +211,8 @@ export const useFixtureStore = defineStore('fixture-store', () => {
       .select();
 
     if (error) throw new Error(error.message);
+
+    notifyPlayerStatisticsChanged();
   };
 
   const getUserFullName = (profile: { full_name: string | null } | null | undefined) => {

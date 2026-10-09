@@ -3,6 +3,7 @@ import { useToast as useNuxtToast } from '@nuxt/ui/composables';
 import { useDraftedTeamsStore } from '~/stores/draftedTeams';
 import { useFixtureStore } from '~/stores/fixtures';
 import { useAppSettings } from '~/composables/useAppSettings';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
 import type { Database, DraftedTeamWithPlayerPointsByGameweek } from '~/types/database.types';
 import { calculateWeeklyStats } from '~/composables/useWeeklyStats';
 
@@ -12,9 +13,29 @@ const route = useRoute();
 const router = useRouter();
 const fixtureStore = useFixtureStore();
 const { getCurrentGameweek } = useAppSettings();
+const { playerStatisticsRevision, notifyWeeklyStatisticsChanged } = useLeagueDataChanges();
 const weeks = ref(Array.from({ length: 38 }, (_, i) => i + 1));
 const selectedWeek = ref(1);
-const isLoadingWeekChange = ref(false);
+const isLoadingWeekChange = ref(true);
+let hasLoadedWeek = false;
+const draftedTeamsStore = useDraftedTeamsStore();
+const draftedTeamsWithPoints: Ref<DraftedTeamWithPlayerPointsByGameweek[] | undefined>
+  = ref();
+let teamPointsRequest = 0;
+
+const loadTeamPoints = async (week: number): Promise<void> => {
+  const request = ++teamPointsRequest;
+  const revision = playerStatisticsRevision.value;
+  const teams = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(week);
+  if (request !== teamPointsRequest || selectedWeek.value !== week) return;
+
+  if (revision !== playerStatisticsRevision.value) {
+    await loadTeamPoints(week);
+    return;
+  }
+
+  draftedTeamsWithPoints.value = teams;
+};
 
 // Initialize selected week from URL query, current gameweek setting, or fallback to 1
 onMounted(async () => {
@@ -36,12 +57,8 @@ onMounted(async () => {
     // Fetch initial data for the determined week
     isLoadingWeekChange.value = true;
     await fixtureStore.fetchFixtures(finalWeek);
-    draftedTeamsWithPoints.value
-      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-        finalWeek,
-      );
+    await loadTeamPoints(finalWeek);
     fixtureStore.selectedGameweek = finalWeek;
-    isLoadingWeekChange.value = false;
   }
   catch (error) {
     console.error('Failed to load current gameweek setting:', error);
@@ -59,18 +76,14 @@ onMounted(async () => {
     // Fetch initial data for the fallback week
     isLoadingWeekChange.value = true;
     await fixtureStore.fetchFixtures(fallbackWeek);
-    draftedTeamsWithPoints.value
-      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-        fallbackWeek,
-      );
+    await loadTeamPoints(fallbackWeek);
     fixtureStore.selectedGameweek = fallbackWeek;
+  }
+  finally {
+    hasLoadedWeek = true;
     isLoadingWeekChange.value = false;
   }
 });
-
-const draftedTeamsStore = useDraftedTeamsStore();
-const draftedTeamsWithPoints: Ref<DraftedTeamWithPlayerPointsByGameweek[] | undefined>
-  = ref();
 
 definePageMeta({
   middleware: ['auth'],
@@ -79,26 +92,45 @@ definePageMeta({
 watch(
   selectedWeek,
   async (newWeek) => {
+    if (!hasLoadedWeek) return;
+
     isLoadingWeekChange.value = true;
-    await fixtureStore.fetchFixtures(newWeek);
-    draftedTeamsWithPoints.value
-      = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-        newWeek,
-      );
-    fixtureStore.selectedGameweek = newWeek;
-    isLoadingWeekChange.value = false;
-    await router.push({
-      path: 'fixtures',
-      query: { week: newWeek },
-    });
+    draftedTeamsWithPoints.value = undefined;
+    try {
+      await fixtureStore.fetchFixtures(newWeek);
+      await loadTeamPoints(newWeek);
+      fixtureStore.selectedGameweek = newWeek;
+      await router.push({
+        path: 'fixtures',
+        query: { week: newWeek },
+      });
+    }
+    catch (error) {
+      handleApiError(error, toast);
+    }
+    finally {
+      isLoadingWeekChange.value = false;
+    }
   },
 );
 
-onActivated(async () => {
-  if (draftedTeamsWithPoints.value) {
-    draftedTeamsWithPoints.value = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(
-      selectedWeek.value,
-    );
+onActivated(() => {
+  if (!hasLoadedWeek) return;
+
+  const urlWeek = Number(route.query.week) || selectedWeek.value;
+  if (urlWeek !== selectedWeek.value) {
+    selectedWeek.value = urlWeek;
+  }
+});
+
+watch(playerStatisticsRevision, async () => {
+  if (!hasLoadedWeek) return;
+
+  try {
+    await loadTeamPoints(selectedWeek.value);
+  }
+  catch (error) {
+    handleApiError(error, toast);
   }
 });
 
@@ -133,11 +165,13 @@ const progressStats = computed(() => {
 });
 
 const updateWeeklyStats = async () => {
-  const formattedWeeklyData = draftedTeamsWithPoints.value!.map((team) => {
-    const stats = calculateWeeklyStats(team, selectedWeek.value);
+  const week = selectedWeek.value;
+  const teams = await draftedTeamsStore.fetchDraftedTeamsWithPlayerPointsByGameweek(week);
+  const formattedWeeklyData = teams.map((team) => {
+    const stats = calculateWeeklyStats(team, week);
     return {
       team: team.drafted_team_id,
-      week: selectedWeek.value,
+      week,
       points: stats.points,
       goals: stats.goals,
       assists: stats.assists,
@@ -149,13 +183,16 @@ const updateWeeklyStats = async () => {
   const { error: deleteError } = await supabase
     .from('weekly_statistics')
     .delete()
-    .eq('week', selectedWeek.value);
+    .eq('week', week);
 
   if (deleteError) throw new Error('Failed to update this gameweek');
 
-  await supabase.from('weekly_statistics').insert(formattedWeeklyData).select();
+  const { error: insertError } = await supabase.from('weekly_statistics').insert(formattedWeeklyData).select();
 
-  handleApiSuccess(`Week ${selectedWeek.value} has been updated`, toast);
+  if (insertError) throw new Error('Failed to update this gameweek');
+
+  notifyWeeklyStatisticsChanged();
+  handleApiSuccess(`Week ${week} has been updated`, toast);
 };
 </script>
 
@@ -203,6 +240,7 @@ const updateWeeklyStats = async () => {
             v-model="selectedWeek"
             class="w-28"
             :items="weeks"
+            :disabled="isLoadingWeekChange"
             placeholder="Select a gameweek"
           >
             <template #default="{ modelValue }">

@@ -1,4 +1,4 @@
-import { ref, readonly } from 'vue';
+import { ref, readonly, watch } from 'vue';
 import { useTableStore } from '@/stores/table';
 import type { WeeklyData } from '@/types/Table';
 import type { Database } from '@/types/database.types';
@@ -6,11 +6,13 @@ import type { WeeklyTransfer, TopPositionPlayers, LeagueAverages, PositionMover,
 import { PlayerPosition } from '@/types/PlayerPosition';
 import { getPositionName } from '@/utils/playerPosition';
 import { useAppSettings } from '@/composables/useAppSettings';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
 
 export function useHomepageDashboard() {
   const tableStore = useTableStore();
   const supabase = useSupabaseClient<Database>();
   const { getCurrentGameweek: getGameweekFromDB } = useAppSettings();
+  const { playerStatisticsRevision, weeklyStatisticsRevision } = useLeagueDataChanges();
 
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -52,9 +54,7 @@ export function useHomepageDashboard() {
     return !!weeklyData.value?.some(team => team.week_points > 0);
   };
 
-  const getLeagueAverages = async (): Promise<LeagueAverages> => {
-    const currentWeek = getCurrentGameweek();
-
+  const getLeagueAverages = async (currentWeek = getCurrentGameweek()): Promise<LeagueAverages> => {
     if (currentWeek === null) {
       console.warn('Cannot calculate league averages: gameweek data unavailable');
       return {
@@ -73,7 +73,8 @@ export function useHomepageDashboard() {
         .order('points', { ascending: false });
 
       if (error) console.error('Error fetching weekly statistics for league averages:', error);
-      if (error || !allWeeklyStats || allWeeklyStats.length === 0) {
+      if (error) return leagueAverages.value;
+      if (!allWeeklyStats || allWeeklyStats.length === 0) {
         return {
           averagePoints: 0,
           totalTeams: 0,
@@ -97,13 +98,7 @@ export function useHomepageDashboard() {
     }
     catch (err) {
       console.error('Error calculating league averages:', err);
-      return {
-        averagePoints: 0,
-        totalTeams: 0,
-        highestPoints: 0,
-        lowestPoints: 0,
-        weeksPlayed: 0,
-      };
+      return leagueAverages.value;
     }
   };
 
@@ -145,6 +140,7 @@ export function useHomepageDashboard() {
   };
 
   const fetchTopPositionPlayers = async (): Promise<void> => {
+    const revision = playerStatisticsRevision.value;
     try {
       const positions = [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD];
 
@@ -159,7 +155,8 @@ export function useHomepageDashboard() {
           .eq('players_view.position', position);
 
         if (statsError) console.error(`Error fetching top ${getPositionName(position)} players:`, statsError);
-        if (statsError || !topPlayerStats || topPlayerStats.length === 0) {
+        if (statsError) return { position, players: topPositionPlayers.value[position] };
+        if (!topPlayerStats || topPlayerStats.length === 0) {
           return { position, players: null };
         }
 
@@ -202,19 +199,18 @@ export function useHomepageDashboard() {
         };
       }));
 
+      if (playerStatisticsRevision.value !== revision) return;
+
       results.forEach(({ position, players }) => {
         topPositionPlayers.value[position] = players || null;
       });
     }
     catch (err) {
       console.error('Error fetching top position players:', err);
-      Object.keys(topPositionPlayers.value).forEach((key) => {
-        topPositionPlayers.value[parseInt(key)] = null;
-      });
     }
   };
 
-  const fetchWeeklyTransfers = async (week: number): Promise<void> => {
+  const fetchWeeklyTransfersData = async (week: number): Promise<WeeklyTransfer[]> => {
     try {
       const { data: transfers, error: transfersError } = await supabase
         .from('drafted_transfers')
@@ -223,12 +219,11 @@ export function useHomepageDashboard() {
 
       if (transfersError) {
         console.error('Error fetching transfers:', transfersError);
-        return;
+        return [];
       }
 
       if (!transfers || transfers.length === 0) {
-        weeklyTransfers.value = [];
-        return;
+        return [];
       }
 
       const draftedPlayerIds = transfers.map(t => t.drafted_player);
@@ -312,15 +307,21 @@ export function useHomepageDashboard() {
         };
       });
 
-      weeklyTransfers.value = results;
+      return results;
     }
     catch (err) {
       console.error('Error fetching weekly transfers:', err);
-      weeklyTransfers.value = [];
+      return [];
     }
   };
 
+  const fetchWeeklyTransfers = async (week: number): Promise<void> => {
+    weeklyTransfers.value = await fetchWeeklyTransfersData(week);
+  };
+
   const loadDashboardData = async (): Promise<void> => {
+    const playerRevision = playerStatisticsRevision.value;
+    const weeklyRevision = weeklyStatisticsRevision.value;
     try {
       isLoading.value = true;
       error.value = null;
@@ -365,8 +366,46 @@ export function useHomepageDashboard() {
     }
     finally {
       isLoading.value = false;
+      if (currentGameweek.value !== null) {
+        await Promise.all([
+          playerStatisticsRevision.value !== playerRevision ? fetchTopPositionPlayers() : Promise.resolve(),
+          weeklyStatisticsRevision.value !== weeklyRevision ? updateWeeklyResults() : Promise.resolve(),
+        ]);
+      }
     }
   };
+
+  watch(playerStatisticsRevision, async () => {
+    if (!isLoading.value && currentGameweek.value !== null) await fetchTopPositionPlayers();
+  });
+
+  const updateWeeklyResults = async () => {
+    const revision = weeklyStatisticsRevision.value;
+    try {
+      const week = await getGameweekFromDB();
+      const [nextWeeklyData, nextLeagueAverages, , nextTransfers] = await Promise.all([
+        tableStore.fetchWeeklyStatsData(week),
+        getLeagueAverages(week),
+        tableStore.fetchWeeklyWinners(),
+        week !== currentGameweek.value ? fetchWeeklyTransfersData(week) : Promise.resolve(weeklyTransfers.value),
+      ]);
+      if (weeklyStatisticsRevision.value !== revision) return;
+
+      currentGameweek.value = week;
+      weeklyData.value = nextWeeklyData;
+      leagueAverages.value = nextLeagueAverages;
+      weeklyTransfers.value = nextTransfers;
+    }
+    catch (err) {
+      if (weeklyStatisticsRevision.value === revision) {
+        error.value = err instanceof Error ? err.message : 'Failed to update dashboard results';
+      }
+    }
+  };
+
+  watch(weeklyStatisticsRevision, async () => {
+    if (!isLoading.value && currentGameweek.value !== null) await updateWeeklyResults();
+  });
 
   return {
     getCurrentGameweek,

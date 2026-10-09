@@ -14,6 +14,7 @@ export function useHomepageDashboard() {
 
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const weeklyData = ref<WeeklyData[] | undefined>();
   const weeklyTransfers = ref<WeeklyTransfer[]>([]);
   const leagueAverages = ref<LeagueAverages>({
     averagePoints: 0,
@@ -48,8 +49,7 @@ export function useHomepageDashboard() {
   };
 
   const hasResults = (): boolean => {
-    const weeklyData = tableStore.weeklyData;
-    return !!(weeklyData && weeklyData.length > 0 && weeklyData.some(team => team.week_points > 0));
+    return !!weeklyData.value?.some(team => team.week_points > 0);
   };
 
   const getLeagueAverages = async (): Promise<LeagueAverages> => {
@@ -107,7 +107,7 @@ export function useHomepageDashboard() {
     }
   };
 
-  const getPositionMovers = (weeklyData: WeeklyData[]): PositionMovers => {
+  const getPositionMovers = (weeklyData: readonly WeeklyData[]): PositionMovers => {
     if (!weeklyData || weeklyData.length === 0) {
       return {
         biggestRisers: [],
@@ -324,6 +324,8 @@ export function useHomepageDashboard() {
     try {
       isLoading.value = true;
       error.value = null;
+      weeklyData.value = undefined;
+      currentGameweek.value = null;
 
       // Always load season-independent data first
       await fetchTopPositionPlayers();
@@ -338,11 +340,12 @@ export function useHomepageDashboard() {
         }
 
         // Load gameweek-specific data
-        await Promise.all([
-          tableStore.fetchWeeklyStats(currentWeek),
+        const [currentWeekData] = await Promise.all([
+          tableStore.fetchWeeklyStatsData(currentWeek),
           tableStore.fetchWeeklyWinners(),
           fetchWeeklyTransfers(currentWeek),
         ]);
+        weeklyData.value = currentWeekData;
 
         // League averages depend on gameweek but shouldn't fail the whole dashboard
         leagueAverages.value = await getLeagueAverages();
@@ -372,6 +375,7 @@ export function useHomepageDashboard() {
     hasResults,
     getPositionMovers,
     loadDashboardData,
+    weeklyData: readonly(weeklyData),
     weeklyTransfers: readonly(weeklyTransfers),
     topPositionPlayers: readonly(topPositionPlayers),
     leagueAverages: readonly(leagueAverages),

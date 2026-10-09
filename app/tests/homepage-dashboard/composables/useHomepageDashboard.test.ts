@@ -4,6 +4,8 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import type { WeeklyData, WeeklyWinners } from '@/types/Table';
 import { withSetup } from '@/tests/setup';
 import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
+import { flushPromises } from '@vue/test-utils';
 
 // Mock the table store
 const mockFetchWeeklyStatsData = vi.fn();
@@ -32,9 +34,9 @@ mockNuxtImport('useRuntimeConfig', () => {
 
 // Queue-based Supabase mock: each from(table) call consumes the next queued response
 type MockResponse = { data: unknown; error: unknown };
-let tableQueues: Record<string, MockResponse[]> = {};
+let tableQueues: Record<string, Array<MockResponse | Promise<MockResponse>>> = {};
 
-const makeChain = (response: MockResponse) => {
+const makeChain = (response: MockResponse | Promise<MockResponse>) => {
   const chain = {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
@@ -151,6 +153,48 @@ describe('dashboard empty statistics', () => {
     expect(consoleError).toHaveBeenCalledWith('Error fetching top GK players:', queryError);
     expect(consoleError).toHaveBeenCalledTimes(1);
     expect(dashboard.topPositionPlayers.value[1]).toBeNull();
+    app.unmount();
+  });
+
+  it('catches up with a save made during the initial dashboard load', async () => {
+    const pending: Array<(response: MockResponse) => void> = [];
+    const playerStats = (points: number) => [{
+      player_id: 1, points,
+      players_view: { web_name: 'Saka', position: 3, image: '' },
+    }];
+    tableQueues['player_statistics'] = [
+      ...Array.from({ length: 4 }, () => new Promise<MockResponse>((resolve) => { pending.push(resolve); })),
+      ...Array.from({ length: 4 }, () => ({ data: playerStats(9), error: null })),
+    ];
+    const [dashboard, app] = withSetup(() => useHomepageDashboard());
+    const initialLoad = dashboard.loadDashboardData();
+    await flushPromises();
+    useLeagueDataChanges().notifyPlayerStatisticsChanged();
+    await flushPromises();
+    pending.forEach(resolve => resolve({ data: playerStats(5), error: null }));
+    await initialLoad;
+    await flushPromises();
+
+    expect(dashboard.topPositionPlayers.value[3]?.points).toBe(9);
+    app.unmount();
+  });
+
+  it('keeps existing top players when the read following a save fails', async () => {
+    tableQueues['player_statistics'] = Array.from({ length: 4 }, () => ({
+      data: [{ player_id: 1, points: 9, players_view: { web_name: 'Saka', position: 3, image: '' } }],
+      error: null,
+    }));
+    const [dashboard, app] = withSetup(() => useHomepageDashboard());
+    await dashboard.loadDashboardData();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    tableQueues['player_statistics'] = Array.from({ length: 4 }, () => ({ data: null, error: { message: 'Network error' } }));
+
+    useLeagueDataChanges().notifyPlayerStatisticsChanged();
+    await flushPromises();
+
+    expect(dashboard.topPositionPlayers.value[3]?.points).toBe(9);
+    expect(dashboard.isLoading.value).toBe(false);
+    expect(consoleError).toHaveBeenCalled();
     app.unmount();
   });
 });

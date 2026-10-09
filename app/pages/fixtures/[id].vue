@@ -77,7 +77,8 @@ const updateFixture = async () => {
       fixture.value.id,
     );
 
-    await Promise.all([a, b]);
+    const [savedFixture] = await Promise.all([a, b]);
+    if (savedFixture) fixture.value = savedFixture;
 
     await navigateTo({
       path: '/fixtures',

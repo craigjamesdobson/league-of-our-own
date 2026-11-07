@@ -4,6 +4,10 @@ import type { FormLeader, RecentFormSummary } from '~/logic/recent-form';
 const props = defineProps<{ summary: RecentFormSummary; isLoading: boolean; error: string | null }>();
 const emit = defineEmits<{ retry: [] }>();
 const format = (value: number) => value.toLocaleString('en-GB', { maximumFractionDigits: 1 });
+const gameweekList = new Intl.ListFormat('en-GB');
+const formatAboveAverageWeeks = (team: FormLeader) => gameweekList.format(
+  team.scores.filter(score => score.points > score.leagueAverage).map(score => String(score.week)),
+);
 const first = computed(() => ({ form: props.summary.inForm[0], improved: props.summary.improved[0], regular: props.summary.regularScorers[0], climber: props.summary.climbers[0] }));
 const weekLabel = computed(() => {
   const weeks = props.summary.weeks;
@@ -249,7 +253,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               </p><span class="text-xl font-medium tabular-nums text-slate-500 dark:text-slate-400">/ {{ summary.weeks.length }}</span>
             </div>
             <p class="stat-caption">
-              Weeks above the league average
+              {{ first.regular.value === summary.weeks.length ? `Beat the league average in ${weekLabel}` : 'Gameweeks above the league average' }}
             </p>
             <ul
               class="mt-4 space-y-3"
@@ -258,16 +262,16 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               <li
                 v-for="team in summary.regularScorers"
                 :key="team.drafted_team_id"
-                class="flex items-center justify-between gap-3"
               >
-                <span class="team-name">{{ team.team_name }}</span><span class="flex shrink-0 gap-1.5"><span
-                  v-for="score in team.scores"
-                  :key="score.week"
-                  role="img"
-                  :aria-label="`GW ${score.week}: ${score.points} points, ${score.points > score.leagueAverage ? 'above' : 'not above'} league average`"
-                  class="size-2 rounded-full"
-                  :class="score.points > score.leagueAverage ? 'bg-primary dark:bg-primary-300' : 'bg-slate-200 dark:bg-slate-700'"
-                /></span>
+                <p class="team-name">
+                  {{ team.team_name }}
+                </p>
+                <p
+                  v-if="team.value < summary.weeks.length"
+                  class="stat-caption mt-1"
+                >
+                  Beat the average in GW {{ formatAboveAverageWeeks(team) }}
+                </p>
               </li>
             </ul>
             <p

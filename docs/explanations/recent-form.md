@@ -19,7 +19,7 @@ All tied stat leaders are included, ordered by name for display. All tied teams 
 
 ## Interaction and loading
 
-The section uses one panel with four compact columns. The in-form team includes its five weekly scores; Most Improved compares previous and recent totals; regular scorers have one above-average marker per week; climbers show starting and ending positions. All values and tied names are visible without selecting a period or expanding a card. Loading, empty, insufficient-history, no-positive-result and retryable error states remain.
+The section uses one panel with four compact columns. It shows weekly scores for the in-form team, compares previous and recent totals for Most Improved, and gives starting and ending positions for climbers. The regular scorer column shows the gameweeks for each team or a shared range when the leaders beat the average every week. All values and tied names are visible without selecting a period or expanding a card. Loading, empty, insufficient-history, no-positive-result and retryable error states remain.
 
 Requests for a superseded gameweek or Active Season cannot overwrite newer data. Response shapes are validated before displaying statistics. The calculation boundary and loader have tests for ties, negative and zero scores, incomplete fixtures, missing records, early-season windows, pagination, failed reads and stale responses.
 

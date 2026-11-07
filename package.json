@@ -19,6 +19,7 @@
     "db:restore-local": "./scripts/db-restore-local.sh",
     "db:restore-staging": "./scripts/db-restore-staging.sh",
     "db:rebuild-staging": "./scripts/db-rebuild-staging.sh",
+    "db:seed:recent-form": "TMPDIR=/tmp tsx scripts/seed-recent-form-demo.ts",
     "db:reset:clean": "supabase db reset --no-seed",
     "db:reset:fpl": "supabase db reset --no-seed && TMPDIR=/tmp tsx scripts/seed-fpl-development.ts",
     "season:import": "bash scripts/import-season-data.sh",

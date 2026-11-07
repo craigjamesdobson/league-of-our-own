@@ -115,7 +115,7 @@ describe('dashboard empty statistics', () => {
   it.each([
     { description: 'empty array', data: [] },
     { description: 'null result', data: null },
-  ])('loads empty position and league statistics without reporting database errors: $description', async ({ data }) => {
+  ])('loads empty position statistics without reporting database errors: $description', async ({ data }) => {
     tableQueues['player_statistics'] = Array.from({ length: 4 }, () => ({ data, error: null }));
     tableQueues['weekly_statistics'] = [{ data, error: null }];
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -124,13 +124,6 @@ describe('dashboard empty statistics', () => {
     await dashboard.loadDashboardData();
 
     expect(dashboard.topPositionPlayers.value).toEqual({ 1: null, 2: null, 3: null, 4: null });
-    expect(dashboard.leagueAverages.value).toEqual({
-      averagePoints: 0,
-      totalTeams: 0,
-      highestPoints: 0,
-      lowestPoints: 0,
-      weeksPlayed: 0,
-    });
     expect(dashboard.error.value).toBeNull();
     expect(dashboard.isLoading.value).toBe(false);
     expect(consoleError).not.toHaveBeenCalled();
@@ -157,7 +150,7 @@ describe('dashboard empty statistics', () => {
 
 describe('fetchWeeklyTransfers - player_out resolution', () => {
   // Populate queues for every table touched by loadDashboardData that isn't
-  // directly under test (fetchTopPositionPlayers, loadCurrentGameweek, getLeagueAverages).
+  // directly under test (fetchTopPositionPlayers and loadCurrentGameweek).
   const setupBaseQueues = (gameweek: number) => {
     tableQueues['player_statistics'] = [
       { data: [], error: null },

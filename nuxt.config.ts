@@ -111,6 +111,18 @@ export default defineNuxtConfig({
     hotjarId: 5090647,
   },
 
+  icon: {
+    clientBundle: {
+      icons: [
+        'lucide:chart-no-axes-combined',
+        'lucide:trending-up',
+        'lucide:chart-column-increasing',
+        'lucide:arrow-up-right',
+        'lucide:arrow-right',
+      ],
+    },
+  },
+
   scripts: {
     registry: {
       googleTagManager: {

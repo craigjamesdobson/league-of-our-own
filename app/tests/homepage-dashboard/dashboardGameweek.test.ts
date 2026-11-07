@@ -34,9 +34,12 @@ mockNuxtImport('useSupabaseClient', () => () => ({
     };
     return {
       select() { return this; },
-      in() { return Promise.resolve(response); },
-      eq() { return Promise.resolve(response); },
-      order() { return Promise.resolve(response); },
+      in() { return this; },
+      eq() { return this; },
+      lte() { return this; },
+      order() { return this; },
+      range() { return this; },
+      then(resolve: (value: typeof response) => unknown) { return Promise.resolve(response).then(resolve); },
     };
   },
 }));

@@ -18,6 +18,17 @@ export type WhatsNewEntry = {
  */
 export const whatsNewEntries: WhatsNewEntry[] = [
   {
+    id: 'recent-form-2026-11-07',
+    publishedAt: '2026-11-07T12:00:00Z',
+    title: 'Recent Form on the dashboard',
+    summary: 'See how teams are doing over the last five completed gameweeks.',
+    details: [
+      'See who scored the most points and who climbed the most places in the league.',
+      'Find the most improved team by comparing the latest five completed gameweeks with the previous five.',
+      'See who beat the weekly league average most often and which gameweeks they did it in.',
+    ],
+  },
+  {
     id: 'transfer-requests-2026-09-23',
     publishedAt: '2026-10-07T12:00:00Z',
     title: 'Request transfers by email',

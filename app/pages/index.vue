@@ -3,7 +3,8 @@ import { useHomepageDashboard } from '@/composables/useHomepageDashboard';
 
 import TopPerformers from '@/components/Dashboard/TopPerformers.vue';
 import PositionMovers from '@/components/Dashboard/PositionMovers.vue';
-import WeeklyStats from '@/components/Dashboard/WeeklyStats.vue';
+import RecentForm from '~/components/Dashboard/RecentForm.vue';
+import { useRecentForm } from '~/composables/useRecentForm';
 import WeeklyTransfers from '@/components/Dashboard/WeeklyTransfers.vue';
 import TopPerformingPlayers from '@/components/Dashboard/TopPerformingPlayers.vue';
 import WelcomeBack from '@/components/Home/WelcomeBack.vue';
@@ -26,7 +27,8 @@ const weeklyData = computed(() => dashboard.weeklyData.value || []);
 const isLoading = computed(() => dashboard.isLoading.value);
 const isGameweekLoading = computed(() => isLoading.value || (hasGameweekData.value && dashboard.weeklyData.value === undefined));
 
-const leagueAverages = computed(() => dashboard.leagueAverages.value);
+const recentForm = useRecentForm(currentGameweek);
+const { summary: recentFormSummary, isLoading: isRecentFormLoading, error: recentFormError } = recentForm;
 
 const positionMovers = computed(() => {
   if (!weeklyData.value || weeklyData.value.length === 0) {
@@ -75,16 +77,12 @@ onMounted(async () => {
           </div>
 
           <div class="space-y-8">
-            <!-- Overall League Statistics -->
-            <div class="w-full">
-              <h2 class="text-base md:text-lg font-black uppercase text-slate-900 tracking-wide mb-4 dark:text-slate-100">
-                LEAGUE STATISTICS
-              </h2>
-              <WeeklyStats
-                :league-averages="leagueAverages"
-                :is-loading="isLoading"
-              />
-            </div>
+            <RecentForm
+              :summary="recentFormSummary"
+              :is-loading="isLoading || isRecentFormLoading"
+              :error="recentFormError"
+              @retry="recentForm.reload"
+            />
 
             <!-- Top Performing Players -->
             <div class="w-full">

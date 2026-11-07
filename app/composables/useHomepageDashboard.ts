@@ -2,7 +2,7 @@ import { ref, readonly } from 'vue';
 import { useTableStore } from '@/stores/table';
 import type { WeeklyData } from '@/types/Table';
 import type { Database } from '@/types/database.types';
-import type { WeeklyTransfer, TopPositionPlayers, LeagueAverages, PositionMover, PositionMovers } from '@/types/Dashboard';
+import type { WeeklyTransfer, TopPositionPlayers, PositionMover, PositionMovers } from '@/types/Dashboard';
 import { PlayerPosition } from '@/types/PlayerPosition';
 import { getPositionName } from '@/utils/playerPosition';
 import { useAppSettings } from '@/composables/useAppSettings';
@@ -16,13 +16,6 @@ export function useHomepageDashboard() {
   const error = ref<string | null>(null);
   const weeklyData = ref<WeeklyData[] | undefined>();
   const weeklyTransfers = ref<WeeklyTransfer[]>([]);
-  const leagueAverages = ref<LeagueAverages>({
-    averagePoints: 0,
-    totalTeams: 0,
-    highestPoints: 0,
-    lowestPoints: 0,
-    weeksPlayed: 0,
-  });
   const topPositionPlayers = ref<{ [key: number]: TopPositionPlayers | null }>({
     [PlayerPosition.GOALKEEPER]: null,
     [PlayerPosition.DEFENDER]: null,
@@ -50,61 +43,6 @@ export function useHomepageDashboard() {
 
   const hasResults = (): boolean => {
     return !!weeklyData.value?.some(team => team.week_points > 0);
-  };
-
-  const getLeagueAverages = async (): Promise<LeagueAverages> => {
-    const currentWeek = getCurrentGameweek();
-
-    if (currentWeek === null) {
-      console.warn('Cannot calculate league averages: gameweek data unavailable');
-      return {
-        averagePoints: 0,
-        totalTeams: 0,
-        highestPoints: 0,
-        lowestPoints: 0,
-        weeksPlayed: 0,
-      };
-    }
-
-    try {
-      const { data: allWeeklyStats, error } = await supabase
-        .from('weekly_statistics')
-        .select('points, week, team')
-        .order('points', { ascending: false });
-
-      if (error) console.error('Error fetching weekly statistics for league averages:', error);
-      if (error || !allWeeklyStats || allWeeklyStats.length === 0) {
-        return {
-          averagePoints: 0,
-          totalTeams: 0,
-          highestPoints: 0,
-          lowestPoints: 0,
-          weeksPlayed: 0,
-        };
-      }
-
-      const weeklyScores = allWeeklyStats.map(stat => stat.points);
-      const totalSum = weeklyScores.reduce((sum, points) => sum + points, 0);
-      const uniqueTeams = new Set(allWeeklyStats.map(stat => stat.team)).size;
-
-      return {
-        averagePoints: totalSum / weeklyScores.length,
-        totalTeams: uniqueTeams,
-        highestPoints: Math.max(...weeklyScores),
-        lowestPoints: Math.min(...weeklyScores),
-        weeksPlayed: currentWeek,
-      };
-    }
-    catch (err) {
-      console.error('Error calculating league averages:', err);
-      return {
-        averagePoints: 0,
-        totalTeams: 0,
-        highestPoints: 0,
-        lowestPoints: 0,
-        weeksPlayed: 0,
-      };
-    }
   };
 
   const getPositionMovers = (weeklyData: readonly WeeklyData[]): PositionMovers => {
@@ -346,16 +284,12 @@ export function useHomepageDashboard() {
           fetchWeeklyTransfers(currentWeek),
         ]);
         weeklyData.value = currentWeekData;
-
-        // League averages depend on gameweek but shouldn't fail the whole dashboard
-        leagueAverages.value = await getLeagueAverages();
       }
       catch (gameweekError) {
         // Log gameweek-specific errors but don't crash the dashboard
         console.error('Failed to load gameweek data:', gameweekError);
         // Reset gameweek-dependent data to safe defaults
         weeklyTransfers.value = [];
-        // Don't reset leagueAverages as getLeagueAverages handles its own errors
       }
     }
     catch (err) {
@@ -378,7 +312,6 @@ export function useHomepageDashboard() {
     weeklyData: readonly(weeklyData),
     weeklyTransfers: readonly(weeklyTransfers),
     topPositionPlayers: readonly(topPositionPlayers),
-    leagueAverages: readonly(leagueAverages),
     isLoading: readonly(isLoading),
     error: readonly(error),
   };

@@ -57,6 +57,28 @@ The seeder reads its connection details from `supabase status` and refuses any
 Supabase API or database URL that is not a loopback address. It cannot seed a
 linked staging or production project.
 
+### Recent Form dashboard demo
+
+With the FPL-backed local database already populated, run:
+
+```bash
+pnpm db:seed:recent-form
+```
+
+This reuses the existing demo squads and transfers, generates simulated player
+performances and matching team scores, and verifies 21 gameweeks. The dashboard
+opens at gameweek 21, with enough history for all four Recent Form statistics
+over the last five completed gameweeks, including varied leaders and tied results. Refresh the homepage after seeding.
+
+The command replaces local scoring data for the Active Season; it does not reset
+the schema or replace clubs, players, squads, transfers or local admin accounts.
+It requires existing `local.test` demo teams and the two local development admins,
+and refuses any non-loopback Supabase URL. Before writing, it saves the existing
+fixtures, player statistics, weekly statistics and settings as an ignored JSON
+backup under `.scratch/recent-form-demo/`.
+
+All generated results are fictional development data.
+
 ### Hot Reload Behavior
 
 - **Vue components**: Instant HMR (hot module replacement)
@@ -312,4 +334,4 @@ git reset --hard HEAD~1
 
 ---
 
-**Last updated:** 2026-07-25
+**Last updated:** 2026-10-09

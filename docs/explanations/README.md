@@ -28,6 +28,7 @@ Platform behavior and deployment-specific findings:
 
 ### Feature behavior
 
+- **[Recent Form](recent-form.md)** - Rolling league-wide performance statistics, verified gameweeks and score comparisons
 - **[Your team selection](your-team-selection.md)** - How the browser-persisted team preference is selected and displayed
 - **[Transfer request UX research](transfer-request-ux-research.md)** - Why the transfer entry page starts with a method choice and separates online and email instructions
 
@@ -61,4 +62,4 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for documentation standards.
 
 ---
 
-**Last updated:** 2026-10-07
+**Last updated:** 2026-10-09

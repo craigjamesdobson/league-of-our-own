@@ -36,14 +36,6 @@ type TopPositionPlayers = {
   points: number;
 };
 
-type LeagueAverages = {
-  averagePoints: number;
-  totalTeams: number;
-  highestPoints: number;
-  lowestPoints: number;
-  weeksPlayed: number;
-};
-
 type PositionMover = {
   drafted_team_id: number;
   team_name: string;
@@ -65,4 +57,4 @@ type PositionMovers = {
   biggestFallers: PositionMover[];
 };
 
-export type { WeeklyTransfer, TeamTransfers, TopPositionPlayer, TopPositionPlayers, LeagueAverages, PositionMover, PositionMovers };
+export type { WeeklyTransfer, TeamTransfers, TopPositionPlayer, TopPositionPlayers, PositionMover, PositionMovers };

@@ -14,13 +14,14 @@ export type FormLeader = FormTeam & {
   scores: { week: number; points: number; leagueAverage: number }[];
   previousScores: { week: number; points: number }[];
 };
+type RankedFormLeader = FormLeader & { rank: number };
 export type RecentFormSummary = {
   weeks: number[];
   previousWeeks: number[];
   inForm: FormLeader[];
   improved: FormLeader[];
-  regularScorers: FormLeader[];
-  climbers: FormLeader[];
+  regularScorers: RankedFormLeader[];
+  climbers: RankedFormLeader[];
   canCompare: boolean;
   canRank: boolean;
 };
@@ -29,12 +30,25 @@ const totalPoints = (scores: readonly FormScore[], weeks: readonly number[], tea
   scores.filter(score => score.team === team && weeks.includes(score.week))
     .reduce((sum, score) => sum + score.points, 0);
 
+const compareNames = (a: FormTeam, b: FormTeam) =>
+  a.team_name.localeCompare(b.team_name) || a.drafted_team_id - b.drafted_team_id;
+
 const leaders = (teams: readonly FormLeader[], requirePositive = false): FormLeader[] => {
   if (teams.length === 0) return [];
   const best = Math.max(...teams.map(team => team.value));
   if (requirePositive && best <= 0) return [];
   return teams.filter(team => team.value === best)
-    .toSorted((a, b) => a.team_name.localeCompare(b.team_name) || a.drafted_team_id - b.drafted_team_id);
+    .toSorted(compareNames);
+};
+
+const topThree = (teams: readonly FormLeader[]): RankedFormLeader[] => {
+  const ranked = teams.filter(team => team.value > 0)
+    .toSorted((a, b) => b.value - a.value || compareNames(a, b));
+  const cutoff = ranked[2]?.value ?? 0;
+  return ranked.filter(team => team.value >= cutoff).map(team => ({
+    ...team,
+    rank: ranked.findIndex(candidate => candidate.value === team.value) + 1,
+  }));
 };
 
 const positions = (teams: readonly FormTeam[], scores: readonly FormScore[], week: number) => {
@@ -109,15 +123,15 @@ export function getRecentFormSummary({ teams, scores, fixtures, currentGameweek,
     ...base,
     inForm: leaders(results),
     improved: canCompare ? leaders(results.map(team => ({ ...team, value: team.totalPoints - (team.previousPoints ?? 0) })), true) : [],
-    regularScorers: leaders(results.map(team => ({
+    regularScorers: topThree(results.map(team => ({
       ...team,
       value: team.scores.filter(score => score.points > score.leagueAverage).length,
-    })), true),
+    }))),
     climbers: canRank
-      ? leaders(results.map(team => ({
+      ? topThree(results.map(team => ({
           ...team,
           value: (team.startPosition ?? 0) - (team.endPosition ?? 0),
-        })), true)
+        })))
       : [],
   };
 }

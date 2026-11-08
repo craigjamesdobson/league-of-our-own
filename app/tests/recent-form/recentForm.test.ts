@@ -27,6 +27,21 @@ describe('recent form across completed gameweeks', () => {
     expect(result.inForm.map(team => team.value)).toEqual([60, 60]);
   });
 
+  it('ranks the top three climbers and includes regular scorers tied at the cutoff', () => {
+    const teams = Array.from({ length: 8 }, (_, index) => ({
+      drafted_team_id: index + 1, team_name: `Team ${index + 1}`, team_owner: '',
+    }));
+    const scores = teams.flatMap((team, index) => formFixtures.map(({ game_week: week }) => ({
+      team: team.drafted_team_id, week: week!, points: week === 1 ? index + 1 : 8 - index, goals: 0,
+    })));
+    const result = getRecentFormSummary({ ...input, teams, scores, period: 5 });
+
+    expect(result.climbers.map(({ rank, value }) => [rank, value])).toEqual([[1, 7], [2, 5], [3, 3]]);
+    expect(result.regularScorers.map(({ drafted_team_id, rank }) => [drafted_team_id, rank])).toEqual([
+      [1, 1], [2, 1], [3, 1], [4, 1],
+    ]);
+  });
+
   it('excludes a whole gameweek when one fixture is unverified, including partially verified current results', () => {
     const fixtures = [...formFixtures, { game_week: 6, verified_at: null, verified_by: null }];
     expect(getRecentFormSummary({ ...input, fixtures }).weeks).toEqual([3, 4, 5]);

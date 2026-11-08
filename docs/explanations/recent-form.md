@@ -12,14 +12,14 @@ Teams and score history are filtered to the Active Season. Score history is pagi
 
 - **In-form team:** the highest total across the selected gameweeks, with average points per gameweek.
 - **Most improved:** the greatest positive increase over the immediately preceding equal-length set of completed gameweeks. Both full periods must exist. If no team improved, say so.
-- **Regular high scorer:** the most selected weeks strictly above that week's mean score across all Active Season teams. Equality does not count as above average.
-- **Biggest climber:** the greatest positive rank improvement between the standings immediately before the period and those at its end. Rank by cumulative points, then cumulative goals. Teams equal on both share a competition rank, so arbitrary row ordering cannot create movement. Verified, complete score history through the end of the window is required; the opening week has no earlier standings baseline.
+- **Regular high scorers:** the teams with the most selected weeks strictly above that week's mean score across all Active Season teams. Equality does not count as above average.
+- **Biggest climbers:** the teams with the greatest positive rank improvement between the standings immediately before the period and those at its end. Rank by cumulative points, then cumulative goals. Teams equal on both share a competition rank, so arbitrary row ordering cannot create movement. Verified, complete score history through the end of the window is required; the opening week has no earlier standings baseline.
 
-All tied stat leaders are included, ordered by name for display. All tied teams appear as compact rows in the shared stat board. The selected-team cookie has no effect on calculations or ordering.
+Regular High Scorers and Biggest Climbers show the top three places, including ties at the cutoff. Teams sharing a place are ordered by name. In-form Team and Most Improved show all joint leaders. The selected-team cookie has no effect on calculations or ordering.
 
 ## Interaction and loading
 
-The section uses one panel with four compact columns. It shows weekly scores for the in-form team, compares previous and recent totals for Most Improved, and gives starting and ending positions for climbers. The regular scorer column shows the gameweeks for each team or a shared range when the leaders beat the average every week. All values and tied names are visible without selecting a period or expanding a card. Loading, empty, insufficient-history, no-positive-result and retryable error states remain.
+The section uses one panel with four compact columns. It shows weekly scores for the in-form team, compares previous and recent totals for Most Improved, and gives starting and ending positions for climbers. Regular High Scorers displays a dot for every gameweek, including perfect records. Darker dots show weeks above average. Selecting a dot opens the gameweek, score and league average. Loading, empty, insufficient-history, no-positive-result and retryable error states remain.
 
 Requests for a superseded gameweek or Active Season cannot overwrite newer data. Response shapes are validated before displaying statistics. The calculation boundary and loader have tests for ties, negative and zero scores, incomplete fixtures, missing records, early-season windows, pagination, failed reads and stale responses.
 

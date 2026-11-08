@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core';
 import type { FormLeader, RecentFormSummary } from '~/logic/recent-form';
 
 const props = defineProps<{ summary: RecentFormSummary; isLoading: boolean; error: string | null }>();
 const emit = defineEmits<{ retry: [] }>();
-const format = (value: number) => value.toLocaleString('en-GB', { maximumFractionDigits: 1 });
-const gameweekList = new Intl.ListFormat('en-GB');
-const formatAboveAverageWeeks = (team: FormLeader) => gameweekList.format(
-  team.scores.filter(score => score.points > score.leagueAverage).map(score => String(score.week)),
-);
-const first = computed(() => ({ form: props.summary.inForm[0], improved: props.summary.improved[0], regular: props.summary.regularScorers[0], climber: props.summary.climbers[0] }));
+const canHover = useMediaQuery('(hover: hover) and (pointer: fine)');
+const format = (value: number, maximumFractionDigits = 1) => value.toLocaleString('en-GB', { maximumFractionDigits });
+const describeScore = ({ week, points, leagueAverage }: FormLeader['scores'][number]) =>
+  `GW ${week}: ${format(points)} pts · League average ${format(leagueAverage, 3)} pts · ${points > leagueAverage ? 'Above average' : 'At or below average'}`;
+const first = computed(() => ({ form: props.summary.inForm[0], improved: props.summary.improved[0] }));
 const weekLabel = computed(() => {
   const weeks = props.summary.weeks;
   const start = weeks[0];
@@ -81,7 +81,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
         class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
       >
         <article
-          class="form-stat"
+          class="form-stat flex flex-col"
           aria-labelledby="form-team-heading"
         >
           <div class="stat-heading">
@@ -98,11 +98,8 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               In-form team
             </h3>
           </div>
-          <div
-            v-if="first.form"
-            class="mt-3"
-          >
-            <div class="flex items-baseline gap-2">
+          <template v-if="first.form">
+            <div class="mt-3 flex items-baseline gap-2">
               <p class="stat-value text-primary dark:text-primary-300">
                 {{ format(first.form.value) }}
               </p><span class="stat-unit">pts</span>
@@ -110,44 +107,46 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
             <p class="stat-caption">
               {{ format(first.form.average) }} points per gameweek
             </p>
-            <ul
-              class="mt-4 space-y-1.5"
-              aria-label="In-form teams"
-            >
-              <li
-                v-for="team in summary.inForm"
-                :key="team.drafted_team_id"
-                class="team-name"
+            <div class="stat-details">
+              <ul
+                class="space-y-1.5"
+                aria-label="In-form teams"
               >
-                {{ team.team_name }}
-              </li>
-            </ul>
-            <ol
-              v-if="summary.inForm.length === 1"
-              class="mt-4 grid grid-cols-5 gap-1.5"
-              aria-label="Points in each gameweek"
-            >
-              <li
-                v-for="score in first.form.scores"
-                :key="score.week"
-                class="rounded-md bg-slate-50 py-2 text-center dark:bg-slate-800/70"
+                <li
+                  v-for="team in summary.inForm"
+                  :key="team.drafted_team_id"
+                  class="team-name"
+                >
+                  {{ team.team_name }}
+                </li>
+              </ul>
+              <ol
+                v-if="summary.inForm.length === 1"
+                class="mt-4 grid grid-cols-5 gap-1.5"
+                aria-label="Points in each gameweek"
               >
-                <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">GW {{ score.week }}</span><span
-                  class="mt-1 block text-sm font-bold tabular-nums"
-                  :class="score.points < 0 ? 'text-red-600 dark:text-red-300' : 'text-slate-800 dark:text-slate-100'"
-                >{{ score.points }}</span>
-              </li>
-            </ol>
-            <p
-              v-if="summary.inForm.length > 1"
-              class="stat-caption mt-2"
-            >
-              Joint highest total
-            </p>
-          </div>
+                <li
+                  v-for="score in first.form.scores"
+                  :key="score.week"
+                  class="rounded-md bg-slate-50 py-2 text-center dark:bg-slate-800/70"
+                >
+                  <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">GW {{ score.week }}</span><span
+                    class="mt-1 block text-sm font-bold tabular-nums"
+                    :class="score.points < 0 ? 'text-red-600 dark:text-red-300' : 'text-slate-800 dark:text-slate-100'"
+                  >{{ score.points }}</span>
+                </li>
+              </ol>
+              <p
+                v-if="summary.inForm.length > 1"
+                class="stat-caption mt-2"
+              >
+                Joint highest total
+              </p>
+            </div>
+          </template>
         </article>
         <article
-          class="form-stat"
+          class="form-stat flex flex-col"
           aria-labelledby="form-improved-heading"
         >
           <div class="stat-heading">
@@ -173,52 +172,53 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
             <p class="stat-caption">
               More than the previous five gameweeks
             </p>
-            <div
-              v-for="team in summary.improved"
-              :key="team.drafted_team_id"
-              class="mt-4"
-            >
-              <p class="team-name">
-                {{ team.team_name }}
-              </p>
-              <dl class="mt-3 space-y-2.5">
-                <div>
-                  <div class="flex items-center justify-between gap-2 text-xs">
-                    <dt class="text-slate-500 dark:text-slate-400">
-                      Previous 5
-                    </dt><dd class="font-semibold tabular-nums text-slate-600 dark:text-slate-300">
-                      {{ team.previousPoints }} pts
-                    </dd>
-                  </div><div
-                    v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
-                    class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
-                    aria-hidden="true"
-                  >
-                    <div
-                      class="h-full rounded-full bg-slate-300 dark:bg-slate-600"
-                      :style="{ width: comparisonWidth(team.previousPoints ?? 0, team) }"
-                    />
+            <div class="stat-details space-y-5">
+              <div
+                v-for="team in summary.improved"
+                :key="team.drafted_team_id"
+              >
+                <p class="team-name">
+                  {{ team.team_name }}
+                </p>
+                <dl class="mt-3 space-y-2.5">
+                  <div>
+                    <div class="flex items-center justify-between gap-2 text-xs">
+                      <dt class="text-slate-500 dark:text-slate-400">
+                        Previous 5
+                      </dt><dd class="font-semibold tabular-nums text-slate-600 dark:text-slate-300">
+                        {{ team.previousPoints }} pts
+                      </dd>
+                    </div><div
+                      v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
+                      class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                      aria-hidden="true"
+                    >
+                      <div
+                        class="h-full rounded-full bg-slate-300 dark:bg-slate-600"
+                        :style="{ width: comparisonWidth(team.previousPoints ?? 0, team) }"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div class="flex items-center justify-between gap-2 text-xs">
-                    <dt class="text-slate-500 dark:text-slate-400">
-                      Last 5
-                    </dt><dd class="font-semibold tabular-nums text-slate-800 dark:text-slate-100">
-                      {{ team.totalPoints }} pts
-                    </dd>
-                  </div><div
-                    v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
-                    class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
-                    aria-hidden="true"
-                  >
-                    <div
-                      class="h-full rounded-full bg-primary dark:bg-primary-300"
-                      :style="{ width: comparisonWidth(team.totalPoints, team) }"
-                    />
+                  <div>
+                    <div class="flex items-center justify-between gap-2 text-xs">
+                      <dt class="text-slate-500 dark:text-slate-400">
+                        Last 5
+                      </dt><dd class="font-semibold tabular-nums text-slate-800 dark:text-slate-100">
+                        {{ team.totalPoints }} pts
+                      </dd>
+                    </div><div
+                      v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
+                      class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                      aria-hidden="true"
+                    >
+                      <div
+                        class="h-full rounded-full bg-primary dark:bg-primary-300"
+                        :style="{ width: comparisonWidth(team.totalPoints, team) }"
+                      />
+                    </div>
                   </div>
-                </div>
-              </dl>
+                </dl>
+              </div>
             </div>
           </template>
           <p
@@ -229,7 +229,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
           </p>
         </article>
         <article
-          class="form-stat"
+          class="form-stat flex flex-col"
           aria-labelledby="form-regular-heading"
         >
           <div class="stat-heading">
@@ -243,43 +243,53 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               id="form-regular-heading"
               class="stat-title"
             >
-              Regular high scorer
+              Regular high scorers
             </h3>
           </div>
-          <template v-if="first.regular">
-            <div class="mt-3 flex items-baseline gap-1">
-              <p class="stat-value text-slate-900 dark:text-slate-100">
-                {{ first.regular.value }}
-              </p><span class="text-xl font-medium tabular-nums text-slate-500 dark:text-slate-400">/ {{ summary.weeks.length }}</span>
-            </div>
+          <template v-if="summary.regularScorers.length">
             <p class="stat-caption">
-              {{ first.regular.value === summary.weeks.length ? `Beat the league average in ${weekLabel}` : 'Gameweeks above the league average' }}
+              Gameweeks above the league average
             </p>
-            <ul
-              class="mt-4 space-y-3"
+            <ol
+              class="stat-details divide-y divide-slate-200 dark:divide-slate-800"
               aria-label="Regular high scorers"
             >
               <li
                 v-for="team in summary.regularScorers"
                 :key="team.drafted_team_id"
+                class="ranked-team"
               >
+                <span class="team-rank">{{ team.rank }}</span>
                 <p class="team-name">
                   {{ team.team_name }}
                 </p>
-                <p
-                  v-if="team.value < summary.weeks.length"
-                  class="stat-caption mt-1"
-                >
-                  Beat the average in GW {{ formatAboveAverageWeeks(team) }}
-                </p>
+                <span class="ranked-value">{{ team.value }}/{{ summary.weeks.length }}</span>
+                <div class="ranked-meta flex flex-wrap gap-1">
+                  <UPopover
+                    v-for="score in team.scores"
+                    :key="`${score.week}-${canHover}`"
+                    :mode="canHover ? 'hover' : 'click'"
+                  >
+                    <button
+                      type="button"
+                      class="week-indicator"
+                      :aria-label="describeScore(score)"
+                    >
+                      <span
+                        class="size-3 rounded-full"
+                        :class="score.points > score.leagueAverage ? 'bg-primary/90 dark:bg-primary-300/90' : 'bg-primary/20 ring-1 ring-inset ring-primary/65 dark:bg-primary-300/20 dark:ring-primary-300/60'"
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <template #content>
+                      <p class="px-3 py-2 text-xs">
+                        {{ describeScore(score) }}
+                      </p>
+                    </template>
+                  </UPopover>
+                </div>
               </li>
-            </ul>
-            <p
-              v-if="summary.regularScorers.length > 1"
-              class="stat-caption mt-3"
-            >
-              {{ summary.regularScorers.length }} teams share the best record
-            </p>
+            </ol>
           </template>
           <p
             v-else
@@ -289,7 +299,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
           </p>
         </article>
         <article
-          class="form-stat"
+          class="form-stat flex flex-col"
           aria-labelledby="form-climber-heading"
         >
           <div class="stat-heading">
@@ -303,36 +313,32 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               id="form-climber-heading"
               class="stat-title"
             >
-              Biggest climber
+              Biggest climbers
             </h3>
           </div>
-          <template v-if="first.climber">
-            <div class="mt-3 flex items-baseline gap-2">
-              <p class="stat-value text-emerald-700 dark:text-emerald-400">
-                +{{ first.climber.value }}
-              </p><span class="stat-unit">{{ first.climber.value === 1 ? 'place' : 'places' }}</span>
-            </div>
+          <template v-if="summary.climbers.length">
             <p class="stat-caption">
-              Gained over the last {{ summary.weeks.length }} gameweeks
+              Places gained over the period
             </p>
-            <ul
-              class="mt-4 space-y-2"
+            <ol
+              class="stat-details divide-y divide-slate-200 dark:divide-slate-800"
               aria-label="Biggest climbers"
             >
               <li
                 v-for="team in summary.climbers"
                 :key="team.drafted_team_id"
-                class="flex items-center justify-between gap-3"
+                class="ranked-team"
               >
-                <span class="team-name">{{ team.team_name }}</span><span class="flex shrink-0 items-center gap-1.5 text-xs tabular-nums"><span class="text-slate-500 dark:text-slate-400">{{ team.startPosition }}</span><Icon
-                  mode="svg"
-                  name="lucide:arrow-right"
-                  size="12"
-                  class="text-slate-400 dark:text-slate-500"
-                  aria-hidden="true"
-                /><span class="font-bold text-slate-800 dark:text-slate-100">{{ team.endPosition }}</span></span>
+                <span class="team-rank">{{ team.rank }}</span>
+                <p class="team-name">
+                  {{ team.team_name }}
+                </p>
+                <span class="ranked-value text-emerald-700 dark:text-emerald-400">+{{ team.value }}</span>
+                <p class="ranked-meta text-xs tabular-nums text-slate-500 dark:text-slate-400">
+                  {{ team.startPosition }} → {{ team.endPosition }}
+                </p>
               </li>
-            </ul>
+            </ol>
           </template>
           <p
             v-else
@@ -348,7 +354,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
 
 <style scoped>
 @reference "@/assets/styles/base.css";
-.form-stat { @apply min-w-0 p-5 sm:p-6; }
+.form-stat { @apply min-w-0 p-5 sm:p-6; container-type: inline-size; }
 .form-stat + .form-stat { @apply border-t border-slate-200 dark:border-slate-800; }
 .stat-heading { @apply flex items-center gap-2; }
 .stat-title { @apply text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200; }
@@ -356,7 +362,18 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
 .stat-value { @apply text-4xl font-bold leading-none tracking-tight tabular-nums; }
 .stat-unit { @apply text-sm font-medium text-slate-500 dark:text-slate-400; }
 .stat-caption { @apply mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400; }
-.team-name { @apply min-w-0 break-words text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100; }
+.stat-details { @apply mt-auto pt-5; }
+.team-name { @apply min-w-0 break-words text-sm font-medium leading-snug text-slate-900 dark:text-slate-100; }
+.ranked-team { @apply grid grid-cols-[1rem_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 py-2 first:pt-0 last:pb-0; }
+.team-rank { @apply text-xs tabular-nums text-slate-500 dark:text-slate-400; }
+.ranked-value { @apply col-start-3 row-start-1 justify-self-end text-sm font-semibold tabular-nums; }
+.ranked-meta { @apply col-span-2 col-start-2; }
+@container (min-width: 22rem) {
+  .ranked-team { @apply grid-cols-[1rem_minmax(0,1fr)_auto_minmax(2rem,auto)]; }
+  .ranked-value { @apply col-start-4; }
+  .ranked-meta { @apply col-span-1 col-start-3 row-start-1 justify-self-end; }
+}
+.week-indicator { @apply inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary; }
 .stat-empty { @apply mt-5 text-sm leading-relaxed text-slate-500 dark:text-slate-400; }
 @media (min-width: 640px) {
   .form-stat + .form-stat { @apply border-t-0; }

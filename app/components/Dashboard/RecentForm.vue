@@ -264,7 +264,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
                   {{ team.team_name }}
                 </p>
                 <span class="ranked-value">{{ team.value }}/{{ summary.weeks.length }}</span>
-                <div class="ranked-meta flex flex-wrap gap-1">
+                <div class="ranked-meta flex flex-wrap">
                   <UPopover
                     v-for="score in team.scores"
                     :key="`${score.week}-${canHover}`"
@@ -363,7 +363,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
 .stat-unit { @apply text-sm font-medium text-slate-500 dark:text-slate-400; }
 .stat-caption { @apply mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400; }
 .stat-details { @apply mt-auto pt-5; }
-.team-name { @apply min-w-0 break-words text-sm font-medium uppercase leading-snug text-slate-900 dark:text-slate-100; }
+.team-name { @apply min-w-0 break-words text-xs font-medium uppercase leading-snug text-slate-900 dark:text-slate-100; }
 .ranked-team { @apply grid grid-cols-[1rem_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 py-2 first:pt-0 last:pb-0; }
 .team-rank { @apply text-xs tabular-nums text-slate-500 dark:text-slate-400; }
 .ranked-value { @apply col-start-3 row-start-1 justify-self-end text-sm font-semibold tabular-nums; }
@@ -373,7 +373,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
   .ranked-value { @apply col-start-4; }
   .ranked-meta { @apply col-span-1 col-start-3 row-start-1 justify-self-end; }
 }
-.week-indicator { @apply inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary; }
+.week-indicator { @apply inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary; }
 .stat-empty { @apply mt-5 text-sm leading-relaxed text-slate-500 dark:text-slate-400; }
 @media (min-width: 640px) {
   .form-stat + .form-stat { @apply border-t-0; }

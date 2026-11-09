@@ -1,5 +1,7 @@
 import type { Tables } from '~/types/database.types';
 
+export const RECENT_FORM_LIST_LIMIT = 5;
+
 export type RecentFormPeriod = 3 | 5 | 10;
 export type FormTeam = Pick<Tables<'drafted_teams'>, 'drafted_team_id' | 'team_name' | 'team_owner'>;
 export type FormScore = Pick<Tables<'weekly_statistics'>, 'team' | 'week' | 'points' | 'goals'>;
@@ -7,6 +9,7 @@ export type FormFixture = Pick<Tables<'fixtures'>, 'game_week' | 'verified_at' |
 export type FormLeader = FormTeam & {
   value: number;
   totalPoints: number;
+  totalGoals: number;
   average: number;
   previousPoints: number | null;
   startPosition: number | null;
@@ -33,18 +36,19 @@ const totalPoints = (scores: readonly FormScore[], weeks: readonly number[], tea
 const compareNames = (a: FormTeam, b: FormTeam) =>
   a.team_name.localeCompare(b.team_name) || a.drafted_team_id - b.drafted_team_id;
 
-const leaders = (teams: readonly FormLeader[], requirePositive = false): FormLeader[] => {
-  if (teams.length === 0) return [];
-  const best = Math.max(...teams.map(team => team.value));
-  if (requirePositive && best <= 0) return [];
-  return teams.filter(team => team.value === best)
-    .toSorted(compareNames);
+const pickLeader = (teams: readonly FormLeader[], requirePositive = false): FormLeader[] => {
+  const best = teams.toSorted((a, b) => b.value - a.value || b.totalGoals - a.totalGoals || compareNames(a, b))[0];
+  return best && (!requirePositive || best.value > 0) ? [best] : [];
 };
 
-const topThree = (teams: readonly FormLeader[]): RankedFormLeader[] => {
+const rankedLeaders = (
+  teams: readonly FormLeader[],
+  limit: number,
+  compareTies: (a: FormLeader, b: FormLeader) => number = compareNames,
+): RankedFormLeader[] => {
   const ranked = teams.filter(team => team.value > 0)
-    .toSorted((a, b) => b.value - a.value || compareNames(a, b));
-  const cutoff = ranked[2]?.value ?? 0;
+    .toSorted((a, b) => b.value - a.value || compareTies(a, b));
+  const cutoff = ranked[limit - 1]?.value ?? 0;
   return ranked.filter(team => team.value >= cutoff).map(team => ({
     ...team,
     rank: ranked.findIndex(candidate => candidate.value === team.value) + 1,
@@ -102,6 +106,8 @@ export function getRecentFormSummary({ teams, scores, fixtures, currentGameweek,
       ...team,
       value: points,
       totalPoints: points,
+      totalGoals: scores.filter(score => score.team === team.drafted_team_id && weeks.includes(score.week))
+        .reduce((sum, score) => sum + (score.goals ?? 0), 0),
       average: points / weeks.length,
       previousPoints: canCompare ? totalPoints(scores, previousWeeks, team.drafted_team_id) : null,
       startPosition: startPositions.get(team.drafted_team_id) ?? null,
@@ -121,17 +127,17 @@ export function getRecentFormSummary({ teams, scores, fixtures, currentGameweek,
 
   return {
     ...base,
-    inForm: leaders(results),
-    improved: canCompare ? leaders(results.map(team => ({ ...team, value: team.totalPoints - (team.previousPoints ?? 0) })), true) : [],
-    regularScorers: topThree(results.map(team => ({
+    inForm: pickLeader(results),
+    improved: canCompare ? pickLeader(results.map(team => ({ ...team, value: team.totalPoints - (team.previousPoints ?? 0) })), true) : [],
+    regularScorers: rankedLeaders(results.map(team => ({
       ...team,
       value: team.scores.filter(score => score.points > score.leagueAverage).length,
-    }))),
+    })), RECENT_FORM_LIST_LIMIT, (a, b) => b.totalPoints - a.totalPoints || compareNames(a, b)),
     climbers: canRank
-      ? topThree(results.map(team => ({
+      ? rankedLeaders(results.map(team => ({
           ...team,
           value: (team.startPosition ?? 0) - (team.endPosition ?? 0),
-        })))
+        })), RECENT_FORM_LIST_LIMIT)
       : [],
   };
 }

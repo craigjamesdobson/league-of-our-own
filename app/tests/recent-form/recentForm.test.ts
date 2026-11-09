@@ -20,25 +20,36 @@ describe('recent form across completed gameweeks', () => {
     ]);
   });
 
-  it('shows every joint leader without favouring input order', () => {
-    const scores = formScores.map(score => score.team === 2 && score.week > 3 ? { ...score, points: 20 } : score);
+  it('breaks ties for in-form and most improved by recent goals, then name', () => {
+    const scores = formScores.map(score => score.team === 1 || score.team === 2
+      ? {
+          ...score, points: score.week > 3 ? 20 : 5,
+          goals: Number((score.team === 1 && score.week === 1) || (score.team === 2 && score.week === 4)),
+        }
+      : score);
     const result = getRecentFormSummary({ ...input, scores, teams: [...formTeams].reverse() });
-    expect(result.inForm.map(team => team.drafted_team_id)).toEqual([1, 2]);
-    expect(result.inForm.map(team => team.value)).toEqual([60, 60]);
+    expect(result.inForm).toMatchObject([{ drafted_team_id: 2, value: 60 }]);
+    expect(result.improved).toMatchObject([{ drafted_team_id: 2, value: 45 }]);
+    expect(result.regularScorers.map(team => team.endPosition)).toEqual([1, 1]);
+
+    const equalGoals = scores.map(score => score.week > 3 ? { ...score, goals: 0 } : score);
+    const alphabetical = getRecentFormSummary({ ...input, scores: equalGoals, teams: [...formTeams].reverse() });
+    expect(alphabetical.inForm).toMatchObject([{ drafted_team_id: 1, value: 60 }]);
+    expect(alphabetical.improved).toMatchObject([{ drafted_team_id: 1, value: 45 }]);
   });
 
-  it('ranks the top three climbers and includes regular scorers tied at the cutoff', () => {
-    const teams = Array.from({ length: 8 }, (_, index) => ({
-      drafted_team_id: index + 1, team_name: `Team ${index + 1}`, team_owner: '',
+  it('shows the top five climbers and orders tied scorers by points before name', () => {
+    const teams = Array.from({ length: 12 }, (_, index) => ({
+      drafted_team_id: index + 1, team_name: `Team ${12 - index}`, team_owner: '',
     }));
     const scores = teams.flatMap((team, index) => formFixtures.map(({ game_week: week }) => ({
-      team: team.drafted_team_id, week: week!, points: week === 1 ? index + 1 : 8 - index, goals: 0,
+      team: team.drafted_team_id, week: week!, points: week === 1 ? index + 1 : 12 - index, goals: 0,
     })));
     const result = getRecentFormSummary({ ...input, teams, scores, period: 5 });
 
-    expect(result.climbers.map(({ rank, value }) => [rank, value])).toEqual([[1, 7], [2, 5], [3, 3]]);
+    expect(result.climbers.map(({ rank, value }) => [rank, value])).toEqual([[1, 11], [2, 9], [3, 7], [4, 5], [5, 3]]);
     expect(result.regularScorers.map(({ drafted_team_id, rank }) => [drafted_team_id, rank])).toEqual([
-      [1, 1], [2, 1], [3, 1], [4, 1],
+      [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
     ]);
   });
 
@@ -80,7 +91,7 @@ describe('recent form across completed gameweeks', () => {
     const scores = formScores.map(score => ({ ...score, points: 0 }));
     const result = getRecentFormSummary({ ...input, scores });
     expect(result.weeks).toEqual([4, 5, 6]);
-    expect(result.inForm).toHaveLength(3);
+    expect(result.inForm).toHaveLength(1);
     expect(result.regularScorers).toEqual([]);
     expect(result.improved).toEqual([]);
     expect(result.climbers).toEqual([]);
@@ -99,11 +110,11 @@ describe('recent form across completed gameweeks', () => {
     expect(result.climbers).toEqual([]);
   });
 
-  it('uses goals to separate equal totals and shares positions when points and goals are both tied', () => {
+  it('uses goals to separate equal standings totals', () => {
     const scores = formScores.map(score => ({ ...score, points: 10, goals: score.team === 1 && score.week === 4 ? 1 : 0 }));
     const result = getRecentFormSummary({ ...input, scores });
     expect(result.climbers).toEqual([]);
-    expect(result.inForm.map(team => team.endPosition)).toEqual([1, 2, 2]);
+    expect(result.inForm[0]?.endPosition).toBe(1);
   });
 
   it('returns an honest empty state when there are no teams, fixtures or complete scores', () => {

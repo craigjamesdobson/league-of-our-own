@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core';
-import type { FormLeader, RecentFormSummary } from '~/logic/recent-form';
+import RecentFormTies from './RecentFormTies.vue';
+import { RECENT_FORM_LIST_LIMIT, type FormLeader, type RecentFormSummary } from '~/logic/recent-form';
 
 const props = defineProps<{ summary: RecentFormSummary; isLoading: boolean; error: string | null }>();
 const emit = defineEmits<{ retry: [] }>();
@@ -9,6 +10,15 @@ const format = (value: number, maximumFractionDigits = 1) => value.toLocaleStrin
 const describeScore = ({ week, points, leagueAverage }: FormLeader['scores'][number]) =>
   `GW ${week}: ${format(points)} pts · League average ${format(leagueAverage, 3)} pts · ${points > leagueAverage ? 'Above average' : 'At or below average'}`;
 const first = computed(() => ({ form: props.summary.inForm[0], improved: props.summary.improved[0] }));
+const visibleScorers = computed(() => props.summary.regularScorers.slice(0, RECENT_FORM_LIST_LIMIT));
+const extraScorers = computed(() => props.summary.regularScorers.slice(RECENT_FORM_LIST_LIMIT));
+const visibleClimbers = computed(() => props.summary.climbers.slice(0, RECENT_FORM_LIST_LIMIT));
+const extraClimbers = computed(() => props.summary.climbers.slice(RECENT_FORM_LIST_LIMIT));
+const extraScorerRecord = computed(() => `${extraScorers.value[0]?.value}/${props.summary.weeks.length}`);
+const extraClimberRecord = computed(() => {
+  const places = extraClimbers.value[0]?.value ?? 0;
+  return `+${places} ${places === 1 ? 'place' : 'places'}`;
+});
 const weekLabel = computed(() => {
   const weeks = props.summary.weeks;
   const start = weeks[0];
@@ -108,40 +118,24 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               {{ format(first.form.average) }} points per gameweek
             </p>
             <div class="stat-details">
-              <ul
-                class="space-y-1.5"
-                aria-label="In-form teams"
-              >
-                <li
-                  v-for="team in summary.inForm"
-                  :key="team.drafted_team_id"
-                  class="team-name"
-                >
-                  {{ team.team_name }}
-                </li>
-              </ul>
+              <p class="team-name">
+                {{ first.form.team_name }}
+              </p>
               <ol
-                v-if="summary.inForm.length === 1"
                 class="mt-4 grid grid-cols-5 gap-1.5"
                 aria-label="Points in each gameweek"
               >
                 <li
                   v-for="score in first.form.scores"
                   :key="score.week"
-                  class="rounded-md bg-slate-50 py-2 text-center dark:bg-slate-800/70"
+                  class="rounded-md bg-slate-50 py-4 text-center sm:py-5 dark:bg-slate-800/70"
                 >
                   <span class="block text-[11px] font-medium text-slate-500 dark:text-slate-400">GW {{ score.week }}</span><span
-                    class="mt-1 block text-sm font-bold tabular-nums"
+                    class="mt-1 block text-lg font-bold tabular-nums sm:text-xl"
                     :class="score.points < 0 ? 'text-red-600 dark:text-red-300' : 'text-slate-800 dark:text-slate-100'"
                   >{{ score.points }}</span>
                 </li>
               </ol>
-              <p
-                v-if="summary.inForm.length > 1"
-                class="stat-caption mt-2"
-              >
-                Joint highest total
-              </p>
             </div>
           </template>
         </article>
@@ -172,53 +166,48 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
             <p class="stat-caption">
               More than the previous five gameweeks
             </p>
-            <div class="stat-details space-y-5">
-              <div
-                v-for="team in summary.improved"
-                :key="team.drafted_team_id"
-              >
-                <p class="team-name">
-                  {{ team.team_name }}
-                </p>
-                <dl class="mt-3 space-y-2.5">
-                  <div>
-                    <div class="flex items-center justify-between gap-2 text-xs">
-                      <dt class="text-slate-500 dark:text-slate-400">
-                        Previous 5
-                      </dt><dd class="font-semibold tabular-nums text-slate-600 dark:text-slate-300">
-                        {{ team.previousPoints }} pts
-                      </dd>
-                    </div><div
-                      v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
-                      class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
-                      aria-hidden="true"
-                    >
-                      <div
-                        class="h-full rounded-full bg-slate-300 dark:bg-slate-600"
-                        :style="{ width: comparisonWidth(team.previousPoints ?? 0, team) }"
-                      />
-                    </div>
+            <div class="stat-details">
+              <p class="team-name">
+                {{ first.improved.team_name }}
+              </p>
+              <dl class="mt-4 space-y-4">
+                <div>
+                  <div class="flex items-center justify-between gap-2 text-sm">
+                    <dt class="text-slate-500 dark:text-slate-400">
+                      Previous 5
+                    </dt><dd class="font-semibold tabular-nums text-slate-600 dark:text-slate-300">
+                      {{ first.improved.previousPoints }} pts
+                    </dd>
+                  </div><div
+                    v-if="(first.improved.previousPoints ?? 0) >= 0 && first.improved.totalPoints >= 0"
+                    class="mt-2 h-3.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                    aria-hidden="true"
+                  >
+                    <div
+                      class="h-full rounded-full bg-slate-300 dark:bg-slate-600"
+                      :style="{ width: comparisonWidth(first.improved.previousPoints ?? 0, first.improved) }"
+                    />
                   </div>
-                  <div>
-                    <div class="flex items-center justify-between gap-2 text-xs">
-                      <dt class="text-slate-500 dark:text-slate-400">
-                        Last 5
-                      </dt><dd class="font-semibold tabular-nums text-slate-800 dark:text-slate-100">
-                        {{ team.totalPoints }} pts
-                      </dd>
-                    </div><div
-                      v-if="(team.previousPoints ?? 0) >= 0 && team.totalPoints >= 0"
-                      class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
-                      aria-hidden="true"
-                    >
-                      <div
-                        class="h-full rounded-full bg-primary dark:bg-primary-300"
-                        :style="{ width: comparisonWidth(team.totalPoints, team) }"
-                      />
-                    </div>
+                </div>
+                <div>
+                  <div class="flex items-center justify-between gap-2 text-sm">
+                    <dt class="text-slate-500 dark:text-slate-400">
+                      Last 5
+                    </dt><dd class="font-semibold tabular-nums text-slate-800 dark:text-slate-100">
+                      {{ first.improved.totalPoints }} pts
+                    </dd>
+                  </div><div
+                    v-if="(first.improved.previousPoints ?? 0) >= 0 && first.improved.totalPoints >= 0"
+                    class="mt-2 h-3.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+                    aria-hidden="true"
+                  >
+                    <div
+                      class="h-full rounded-full bg-primary dark:bg-primary-300"
+                      :style="{ width: comparisonWidth(first.improved.totalPoints, first.improved) }"
+                    />
                   </div>
-                </dl>
-              </div>
+                </div>
+              </dl>
             </div>
           </template>
           <p
@@ -245,6 +234,12 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
             >
               Regular high scorers
             </h3>
+            <RecentFormTies
+              v-if="extraScorers.length"
+              :teams="extraScorers"
+              :label="`Show ${extraScorers.length} more teams on ${extraScorerRecord}`"
+              :record="extraScorerRecord"
+            />
           </div>
           <template v-if="summary.regularScorers.length">
             <p class="stat-caption">
@@ -255,7 +250,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               aria-label="Regular high scorers"
             >
               <li
-                v-for="team in summary.regularScorers"
+                v-for="team in visibleScorers"
                 :key="team.drafted_team_id"
                 class="ranked-team"
               >
@@ -315,6 +310,12 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
             >
               Biggest climbers
             </h3>
+            <RecentFormTies
+              v-if="extraClimbers.length"
+              :teams="extraClimbers"
+              :label="`Show ${extraClimbers.length} more teams tied at ${extraClimberRecord}`"
+              :record="extraClimberRecord"
+            />
           </div>
           <template v-if="summary.climbers.length">
             <p class="stat-caption">
@@ -325,7 +326,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
               aria-label="Biggest climbers"
             >
               <li
-                v-for="team in summary.climbers"
+                v-for="team in visibleClimbers"
                 :key="team.drafted_team_id"
                 class="ranked-team"
               >
@@ -356,7 +357,7 @@ const comparisonWidth = (value: number, team: FormLeader) => `${value / Math.max
 @reference "@/assets/styles/base.css";
 .form-stat { @apply min-w-0 p-5 sm:p-6; container-type: inline-size; }
 .form-stat + .form-stat { @apply border-t border-slate-200 dark:border-slate-800; }
-.stat-heading { @apply flex items-center gap-2; }
+.stat-heading { @apply flex min-h-7 items-center gap-2; }
 .stat-title { @apply text-xs font-bold uppercase tracking-wide text-slate-700 dark:text-slate-200; }
 .stat-icon { @apply shrink-0 text-primary dark:text-primary-300; }
 .stat-value { @apply text-4xl font-bold leading-none tracking-tight tabular-nums; }

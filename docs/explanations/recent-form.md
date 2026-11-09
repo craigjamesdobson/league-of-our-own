@@ -15,7 +15,7 @@ Teams and score history are filtered to the Active Season. Score history is pagi
 - **Regular high scorers:** the teams with the most selected weeks strictly above that week's mean score across all Active Season teams. Equality does not count as above average.
 - **Biggest climbers:** the teams with the greatest positive rank improvement between the standings immediately before the period and those at its end. Rank by cumulative points, then cumulative goals. Teams equal on both share a competition rank, so arbitrary row ordering cannot create movement. Verified, complete score history through the end of the window is required; the opening week has no earlier standings baseline.
 
-Regular High Scorers and Biggest Climbers show the top three places, including ties at the cutoff. Teams sharing a place are ordered by name. In-form Team and Most Improved show all joint leaders. The selected-team cookie has no effect on calculations or ordering.
+Regular High Scorers ranks teams by weeks above average. Teams with the same record share a rank and are displayed in order of total points over the selected weeks, then by name. Biggest Climbers ranks teams by places gained, with tied teams ordered by name. Both columns show up to five teams and list additional teams with the fifth team's record in a popover. In-form Team and Most Improved break ties by goals scored in the displayed gameweeks, then by team name. The selected-team cookie has no effect on calculations or ordering.
 
 ## Interaction and loading
 

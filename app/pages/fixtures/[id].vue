@@ -14,6 +14,7 @@ type PageHeaderState = {
 
 definePageMeta({
   keepalive: true,
+  middleware: ['auth'],
 });
 
 const route = useRoute();

@@ -10,20 +10,6 @@ import {
 import { sendTransferRequestEmails } from '../utils/transferRequestEmail';
 import { assertOnlineTransferRequestsEnabled } from '../utils/onlineTransferRequests';
 
-type TransferRequestRpcClient = {
-  rpc: (
-    functionName: 'save_transfer_request',
-    args: Record<string, unknown>,
-  ) => Promise<{
-    data: {
-      transfer_request_id: number;
-      drafted_team_id: number;
-      target_gameweek: number;
-    } | null;
-    error: { message: string } | null;
-  }>;
-};
-
 const getTransferRequestValidationMessage = (message: string) => {
   const knownMessages = [
     'A transfer request is already pending for this team',
@@ -60,7 +46,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
-    const rpcClient = supabase as unknown as TransferRequestRpcClient;
 
     return await processTransferRequest(await readBody(event), {
       isRateLimited: () => isTransferRequestRateLimited(requesterIP),
@@ -94,7 +79,7 @@ export default defineEventHandler(async (event) => {
         if (teamError || !team || !team.allowed_transfers) {
           throw new TransferRequestError(422, 'Unable to submit transfer request');
         }
-        const { data, error } = await rpcClient.rpc('save_transfer_request', {
+        const { data, error } = await supabase.rpc('save_transfer_request', {
           p_active_season: activeSeason,
           p_drafted_team_id: team.drafted_team_id,
           p_team_name: team.team_name,
@@ -102,7 +87,7 @@ export default defineEventHandler(async (event) => {
           p_requester_name: request.requesterName,
           p_requester_email: request.requesterEmail,
           p_target_gameweek: targetGameweek,
-          p_transfer_request_id: pendingRequestId,
+          p_transfer_request_id: pendingRequestId ?? undefined,
           p_items: [
             {
               transfer_number: 1,

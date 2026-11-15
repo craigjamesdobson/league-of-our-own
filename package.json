@@ -15,7 +15,7 @@
     "test:ui": "vitest --ui",
     "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "build:cloudflare": "nuxi build --preset=cloudflare_pages",
-    "generate-types": "npx supabase gen types typescript --local > types/database-generated.types.ts",
+    "generate-types": "npx supabase gen types typescript --local > app/types/database-generated.types.ts",
     "db:restore-local": "./scripts/db-restore-local.sh",
     "db:restore-staging": "./scripts/db-restore-staging.sh",
     "db:rebuild-staging": "./scripts/db-rebuild-staging.sh",

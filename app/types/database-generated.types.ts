@@ -1,1007 +1,1454 @@
-export type Json
-  = | string
-    | number
-    | boolean
-    | null
-    | { [key: string]: Json | undefined }
-    | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
-    };
+    }
     Views: {
       [_ in never]: never
-    };
+    }
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
     Enums: {
       [_ in never]: never
-    };
+    }
     CompositeTypes: {
       [_ in never]: never
-    };
-  };
+    }
+  }
   public: {
     Tables: {
       drafted_players: {
         Row: {
-          created_at: string;
-          drafted_player: number | null;
-          drafted_player_id: number;
-          drafted_team: number | null;
-        };
+          created_at: string
+          drafted_player: number | null
+          drafted_player_id: number
+          drafted_team: number | null
+        }
         Insert: {
-          created_at?: string;
-          drafted_player?: number | null;
-          drafted_player_id?: number;
-          drafted_team?: number | null;
-        };
+          created_at?: string
+          drafted_player?: number | null
+          drafted_player_id?: number
+          drafted_team?: number | null
+        }
         Update: {
-          created_at?: string;
-          drafted_player?: number | null;
-          drafted_player_id?: number;
-          drafted_team?: number | null;
-        };
+          created_at?: string
+          drafted_player?: number | null
+          drafted_player_id?: number
+          drafted_team?: number | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'drafted_players_drafted_player_fkey';
-            columns: ['drafted_player'];
-            isOneToOne: false;
-            referencedRelation: 'players';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "drafted_players_drafted_player_fkey"
+            columns: ["drafted_player"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["player_id"]
           },
           {
-            foreignKeyName: 'drafted_players_drafted_player_fkey';
-            columns: ['drafted_player'];
-            isOneToOne: false;
-            referencedRelation: 'players_view';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "drafted_players_drafted_player_fkey"
+            columns: ["drafted_player"]
+            isOneToOne: false
+            referencedRelation: "players_view"
+            referencedColumns: ["player_id"]
           },
           {
-            foreignKeyName: 'drafted_players_drafted_team_fkey';
-            columns: ['drafted_team'];
-            isOneToOne: false;
-            referencedRelation: 'drafted_teams';
-            referencedColumns: ['drafted_team_id'];
+            foreignKeyName: "drafted_players_drafted_team_fkey"
+            columns: ["drafted_team"]
+            isOneToOne: false
+            referencedRelation: "drafted_teams"
+            referencedColumns: ["drafted_team_id"]
           },
-        ];
-      };
+        ]
+      }
       drafted_teams: {
         Row: {
-          active_season: string;
-          allow_communication: boolean;
-          allowed_transfers: boolean;
-          contact_number: string | null;
-          created_at: string;
-          drafted_team_id: number;
-          edited_count: number | null;
-          key: string;
-          team_email: string;
-          team_name: string;
-          team_owner: string;
-          total_team_value: number;
-          updated_at: string | null;
-        };
+          active_season: string
+          allow_communication: boolean
+          allowed_transfers: boolean
+          contact_number: string | null
+          created_at: string
+          drafted_team_id: number
+          edited_count: number | null
+          key: string
+          team_email: string
+          team_name: string
+          team_owner: string
+          total_team_value: number
+          updated_at: string | null
+        }
         Insert: {
-          active_season: string;
-          allow_communication?: boolean;
-          allowed_transfers: boolean;
-          contact_number?: string | null;
-          created_at?: string;
-          drafted_team_id?: number;
-          edited_count?: number | null;
-          key?: string;
-          team_email: string;
-          team_name: string;
-          team_owner: string;
-          total_team_value: number;
-          updated_at?: string | null;
-        };
+          active_season: string
+          allow_communication?: boolean
+          allowed_transfers: boolean
+          contact_number?: string | null
+          created_at?: string
+          drafted_team_id?: number
+          edited_count?: number | null
+          key?: string
+          team_email: string
+          team_name: string
+          team_owner: string
+          total_team_value: number
+          updated_at?: string | null
+        }
         Update: {
-          active_season?: string;
-          allow_communication?: boolean;
-          allowed_transfers?: boolean;
-          contact_number?: string | null;
-          created_at?: string;
-          drafted_team_id?: number;
-          edited_count?: number | null;
-          key?: string;
-          team_email?: string;
-          team_name?: string;
-          team_owner?: string;
-          total_team_value?: number;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
+          active_season?: string
+          allow_communication?: boolean
+          allowed_transfers?: boolean
+          contact_number?: string | null
+          created_at?: string
+          drafted_team_id?: number
+          edited_count?: number | null
+          key?: string
+          team_email?: string
+          team_name?: string
+          team_owner?: string
+          total_team_value?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       drafted_transfers: {
         Row: {
-          active_transfer_expiry: string | null;
-          created_at: string;
-          drafted_player: number;
-          drafted_transfer_id: number;
-          player_id: number;
-          transfer_week: number | null;
-        };
+          active_transfer_expiry: string | null
+          created_at: string
+          drafted_player: number
+          drafted_transfer_id: number
+          player_id: number
+          transfer_week: number | null
+        }
         Insert: {
-          active_transfer_expiry?: string | null;
-          created_at?: string;
-          drafted_player: number;
-          drafted_transfer_id?: number;
-          player_id: number;
-          transfer_week?: number | null;
-        };
+          active_transfer_expiry?: string | null
+          created_at?: string
+          drafted_player: number
+          drafted_transfer_id?: number
+          player_id: number
+          transfer_week?: number | null
+        }
         Update: {
-          active_transfer_expiry?: string | null;
-          created_at?: string;
-          drafted_player?: number;
-          drafted_transfer_id?: number;
-          player_id?: number;
-          transfer_week?: number | null;
-        };
+          active_transfer_expiry?: string | null
+          created_at?: string
+          drafted_player?: number
+          drafted_transfer_id?: number
+          player_id?: number
+          transfer_week?: number | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'drafted_transfers_drafted_player_fkey';
-            columns: ['drafted_player'];
-            isOneToOne: false;
-            referencedRelation: 'drafted_players';
-            referencedColumns: ['drafted_player_id'];
+            foreignKeyName: "drafted_transfers_drafted_player_fkey"
+            columns: ["drafted_player"]
+            isOneToOne: false
+            referencedRelation: "drafted_players"
+            referencedColumns: ["drafted_player_id"]
           },
           {
-            foreignKeyName: 'drafted_transfers_player_id_fkey';
-            columns: ['player_id'];
-            isOneToOne: false;
-            referencedRelation: 'players';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "drafted_transfers_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["player_id"]
           },
           {
-            foreignKeyName: 'drafted_transfers_player_id_fkey';
-            columns: ['player_id'];
-            isOneToOne: false;
-            referencedRelation: 'players_view';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "drafted_transfers_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players_view"
+            referencedColumns: ["player_id"]
           },
-        ];
-      };
+        ]
+      }
       fixtures: {
         Row: {
-          away_team: number | null;
-          away_team_score: number | null;
-          created_at: string;
-          game_week: number | null;
-          home_team: number | null;
-          home_team_score: number | null;
-          id: number;
-          populated_at: string | null;
-          populated_by: string | null;
-          verified_at: string | null;
-          verified_by: string | null;
-        };
+          away_team: number | null
+          away_team_score: number | null
+          created_at: string
+          game_week: number | null
+          home_team: number | null
+          home_team_score: number | null
+          id: number
+          populated_at: string | null
+          populated_by: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
         Insert: {
-          away_team?: number | null;
-          away_team_score?: number | null;
-          created_at?: string;
-          game_week?: number | null;
-          home_team?: number | null;
-          home_team_score?: number | null;
-          id?: number;
-          populated_at?: string | null;
-          populated_by?: string | null;
-          verified_at?: string | null;
-          verified_by?: string | null;
-        };
+          away_team?: number | null
+          away_team_score?: number | null
+          created_at?: string
+          game_week?: number | null
+          home_team?: number | null
+          home_team_score?: number | null
+          id?: number
+          populated_at?: string | null
+          populated_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
         Update: {
-          away_team?: number | null;
-          away_team_score?: number | null;
-          created_at?: string;
-          game_week?: number | null;
-          home_team?: number | null;
-          home_team_score?: number | null;
-          id?: number;
-          populated_at?: string | null;
-          populated_by?: string | null;
-          verified_at?: string | null;
-          verified_by?: string | null;
-        };
+          away_team?: number | null
+          away_team_score?: number | null
+          created_at?: string
+          game_week?: number | null
+          home_team?: number | null
+          home_team_score?: number | null
+          id?: number
+          populated_at?: string | null
+          populated_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'fixtures_populated_by_fkey';
-            columns: ['populated_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "fixtures_populated_by_fkey"
+            columns: ["populated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'fixtures_verified_by_fkey';
-            columns: ['verified_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "fixtures_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'public_fixtures_away_team_fkey';
-            columns: ['away_team'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id'];
+            foreignKeyName: "public_fixtures_away_team_fkey"
+            columns: ["away_team"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'public_fixtures_home_team_fkey';
-            columns: ['home_team'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id'];
+            foreignKeyName: "public_fixtures_home_team_fkey"
+            columns: ["home_team"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      player_previous_season_statistics: {
+        Row: {
+          assists: number
+          clean_sheets: number
+          goals: number
+          minutes: number
+          player_id: number
+          points: number
+          red_cards: number
+          season_name: string | null
+          synced_at: string
+        }
+        Insert: {
+          assists?: number
+          clean_sheets?: number
+          goals?: number
+          minutes?: number
+          player_id: number
+          points?: number
+          red_cards?: number
+          season_name?: string | null
+          synced_at?: string
+        }
+        Update: {
+          assists?: number
+          clean_sheets?: number
+          goals?: number
+          minutes?: number
+          player_id?: number
+          points?: number
+          red_cards?: number
+          season_name?: string | null
+          synced_at?: string
+        }
+        Relationships: []
+      }
       player_statistics: {
         Row: {
-          assists: number | null;
-          author: string | null;
-          clean_sheet: boolean | null;
-          created_at: string;
-          fixture_id: number;
-          goals: number | null;
-          id: number;
-          player_id: number;
-          points: number;
-          red_card: boolean | null;
-        };
+          assists: number | null
+          author: string | null
+          clean_sheet: boolean | null
+          created_at: string
+          fixture_id: number
+          goals: number | null
+          id: number
+          player_id: number
+          points: number
+          red_card: boolean | null
+        }
         Insert: {
-          assists?: number | null;
-          author?: string | null;
-          clean_sheet?: boolean | null;
-          created_at?: string;
-          fixture_id: number;
-          goals?: number | null;
-          id?: number;
-          player_id: number;
-          points: number;
-          red_card?: boolean | null;
-        };
+          assists?: number | null
+          author?: string | null
+          clean_sheet?: boolean | null
+          created_at?: string
+          fixture_id: number
+          goals?: number | null
+          id?: number
+          player_id: number
+          points: number
+          red_card?: boolean | null
+        }
         Update: {
-          assists?: number | null;
-          author?: string | null;
-          clean_sheet?: boolean | null;
-          created_at?: string;
-          fixture_id?: number;
-          goals?: number | null;
-          id?: number;
-          player_id?: number;
-          points?: number;
-          red_card?: boolean | null;
-        };
+          assists?: number | null
+          author?: string | null
+          clean_sheet?: boolean | null
+          created_at?: string
+          fixture_id?: number
+          goals?: number | null
+          id?: number
+          player_id?: number
+          points?: number
+          red_card?: boolean | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'public_player_statistics_fixture_id_fkey';
-            columns: ['fixture_id'];
-            isOneToOne: false;
-            referencedRelation: 'fixtures';
-            referencedColumns: ['id'];
+            foreignKeyName: "public_player_statistics_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'public_player_statistics_player_id_fkey';
-            columns: ['player_id'];
-            isOneToOne: false;
-            referencedRelation: 'players';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "public_player_statistics_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["player_id"]
           },
           {
-            foreignKeyName: 'public_player_statistics_player_id_fkey';
-            columns: ['player_id'];
-            isOneToOne: false;
-            referencedRelation: 'players_view';
-            referencedColumns: ['player_id'];
+            foreignKeyName: "public_player_statistics_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players_view"
+            referencedColumns: ["player_id"]
           },
-        ];
-      };
+        ]
+      }
       players: {
         Row: {
-          assists: number | null;
-          bonus: number | null;
-          bps: number | null;
-          chance_of_playing_next_round: string | null;
-          chance_of_playing_this_round: string | null;
-          clean_sheets: number | null;
-          clean_sheets_per_90: string | null;
-          code: number;
-          corners_and_indirect_freekicks_order: string | null;
-          corners_and_indirect_freekicks_text: string | null;
-          cost_change_event: number | null;
-          cost_change_event_fall: number | null;
-          cost_change_start: number | null;
-          cost_change_start_fall: number | null;
-          created_at: string | null;
-          creativity: string | null;
-          creativity_rank: number | null;
-          creativity_rank_type: number | null;
-          direct_freekicks_order: string | null;
-          direct_freekicks_text: string | null;
-          dreamteam_count: number | null;
-          element_type: number | null;
-          ep_next: string | null;
-          ep_this: string | null;
-          event_points: number | null;
-          expected_assists: string | null;
-          expected_assists_per_90: string | null;
-          expected_goal_involvements: string | null;
-          expected_goal_involvements_per_90: string | null;
-          expected_goals: string | null;
-          expected_goals_conceded: string | null;
-          expected_goals_conceded_per_90: string | null;
-          expected_goals_per_90: string | null;
-          first_name: string | null;
-          form: string | null;
-          form_rank: number | null;
-          form_rank_type: number | null;
-          goals_conceded: number | null;
-          goals_conceded_per_90: string | null;
-          goals_scored: number | null;
-          ict_index: string | null;
-          ict_index_rank: number | null;
-          ict_index_rank_type: number | null;
-          in_dreamteam: boolean | null;
-          influence: string | null;
-          influence_rank: number | null;
-          influence_rank_type: number | null;
-          minutes: number | null;
-          news: string | null;
-          news_added: string | null;
-          now_cost: number | null;
-          now_cost_rank: number | null;
-          now_cost_rank_type: number | null;
-          own_goals: number | null;
-          penalties_missed: number | null;
-          penalties_order: string | null;
-          penalties_saved: number | null;
-          penalties_text: string | null;
-          photo: string | null;
-          player_id: number;
-          points_per_game: string | null;
-          points_per_game_rank: number | null;
-          points_per_game_rank_type: number | null;
-          red_cards: number | null;
-          saves: number | null;
-          saves_per_90: string | null;
-          second_name: string | null;
-          selected_by_percent: string | null;
-          selected_rank: number | null;
-          selected_rank_type: number | null;
-          special: boolean | null;
-          squad_number: string | null;
-          starts: number | null;
-          starts_per_90: string | null;
-          status: string | null;
-          team: number;
-          team_code: number | null;
-          threat: string | null;
-          threat_rank: number | null;
-          threat_rank_type: number | null;
-          total_points: number | null;
-          transfers_in: number | null;
-          transfers_in_event: number | null;
-          transfers_out: number | null;
-          transfers_out_event: number | null;
-          updated_at: string | null;
-          value_form: string | null;
-          value_season: string | null;
-          web_name: string | null;
-          yellow_cards: number | null;
-        };
+          assists: number | null
+          bonus: number | null
+          bps: number | null
+          chance_of_playing_next_round: string | null
+          chance_of_playing_this_round: string | null
+          clean_sheets: number | null
+          clean_sheets_per_90: string | null
+          code: number
+          corners_and_indirect_freekicks_order: string | null
+          corners_and_indirect_freekicks_text: string | null
+          cost_change_event: number | null
+          cost_change_event_fall: number | null
+          cost_change_start: number | null
+          cost_change_start_fall: number | null
+          created_at: string | null
+          creativity: string | null
+          creativity_rank: number | null
+          creativity_rank_type: number | null
+          direct_freekicks_order: string | null
+          direct_freekicks_text: string | null
+          dreamteam_count: number | null
+          element_type: number | null
+          ep_next: string | null
+          ep_this: string | null
+          event_points: number | null
+          expected_assists: string | null
+          expected_assists_per_90: string | null
+          expected_goal_involvements: string | null
+          expected_goal_involvements_per_90: string | null
+          expected_goals: string | null
+          expected_goals_conceded: string | null
+          expected_goals_conceded_per_90: string | null
+          expected_goals_per_90: string | null
+          first_name: string | null
+          form: string | null
+          form_rank: number | null
+          form_rank_type: number | null
+          goals_conceded: number | null
+          goals_conceded_per_90: string | null
+          goals_scored: number | null
+          ict_index: string | null
+          ict_index_rank: number | null
+          ict_index_rank_type: number | null
+          in_dreamteam: boolean | null
+          influence: string | null
+          influence_rank: number | null
+          influence_rank_type: number | null
+          minutes: number | null
+          news: string | null
+          news_added: string | null
+          now_cost: number | null
+          now_cost_rank: number | null
+          now_cost_rank_type: number | null
+          own_goals: number | null
+          penalties_missed: number | null
+          penalties_order: string | null
+          penalties_saved: number | null
+          penalties_text: string | null
+          photo: string | null
+          player_id: number
+          points_per_game: string | null
+          points_per_game_rank: number | null
+          points_per_game_rank_type: number | null
+          red_cards: number | null
+          saves: number | null
+          saves_per_90: string | null
+          second_name: string | null
+          selected_by_percent: string | null
+          selected_rank: number | null
+          selected_rank_type: number | null
+          special: boolean | null
+          squad_number: string | null
+          starts: number | null
+          starts_per_90: string | null
+          status: string | null
+          team: number
+          team_code: number | null
+          threat: string | null
+          threat_rank: number | null
+          threat_rank_type: number | null
+          total_points: number | null
+          transfers_in: number | null
+          transfers_in_event: number | null
+          transfers_out: number | null
+          transfers_out_event: number | null
+          updated_at: string | null
+          value_form: string | null
+          value_season: string | null
+          web_name: string | null
+          yellow_cards: number | null
+        }
         Insert: {
-          assists?: number | null;
-          bonus?: number | null;
-          bps?: number | null;
-          chance_of_playing_next_round?: string | null;
-          chance_of_playing_this_round?: string | null;
-          clean_sheets?: number | null;
-          clean_sheets_per_90?: string | null;
-          code: number;
-          corners_and_indirect_freekicks_order?: string | null;
-          corners_and_indirect_freekicks_text?: string | null;
-          cost_change_event?: number | null;
-          cost_change_event_fall?: number | null;
-          cost_change_start?: number | null;
-          cost_change_start_fall?: number | null;
-          created_at?: string | null;
-          creativity?: string | null;
-          creativity_rank?: number | null;
-          creativity_rank_type?: number | null;
-          direct_freekicks_order?: string | null;
-          direct_freekicks_text?: string | null;
-          dreamteam_count?: number | null;
-          element_type?: number | null;
-          ep_next?: string | null;
-          ep_this?: string | null;
-          event_points?: number | null;
-          expected_assists?: string | null;
-          expected_assists_per_90?: string | null;
-          expected_goal_involvements?: string | null;
-          expected_goal_involvements_per_90?: string | null;
-          expected_goals?: string | null;
-          expected_goals_conceded?: string | null;
-          expected_goals_conceded_per_90?: string | null;
-          expected_goals_per_90?: string | null;
-          first_name?: string | null;
-          form?: string | null;
-          form_rank?: number | null;
-          form_rank_type?: number | null;
-          goals_conceded?: number | null;
-          goals_conceded_per_90?: string | null;
-          goals_scored?: number | null;
-          ict_index?: string | null;
-          ict_index_rank?: number | null;
-          ict_index_rank_type?: number | null;
-          in_dreamteam?: boolean | null;
-          influence?: string | null;
-          influence_rank?: number | null;
-          influence_rank_type?: number | null;
-          minutes?: number | null;
-          news?: string | null;
-          news_added?: string | null;
-          now_cost?: number | null;
-          now_cost_rank?: number | null;
-          now_cost_rank_type?: number | null;
-          own_goals?: number | null;
-          penalties_missed?: number | null;
-          penalties_order?: string | null;
-          penalties_saved?: number | null;
-          penalties_text?: string | null;
-          photo?: string | null;
-          player_id: number;
-          points_per_game?: string | null;
-          points_per_game_rank?: number | null;
-          points_per_game_rank_type?: number | null;
-          red_cards?: number | null;
-          saves?: number | null;
-          saves_per_90?: string | null;
-          second_name?: string | null;
-          selected_by_percent?: string | null;
-          selected_rank?: number | null;
-          selected_rank_type?: number | null;
-          special?: boolean | null;
-          squad_number?: string | null;
-          starts?: number | null;
-          starts_per_90?: string | null;
-          status?: string | null;
-          team: number;
-          team_code?: number | null;
-          threat?: string | null;
-          threat_rank?: number | null;
-          threat_rank_type?: number | null;
-          total_points?: number | null;
-          transfers_in?: number | null;
-          transfers_in_event?: number | null;
-          transfers_out?: number | null;
-          transfers_out_event?: number | null;
-          updated_at?: string | null;
-          value_form?: string | null;
-          value_season?: string | null;
-          web_name?: string | null;
-          yellow_cards?: number | null;
-        };
+          assists?: number | null
+          bonus?: number | null
+          bps?: number | null
+          chance_of_playing_next_round?: string | null
+          chance_of_playing_this_round?: string | null
+          clean_sheets?: number | null
+          clean_sheets_per_90?: string | null
+          code: number
+          corners_and_indirect_freekicks_order?: string | null
+          corners_and_indirect_freekicks_text?: string | null
+          cost_change_event?: number | null
+          cost_change_event_fall?: number | null
+          cost_change_start?: number | null
+          cost_change_start_fall?: number | null
+          created_at?: string | null
+          creativity?: string | null
+          creativity_rank?: number | null
+          creativity_rank_type?: number | null
+          direct_freekicks_order?: string | null
+          direct_freekicks_text?: string | null
+          dreamteam_count?: number | null
+          element_type?: number | null
+          ep_next?: string | null
+          ep_this?: string | null
+          event_points?: number | null
+          expected_assists?: string | null
+          expected_assists_per_90?: string | null
+          expected_goal_involvements?: string | null
+          expected_goal_involvements_per_90?: string | null
+          expected_goals?: string | null
+          expected_goals_conceded?: string | null
+          expected_goals_conceded_per_90?: string | null
+          expected_goals_per_90?: string | null
+          first_name?: string | null
+          form?: string | null
+          form_rank?: number | null
+          form_rank_type?: number | null
+          goals_conceded?: number | null
+          goals_conceded_per_90?: string | null
+          goals_scored?: number | null
+          ict_index?: string | null
+          ict_index_rank?: number | null
+          ict_index_rank_type?: number | null
+          in_dreamteam?: boolean | null
+          influence?: string | null
+          influence_rank?: number | null
+          influence_rank_type?: number | null
+          minutes?: number | null
+          news?: string | null
+          news_added?: string | null
+          now_cost?: number | null
+          now_cost_rank?: number | null
+          now_cost_rank_type?: number | null
+          own_goals?: number | null
+          penalties_missed?: number | null
+          penalties_order?: string | null
+          penalties_saved?: number | null
+          penalties_text?: string | null
+          photo?: string | null
+          player_id: number
+          points_per_game?: string | null
+          points_per_game_rank?: number | null
+          points_per_game_rank_type?: number | null
+          red_cards?: number | null
+          saves?: number | null
+          saves_per_90?: string | null
+          second_name?: string | null
+          selected_by_percent?: string | null
+          selected_rank?: number | null
+          selected_rank_type?: number | null
+          special?: boolean | null
+          squad_number?: string | null
+          starts?: number | null
+          starts_per_90?: string | null
+          status?: string | null
+          team: number
+          team_code?: number | null
+          threat?: string | null
+          threat_rank?: number | null
+          threat_rank_type?: number | null
+          total_points?: number | null
+          transfers_in?: number | null
+          transfers_in_event?: number | null
+          transfers_out?: number | null
+          transfers_out_event?: number | null
+          updated_at?: string | null
+          value_form?: string | null
+          value_season?: string | null
+          web_name?: string | null
+          yellow_cards?: number | null
+        }
         Update: {
-          assists?: number | null;
-          bonus?: number | null;
-          bps?: number | null;
-          chance_of_playing_next_round?: string | null;
-          chance_of_playing_this_round?: string | null;
-          clean_sheets?: number | null;
-          clean_sheets_per_90?: string | null;
-          code?: number;
-          corners_and_indirect_freekicks_order?: string | null;
-          corners_and_indirect_freekicks_text?: string | null;
-          cost_change_event?: number | null;
-          cost_change_event_fall?: number | null;
-          cost_change_start?: number | null;
-          cost_change_start_fall?: number | null;
-          created_at?: string | null;
-          creativity?: string | null;
-          creativity_rank?: number | null;
-          creativity_rank_type?: number | null;
-          direct_freekicks_order?: string | null;
-          direct_freekicks_text?: string | null;
-          dreamteam_count?: number | null;
-          element_type?: number | null;
-          ep_next?: string | null;
-          ep_this?: string | null;
-          event_points?: number | null;
-          expected_assists?: string | null;
-          expected_assists_per_90?: string | null;
-          expected_goal_involvements?: string | null;
-          expected_goal_involvements_per_90?: string | null;
-          expected_goals?: string | null;
-          expected_goals_conceded?: string | null;
-          expected_goals_conceded_per_90?: string | null;
-          expected_goals_per_90?: string | null;
-          first_name?: string | null;
-          form?: string | null;
-          form_rank?: number | null;
-          form_rank_type?: number | null;
-          goals_conceded?: number | null;
-          goals_conceded_per_90?: string | null;
-          goals_scored?: number | null;
-          ict_index?: string | null;
-          ict_index_rank?: number | null;
-          ict_index_rank_type?: number | null;
-          in_dreamteam?: boolean | null;
-          influence?: string | null;
-          influence_rank?: number | null;
-          influence_rank_type?: number | null;
-          minutes?: number | null;
-          news?: string | null;
-          news_added?: string | null;
-          now_cost?: number | null;
-          now_cost_rank?: number | null;
-          now_cost_rank_type?: number | null;
-          own_goals?: number | null;
-          penalties_missed?: number | null;
-          penalties_order?: string | null;
-          penalties_saved?: number | null;
-          penalties_text?: string | null;
-          photo?: string | null;
-          player_id?: number;
-          points_per_game?: string | null;
-          points_per_game_rank?: number | null;
-          points_per_game_rank_type?: number | null;
-          red_cards?: number | null;
-          saves?: number | null;
-          saves_per_90?: string | null;
-          second_name?: string | null;
-          selected_by_percent?: string | null;
-          selected_rank?: number | null;
-          selected_rank_type?: number | null;
-          special?: boolean | null;
-          squad_number?: string | null;
-          starts?: number | null;
-          starts_per_90?: string | null;
-          status?: string | null;
-          team?: number;
-          team_code?: number | null;
-          threat?: string | null;
-          threat_rank?: number | null;
-          threat_rank_type?: number | null;
-          total_points?: number | null;
-          transfers_in?: number | null;
-          transfers_in_event?: number | null;
-          transfers_out?: number | null;
-          transfers_out_event?: number | null;
-          updated_at?: string | null;
-          value_form?: string | null;
-          value_season?: string | null;
-          web_name?: string | null;
-          yellow_cards?: number | null;
-        };
+          assists?: number | null
+          bonus?: number | null
+          bps?: number | null
+          chance_of_playing_next_round?: string | null
+          chance_of_playing_this_round?: string | null
+          clean_sheets?: number | null
+          clean_sheets_per_90?: string | null
+          code?: number
+          corners_and_indirect_freekicks_order?: string | null
+          corners_and_indirect_freekicks_text?: string | null
+          cost_change_event?: number | null
+          cost_change_event_fall?: number | null
+          cost_change_start?: number | null
+          cost_change_start_fall?: number | null
+          created_at?: string | null
+          creativity?: string | null
+          creativity_rank?: number | null
+          creativity_rank_type?: number | null
+          direct_freekicks_order?: string | null
+          direct_freekicks_text?: string | null
+          dreamteam_count?: number | null
+          element_type?: number | null
+          ep_next?: string | null
+          ep_this?: string | null
+          event_points?: number | null
+          expected_assists?: string | null
+          expected_assists_per_90?: string | null
+          expected_goal_involvements?: string | null
+          expected_goal_involvements_per_90?: string | null
+          expected_goals?: string | null
+          expected_goals_conceded?: string | null
+          expected_goals_conceded_per_90?: string | null
+          expected_goals_per_90?: string | null
+          first_name?: string | null
+          form?: string | null
+          form_rank?: number | null
+          form_rank_type?: number | null
+          goals_conceded?: number | null
+          goals_conceded_per_90?: string | null
+          goals_scored?: number | null
+          ict_index?: string | null
+          ict_index_rank?: number | null
+          ict_index_rank_type?: number | null
+          in_dreamteam?: boolean | null
+          influence?: string | null
+          influence_rank?: number | null
+          influence_rank_type?: number | null
+          minutes?: number | null
+          news?: string | null
+          news_added?: string | null
+          now_cost?: number | null
+          now_cost_rank?: number | null
+          now_cost_rank_type?: number | null
+          own_goals?: number | null
+          penalties_missed?: number | null
+          penalties_order?: string | null
+          penalties_saved?: number | null
+          penalties_text?: string | null
+          photo?: string | null
+          player_id?: number
+          points_per_game?: string | null
+          points_per_game_rank?: number | null
+          points_per_game_rank_type?: number | null
+          red_cards?: number | null
+          saves?: number | null
+          saves_per_90?: string | null
+          second_name?: string | null
+          selected_by_percent?: string | null
+          selected_rank?: number | null
+          selected_rank_type?: number | null
+          special?: boolean | null
+          squad_number?: string | null
+          starts?: number | null
+          starts_per_90?: string | null
+          status?: string | null
+          team?: number
+          team_code?: number | null
+          threat?: string | null
+          threat_rank?: number | null
+          threat_rank_type?: number | null
+          total_points?: number | null
+          transfers_in?: number | null
+          transfers_in_event?: number | null
+          transfers_out?: number | null
+          transfers_out_event?: number | null
+          updated_at?: string | null
+          value_form?: string | null
+          value_season?: string | null
+          web_name?: string | null
+          yellow_cards?: number | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'players_team_fkey';
-            columns: ['team'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id'];
+            foreignKeyName: "players_team_fkey"
+            columns: ["team"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       profiles: {
         Row: {
-          avatar_url: string | null;
-          full_name: string | null;
-          id: string;
-          updated_at: string | null;
-          username: string | null;
-          website: string | null;
-        };
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+          website: string | null
+        }
         Insert: {
-          avatar_url?: string | null;
-          full_name?: string | null;
-          id: string;
-          updated_at?: string | null;
-          username?: string | null;
-          website?: string | null;
-        };
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
         Update: {
-          avatar_url?: string | null;
-          full_name?: string | null;
-          id?: string;
-          updated_at?: string | null;
-          username?: string | null;
-          website?: string | null;
-        };
-        Relationships: [];
-      };
-      settings: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      season_result_players: {
         Row: {
-          created_at: string | null;
-          setting_id: number;
-          setting_key: string;
-          setting_value: string;
-          updated_at: string | null;
-          updated_by: string | null;
-        };
+          club_name: string
+          club_short_name: string
+          id: number
+          player_display_name: string
+          position: string
+          season_result_id: number
+          squad_order: number
+        }
         Insert: {
-          created_at?: string | null;
-          setting_id?: number;
-          setting_key: string;
-          setting_value: string;
-          updated_at?: string | null;
-          updated_by?: string | null;
-        };
+          club_name: string
+          club_short_name: string
+          id?: number
+          player_display_name: string
+          position: string
+          season_result_id: number
+          squad_order: number
+        }
         Update: {
-          created_at?: string | null;
-          setting_id?: number;
-          setting_key?: string;
-          setting_value?: string;
-          updated_at?: string | null;
-          updated_by?: string | null;
-        };
-        Relationships: [];
-      };
-      teams: {
-        Row: {
-          id: number;
-          name: string | null;
-          short_name: string | null;
-        };
-        Insert: {
-          id: number;
-          name?: string | null;
-          short_name?: string | null;
-        };
-        Update: {
-          id?: number;
-          name?: string | null;
-          short_name?: string | null;
-        };
-        Relationships: [];
-      };
-      weekly_statistics: {
-        Row: {
-          assists: number | null;
-          clean_sheets: number | null;
-          created_at: string;
-          goals: number | null;
-          id: number;
-          points: number;
-          red_cards: number | null;
-          team: number | null;
-          week: number;
-        };
-        Insert: {
-          assists?: number | null;
-          clean_sheets?: number | null;
-          created_at?: string;
-          goals?: number | null;
-          id?: number;
-          points: number;
-          red_cards?: number | null;
-          team?: number | null;
-          week: number;
-        };
-        Update: {
-          assists?: number | null;
-          clean_sheets?: number | null;
-          created_at?: string;
-          goals?: number | null;
-          id?: number;
-          points?: number;
-          red_cards?: number | null;
-          team?: number | null;
-          week?: number;
-        };
+          club_name?: string
+          club_short_name?: string
+          id?: number
+          player_display_name?: string
+          position?: string
+          season_result_id?: number
+          squad_order?: number
+        }
         Relationships: [
           {
-            foreignKeyName: 'public_weekly_statistics_team_fkey';
-            columns: ['team'];
-            isOneToOne: false;
-            referencedRelation: 'drafted_teams';
-            referencedColumns: ['drafted_team_id'];
+            foreignKeyName: "season_result_players_result_id_fkey"
+            columns: ["season_result_id"]
+            isOneToOne: false
+            referencedRelation: "season_results"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
+        ]
+      }
+      season_result_transfers: {
+        Row: {
+          gameweek: number
+          id: number
+          incoming_club_name: string
+          incoming_club_short_name: string
+          incoming_player_display_name: string
+          outgoing_club_name: string
+          outgoing_club_short_name: string
+          outgoing_player_display_name: string
+          season_result_id: number
+          transfer_order: number
+        }
+        Insert: {
+          gameweek: number
+          id?: number
+          incoming_club_name: string
+          incoming_club_short_name: string
+          incoming_player_display_name: string
+          outgoing_club_name: string
+          outgoing_club_short_name: string
+          outgoing_player_display_name: string
+          season_result_id: number
+          transfer_order: number
+        }
+        Update: {
+          gameweek?: number
+          id?: number
+          incoming_club_name?: string
+          incoming_club_short_name?: string
+          incoming_player_display_name?: string
+          outgoing_club_name?: string
+          outgoing_club_short_name?: string
+          outgoing_player_display_name?: string
+          season_result_id?: number
+          transfer_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_result_transfers_result_id_fkey"
+            columns: ["season_result_id"]
+            isOneToOne: false
+            referencedRelation: "season_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      season_results: {
+        Row: {
+          final_position: number
+          final_score: number
+          id: number
+          owner_display_name: string
+          season_id: number
+          team_name: string
+        }
+        Insert: {
+          final_position: number
+          final_score: number
+          id?: number
+          owner_display_name: string
+          season_id: number
+          team_name: string
+        }
+        Update: {
+          final_position?: number
+          final_score?: number
+          id?: number
+          owner_display_name?: string
+          season_id?: number
+          team_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "season_results_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seasons: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          display_name: string
+          final_gameweek: number
+          id: number
+          season_key: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          display_name: string
+          final_gameweek: number
+          id?: number
+          season_key: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          display_name?: string
+          final_gameweek?: number
+          id?: number
+          season_key?: string
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          created_at: string | null
+          setting_id: number
+          setting_key: string
+          setting_value: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          setting_id?: number
+          setting_key: string
+          setting_value: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          setting_id?: number
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      teams: {
+        Row: {
+          id: number
+          name: string | null
+          short_name: string | null
+        }
+        Insert: {
+          id: number
+          name?: string | null
+          short_name?: string | null
+        }
+        Update: {
+          id?: number
+          name?: string | null
+          short_name?: string | null
+        }
+        Relationships: []
+      }
+      transfer_request_items: {
+        Row: {
+          drafted_player_id: number
+          player_id: number
+          player_in: string
+          player_out: string
+          transfer_number: number
+          transfer_request_id: number
+          transfer_request_item_id: number
+        }
+        Insert: {
+          drafted_player_id: number
+          player_id: number
+          player_in: string
+          player_out: string
+          transfer_number: number
+          transfer_request_id: number
+          transfer_request_item_id?: number
+        }
+        Update: {
+          drafted_player_id?: number
+          player_id?: number
+          player_in?: string
+          player_out?: string
+          transfer_number?: number
+          transfer_request_id?: number
+          transfer_request_item_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transfer_request_items_drafted_player_id_fkey"
+            columns: ["drafted_player_id"]
+            isOneToOne: false
+            referencedRelation: "drafted_players"
+            referencedColumns: ["drafted_player_id"]
+          },
+          {
+            foreignKeyName: "transfer_request_items_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["player_id"]
+          },
+          {
+            foreignKeyName: "transfer_request_items_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players_view"
+            referencedColumns: ["player_id"]
+          },
+          {
+            foreignKeyName: "transfer_request_items_transfer_request_id_fkey"
+            columns: ["transfer_request_id"]
+            isOneToOne: false
+            referencedRelation: "transfer_requests"
+            referencedColumns: ["transfer_request_id"]
+          },
+        ]
+      }
+      transfer_requests: {
+        Row: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+        Insert: {
+          active_season: string
+          cancelled_at?: string | null
+          created_at?: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_gameweek: number
+          transfer_request_id?: number
+        }
+        Update: {
+          active_season?: string
+          cancelled_at?: string | null
+          created_at?: string
+          drafted_team_id?: number
+          requester_email?: string
+          requester_name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          target_gameweek?: number
+          transfer_request_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transfer_requests_drafted_team_id_fkey"
+            columns: ["drafted_team_id"]
+            isOneToOne: false
+            referencedRelation: "drafted_teams"
+            referencedColumns: ["drafted_team_id"]
+          },
+        ]
+      }
+      weekly_statistics: {
+        Row: {
+          assists: number | null
+          clean_sheets: number | null
+          created_at: string
+          goals: number | null
+          id: number
+          points: number
+          red_cards: number | null
+          team: number | null
+          week: number
+        }
+        Insert: {
+          assists?: number | null
+          clean_sheets?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: number
+          points: number
+          red_cards?: number | null
+          team?: number | null
+          week: number
+        }
+        Update: {
+          assists?: number | null
+          clean_sheets?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: number
+          points?: number
+          red_cards?: number | null
+          team?: number | null
+          week?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_weekly_statistics_team_fkey"
+            columns: ["team"]
+            isOneToOne: false
+            referencedRelation: "drafted_teams"
+            referencedColumns: ["drafted_team_id"]
+          },
+        ]
+      }
+    }
     Views: {
       players_view: {
         Row: {
-          assists: number | null;
-          clean_sheets: number | null;
-          code: number | null;
-          cost: number | null;
-          first_name: string | null;
-          goals_scored: number | null;
-          image: string | null;
-          image_large: string | null;
-          is_unavailable: boolean | null;
-          minutes: number | null;
-          news: string | null;
-          player_id: number | null;
-          position: number | null;
-          red_cards: number | null;
-          second_name: string | null;
-          status: string | null;
-          team: number | null;
-          team_name: string | null;
-          team_short_name: string | null;
-          unavailable_for_season: boolean | null;
-          web_name: string | null;
-        };
+          assists: number | null
+          clean_sheets: number | null
+          code: number | null
+          cost: number | null
+          first_name: string | null
+          goals_scored: number | null
+          image: string | null
+          image_large: string | null
+          is_unavailable: boolean | null
+          minutes: number | null
+          news: string | null
+          player_id: number | null
+          position: number | null
+          red_cards: number | null
+          second_name: string | null
+          status: string | null
+          team: number | null
+          team_name: string | null
+          team_short_name: string | null
+          total_points: number | null
+          unavailable_for_season: boolean | null
+          web_name: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: 'players_team_fkey';
-            columns: ['team'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id'];
+            foreignKeyName: "players_team_fkey"
+            columns: ["team"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
+        ]
+      }
+    }
     Functions: {
+      approve_transfer_request: {
+        Args: { p_transfer_request_id: number }
+        Returns: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+      }
+      archive_completed_season: {
+        Args: {
+          archive_display_name: string
+          final_gameweek: number
+          source_season_key: string
+        }
+        Returns: {
+          player_count: number
+          season_id: number
+          team_count: number
+          transfer_count: number
+        }[]
+      }
+      cancel_transfer_request: {
+        Args: { p_team_key: string; p_transfer_request_id: number }
+        Returns: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+      }
+      cancel_transfer_request_item: {
+        Args: {
+          p_team_key: string
+          p_transfer_number: number
+          p_transfer_request_id: number
+        }
+        Returns: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+      }
+      clear_archived_season_operational_data: {
+        Args: { source_season_key: string }
+        Returns: {
+          club_count: number
+          drafted_player_count: number
+          drafted_team_count: number
+          fixture_count: number
+          player_count: number
+          player_statistic_count: number
+          transfer_count: number
+          weekly_statistic_count: number
+        }[]
+      }
+      close_team_registration_if_due: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_drafted_teams_and_players: {
-        Args: Record<PropertyKey, never>;
-        Returns: Json;
-      };
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_drafted_teams_by_season: {
-        Args: { active_season_param: string };
-        Returns: Json;
-      };
+        Args: { active_season_param: string }
+        Returns: Json
+      }
       get_drafted_teams_with_player_points_by_gameweek: {
-        Args: { active_season_param: string; game_week_param: number };
+        Args: { active_season_param: string; game_week_param: number }
         Returns: {
-          allowed_transfers: boolean;
-          drafted_team_id: number;
-          players: Json;
-          team_email: string;
-          team_name: string;
-          team_owner: string;
-        }[];
-      };
+          allowed_transfers: boolean
+          drafted_team_id: number
+          players: Json
+          team_email: string
+          team_name: string
+          team_owner: string
+          weekly_stats: Json
+        }[]
+      }
       get_drafted_teams_with_player_points_by_gameweek_2: {
-        Args: { game_week_param: number };
+        Args: { game_week_param: number }
         Returns: {
-          allowed_transfers: boolean;
-          drafted_team_id: number;
-          players: Json;
-          team_email: string;
-          team_name: string;
-          team_owner: string;
-          weekly_stats: Json;
-        }[];
-      };
+          allowed_transfers: boolean
+          drafted_team_id: number
+          players: Json
+          team_email: string
+          team_name: string
+          team_owner: string
+          weekly_stats: Json
+        }[]
+      }
       get_player_stats_by_team_id: {
-        Args: { team_id_param: number };
+        Args: { team_id_param: number }
         Returns: {
-          assists: number;
-          clean_sheets: number;
-          cost: number;
-          first_name: string;
-          goals_scored: number;
-          image: string;
-          image_large: string;
-          is_unavailable: boolean;
-          minutes: number;
-          news: string;
-          number_code: number;
-          player_id: number;
-          position: number;
-          red_cards: number;
-          second_name: string;
-          status: string;
-          team: number;
-          team_name: string;
-          team_short_name: string;
-          unavailable_for_season: boolean;
-          web_name: string;
-          week_assists: number;
-          week_cleansheet: boolean;
-          week_goals: number;
-          week_redcard: boolean;
-        }[];
-      };
+          assists: number
+          clean_sheets: number
+          cost: number
+          first_name: string
+          goals_scored: number
+          image: string
+          image_large: string
+          is_unavailable: boolean
+          minutes: number
+          news: string
+          number_code: number
+          player_id: number
+          position: number
+          red_cards: number
+          second_name: string
+          status: string
+          team: number
+          team_name: string
+          team_short_name: string
+          unavailable_for_season: boolean
+          web_name: string
+          week_assists: number
+          week_cleansheet: boolean
+          week_goals: number
+          week_redcard: boolean
+        }[]
+      }
       get_player_stats_by_team_id_for_fixture: {
-        Args: { fixture_id_param: number; team_id_param: number };
+        Args: { fixture_id_param: number; team_id_param: number }
         Returns: {
-          assists: number;
-          clean_sheets: number;
-          code: number;
-          cost: number;
-          first_name: string;
-          goals_scored: number;
-          image: string;
-          image_large: string;
-          is_unavailable: boolean;
-          minutes: number;
-          news: string;
-          player_id: number;
-          position: number;
-          red_cards: number;
-          second_name: string;
-          status: string;
-          team: number;
-          team_name: string;
-          team_short_name: string;
-          unavailable_for_season: boolean;
-          web_name: string;
-          week_assists: number;
-          week_cleansheet: boolean;
-          week_goals: number;
-          week_redcard: boolean;
-        }[];
-      };
+          assists: number
+          clean_sheets: number
+          code: number
+          cost: number
+          first_name: string
+          goals_scored: number
+          image: string
+          image_large: string
+          is_unavailable: boolean
+          minutes: number
+          news: string
+          player_id: number
+          position: number
+          red_cards: number
+          second_name: string
+          status: string
+          team: number
+          team_name: string
+          team_short_name: string
+          unavailable_for_season: boolean
+          web_name: string
+          week_assists: number
+          week_cleansheet: boolean
+          week_goals: number
+          week_redcard: boolean
+        }[]
+      }
       get_player_team: {
-        Args: Record<PropertyKey, never>;
+        Args: Record<PropertyKey, never>
         Returns: {
-          team_id: number;
-          team_name: string;
-          web_name: string;
-        }[];
-      };
+          team_id: number
+          team_name: string
+          web_name: string
+        }[]
+      }
       get_weekly_stats_for_gameweek: {
         Args:
           | { active_season_param: string; target_week: number }
-          | { target_week: number };
+          | { target_week: number }
         Returns: {
-          assists: number;
-          clean_sheets: number;
-          drafted_team_id: number;
-          goals: number;
-          prev_week_position: number;
-          red_cards: number;
-          team_name: string;
-          team_owner: string;
-          total_points: number;
-          week_points: number;
-          weekly_winner: boolean;
-        }[];
-      };
+          assists: number
+          clean_sheets: number
+          drafted_team_id: number
+          goals: number
+          prev_week_position: number
+          red_cards: number
+          team_name: string
+          team_owner: string
+          total_points: number
+          week_points: number
+          weekly_winner: boolean
+        }[]
+      }
       get_weekly_winners: {
-        Args: Record<PropertyKey, never>;
+        Args: Record<PropertyKey, never>
         Returns: {
-          points: number;
-          top_teams: Json[];
-          week: number;
-        }[];
-      };
+          points: number
+          top_teams: Json[]
+          week: number
+        }[]
+      }
       insert_or_update_data: {
-        Args: { id_field: number; other_field: string };
-        Returns: undefined;
-      };
-    };
+        Args: { id_field: number; other_field: string }
+        Returns: undefined
+      }
+      reject_transfer_request: {
+        Args: { p_transfer_request_id: number }
+        Returns: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+      }
+      save_team_submission: {
+        Args: {
+          p_active_season: string
+          p_allow_communication: boolean
+          p_allowed_transfers: boolean
+          p_contact_number: string
+          p_edit_key: string
+          p_player_ids: number[]
+          p_team_email: string
+          p_team_name: string
+          p_team_owner: string
+          p_total_team_value: number
+        }
+        Returns: {
+          active_season: string
+          allow_communication: boolean
+          allowed_transfers: boolean
+          contact_number: string | null
+          created_at: string
+          drafted_team_id: number
+          edited_count: number | null
+          key: string
+          team_email: string
+          team_name: string
+          team_owner: string
+          total_team_value: number
+          updated_at: string | null
+        }
+      }
+      save_transfer_request: {
+        Args: {
+          p_active_season: string
+          p_drafted_team_id: number
+          p_items: Json
+          p_requester_email: string
+          p_requester_name: string
+          p_target_gameweek: number
+          p_team_key: string
+          p_team_name: string
+          p_transfer_request_id?: number
+        }
+        Returns: {
+          active_season: string
+          cancelled_at: string | null
+          created_at: string
+          drafted_team_id: number
+          requester_email: string
+          requester_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          target_gameweek: number
+          transfer_request_id: number
+        }
+      }
+    }
     Enums: {
       [_ in never]: never
-    };
+    }
     CompositeTypes: {
       [_ in never]: never
-    };
-  };
-};
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-      & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-    & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
-      Row: infer R;
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
     }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
       ? R
       : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables']
-    & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables']
-      & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R;
-      }
-        ? R
-        : never
-    : never;
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema['Tables']
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-    Insert: infer I;
-  }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I;
-    }
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
       ? I
       : never
-    : never;
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema['Tables']
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-    Update: infer U;
-  }
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U;
-    }
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
       ? U
       : never
-    : never;
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema['Enums']
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
-    : never;
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema['CompositeTypes']
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-    : never;
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   graphql_public: {
@@ -1010,4 +1457,5 @@ export const Constants = {
   public: {
     Enums: {},
   },
-} as const;
+} as const
+

@@ -151,7 +151,7 @@ server/
 
 **Type Generation**:
 ```bash
-pnpm generate-types              # Generate from remote Supabase project
+pnpm generate-types              # Generate from the local Supabase instance
 ```
 
 **Type System**:

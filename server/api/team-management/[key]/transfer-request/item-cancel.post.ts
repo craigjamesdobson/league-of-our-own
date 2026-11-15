@@ -5,20 +5,6 @@ import { assertOnlineTransferRequestsEnabled } from '../../../../utils/onlineTra
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-type CancelTransferRequestItemRpcClient = {
-  rpc: (
-    functionName: 'cancel_transfer_request_item',
-    args: {
-      p_transfer_request_id: number;
-      p_transfer_number: number;
-      p_team_key: string;
-    },
-  ) => Promise<{
-    data: { transfer_request_id: number } | null;
-    error: { message: string } | null;
-  }>;
-};
-
 export default defineEventHandler(async (event) => {
   await assertOnlineTransferRequestsEnabled();
   const key = getRouterParam(event, 'key');
@@ -53,8 +39,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
-  const rpcClient = supabase as unknown as CancelTransferRequestItemRpcClient;
-  const { data, error } = await rpcClient.rpc('cancel_transfer_request_item', {
+  const { data, error } = await supabase.rpc('cancel_transfer_request_item', {
     p_transfer_request_id: transferRequestId,
     p_transfer_number: transferNumber,
     p_team_key: key,

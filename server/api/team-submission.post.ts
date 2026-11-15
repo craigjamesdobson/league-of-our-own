@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '~/types/database.types';
 import {
   processTeamSubmission,
-  type SavedTeam,
   type SaveTeamSubmission,
   type SaveTeamResult,
   TeamSubmissionError,
@@ -11,16 +10,6 @@ import {
   sendCreatedTeamEmails,
 } from '../utils/teamSubmissionEmail';
 import { APP_SETTING_KEYS, parseAppSettings } from '../../shared/utils/appSettings';
-
-type SubmissionRpcClient = {
-  rpc: (
-    functionName: 'save_team_submission',
-    args: Record<string, unknown>,
-  ) => Promise<{
-    data: SavedTeam | null;
-    error: { code?: string; details?: string; message: string } | null;
-  }>;
-};
 
 const EMAIL_UNIQUE_INDEX = 'drafted_teams_season_email_unique';
 const NAME_UNIQUE_INDEX = 'drafted_teams_season_name_unique';
@@ -41,7 +30,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
-    const rpcClient = supabase as unknown as SubmissionRpcClient;
 
     return await processTeamSubmission(await readBody(event), {
       loadAppSettings: async () => {
@@ -84,7 +72,7 @@ export default defineEventHandler(async (event) => {
         return data ?? [];
       },
       saveTeam: async (submission: SaveTeamSubmission): Promise<SaveTeamResult> => {
-        const { data, error } = await rpcClient.rpc('save_team_submission', {
+        const { data, error } = await supabase.rpc('save_team_submission', {
           p_active_season: submission.activeSeason,
           p_allow_communication: submission.allowCommunication,
           p_allowed_transfers: submission.allowedTransfers,

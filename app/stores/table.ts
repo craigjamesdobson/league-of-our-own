@@ -37,7 +37,6 @@ export const useTableStore = defineStore('table-store', () => {
       throw new Error(error.message);
     }
 
-    // @ts-expect-error - type returned from supabase is not correct
     weeklyWinners.value = data;
   };
 

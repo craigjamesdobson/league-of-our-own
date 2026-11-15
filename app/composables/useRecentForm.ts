@@ -2,6 +2,7 @@ import { computed, onScopeDispose, readonly, ref, watch, type Ref } from 'vue';
 import { z } from 'zod';
 import type { Database } from '~/types/database.types';
 import { useAppSettings } from '~/composables/useAppSettings';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
 import { getRecentFormSummary, type FormFixture, type FormScore, type FormTeam } from '~/logic/recent-form';
 
 const teamsSchema = z.array(z.object({
@@ -24,6 +25,7 @@ const fixturesSchema = z.array(z.object({
 export function useRecentForm(gameweek: Readonly<Ref<number | null>>) {
   const supabase = useSupabaseClient<Database>();
   const { activeSeason } = useAppSettings();
+  const { weeklyStatisticsRevision } = useLeagueDataChanges();
   const teams = ref<FormTeam[]>([]);
   const scores = ref<FormScore[]>([]);
   const fixtures = ref<FormFixture[]>([]);
@@ -42,17 +44,19 @@ export function useRecentForm(gameweek: Readonly<Ref<number | null>>) {
     return [...page, ...await fetchScores(season, week, offset + 1000)];
   };
 
-  const load = async () => {
+  const fetchForm = async ({ keepCurrent }: { keepCurrent: boolean }) => {
     const request = ++requestId;
     const week = gameweek.value;
     const season = activeSeason.value;
-    teams.value = [];
-    scores.value = [];
-    fixtures.value = [];
-    error.value = null;
+    if (!keepCurrent) {
+      teams.value = [];
+      scores.value = [];
+      fixtures.value = [];
+      error.value = null;
+    }
     isLoading.value = false;
     if (week === null || !season) return;
-    isLoading.value = true;
+    isLoading.value = !keepCurrent;
 
     try {
       const [teamResult, scoreResult, fixtureResult] = await Promise.all([
@@ -71,14 +75,18 @@ export function useRecentForm(gameweek: Readonly<Ref<number | null>>) {
       fixtures.value = parsedFixtures;
     }
     catch {
-      if (request === requestId) error.value = 'Recent form could not be loaded. Please try again.';
+      if (request === requestId && !keepCurrent) error.value = 'Recent form could not be loaded. Please try again.';
     }
     finally {
       if (request === requestId) isLoading.value = false;
     }
   };
 
+  const load = () => fetchForm({ keepCurrent: false });
+  const refresh = () => fetchForm({ keepCurrent: teams.value.length > 0 });
+
   watch([gameweek, activeSeason], load, { immediate: true });
+  watch(weeklyStatisticsRevision, refresh);
   onScopeDispose(() => {
     requestId += 1;
   });

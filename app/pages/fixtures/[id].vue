@@ -72,13 +72,10 @@ const updateFixture = async () => {
   if (!homePlayers.value || !awayPlayers.value) throw new Error('No players');
 
   try {
-    const a = fixtureStore.updateFixtureScore(fixture.value);
-    const b = fixtureStore.updatePlayerStatistics(
+    const savedFixture = await fixtureStore.saveFixtureResult(
+      fixture.value,
       [...homePlayers.value, ...awayPlayers.value],
-      fixture.value.id,
     );
-
-    const [savedFixture] = await Promise.all([a, b]);
     if (savedFixture) fixture.value = savedFixture;
 
     await navigateTo({

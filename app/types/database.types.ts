@@ -1,5 +1,5 @@
 import type { MergeDeep } from 'type-fest';
-import type { Database as DatabaseGenerated } from './database-generated.types';
+import type { Database as DatabaseGenerated, Json } from './database-generated.types';
 import type { DraftedTeamWithPlayers } from './DraftedTeam';
 import type { WeeklyWinners } from './Table';
 
@@ -24,6 +24,15 @@ export type Database = MergeDeep<
         };
         get_weekly_winners: {
           Returns: WeeklyWinners[];
+        };
+        save_fixture_result: {
+          Args: {
+            p_fixture_id: number;
+            p_home_team_score: number;
+            p_away_team_score: number;
+            p_player_statistics: Json;
+          };
+          Returns: undefined;
         };
         save_team_submission: {
           Args: {

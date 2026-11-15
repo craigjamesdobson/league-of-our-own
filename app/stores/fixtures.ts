@@ -3,13 +3,7 @@ import { usePlayerStore } from './players';
 import type { Fixture } from '~/types/Fixture';
 import type { Player, PlayerWithStats } from '~/types/Player';
 import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
-import type {
-  Database,
-  Tables,
-  TablesInsert,
-} from '~/types/database.types';
-
-const route = useRoute();
+import type { Database, Tables } from '~/types/database.types';
 
 const getPlayersWithStats = (players: PlayerWithStats[]) => {
   return players!.filter((player) => {
@@ -67,6 +61,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
   const supabase = useSupabaseClient<Database>();
   const playerStore = usePlayerStore();
   const { notifyPlayerStatisticsChanged } = useLeagueDataChanges();
+  const route = useRoute();
 
   const fixtures: Ref<Fixture[] | null> = ref(null);
   const selectedGameweek = ref(+(route.query.week || 1));
@@ -130,24 +125,27 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     return data;
   };
 
-  const updateFixtureScore = async (fixtureData: Fixture) => {
-    const user = useSupabaseUser();
-    const currentTime = new Date().toISOString();
-
-    const formattedFixture: TablesInsert<'fixtures'> = {
-      id: fixtureData.id,
-      home_team_score: fixtureData.home_team_score,
-      away_team_score: fixtureData.away_team_score,
-      populated_by: user.value?.id || null,
-      populated_at: currentTime,
-    };
-
-    const { error } = await supabase
-      .from('fixtures')
-      .upsert(formattedFixture)
-      .select();
+  const saveFixtureResult = async (
+    fixtureData: Fixture,
+    playersWithStats: PlayerWithStats[],
+  ) => {
+    const { error } = await supabase.rpc('save_fixture_result', {
+      p_fixture_id: fixtureData.id,
+      p_home_team_score: fixtureData.home_team_score,
+      p_away_team_score: fixtureData.away_team_score,
+      p_player_statistics: getPlayersWithStats(playersWithStats).map(player => ({
+        player_id: player.player_id,
+        goals: player.week_goals,
+        assists: player.week_assists,
+        clean_sheet: player.week_cleansheet,
+        red_card: player.week_redcard,
+        points: player.week_points,
+      })),
+    });
 
     if (error) throw new Error(error.message);
+
+    notifyPlayerStatisticsChanged();
 
     return await fetchFixtureByID(fixtureData.id);
   };
@@ -175,44 +173,6 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     if (error) throw new Error(error.message);
 
     return populatePlayersWithStats([...playerStore.players], data, teamID);
-  };
-
-  const updatePlayerStatistics = async (
-    PlayersWithStats: PlayerWithStats[],
-    fixtureID: number,
-  ) => {
-    const user = useSupabaseUser();
-
-    const { error: deleteError } = await supabase
-      .from('player_statistics')
-      .delete()
-      .eq('fixture_id', fixtureID);
-
-    if (deleteError) throw new Error(deleteError.message);
-
-    const filteredPlayers = getPlayersWithStats(PlayersWithStats);
-
-    const formattedPlayers = filteredPlayers.map((x) => {
-      return {
-        player_id: x.player_id,
-        fixture_id: fixtureID,
-        goals: x.week_goals,
-        assists: x.week_assists,
-        clean_sheet: x.week_cleansheet,
-        red_card: x.week_redcard,
-        points: x.week_points,
-        author: user.value?.id || null,
-      };
-    });
-
-    const { error } = await supabase
-      .from('player_statistics')
-      .insert(formattedPlayers)
-      .select();
-
-    if (error) throw new Error(error.message);
-
-    notifyPlayerStatisticsChanged();
   };
 
   const getUserFullName = (profile: { full_name: string | null } | null | undefined) => {
@@ -259,8 +219,7 @@ export const useFixtureStore = defineStore('fixture-store', () => {
     fetchFixtureByID,
     fetchPlayersWithStatistics,
     fetchPlayersWithStatisticsByGameweek,
-    updateFixtureScore,
-    updatePlayerStatistics,
+    saveFixtureResult,
     updateFixtureVerificationStatus,
     getUserFullName,
     checkWeekVerificationStatus,

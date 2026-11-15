@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { flushPromises } from '@vue/test-utils';
 import { mockNuxtImport } from '@nuxt/test-utils/runtime';
 import { useRecentForm } from '~/composables/useRecentForm';
+import { useLeagueDataChanges } from '~/composables/useLeagueDataChanges';
 import { withSetup } from '~/tests/setup';
 import { formFixtures, formScores, formTeams } from './fixtures';
 
@@ -139,6 +140,38 @@ describe('recent form data loading', () => {
     await flushPromises();
     expect(form.summary.value.weeks).toEqual([]);
     expect(mockEq).toHaveBeenCalledWith('active_season', '27-28');
+    app.unmount();
+  });
+
+  it('refreshes after a gameweek is saved while keeping the current form on screen', async () => {
+    const [form, app] = withSetup(() => useRecentForm(ref(6)));
+    await flushPromises();
+    const { notifyWeeklyStatisticsChanged } = useLeagueDataChanges();
+    const callsBeforeSave = mockFrom.mock.calls.length;
+
+    notifyWeeklyStatisticsChanged();
+    await nextTick();
+
+    expect(form.isLoading.value).toBe(false);
+    expect(form.summary.value.weeks).toEqual([2, 3, 4, 5, 6]);
+
+    await flushPromises();
+
+    expect(mockFrom.mock.calls.length).toBe(callsBeforeSave + 3);
+    expect(form.summary.value.weeks).toEqual([2, 3, 4, 5, 6]);
+    app.unmount();
+  });
+
+  it('keeps the current form when a refresh after a save fails', async () => {
+    const [form, app] = withSetup(() => useRecentForm(ref(6)));
+    await flushPromises();
+    mockFrom.mockImplementation(() => chain({ data: null, error: { message: 'Offline' } }));
+
+    useLeagueDataChanges().notifyWeeklyStatisticsChanged();
+    await flushPromises();
+
+    expect(form.error.value).toBeNull();
+    expect(form.summary.value.weeks).toEqual([2, 3, 4, 5, 6]);
     app.unmount();
   });
 });
